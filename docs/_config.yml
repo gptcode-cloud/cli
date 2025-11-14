@@ -1,0 +1,11 @@
+title: "Chuchu"
+theme: null
+markdown: kramdown
+exclude:
+  - README.md
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: "default"

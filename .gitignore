@@ -1,0 +1,38 @@
+# Binaries
+chu
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binaries
+*.test
+
+# Go workspace file
+go.work
+
+# Output of the go coverage tool
+*.out
+
+# Dependency directories
+vendor/
+
+# Build artifacts
+dist/
+build/
+bin/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# User config (should stay local)
+.chuchu/
