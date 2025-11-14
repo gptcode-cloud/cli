@@ -115,15 +115,127 @@ Across all languages (Elixir, Ruby, JS/TS, Go, etc.):
 
 ---
 
-## 5. Code Structure and Naming
+## 5. Naming Conventions
 
-When designing modules, classes, or functions:
+Naming is one of the most critical aspects of code quality. Names must reveal intent, be searchable, and avoid encoding.
 
-- Modules/types: nouns that represent domain concepts, e.g. `InvoiceTotal`, `OrderProcessor`.
-- Functions/methods: verbs that represent operations, e.g. `calculate_total`, `validate_order`, `build_response`.
-- Avoid vague names like `helper`, `utils`, `manager` when you can choose more precise names.
+### 5.1 Core Principles (Clean Code, Code Complete)
 
-If you see a chance to improve a name without breaking clarity, you should propose it.
+**Be Descriptive and Intent-Revealing**
+A name should answer:
+- Why does it exist?
+- What does it do?
+- How is it used?
+
+```python
+# Bad: What does this represent?
+d = 42
+
+# Good: Clear intent
+days_since_last_login = 42
+```
+
+**Choose Searchable Names**
+- Use full, pronounceable words
+- Avoid single-letter names (except loop indices in small scopes)
+- Avoid cryptic abbreviations
+
+```typescript
+// Bad: Hard to search, hard to pronounce
+const yyyymmdstr = format(new Date(), 'yyyy/MM/dd')
+
+// Good: Searchable and pronounceable
+const currentDateFormatted = format(new Date(), 'yyyy/MM/dd')
+```
+
+**Avoid Encoding Type (Anti-Hungarian Notation)**
+- Don't prefix with data types
+- Modern IDEs/editors show types on hover
+
+```go
+// Bad: Type encoded in name
+strName := "John"
+iAge := 30
+
+// Good: Clean, type is inferred
+name := "John"
+age := 30
+```
+
+### 5.2 Naming by Role
+
+**Modules/Classes/Types** → Nouns representing domain concepts:
+- `InvoiceCalculator`, `OrderProcessor`, `UserRepository`
+- NOT: `InvoiceHelper`, `OrderManager`, `UserUtils`
+
+**Functions/Methods** → Verbs representing operations:
+- `calculate_total`, `validate_order`, `build_response`
+- `is_valid`, `has_permission`, `can_process` (predicates)
+- NOT: `do_stuff`, `handle`, `process` (too vague)
+
+**Variables** → Nouns, should reveal what they hold:
+- `active_users`, `total_amount`, `error_message`
+- NOT: `data`, `info`, `temp`, `x`
+
+**Constants** → ALL_CAPS or camelCase depending on language:
+- `MAX_RETRY_ATTEMPTS`, `DEFAULT_TIMEOUT_MS`
+- Should read like prose: `if retry_count > MAX_RETRY_ATTEMPTS`
+
+### 5.3 Context and Scope
+
+**Use longer names for wider scopes:**
+```ruby
+# Bad: Too short for module-level
+def calc(items)
+  # ...
+end
+
+# Good: Clear at any distance
+def calculate_invoice_total(line_items)
+  # ...
+end
+```
+
+**Shorter names OK in tight scopes:**
+```elixir
+# OK: Loop variable in small scope
+Enum.map(items, fn i -> i.price * i.quantity end)
+
+# Better for larger scope:
+Enum.map(line_items, fn item -> 
+  item.price * item.quantity 
+end)
+```
+
+### 5.4 Red Flags
+
+Challenge any name that includes:
+- `manager`, `helper`, `utils`, `handler` → Usually too vague
+- `data`, `info`, `object` → Says nothing about content
+- `do_`, `perform_`, `execute_` → Redundant verb prefix
+- `temp`, `tmp`, `x`, `foo` → Placeholder that stuck around
+
+### 5.5 Validation Process
+
+**Before accepting any name, ask:**
+1. Can I pronounce it in a conversation?
+2. Can I search for it across the codebase?
+3. Does it reveal intent without needing a comment?
+4. Would a new team member understand it?
+
+If the answer to any is "no", propose a better name.
+
+### Comments
+
+**NEVER write useless comments.**
+
+- Comments that simply restate what the code does are noise: `// Memory file`, `// Loop through items`, `// Set variable`.
+- If the code is clear, no comment is needed.
+- Only add comments for:
+  - Non-obvious **why** decisions or trade-offs
+  - Complex algorithms that benefit from explanation
+  - TODOs or known limitations
+- When in doubt, improve the code clarity instead of adding a comment.
 
 ---
 
@@ -176,8 +288,9 @@ Before finalizing any answer, mentally check:
 1. Did I think before coding and restate the problem when necessary?
 2. Did I either write tests first or clearly describe how tests drive the implementation?
 3. Is the code broken into small, understandable pieces?
-4. Are names intention-revealing?
-5. Did I handle edge cases or at least call them out?
-6. Is this something a senior engineer would be comfortable owning in production?
+4. **Are names intention-revealing, pronounceable, and searchable?**
+5. Did I avoid vague names like `helper`, `manager`, `data`, `temp`?
+6. Did I handle edge cases or at least call them out?
+7. Is this something a senior engineer would be comfortable owning in production?
 
 If the answer to any of these is "no", improve the answer before sending it.
