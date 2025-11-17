@@ -1,4 +1,4 @@
-# Chuchu 🐶
+# Chuchu 🐺
 
 Strict, impatient, TDD-first coding companion for your **terminal** and **Neovim**.
 
@@ -142,12 +142,19 @@ Using **lazy.nvim**:
 Available commands:
 
 ```
-:ChuchuCode         (,cd) - Generate TDD code
-:ChuchuVerified     (,vf) - Mark code as verified/good
-:ChuchuFailed       (,fr) - Mark code as failed/bad
-:ChuchuShell        (,xs) - Get help with shell commands
-:ChuchuToggleChat   (,cc) - Toggle conversation panel
+:ChuchuChat         (<leader>cd / Ctrl+d) - Open/toggle chat panel
+:ChuchuVerified     (<leader>vf / Ctrl+v) - Mark code as verified/good
+:ChuchuFailed       (<leader>fr / Ctrl+r) - Mark code as failed/bad
+:ChuchuShell        (<leader>xs / Ctrl+x) - Get help with shell commands
 ```
+
+**Chat Usage:**
+- Press `Ctrl+d` or `,cd` to open the chat panel
+- Type your message in the area below the `---` separator (insert mode)
+- Press `Esc` to exit insert mode, then `Enter` to send
+- You'll see "_Thinking..._" while waiting for response
+- When the LLM returns code blocks, tabs are created automatically
+- Press `Ctrl+d` again to close the chat panel
 
 ---
 
@@ -281,6 +288,44 @@ Chuchu: Tests first. Give me inputs + expected outputs.
 - Naming is everything
 
 Chuchu gives structure, not fluff.
+
+---
+
+# Development
+
+## Building and Installing
+
+After making changes to the code, always use:
+
+```bash
+go install ./cmd/chu
+```
+
+This compiles and installs the binary to the correct location in `$GOPATH/bin` (managed by your Go toolchain, e.g., mise, asdf, or native Go).
+
+**Do not** use `go build` and manually copy the binary - this can lead to version mismatches between CLI and Neovim plugin.
+
+## Running Tests
+
+```bash
+go test ./...
+```
+
+## Project Structure
+
+```
+chuchu/
+├── cmd/chu/           # CLI entry point
+├── internal/
+│   ├── config/        # Configuration and setup
+│   ├── llm/           # LLM provider implementations
+│   ├── memory/        # Memory/feedback system
+│   ├── modes/         # Chat, TDD, Research, Plan, Implement
+│   ├── prompt/        # Prompt building and templates
+│   └── tools/         # Tool calling (read_file, write_file, etc.)
+├── neovim/            # Neovim plugin (Lua)
+└── docs/              # Documentation
+```
 
 ---
 

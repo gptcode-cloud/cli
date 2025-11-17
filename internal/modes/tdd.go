@@ -67,7 +67,7 @@ Details:
 	var provider llm.Provider
 	switch backendCfg.Type {
 	case "openai":
-		provider = llm.NewOpenAI(backendCfg.BaseURL, backendName)
+		provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
 	default:
 		provider = llm.NewOllama(backendCfg.BaseURL)
 	}

@@ -1,16 +1,3 @@
-// cmd/chu/feature_elixir.go – Elixir-focused feature mode (detailed)
-//
-// Wire from main.go:
-//
-//   if len(os.Args) >= 2 && os.Args[1] == "feature-elixir" {
-//       runFeatureElixir()
-//       return
-//   }
-//
-// From terminal you can do:
-//
-//   echo "Users should be able to calculate invoice totals" | chu feature-elixir
-
 package elixir
 
 import (
@@ -31,7 +18,6 @@ func RunFeatureElixir(builder *prompt.Builder, provider llm.Provider, model stri
 		return fmt.Errorf("empty feature description")
 	}
 
-	// Detect Mix project (walk upward)
 	proj, err := Detect("")
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "Chuchu: could not detect mix project, using defaults:", err)
@@ -44,12 +30,10 @@ func RunFeatureElixir(builder *prompt.Builder, provider llm.Provider, model stri
 		fmt.Fprintln(os.Stderr, "Chuchu: detected Mix project at", proj.Root, "app:", proj.AppName, "module:", proj.ModuleBase)
 	}
 
-	// Generate slug/module/paths
 	slug := SlugForDescription(desc)
 	testPath, implPath := PathsForSlug(proj, slug)
 	moduleName := ModuleNameForSlug(slug)
 
-	// Setup prompt with builder from parameter
 	hint := desc
 	if len(hint) > 200 {
 		hint = hint[:200]
@@ -124,10 +108,8 @@ Do NOT include explanations outside those blocks.
 
 	out := strings.TrimSpace(resp.Text)
 
-	// Print for Neovim plugin
 	fmt.Println(out)
 
-	// Also write files on disk based on # path:
 	writeElixirFilesFromBlocks(proj.Root, out)
 	return nil
 }

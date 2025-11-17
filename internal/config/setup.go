@@ -207,7 +207,14 @@ func interactiveSetup() *Setup {
 			if apiKey != "" {
 				envVar := strings.ToUpper(backendName) + "_API_KEY"
 				os.Setenv(envVar, apiKey)
-				fmt.Fprintf(os.Stderr, "\nNote: Add 'export %s=%s' to your shell profile\n", envVar, apiKey)
+				
+				if err := saveAPIKeyToProfile(envVar, apiKey); err != nil {
+					fmt.Fprintf(os.Stderr, "\nWarning: Could not auto-save to shell profile: %v\n", err)
+					fmt.Fprintf(os.Stderr, "Manually add: export %s=%s\n", envVar, apiKey)
+				} else {
+					fmt.Fprintf(os.Stderr, "\n✓ API key saved to shell profile\n")
+					fmt.Fprintf(os.Stderr, "  Restart your terminal or run: source ~/.zshrc\n")
+				}
 			}
 		}
 	}
@@ -259,6 +266,93 @@ func saveSetup(path string, setup *Setup) error {
 		return err
 	}
 	return os.WriteFile(path, data, 0o644)
+}
+
+func UpdateAPIKey(backendName string) error {
+	setup, err := LoadSetup()
+	if err != nil {
+		return fmt.Errorf("could not load setup: %w", err)
+	}
+	
+	if _, ok := setup.Backend[backendName]; !ok {
+		return fmt.Errorf("backend %q not found in setup. Available: %v", backendName, getBackendNames(setup))
+	}
+	
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Fprintf(os.Stderr, "Enter API key for %s: ", backendName)
+	apiKey, _ := reader.ReadString('\n')
+	apiKey = strings.TrimSpace(apiKey)
+	
+	if apiKey == "" {
+		return fmt.Errorf("API key cannot be empty")
+	}
+	
+	envVar := strings.ToUpper(backendName) + "_API_KEY"
+	os.Setenv(envVar, apiKey)
+	
+	if err := saveAPIKeyToProfile(envVar, apiKey); err != nil {
+		fmt.Fprintf(os.Stderr, "\nWarning: Could not auto-save to shell profile: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Manually add: export %s=%s\n", envVar, apiKey)
+	} else {
+		fmt.Fprintf(os.Stderr, "\n✓ API key saved to shell profile\n")
+		fmt.Fprintf(os.Stderr, "  Restart your terminal or run: source ~/.zshrc\n")
+	}
+	
+	return nil
+}
+
+func getBackendNames(setup *Setup) []string {
+	names := make([]string, 0, len(setup.Backend))
+	for name := range setup.Backend {
+		names = append(names, name)
+	}
+	return names
+}
+
+func saveAPIKeyToProfile(envVar, apiKey string) error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+	
+	shell := os.Getenv("SHELL")
+	var profilePath string
+	
+	if strings.Contains(shell, "zsh") {
+		profilePath = filepath.Join(home, ".zshrc")
+	} else if strings.Contains(shell, "bash") {
+		profilePath = filepath.Join(home, ".bashrc")
+		if _, err := os.Stat(profilePath); os.IsNotExist(err) {
+			profilePath = filepath.Join(home, ".bash_profile")
+		}
+	} else {
+		return fmt.Errorf("unsupported shell: %s", shell)
+	}
+	
+	exportLine := fmt.Sprintf("export %s=%q\n", envVar, apiKey)
+	
+	if _, err := os.Stat(profilePath); err == nil {
+		content, err := os.ReadFile(profilePath)
+		if err != nil {
+			return err
+		}
+		
+		if strings.Contains(string(content), envVar) {
+			return fmt.Errorf("%s already exists in %s", envVar, profilePath)
+		}
+	}
+	
+	f, err := os.OpenFile(profilePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	
+	if _, err := f.WriteString("\n# Chuchu API key\n" + exportLine); err != nil {
+		return err
+	}
+	
+	return nil
 }
 
 func copyIfMissing(srcDir, dstDir, file string) {

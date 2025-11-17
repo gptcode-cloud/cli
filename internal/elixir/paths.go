@@ -8,15 +8,12 @@ import (
 	"strings"
 )
 
-// Project represents a detected Elixir Mix project.
 type Project struct {
-	Root       string // project root directory
-	AppName    string // e.g. "my_app"
-	ModuleBase string // e.g. "MyApp"
+	Root       string
+	AppName    string
+	ModuleBase string
 }
 
-// Detect tries to find a Mix project at or above the given root.
-// It looks for mix.exs and extracts :app and (optionally) mod: {MyApp.Application, ...}.
 func Detect(root string) (*Project, error) {
 	if root == "" {
 		r, err := os.Getwd()
@@ -50,15 +47,13 @@ func parseMixFile(root, mixPath string) (*Project, error) {
 	}
 	src := string(data)
 
-	// app: :my_app
-	reApp := regexp.MustCompile(`app:\s*:(\w+)`)
+	reApp := regexp.MustCompile(`app:\\s*:(\\w+)`)
 	app := "app"
 	if m := reApp.FindStringSubmatch(src); len(m) >= 2 {
 		app = m[1]
 	}
 
-	// mod: {MyApp.Application, ...}
-	reMod := regexp.MustCompile(`mod:\s*{\s*([\w\.]+)`)
+	reMod := regexp.MustCompile(`mod:\\s*{\\s*([\\w\\.]+)`)
 	moduleBase := moduleNamespace(app)
 	if m := reMod.FindStringSubmatch(src); len(m) >= 2 {
 		moduleBase = strings.Split(m[1], ".")[0]
@@ -71,7 +66,6 @@ func parseMixFile(root, mixPath string) (*Project, error) {
 	}, nil
 }
 
-// moduleNamespace converts "my_app" -> "MyApp".
 func moduleNamespace(app string) string {
 	parts := strings.Split(app, "_")
 	for i, p := range parts {
@@ -83,12 +77,9 @@ func moduleNamespace(app string) string {
 	return strings.Join(parts, "")
 }
 
-// SlugForDescription generates a simple slug for a feature description.
-// e.g. "calculate invoice total" -> "invoice_total".
 func SlugForDescription(desc string) string {
 	desc = strings.ToLower(desc)
-	// keep letters, digits, spaces, underscores
-	re := regexp.MustCompile(`[^a-z0-9\s_]+`)
+	re := regexp.MustCompile(`[^a-z0-9\\s_]+`)
 	desc = re.ReplaceAllString(desc, " ")
 	parts := strings.Fields(desc)
 	if len(parts) == 0 {
@@ -98,7 +89,6 @@ func SlugForDescription(desc string) string {
 		return parts[0]
 	}
 
-	// naive: drop common verbs
 	drop := map[string]bool{
 		"calculate": true,
 		"compute":   true,
@@ -127,7 +117,6 @@ func SlugForDescription(desc string) string {
 	return strings.Join(kept, "_")
 }
 
-// ModuleNameForSlug builds "invoice_total" -> "InvoiceTotal".
 func ModuleNameForSlug(slug string) string {
 	if slug == "" {
 		return "Feature"
@@ -142,7 +131,6 @@ func ModuleNameForSlug(slug string) string {
 	return strings.Join(parts, "")
 }
 
-// PathsForSlug returns relative test and implementation paths for a feature slug.
 func PathsForSlug(p *Project, slug string) (testPath, implPath string) {
 	if slug == "" {
 		slug = "feature"
