@@ -1,6 +1,7 @@
 package tools
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"os/exec"
@@ -164,6 +165,29 @@ func ExecuteTool(call ToolCall, workdir string) ToolResult {
 			Error: "Unknown tool",
 		}
 	}
+}
+
+type LLMToolCall struct {
+	ID        string
+	Name      string
+	Arguments string
+}
+
+func ExecuteToolFromLLM(call LLMToolCall, workdir string) ToolResult {
+	var argsMap map[string]interface{}
+	if err := json.Unmarshal([]byte(call.Arguments), &argsMap); err != nil {
+		return ToolResult{
+			Tool:  call.Name,
+			Error: fmt.Sprintf("Failed to parse arguments: %v", err),
+		}
+	}
+
+	toolCall := ToolCall{
+		Name:      call.Name,
+		Arguments: argsMap,
+	}
+
+	return ExecuteTool(toolCall, workdir)
 }
 
 func readFile(call ToolCall, workdir string) ToolResult {

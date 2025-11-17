@@ -1,0 +1,37 @@
+package agents
+
+import (
+	"context"
+
+	"chuchu/internal/llm"
+)
+
+type ResearchAgent struct {
+	orchestrator *llm.OrchestratorProvider
+}
+
+func NewResearch(orchestrator *llm.OrchestratorProvider) *ResearchAgent {
+	return &ResearchAgent{
+		orchestrator: orchestrator,
+	}
+}
+
+const researchPrompt = `You are a research assistant with access to external information sources.
+
+You can use web_search to find current information, documentation, and answers to questions.
+
+Be concise and cite sources when possible.`
+
+func (r *ResearchAgent) Execute(ctx context.Context, userMessage string) (string, error) {
+	resp, err := r.orchestrator.Chat(ctx, llm.ChatRequest{
+		SystemPrompt: researchPrompt,
+		Messages: []llm.ChatMessage{
+			{Role: "user", Content: userMessage},
+		},
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return resp.Text, nil
+}
