@@ -145,22 +145,27 @@ func categorizeAndTagModels(models []ModelAPI) OutputJSON {
 			RecommendedFor: inferRecommendedFor(m),
 		}
 
-		provider := strings.ToLower(m.TopProvider.ID)
+		output.OpenRouter.Models = append(output.OpenRouter.Models, modelOutput)
 
-		switch {
-		case provider == "groq":
-			output.Groq.Models = append(output.Groq.Models, modelOutput)
-		case provider == "openai":
+		parts := strings.Split(m.ID, "/")
+		providerPrefix := ""
+		if len(parts) > 1 {
+			providerPrefix = strings.ToLower(parts[0])
+		}
+
+		switch providerPrefix {
+		case "openai":
 			output.OpenAI.Models = append(output.OpenAI.Models, modelOutput)
-		case provider == "deepseek":
+		case "deepseek":
 			output.DeepSeek.Models = append(output.DeepSeek.Models, modelOutput)
-		case strings.Contains(m.ID, "llama-3.") || strings.Contains(m.ID, "qwen") || strings.Contains(m.ID, "codellama"):
+		case "meta-llama", "mistralai", "qwen", "google":
 			if m.Pricing.Prompt == 0 && m.Pricing.Completion == 0 {
 				output.Ollama.Models = append(output.Ollama.Models, modelOutput)
 			}
-			fallthrough
-		default:
-			output.OpenRouter.Models = append(output.OpenRouter.Models, modelOutput)
+		}
+
+		if m.Pricing.Prompt <= 0.5 && m.Pricing.Completion <= 1.5 {
+			output.Groq.Models = append(output.Groq.Models, modelOutput)
 		}
 	}
 

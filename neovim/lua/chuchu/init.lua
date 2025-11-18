@@ -472,6 +472,8 @@ function M.configure_default_model(backend)
 end
 
 function M.configure_agent_models(backend)
+  vim.notify(string.format("Configuring models for %s agents (router/query/editor/research)", backend), vim.log.levels.INFO)
+  
   local agents = {"router", "query", "editor", "research"}
   local agent_models = {}
   
@@ -604,12 +606,26 @@ function M.get_models_for_backend(backend, callback, agent)
     end
   end
   
-  M.show_model_picker(models, callback)
+  M.show_model_picker(models, callback, agent)
 end
 
-function M.show_model_picker(models, callback)
+function M.show_model_picker(models, callback, agent)
+  local agent_descriptions = {
+    router = "Router (fast intent classification)",
+    query = "Query (read/analyze code)",
+    editor = "Editor (write/modify code)",
+    research = "Research (web search/docs)"
+  }
+  
+  local prompt_text = "Filter models (or Enter for all): "
+  if agent and agent_descriptions[agent] then
+    prompt_text = string.format("%s - filter or Enter: ", agent_descriptions[agent])
+  elseif agent then
+    prompt_text = string.format("Select model for %s (filter or Enter): ", agent)
+  end
+  
   vim.ui.input({
-    prompt = "Search models (or Enter for all): ",
+    prompt = prompt_text,
   }, function(query)
     if query == nil then
       callback({})
@@ -627,12 +643,12 @@ function M.show_model_picker(models, callback)
           table.insert(filtered, model)
         end
       end
-    end
-    
-    if #filtered == 0 then
-      vim.notify("No models match '" .. query .. "'", vim.log.levels.WARN)
-      callback({})
-      return
+      
+      if #filtered == 0 then
+        vim.notify("No models match '" .. query .. "'", vim.log.levels.WARN)
+        callback({})
+        return
+      end
     end
     
     local options = {}
