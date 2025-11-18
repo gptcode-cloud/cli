@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"strings"
 	"time"
 
 	"golang.org/x/term"
@@ -38,47 +37,24 @@ func Chat(input string, args []string) {
 	}
 
 	backendName := setup.Defaults.Backend
-	modelAlias := setup.Defaults.Model
 
 	if len(args) >= 2 && args[1] != "" {
 		backendName = args[1]
 	}
-	if len(args) >= 3 && args[2] != "" {
-		modelAlias = args[2]
-	}
 
 	backendCfg := setup.Backend[backendName]
-	model := backendCfg.DefaultModel
-	if alias, ok := backendCfg.Models[modelAlias]; ok {
-		model = alias
-	} else if modelAlias != "" {
-		model = modelAlias
-	}
 
 	cwd, _ := os.Getwd()
 
 	var provider llm.Provider
-	var orchestrator *llm.OrchestratorProvider
-
-	if strings.Contains(model, "compound") {
-		var customExec llm.Provider
-		customModel := backendCfg.DefaultModel
-
-		if backendCfg.Type == "ollama" {
-			customExec = llm.NewOllama(backendCfg.BaseURL)
-		} else {
-			customExec = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
-		}
-
-		orchestrator = llm.NewOrchestrator(backendCfg.BaseURL, backendName, customExec, customModel)
-		provider = customExec
+	if backendCfg.Type == "ollama" {
+		provider = llm.NewOllama(backendCfg.BaseURL)
 	} else {
-		if backendCfg.Type == "ollama" {
-			provider = llm.NewOllama(backendCfg.BaseURL)
-		} else {
-			provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
-		}
+		provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
 	}
+
+	researchModel := backendCfg.GetModelForAgent("research")
+	orchestrator := llm.NewOrchestrator(backendCfg.BaseURL, backendName, provider, researchModel)
 
 	if len(history.Messages) == 0 || history.Messages[len(history.Messages)-1].Role != "user" {
 		fmt.Fprintln(os.Stderr, "\nERROR: Invalid message history")
@@ -94,7 +70,11 @@ func Chat(input string, args []string) {
 		go showSpinner(stopSpinner)
 	}
 
-	coordinator := agents.NewCoordinator(provider, orchestrator, cwd)
+	routerModel := backendCfg.GetModelForAgent("router")
+	editorModel := backendCfg.GetModelForAgent("editor")
+	queryModel := backendCfg.GetModelForAgent("query")
+	
+	coordinator := agents.NewCoordinator(provider, orchestrator, cwd, routerModel, editorModel, queryModel, researchModel)
 	result, err := coordinator.Execute(context.Background(), userMessage)
 
 	if os.Getenv("CHUCHU_DEBUG") != "1" {
@@ -108,27 +88,37 @@ func Chat(input string, args []string) {
 		return
 	}
 
-	parsed := output.ParseMarkdown(result)
+	isTerminal := isInteractiveTerminal()
 
-	rendered, err := output.RenderMarkdown(parsed.RenderedText)
-	if err != nil {
-		rendered = result
-	}
+	if isTerminal {
+		parsed := output.ParseMarkdown(result)
 
-	fmt.Println(output.Separator())
-	fmt.Print(rendered)
-	fmt.Println(output.Separator())
-
-	if len(parsed.CodeBlocks) > 0 {
-		for _, block := range parsed.CodeBlocks {
-			action := output.PromptCodeBlock(block, len(parsed.CodeBlocks))
-			output.HandleCodeBlock(action, block.Code)
+		rendered, err := output.RenderMarkdown(parsed.RenderedText)
+		if err != nil {
+			rendered = result
 		}
-		fmt.Fprintln(os.Stderr, "")
-		fmt.Fprintln(os.Stderr, output.Success("All commands processed."))
-		fmt.Fprintln(os.Stderr, "")
+
 		fmt.Println(output.Separator())
+		fmt.Print(rendered)
+		fmt.Println(output.Separator())
+
+		if len(parsed.CodeBlocks) > 0 {
+			for _, block := range parsed.CodeBlocks {
+				action := output.PromptCodeBlock(block, len(parsed.CodeBlocks))
+				output.HandleCodeBlock(action, block.Code)
+			}
+			fmt.Fprintln(os.Stderr, "")
+			fmt.Fprintln(os.Stderr, output.Success("All commands processed."))
+			fmt.Fprintln(os.Stderr, "")
+			fmt.Println(output.Separator())
+		}
+	} else {
+		fmt.Println(result)
 	}
+}
+
+func isInteractiveTerminal() bool {
+	return term.IsTerminal(int(os.Stdout.Fd()))
 }
 
 func getTerminalWidth() int {

@@ -19,10 +19,14 @@ const (
 
 type RouterAgent struct {
 	provider llm.Provider
+	model    string
 }
 
-func NewRouter(provider llm.Provider) *RouterAgent {
-	return &RouterAgent{provider: provider}
+func NewRouter(provider llm.Provider, model string) *RouterAgent {
+	return &RouterAgent{
+		provider: provider,
+		model:    model,
+	}
 }
 
 const routerPrompt = `You are a request classifier. Analyze the user's request and classify it into ONE category.
@@ -47,7 +51,7 @@ func (r *RouterAgent) ClassifyIntent(ctx context.Context, userMessage string) (I
 	resp, err := r.provider.Chat(ctx, llm.ChatRequest{
 		SystemPrompt: routerPrompt,
 		UserPrompt:   userMessage,
-		Model:        "llama-3.3-70b-versatile",
+		Model:        r.model,
 	})
 	if err != nil {
 		return "", err

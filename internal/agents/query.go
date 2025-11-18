@@ -12,12 +12,14 @@ import (
 type QueryAgent struct {
 	provider llm.Provider
 	cwd      string
+	model    string
 }
 
-func NewQuery(provider llm.Provider, cwd string) *QueryAgent {
+func NewQuery(provider llm.Provider, cwd string, model string) *QueryAgent {
 	return &QueryAgent{
 		provider: provider,
 		cwd:      cwd,
+		model:    model,
 	}
 }
 
@@ -107,7 +109,7 @@ func (q *QueryAgent) Execute(ctx context.Context, userMessage string) (string, e
 			SystemPrompt: queryPrompt,
 			Messages:     messages,
 			Tools:        toolDefs,
-			Model:        "llama-3.3-70b-versatile",
+			Model:        q.model,
 		})
 		if err != nil {
 			return "", err
@@ -151,7 +153,7 @@ func (q *QueryAgent) Execute(ctx context.Context, userMessage string) (string, e
 			finalResp, err := q.provider.Chat(ctx, llm.ChatRequest{
 				SystemPrompt: queryPrompt + "\n\nProvide your final answer based on the tool results above. Do NOT call more tools.",
 				Messages:     messages,
-				Model:        "llama-3.3-70b-versatile",
+				Model:        q.model,
 			})
 			if err != nil {
 				return "", err

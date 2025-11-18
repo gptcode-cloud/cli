@@ -12,12 +12,14 @@ import (
 type EditorAgent struct {
 	provider llm.Provider
 	cwd      string
+	model    string
 }
 
-func NewEditor(provider llm.Provider, cwd string) *EditorAgent {
+func NewEditor(provider llm.Provider, cwd string, model string) *EditorAgent {
 	return &EditorAgent{
 		provider: provider,
 		cwd:      cwd,
+		model:    model,
 	}
 }
 
@@ -116,7 +118,7 @@ func (e *EditorAgent) Execute(ctx context.Context, userMessage string) (string, 
 			SystemPrompt: editorPrompt,
 			Messages:     messages,
 			Tools:        toolDefs,
-			Model:        "llama-3.3-70b-versatile",
+			Model:        e.model,
 		})
 		if err != nil {
 			return "", err

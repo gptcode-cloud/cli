@@ -28,6 +28,14 @@ type BackendConfig struct {
 	BaseURL      string            `yaml:"base_url"`
 	DefaultModel string            `yaml:"default_model"`
 	Models       map[string]string `yaml:"models"`
+	AgentModels  AgentModels       `yaml:"agent_models,omitempty"`
+}
+
+type AgentModels struct {
+	Router   string `yaml:"router,omitempty"`
+	Query    string `yaml:"query,omitempty"`
+	Editor   string `yaml:"editor,omitempty"`
+	Research string `yaml:"research,omitempty"`
 }
 
 type ProfileDefaults struct {
@@ -54,4 +62,26 @@ func LoadProfile() (*Profile, error) {
 		return &Profile{}, err
 	}
 	return &p, nil
+}
+
+func (bc *BackendConfig) GetModelForAgent(agentType string) string {
+	switch agentType {
+	case "router":
+		if bc.AgentModels.Router != "" {
+			return bc.AgentModels.Router
+		}
+	case "query":
+		if bc.AgentModels.Query != "" {
+			return bc.AgentModels.Query
+		}
+	case "editor":
+		if bc.AgentModels.Editor != "" {
+			return bc.AgentModels.Editor
+		}
+	case "research":
+		if bc.AgentModels.Research != "" {
+			return bc.AgentModels.Research
+		}
+	}
+	return bc.DefaultModel
 }

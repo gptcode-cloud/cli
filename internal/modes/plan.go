@@ -3,19 +3,21 @@ package modes
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
+	"chuchu/internal/agents"
+	"chuchu/internal/config"
 	"chuchu/internal/llm"
-	"chuchu/internal/prompt"
-	"chuchu/internal/tools"
+	"chuchu/internal/output"
+
+	"golang.org/x/term"
 )
 
-func RunPlan(builder *prompt.Builder, provider llm.Provider, model string, args []string) error {
+func RunPlan(args []string) error {
 	task := ""
 	if len(args) > 0 {
 		task = strings.Join(args, " ")
@@ -35,27 +37,74 @@ func RunPlan(builder *prompt.Builder, provider llm.Provider, model string, args 
 		return fmt.Errorf("no task provided")
 	}
 
-	home, _ := os.UserHomeDir()
-	plansDir := filepath.Join(home, ".chuchu", "plans")
-	os.MkdirAll(plansDir, 0755)
+	setup, _ := config.LoadSetup()
+	backendName := setup.Defaults.Backend
+	backendCfg := setup.Backend[backendName]
+	cwd, _ := os.Getwd()
 
-	sys := builder.BuildSystemPrompt(prompt.BuildOptions{
-		Lang: "general",
-		Mode: "plan",
-		Hint: task,
-	})
+	urls := extractURLs(task)
+	var externalContext string
 
-	planPrompt := fmt.Sprintf(`You are creating a detailed implementation plan for this task:
+	if len(urls) > 0 {
+		fmt.Fprintf(os.Stderr, "⠋ Fetching external documentation...\n")
+		
+		var orchestrator *llm.OrchestratorProvider
+		if backendCfg.Type == "ollama" {
+			customExec := llm.NewOllama(backendCfg.BaseURL)
+			orchestrator = llm.NewOrchestrator(backendCfg.BaseURL, backendName, customExec, backendCfg.DefaultModel)
+		} else {
+			customExec := llm.NewChatCompletion(backendCfg.BaseURL, backendName)
+			orchestrator = llm.NewOrchestrator(backendCfg.BaseURL, backendName, customExec, backendCfg.DefaultModel)
+		}
+		
+		researchAgent := agents.NewResearch(orchestrator)
+		for _, url := range urls {
+			docPrompt := fmt.Sprintf("Visit %s and summarize key implementation details for: %s", url, task)
+			docResult, err := researchAgent.Execute(context.Background(), docPrompt)
+			if err == nil {
+				externalContext += fmt.Sprintf("\n\n## External Documentation\n\n%s", docResult)
+			}
+		}
+	}
+
+	fmt.Fprintf(os.Stderr, "⠋ Analyzing codebase...\n")
+	
+	var customExec llm.Provider
+	if backendCfg.Type == "ollama" {
+		customExec = llm.NewOllama(backendCfg.BaseURL)
+	} else {
+		customExec = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
+	}
+	
+	queryModel := backendCfg.GetModelForAgent("query")
+	queryAgent := agents.NewQuery(customExec, cwd, queryModel)
+	
+	codebasePrompt := fmt.Sprintf(`Brief codebase overview for: %s
+
+1. List root directory (use list_files on ".")
+2. Identify main language/framework
+3. Suggest 2-3 key directories for implementation
+
+Keep response under 150 words.`, task)
+	
+	codebaseAnalysis, err := queryAgent.Execute(context.Background(), codebasePrompt)
+	if err != nil {
+		return fmt.Errorf("codebase analysis failed: %w", err)
+	}
+
+	fmt.Fprintf(os.Stderr, "⠋ Creating implementation plan...\n")
+
+	planPrompt := fmt.Sprintf(`Create a detailed implementation plan for this task:
 
 %s
 
-Process:
-1. First, use tools to understand the current codebase:
-   - Read relevant files (use read_file tool)
-   - Search for similar implementations (use search_code tool)
-   - Explore directory structures (use list_files tool)
+## Codebase Analysis
 
-2. After gathering context, create a structured plan with:
+%s
+
+%s
+
+Create a structured plan with:
 
 # [Task Name] Implementation Plan
 
@@ -111,153 +160,41 @@ Process:
 [What to test and how]
 
 ## References
-[Links to research, similar code, etc.]
+[Links to research, similar code, etc.]`, task, codebaseAnalysis, externalContext)
 
-Begin by exploring the codebase, then present your findings and ask for feedback before writing the detailed plan.`, task)
-
-	cwd, _ := os.Getwd()
-	toolsRaw := tools.GetAvailableTools()
-	var availableTools []interface{}
-	for _, t := range toolsRaw {
-		availableTools = append(availableTools, t)
+	editorModel := backendCfg.GetModelForAgent("editor")
+	editorAgent := agents.NewEditor(customExec, cwd, editorModel)
+	planResult, err := editorAgent.Execute(context.Background(), planPrompt)
+	if err != nil {
+		return fmt.Errorf("plan generation failed: %w", err)
 	}
 
-	messages := []llm.ChatMessage{
-		{Role: "user", Content: planPrompt},
-	}
+	home, _ := os.UserHomeDir()
+	plansDir := filepath.Join(home, ".chuchu", "plans")
+	os.MkdirAll(plansDir, 0755)
 
-	maxIterations := 20
-	var fullPlan strings.Builder
-	planFinalized := false
-
-	scanner := bufio.NewScanner(os.Stdin)
-
-	for i := 0; i < maxIterations; i++ {
-		req := llm.ChatRequest{
-			SystemPrompt: sys,
-			Model:        model,
-			Tools:        availableTools,
-			Messages:     messages,
-		}
-
-		resp, err := provider.Chat(context.Background(), req)
+	if term.IsTerminal(int(os.Stdout.Fd())) {
+		rendered, err := output.RenderMarkdown(planResult)
 		if err != nil {
-			return fmt.Errorf("LLM error: %w", err)
+			rendered = planResult
 		}
-
-		if resp.Text != "" {
-			fmt.Println(resp.Text)
-			
-			if strings.Contains(strings.ToLower(resp.Text), "# ") && 
-			   strings.Contains(strings.ToLower(resp.Text), "implementation plan") {
-				fullPlan.WriteString(resp.Text)
-				fullPlan.WriteString("\n\n")
-			}
-		}
-
-		if len(resp.ToolCalls) == 0 {
-			if !planFinalized {
-				fmt.Fprintln(os.Stderr, "\n---")
-				fmt.Fprintln(os.Stderr, "Continue refining the plan? (y/n or provide feedback)")
-				fmt.Fprint(os.Stderr, "> ")
-				
-				if scanner.Scan() {
-					feedback := strings.TrimSpace(scanner.Text())
-					if feedback == "n" || feedback == "no" {
-						planFinalized = true
-						break
-					}
-					if feedback == "y" || feedback == "yes" || feedback == "" {
-						messages = append(messages, llm.ChatMessage{
-							Role: "assistant",
-							Content: resp.Text,
-						})
-						messages = append(messages, llm.ChatMessage{
-							Role: "user",
-							Content: "Please continue refining the plan.",
-						})
-						continue
-					}
-					
-					messages = append(messages, llm.ChatMessage{
-						Role: "assistant",
-						Content: resp.Text,
-					})
-					messages = append(messages, llm.ChatMessage{
-						Role: "user",
-						Content: feedback,
-					})
-					continue
-				}
-			}
-			break
-		}
-
-		messages = append(messages, llm.ChatMessage{
-			Role:      "assistant",
-			Content:   resp.Text,
-			ToolCalls: resp.ToolCalls,
-		})
-
-		for _, tc := range resp.ToolCalls {
-			var args map[string]interface{}
-			json.Unmarshal([]byte(tc.Arguments), &args)
-
-			toolCall := tools.ToolCall{
-				Name:      tc.Name,
-				Arguments: args,
-			}
-
-			result := tools.ExecuteTool(toolCall, cwd)
-
-			if result.Error != "" {
-				messages = append(messages, llm.ChatMessage{
-					Role:       "tool",
-					Content:    fmt.Sprintf("Error: %s", result.Error),
-					Name:       tc.Name,
-					ToolCallID: tc.ID,
-				})
-			} else {
-				messages = append(messages, llm.ChatMessage{
-					Role:       "tool",
-					Content:    result.Result,
-					Name:       tc.Name,
-					ToolCallID: tc.ID,
-				})
-			}
-		}
-	}
-
-	if fullPlan.Len() == 0 {
-		fmt.Fprintln(os.Stderr, "\nNo plan was generated. Try providing more specific requirements.")
-		return nil
+		fmt.Println(output.Separator())
+		fmt.Print(rendered)
+		fmt.Println(output.Separator())
+	} else {
+		fmt.Println(planResult)
 	}
 
 	timestamp := time.Now().Format("2006-01-02")
-	sanitizedTask := strings.Map(func(r rune) rune {
-		if (r >= 'a' && r <= 'z') || (r >= '0' && r <= '9') || r == '-' {
-			return r
-		}
-		if r >= 'A' && r <= 'Z' {
-			return r + 32
-		}
-		if r == ' ' {
-			return '-'
-		}
-		return -1
-	}, task)
-	if len(sanitizedTask) > 50 {
-		sanitizedTask = sanitizedTask[:50]
-	}
-
+	sanitizedTask := sanitizeFilename(task)
 	filename := fmt.Sprintf("%s_%s.md", timestamp, sanitizedTask)
 	planPath := filepath.Join(plansDir, filename)
 
-	err := os.WriteFile(planPath, []byte(fullPlan.String()), 0644)
+	err = os.WriteFile(planPath, []byte(planResult), 0644)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "\nWarning: Could not save plan to %s: %v\n", planPath, err)
 	} else {
-		fmt.Fprintf(os.Stderr, "\n\n✓ Plan saved to: %s\n", planPath)
+		fmt.Fprintf(os.Stderr, "\n✓ Plan saved to: %s\n", planPath)
 		fmt.Fprintf(os.Stderr, "\nTo implement this plan, run:\n  chu implement %s\n", planPath)
 	}
 

@@ -19,11 +19,15 @@ func NewCoordinator(
 	provider llm.Provider,
 	orchestrator *llm.OrchestratorProvider,
 	cwd string,
+	routerModel string,
+	editorModel string,
+	queryModel string,
+	researchModel string,
 ) *Coordinator {
 	return &Coordinator{
-		router:   NewRouter(provider),
-		editor:   NewEditor(provider, cwd),
-		query:    NewQuery(provider, cwd),
+		router:   NewRouter(provider, routerModel),
+		editor:   NewEditor(provider, cwd, editorModel),
+		query:    NewQuery(provider, cwd, queryModel),
 		research: NewResearch(orchestrator),
 	}
 }
