@@ -134,11 +134,19 @@ var modelsCmd = &cobra.Command{
 
 var modelsUpdateCmd = &cobra.Command{
 	Use:   "update",
-	Short: "Update model catalog from OpenRouter API",
+	Short: "Update model catalog from multiple sources",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("Fetching models from OpenRouter API...")
+		fmt.Println("Fetching models from available sources...")
+		
+		apiKeys := map[string]string{
+			"groq":      os.Getenv("GROQ_API_KEY"),
+			"openai":    os.Getenv("OPENAI_API_KEY"),
+			"anthropic": os.Getenv("ANTHROPIC_API_KEY"),
+			"cohere":    os.Getenv("COHERE_API_KEY"),
+		}
+		
 		catalogPath := catalog.GetCatalogPath()
-		if err := catalog.FetchAndSave(catalogPath); err != nil {
+		if err := catalog.FetchAndSave(catalogPath, apiKeys); err != nil {
 			return fmt.Errorf("failed to update catalog: %w", err)
 		}
 		fmt.Printf("✓ Model catalog updated: %s\n", catalogPath)
