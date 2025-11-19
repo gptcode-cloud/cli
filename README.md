@@ -1,337 +1,160 @@
-# Chuchu 🐺
+# 🐺 Chuchu
 
-Strict, impatient, TDD-first coding companion for your **terminal** and **Neovim**.
+**An affordable, TDD-first AI coding assistant for Neovim**
 
-Chuchu does not coddle you.
-Chuchu demands clarity, tests, and small focused functions.
-Chuchu keeps you sharp.
+[![Go Version](https://img.shields.io/github/go-mod/go-version/jadercorrea/chuchu)](go.mod)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub Discussions](https://img.shields.io/github/discussions/jadercorrea/chuchu)](https://github.com/jadercorrea/chuchu/discussions)
 
----
+Chuchu (pronounced "shoo-shoo", Brazilian slang for something small and cute) is a command-line AI coding assistant that helps you write better code through Test-Driven Development—without breaking the bank.
 
-# Badges
+## 💰 Why Chuchu?
 
-![Go Version](https://img.shields.io/badge/go-1.22+-blue)
-![License: MIT](https://img.shields.io/badge/license-MIT-green.svg)
-![Mode: TDD](https://img.shields.io/badge/mode-TDD_only-red)
-![Backends](https://img.shields.io/badge/backends-groq%20%7C%20ollama%20%7C%20deepinfra-lightgrey)
+**Radically affordable**: Use Groq for $2-5/month or Ollama for **$0/month**. Compare that to $20-30/month subscriptions.
 
----
+[Read the full story →](https://jadercorrea.github.io/chuchu/blog/2025-01-19-why-chuchu)
 
-# High-Level Architecture
+## ✨ Features
 
-```
-                   ┌──────────────────────────────┐
-                   │          Neovim UI           │
-                   │   - :ChuchuFeature           │
-                   │   - Feedback shortcuts       │
-                   └───────────────┬─────────────┘
-                                   │
-                                   ▼
-                       ┌───────────────────────┐
-                       │      chuchu CLI       │
-                       │  chu feature-elixir   │
-                       │  chu chat / chu tdd   │
-                       └───────────────┬───────┘
-                                       │
-                                       ▼
-                    ┌──────────────────────────────────┐
-                    │        Prompt Builder             │
-                    │  - profile.yaml                   │
-                    │  - system_prompt.md               │
-                    │  - JSONL memory context           │
-                    └───────────────────┬──────────────┘
-                                        │
-                                        ▼
-                        ┌──────────────────────────────────┐
-                        │        LLM Providers             │
-                        │  - Groq (remote, fast)           │
-                        │  - Ollama (local, private)       │
-                        │  - DeepInfra / OpenAI-compatible │
-                        └──────────────────────────────────┘
-```
+- **🧪 TDD-First**: Writes tests before implementation
+- **🎯 Multi-Agent Architecture**: Router, Query, Editor, and Research agents
+- **💸 Cost Control**: Mix and match cheap/free models per agent
+- **🔌 Model Flexibility**: Groq, Ollama, OpenRouter, OpenAI, Anthropic
+- **📦 Neovim Native**: Deep integration with LSP, Tree-sitter, file navigation
+- **🌐 Web Search**: Research agent can search and summarize web content
+- **🚀 Auto-Install Models**: Discover and install 193+ Ollama models from Neovim
 
----
+## 🚀 Quick Start
 
-# Feature Flow Diagram
-
-```
-User: "I want a feature X" 
-            │
-            ▼
-      Neovim Plugin
-- Opens floating input
-- Sends query → CLI
-            │
-            ▼
-         CLI (chu)
-- Detects project
-- Loads profile/system prompt
-- Loads memory examples
-- Builds LLM request
-            │
-            ▼
-         LLM Provider
-- Returns:
-  • test file
-  • implementation file
-  • reasoning (optional)
-            │
-            ▼
-      Neovim Plugin
-- Opens tests on left
-- Opens implementation on right
-- Chat buffer at bottom
-```
-
----
-
-# Installation
-
-## Requirements
-
-- Go 1.22+
-- Neovim 0.9+
-- At least one backend:
-  - Ollama
-  - OpenAI-compatible providers
-
----
-
-## Cobra Installation
-
-Chuchu uses Cobra.  
-Install it if missing:
-
-```
-go get github.com/spf13/cobra@latest
-```
-
----
-
-# CLI Installation
-
-## Using Makefile
-
-```
-make install
-chu setup
-```
-
-## Or script
-
-```
-chmod +x scripts/install.sh
-./scripts/install.sh
-```
-
----
-
-# Neovim Installation
-
-Using **lazy.nvim**:
-
-```lua
-{
-  dir = "~/workspace/chuchu/neovim",
-  config = function()
-    require("chuchu").setup()
-  end,
-}
-```
-
-Available commands:
-
-```
-:ChuchuChat         (<leader>cd / Ctrl+d) - Open/toggle chat panel
-:ChuchuVerified     (<leader>vf / Ctrl+v) - Mark code as verified/good
-:ChuchuFailed       (<leader>fr / Ctrl+r) - Mark code as failed/bad
-:ChuchuShell        (<leader>xs / Ctrl+x) - Get help with shell commands
-```
-
-**Chat Usage:**
-- Press `Ctrl+d` or `,cd` to open the chat panel
-- Type your message in the area below the `---` separator (insert mode)
-- Press `Esc` to exit insert mode, then `Enter` to send
-- You'll see "_Thinking..._" while waiting for response
-- When the LLM returns code blocks, tabs are created automatically
-- Press `Ctrl+d` again to close the chat panel
-
----
-
-# Memory System (`~/.chuchu/memories.jsonl`)
-
-Each feedback call saves a JSONL line:
-
-```json
-{
-  "timestamp": "2025-11-13T23:59:00Z",
-  "kind": "good",
-  "language": "elixir",
-  "file": "/path/to/module.ex",
-  "snippet": "defmodule Example do ..."
-}
-```
-
-Chuchu uses these as **few-shot examples** to adapt to your coding style.
-
----
-
-# Example Workflows
-
-## 1. Generate Code (Elixir)
-
-```
-:ChuchuCode (or ,cd)
-
-“Add invoice total calculator with
-- rounding
-- discounts
-- validation for empty list”
-```
-
-Results:
-
-- `test/my_app/invoice_total_test.exs`
-- `lib/my_app/invoice_total.ex`
-- Chat buffer explaining reasoning
-
----
-
-## Sample Test Output (Elixir)
-
-```elixir
-defmodule MyApp.InvoiceTotalTest do
-  use ExUnit.Case, async: true
-
-  describe "calculate/1" do
-    test "sums prices and applies discount" do
-      items = [%{price: 50}, %{price: 70}]
-      assert InvoiceTotal.calculate(items, discount: 0.1) == 108.0
-    end
-
-    test "rejects empty list" do
-      assert {:error, :empty_items} = InvoiceTotal.calculate([])
-    end
-  end
-end
-```
-
----
-
-## Sample Implementation (Elixir)
-
-```elixir
-defmodule MyApp.InvoiceTotal do
-  def calculate([], _opts \ []), do: {:error, :empty_items}
-
-  def calculate(items, opts \ []) do
-    total =
-      items
-      |> Enum.map(& &1.price)
-      |> Enum.sum()
-
-    discount = Keyword.get(opts, :discount, 0.0)
-    total * (1 - discount)
-  end
-end
-```
-
----
-
-# 2. Feature (Typescript)
-
-```
-echo "slugify utility with:
-- unicode support
-- optional max length
-- collapse duplicates" | chu feature-ts
-```
-
-Generated:
-
-- `src/utils/slugify.ts`
-- `tests/slugify.test.ts`
-
----
-
-# Chat Mode Example (TS)
-
-```
-> chu chat
-Chuchu: State your problem clearly.
-User: I'm debugging a race condition in express middleware.
-Chuchu: Show the code. No summaries.
-```
-
----
-
-# TDD Mode Example
-
-```
-> chu tdd
-Chuchu: Describe the unit you are adding.
-User: Token expiration validator.
-
-Chuchu: Tests first. Give me inputs + expected outputs.
-```
-
----
-
-# Philosophy
-
-- Think before coding
-- Ask clarifying questions
-- Write tests first
-- Keep functions small
-- Avoid magic
-- Prefer explicit data transformations
-- Naming is everything
-
-Chuchu gives structure, not fluff.
-
----
-
-# Development
-
-## Building and Installing
-
-After making changes to the code, always use:
+### Installation
 
 ```bash
+# Install via go
+go install github.com/jadercorrea/chuchu/cmd/chu@latest
+
+# Or build from source
+git clone https://github.com/jadercorrea/chuchu
+cd chuchu
 go install ./cmd/chu
 ```
 
-This compiles and installs the binary to the correct location in `$GOPATH/bin` (managed by your Go toolchain, e.g., mise, asdf, or native Go).
-
-**Do not** use `go build` and manually copy the binary - this can lead to version mismatches between CLI and Neovim plugin.
-
-## Running Tests
+### Setup
 
 ```bash
-go test ./...
+# Interactive setup wizard
+chu setup
+
+# For ultra-cheap setup, use Groq (get free key at console.groq.com)
+# For free local setup, use Ollama (no API key needed)
 ```
 
-## Project Structure
+### Neovim Integration
 
+Add to your Neovim config:
+
+```lua
+-- lazy.nvim
+{
+  dir = "~/workspace/chuchu/neovim",  -- adjust path to your clone
+  config = function()
+    require("chuchu").setup()
+  end,
+  keys = {
+    { "<leader>cc", "<cmd>lua require('chuchu').toggle()<cr>", desc = "Toggle Chuchu" },
+    { "<leader>cs", "<cmd>lua require('chuchu').send_message()<cr>", desc = "Send message" },
+  }
+}
 ```
-chuchu/
-├── cmd/chu/           # CLI entry point
-├── internal/
-│   ├── config/        # Configuration and setup
-│   ├── llm/           # LLM provider implementations
-│   ├── memory/        # Memory/feedback system
-│   ├── modes/         # Chat, TDD, Research, Plan, Implement
-│   ├── prompt/        # Prompt building and templates
-│   └── tools/         # Tool calling (read_file, write_file, etc.)
-├── neovim/            # Neovim plugin (Lua)
-└── docs/              # Documentation
+
+## 📖 Usage
+
+### Chat Mode
+
+```bash
+chu chat "explain this function"
+chu chat "add error handling to the database connection"
 ```
+
+### Research Mode
+
+```bash
+chu research "how does goroutine scheduling work"
+chu research "best practices for error handling in Go"
+```
+
+### Planning & Implementation
+
+```bash
+chu plan "add user authentication with JWT"
+chu implement
+```
+
+## 💡 Configuration Examples
+
+### Budget Setup ($2-5/month)
+
+```yaml
+defaults:
+  backend: groq
+  
+backend:
+  groq:
+    agent_models:
+      router: llama-3.1-8b-instant      # $0.05/$0.08 per 1M tokens
+      query: llama-3.3-70b-versatile    # $0.59/$0.79 per 1M tokens
+      editor: llama-3.3-70b-versatile
+      research: groq/compound           # Free!
+```
+
+### Free Local Setup ($0/month)
+
+```yaml
+defaults:
+  backend: ollama
+  
+backend:
+  ollama:
+    agent_models:
+      router: llama3.1:8b
+      query: qwen3-coder:latest
+      editor: qwen3-coder:latest
+      research: qwen3-coder:latest
+```
+
+[See more configurations →](https://jadercorrea.github.io/chuchu/blog/2025-01-18-groq-optimal-configs)
+
+## 🏗️ Architecture
+
+Chuchu uses specialized agents for different tasks:
+
+- **Router**: Fast intent classification (8B model)
+- **Query**: Smart code analysis (70B model)
+- **Editor**: Code generation with large context (256K context)
+- **Research**: Web search and documentation (free Compound model)
+
+Each agent can use a different model, optimizing for cost vs capability.
+
+## 🤝 Contributing
+
+We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+## 📝 License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## 🔗 Links
+
+- **Website**: [jadercorrea.github.io/chuchu](https://jadercorrea.github.io/chuchu)
+- **Blog**: [jadercorrea.github.io/chuchu/blog](https://jadercorrea.github.io/chuchu/blog)
+- **Discussions**: [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)
+- **Issues**: [GitHub Issues](https://github.com/jadercorrea/chuchu/issues)
+
+## 💬 Community
+
+- Ask questions in [Discussions](https://github.com/jadercorrea/chuchu/discussions)
+- Share your configs in [Show and Tell](https://github.com/jadercorrea/chuchu/discussions/categories/show-and-tell)
+- Report bugs in [Issues](https://github.com/jadercorrea/chuchu/issues)
 
 ---
 
-# License
-
-MIT
-
----
-
+Made with ❤️ for developers who can't afford $20/month subscriptions

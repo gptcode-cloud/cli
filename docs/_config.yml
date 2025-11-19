@@ -1,11 +1,36 @@
-title: "Chuchu"
-theme: null
+title: Chuchu
+description: An affordable, TDD-first AI coding assistant for Neovim
+baseurl: "/chuchu"
+url: "https://jadercorrea.github.io"
+
+theme: minima
+
+permalink: /blog/:year-:month-:day-:title
+
+collections:
+  posts:
+    output: true
+    permalink: /blog/:year-:month-:day-:title
+
 markdown: kramdown
-exclude:
-  - README.md
+highlighter: rouge
+
+plugins:
+  - jekyll-feed
+  - jekyll-seo-tag
 
 defaults:
   - scope:
       path: ""
+      type: "posts"
+    values:
+      layout: "post"
+  - scope:
+      path: ""
     values:
       layout: "default"
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
