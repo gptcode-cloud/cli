@@ -9,10 +9,11 @@ import (
 )
 
 type Coordinator struct {
-	router       *RouterAgent
-	editor       *EditorAgent
-	query        *QueryAgent
-	research     *ResearchAgent
+	router   *RouterAgent
+	editor   *EditorAgent
+	query    *QueryAgent
+	research *ResearchAgent
+	review   *ReviewAgent
 }
 
 func NewCoordinator(
@@ -29,11 +30,25 @@ func NewCoordinator(
 		editor:   NewEditor(provider, cwd, editorModel),
 		query:    NewQuery(provider, cwd, queryModel),
 		research: NewResearch(orchestrator),
+		review:   NewReview(provider, cwd, queryModel), // Use query model for review as it needs good reasoning
 	}
 }
 
-func (c *Coordinator) Execute(ctx context.Context, userMessage string) (string, error) {
-	intent, err := c.router.ClassifyIntent(ctx, userMessage)
+func (c *Coordinator) Execute(ctx context.Context, history []llm.ChatMessage, statusCallback StatusCallback) (string, error) {
+	// Use the last user message for intent classification
+	lastMessage := ""
+	for i := len(history) - 1; i >= 0; i-- {
+		if history[i].Role == "user" {
+			lastMessage = history[i].Content
+			break
+		}
+	}
+
+	if statusCallback != nil {
+		statusCallback("Router: Classifying intent...")
+	}
+
+	intent, err := c.router.ClassifyIntent(ctx, lastMessage)
 	if err != nil {
 		if os.Getenv("CHUCHU_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[COORDINATOR] Router error: %v, defaulting to query\n", err)
@@ -45,16 +60,22 @@ func (c *Coordinator) Execute(ctx context.Context, userMessage string) (string, 
 		fmt.Fprintf(os.Stderr, "[COORDINATOR] Intent classified as: %s\n", intent)
 	}
 
+	if statusCallback != nil {
+		statusCallback(fmt.Sprintf("Coordinator: Routing to %s agent...", intent))
+	}
+
 	switch intent {
 	case IntentEdit:
-		return c.editor.Execute(ctx, userMessage)
+		return c.editor.Execute(ctx, history, statusCallback)
 	case IntentQuery:
-		return c.query.Execute(ctx, userMessage)
+		return c.query.Execute(ctx, history, statusCallback)
 	case IntentResearch:
-		return c.research.Execute(ctx, userMessage)
+		return c.research.Execute(ctx, history, statusCallback)
 	case IntentTest:
-		return c.editor.Execute(ctx, userMessage)
+		return c.editor.Execute(ctx, history, statusCallback)
+	case IntentReview:
+		return c.review.Execute(ctx, history, statusCallback)
 	default:
-		return c.query.Execute(ctx, userMessage)
+		return c.query.Execute(ctx, history, statusCallback)
 	}
 }

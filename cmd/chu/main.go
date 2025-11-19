@@ -38,13 +38,15 @@ Workflow modes (research → plan → implement):
   chu plan "task"          - Create detailed implementation plan
   chu implement plan.md    - Execute plan phase-by-phase with verification
 
+Code quality:
+  chu review [target]      - Review code for bugs, security, and improvements
+
 Interactive modes:
   chu chat                 - Code-focused conversation (use from CLI or Neovim)
   chu tdd                  - TDD mode (tests → implementation → refine)
 
-Language-specific TDD:
-  chu elixir               - Generate ExUnit tests + implementation for Elixir
-  chu ts                   - Generate tests + implementation for TypeScript
+Feature generation:
+  chu feature "desc"       - Generate tests + implementation (auto-detects language)
 
 Setup:
   chu setup                - Initialize ~/.chuchu configuration
@@ -62,8 +64,8 @@ func init() {
 	rootCmd.AddCommand(researchCmd)
 	rootCmd.AddCommand(planCmd)
 	rootCmd.AddCommand(implementCmd)
-	rootCmd.AddCommand(elixirCmd)
-	rootCmd.AddCommand(tsCmd)
+	rootCmd.AddCommand(featureCmd)
+	rootCmd.AddCommand(reviewCmd)
 }
 
 func newBuilderAndLLM(lang, mode, hint string) (*prompt.Builder, llm.Provider, string, error) {
@@ -182,7 +184,11 @@ var tddCmd = &cobra.Command{
 		if err != nil {
 			return err
 		}
-		return modes.RunTDD(builder, provider, model)
+		desc := ""
+		if len(args) > 0 {
+			desc = args[0]
+		}
+		return modes.RunTDD(builder, provider, model, desc)
 	},
 }
 
@@ -247,27 +253,82 @@ Examples:
 	},
 }
 
-var elixirCmd = &cobra.Command{
-	Use:   "elixir",
-	Short: "Generate ExUnit tests + implementation for an Elixir feature",
+var featureCmd = &cobra.Command{
+	Use:   "feature [description]",
+	Short: "Generate tests + implementation for a feature (auto-detects language)",
+	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		builder, provider, model, err := newBuilderAndLLM("elixir", "tdd", "")
+		lang := detectLanguage()
+		fmt.Printf("Detected language: %s\n", lang)
+
+		builder, provider, model, err := newBuilderAndLLM(lang, "tdd", args[0])
 		if err != nil {
 			return err
 		}
-		return elixir.RunFeatureElixir(builder, provider, model)
+
+		if lang == "elixir" {
+			return elixir.RunFeatureElixir(builder, provider, model)
+		}
+		
+		// Default to generic TDD for other languages
+		return modes.RunTDD(builder, provider, model, args[0])
 	},
 }
 
-var tsCmd = &cobra.Command{
-	Use:   "ts [feature]",
-	Short: "Generate tests + implementation for a TypeScript feature",
-	Args:  cobra.MinimumNArgs(1),
+var reviewCmd = &cobra.Command{
+	Use:   "review [file or directory]",
+	Short: "Review code for bugs, security issues, and improvements",
+	Long: `Review mode performs detailed code analysis.
+
+Review a specific file:
+  chu review main.go
+  chu review src/auth.go
+
+Review a directory:
+  chu review .
+  chu review ./src
+
+Focus on specific aspects:
+  chu review main.go --focus security
+  chu review . --focus performance
+  chu review src/ --focus "error handling"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		builder, provider, model, err := newBuilderAndLLM("typescript", "tdd", args[0])
-		if err != nil {
-			return err
+		target := "."
+		if len(args) > 0 {
+			target = args[0]
 		}
-		return modes.RunTDD(builder, provider, model)
+
+		focus, _ := cmd.Flags().GetString("focus")
+
+		return modes.RunReview(modes.ReviewOptions{
+			Target: target,
+			Focus:  focus,
+		})
 	},
+}
+
+func init() {
+	reviewCmd.Flags().StringP("focus", "f", "", "Focus area for review (e.g., security, performance, error handling)")
+}
+
+func detectLanguage() string {
+	if _, err := os.Stat("mix.exs"); err == nil {
+		return "elixir"
+	}
+	if _, err := os.Stat("Gemfile"); err == nil {
+		return "ruby"
+	}
+	if _, err := os.Stat("go.mod"); err == nil {
+		return "go"
+	}
+	if _, err := os.Stat("package.json"); err == nil {
+		return "typescript"
+	}
+	if _, err := os.Stat("requirements.txt"); err == nil {
+		return "python"
+	}
+	if _, err := os.Stat("Cargo.toml"); err == nil {
+		return "rust"
+	}
+	return "unknown"
 }

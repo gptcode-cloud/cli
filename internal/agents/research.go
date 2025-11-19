@@ -22,12 +22,13 @@ You can use web_search to find current information, documentation, and answers t
 
 Be concise and cite sources when possible.`
 
-func (r *ResearchAgent) Execute(ctx context.Context, userMessage string) (string, error) {
+func (r *ResearchAgent) Execute(ctx context.Context, history []llm.ChatMessage, statusCallback StatusCallback) (string, error) {
+	if statusCallback != nil {
+		statusCallback("Research: Searching/Summarizing...")
+	}
 	resp, err := r.orchestrator.Chat(ctx, llm.ChatRequest{
 		SystemPrompt: researchPrompt,
-		Messages: []llm.ChatMessage{
-			{Role: "user", Content: userMessage},
-		},
+		Messages:     history,
 	})
 	if err != nil {
 		return "", err

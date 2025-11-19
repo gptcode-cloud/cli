@@ -15,6 +15,7 @@ const (
 	IntentEdit     Intent = "edit"
 	IntentResearch Intent = "research"
 	IntentTest     Intent = "test"
+	IntentReview   Intent = "review"
 )
 
 type RouterAgent struct {
@@ -36,6 +37,7 @@ Categories:
 - "edit": User wants to MODIFY code (add, remove, change, refactor files)
 - "research": User wants EXTERNAL information (web search, documentation lookup)
 - "test": User wants to RUN tests or commands
+- "review": User wants CODE REVIEW or CRITIQUE (analyze, check for bugs, improve quality)
 
 Respond with ONLY the category name, nothing else.
 
@@ -44,6 +46,8 @@ Examples:
 "remove TODO comment from main.go" → edit
 "what is the capital of France?" → research
 "run tests" → test
+"review this file" → review
+"check for bugs in main.go" → review
 "explain how authentication works" → query
 "add error handling to user.go" → edit`
 
@@ -58,7 +62,7 @@ func (r *RouterAgent) ClassifyIntent(ctx context.Context, userMessage string) (I
 	}
 
 	intent := strings.TrimSpace(strings.ToLower(resp.Text))
-	
+
 	switch intent {
 	case "query":
 		return IntentQuery, nil
@@ -68,6 +72,8 @@ func (r *RouterAgent) ClassifyIntent(ctx context.Context, userMessage string) (I
 		return IntentResearch, nil
 	case "test":
 		return IntentTest, nil
+	case "review":
+		return IntentReview, nil
 	default:
 		return IntentQuery, fmt.Errorf("unknown intent: %s", intent)
 	}

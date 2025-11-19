@@ -37,6 +37,27 @@
 - Use table-driven tests with meaningful case names.
 - Handle errors explicitly; avoid panics for normal control flow.
 
+## Python
+- Use `pytest` for testing.
+- Use type hints (PEP 484) and check with `mypy` if possible.
+- Follow PEP 8 style guidelines.
+- Prefer list comprehensions and generators over loops where appropriate.
+- Use `pathlib` instead of `os.path`.
+
+## Rust
+- Use `cargo test` and built-in testing framework.
+- Follow idiomatic Rust: use `Result`/`Option` instead of panics.
+- Avoid `unwrap()` or `expect()` in production code; handle errors properly.
+- Use `clippy` for linting.
+- Prefer iterators over loops.
+
+## C / C++
+- Use modern C++ (C++17/20) features: smart pointers, `std::optional`, `auto`.
+- Avoid raw pointers; use RAII for resource management.
+- Use `CMake` or `Make` for build systems.
+- Use Google Test or Catch2 for testing.
+- Header files should have `#pragma once` or include guards.
+
 ## Error Handling and Edge Cases
 
 You must always think about edge cases:

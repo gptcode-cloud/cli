@@ -1,76 +1,30 @@
 package modes
 
 import (
-	"chuchu/internal/config"
 	"chuchu/internal/llm"
-	"chuchu/internal/memory"
 	"chuchu/internal/prompt"
 	"context"
 	"fmt"
 	"strings"
 )
 
-func TDD(input string, args []string) {
-	setup, _ := config.LoadSetup()
-	store, _ := memory.LoadStore()
-
-	lang := setup.Defaults.Lang
-
-	backendName := setup.Defaults.Backend
-	modelAlias := setup.Defaults.Model
-
-	if len(args) >= 1 && args[0] != "" {
-		backendName = args[0]
-	}
-	if len(args) >= 2 && args[1] != "" {
-		modelAlias = args[1]
-	}
-
-	backendCfg := setup.Backend[backendName]
-	model := backendCfg.DefaultModel
-	if alias, ok := backendCfg.Models[modelAlias]; ok {
-		model = alias
-	} else if modelAlias != "" {
-		model = modelAlias
-	}
-
-	pb := prompt.NewDefaultBuilder(store)
-	hint := input
-	if len(hint) > 200 {
-		hint = hint[:200]
-	}
-	sys := pb.BuildSystemPrompt(prompt.BuildOptions{
-		Lang: lang,
+func RunTDD(builder *prompt.Builder, provider llm.Provider, model string, description string) error {
+	sys := builder.BuildSystemPrompt(prompt.BuildOptions{
 		Mode: "tdd",
-		Hint: hint,
+		Hint: description,
 	})
 
 	user := fmt.Sprintf(`
-Language: %s
-
 Task:
 Generate tests first, then the minimum implementation to pass them.
 
-FORMAT STRICT:
-` + "```" + `tests
-# file + test code
-` + "```" + `
-
-` + "```" + `impl
-# file + implementation
-` + "```" + `
+Format:
+Use standard markdown code blocks (e.g., ` + "```python" + ` or ` + "```go" + `).
+Include the file path in a comment at the top of each block.
 
 Details:
 %s
-`, lang, input)
-
-	var provider llm.Provider
-	switch backendCfg.Type {
-	case "openai":
-		provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
-	default:
-		provider = llm.NewOllama(backendCfg.BaseURL)
-	}
+`, description)
 
 	resp, err := provider.Chat(context.Background(), llm.ChatRequest{
 		SystemPrompt: sys,
@@ -78,23 +32,11 @@ Details:
 		Model:        model,
 	})
 	if err != nil {
-		fmt.Println("Erro:", err)
-		return
+		return fmt.Errorf("chat error: %w", err)
 	}
 
 	fmt.Println(strings.TrimSpace(resp.Text))
-}
-
-func RunTDD(builder *prompt.Builder, provider llm.Provider, model string) error {
-	input := ""
-	args := []string{}
-	TDD(input, args)
 	return nil
 }
 
-func RunFeatureTS(builder *prompt.Builder, provider llm.Provider, model string) error {
-	input := ""
-	args := []string{}
-	TDD(input, args)
-	return nil
-}
+

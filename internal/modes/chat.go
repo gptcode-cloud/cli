@@ -30,11 +30,21 @@ func Chat(input string, args []string) {
 
 	var history ChatHistory
 	if input != "" {
-		err := json.Unmarshal([]byte(input), &history)
-		if err != nil {
+		// Try to unmarshal as JSON history
+		if err := json.Unmarshal([]byte(input), &history); err != nil {
+			// If input looks like JSON but failed to parse, log error and return
+			// This prevents sending raw JSON as a user message which blows up context
+			if len(input) > 0 && input[0] == '{' {
+				fmt.Fprintf(os.Stderr, "Error parsing chat history: %v\n", err)
+				return
+			}
+			// Otherwise treat as a single new message (CLI usage)
 			history.Messages = []llm.ChatMessage{{Role: "user", Content: input}}
 		}
 	}
+
+	// Truncate history to avoid context limits
+	history.Messages = truncateHistory(history.Messages, 20)
 
 	backendName := setup.Defaults.Backend
 
@@ -62,8 +72,6 @@ func Chat(input string, args []string) {
 		return
 	}
 
-	userMessage := history.Messages[len(history.Messages)-1].Content
-
 	var stopSpinner chan bool
 	if os.Getenv("CHUCHU_DEBUG") != "1" {
 		stopSpinner = make(chan bool, 1)
@@ -73,9 +81,18 @@ func Chat(input string, args []string) {
 	routerModel := backendCfg.GetModelForAgent("router")
 	editorModel := backendCfg.GetModelForAgent("editor")
 	queryModel := backendCfg.GetModelForAgent("query")
-	
+
 	coordinator := agents.NewCoordinator(provider, orchestrator, cwd, routerModel, editorModel, queryModel, researchModel)
-	result, err := coordinator.Execute(context.Background(), userMessage)
+
+	statusCallback := func(status string) {
+		if os.Getenv("CHUCHU_DEBUG") == "1" {
+			fmt.Fprintf(os.Stderr, "[STATUS] %s\n", status)
+		} else {
+			fmt.Fprintf(os.Stderr, "\r[STATUS] %s", status)
+		}
+	}
+
+	result, err := coordinator.Execute(context.Background(), history.Messages, statusCallback)
 
 	if os.Getenv("CHUCHU_DEBUG") != "1" {
 		stopSpinner <- true
@@ -149,4 +166,14 @@ func RunChat(builder *prompt.Builder, provider llm.Provider, model string, cliAr
 	input, _ := io.ReadAll(os.Stdin)
 	Chat(string(input), cliArgs)
 	return nil
+}
+
+func truncateHistory(messages []llm.ChatMessage, maxMessages int) []llm.ChatMessage {
+	if len(messages) <= maxMessages {
+		return messages
+	}
+
+	// Always keep the system prompt if it exists (though usually it's added later)
+	// For now, just keep the last N messages
+	return messages[len(messages)-maxMessages:]
 }

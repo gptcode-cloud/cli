@@ -19,7 +19,8 @@
 local M = {}
 
 local config = {
-  chat_cmd = { "chu", "chat" },
+  -- Use explicit path to ensure we get the latest binary with status updates
+  chat_cmd = { vim.fn.expand("~/.local/bin/chu"), "chat" },
   keymaps = {
     chat          = "<leader>cd",
     verified      = "<leader>vf",
@@ -404,6 +405,7 @@ function M.show_loading_animation()
   
   local timer = vim.loop.new_timer()
   chat_state.loading_timer = timer
+  chat_state.current_status = "Thinking..."
   
   timer:start(0, 100, vim.schedule_wrap(function()
     if not chat_state.buf or not vim.api.nvim_buf_is_valid(chat_state.buf) then
@@ -416,7 +418,7 @@ function M.show_loading_animation()
     
     vim.api.nvim_buf_set_option(chat_state.buf, "modifiable", true)
     vim.api.nvim_buf_set_lines(chat_state.buf, last_line - 1, last_line, false, 
-      {frames[frame_idx] .. " | Thinking..."})
+      {frames[frame_idx] .. " | " .. chat_state.current_status})
     vim.api.nvim_buf_set_option(chat_state.buf, "modifiable", false)
     
     frame_idx = (frame_idx % #frames) + 1
@@ -895,7 +897,7 @@ function M.shell_help()
       return
     end
 
-    local cmd = { "chu", "chat" }
+    local cmd = { vim.fn.expand("~/.local/bin/chu"), "chat" }
     local output = {}
 
     local job = vim.fn.jobstart(cmd, {
@@ -964,8 +966,12 @@ end
 
 local function extract_all_blocks(text)
   local blocks = {}
-  for tests_block, impl_block in text:gmatch("```tests(.-)```.-```impl(.-)```") do
-    table.insert(blocks, { tests = tests_block, impl = impl_block })
+  -- Capture any code block: ```lang ... ```
+  for lang, content in text:gmatch("```(%w+)(.-)```") do
+    -- Skip if it's just a small inline snippet or empty
+    if #content > 10 then
+      table.insert(blocks, { lang = lang, content = content })
+    end
   end
   return blocks
 end
@@ -1044,7 +1050,10 @@ function M.send_to_llm(user_input)
   table.insert(chat_state.conversation, "Assistant: ")
   local assistant_idx = #chat_state.conversation
 
-  local job = vim.fn.jobstart(cmd, {
+  -- Determine project root (where .git resides) to ensure tools can find source files
+  local git_dir = vim.fn.finddir('.git', '.;')
+  local project_root = git_dir ~= '' and vim.fn.fnamemodify(git_dir, ':h') or vim.fn.getcwd()
+  local job = vim.fn.jobstart(cmd, { cwd = project_root,
     stdout_buffered = false,
     on_stdout = function(_, data, _)
       if not data then return end
@@ -1064,6 +1073,17 @@ function M.send_to_llm(user_input)
               chat_state.conversation[assistant_idx] = "Assistant: " .. assistant_response
               M.render_chat()
             end
+          end
+        end
+      end
+    end,
+    on_stderr = function(_, data, _)
+      if not data then return end
+      for _, line in ipairs(data) do
+        if line ~= "" then
+          local status_match = line:match("%[STATUS%]%s*(.+)")
+          if status_match then
+            chat_state.current_status = status_match
           end
         end
       end
@@ -1222,7 +1242,18 @@ function M.handle_llm_response(raw)
   
   local blocks = extract_all_blocks(raw)
   if #blocks > 0 then
-    M.create_code_tabs(blocks)
+    -- Create a new tab for the code blocks
+    vim.cmd("tabnew")
+    local combined_content = ""
+    
+    for _, block in ipairs(blocks) do
+      combined_content = combined_content .. "// Language: " .. block.lang .. "\n" .. block.content .. "\n\n"
+    end
+
+    local buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(combined_content, "\n"))
+    vim.api.nvim_set_current_buf(buf)
+    vim.bo.filetype = blocks[1].lang -- Set filetype to the first block's language
   end
 end
 

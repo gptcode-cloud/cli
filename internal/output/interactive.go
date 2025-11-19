@@ -20,10 +20,10 @@ const (
 
 func PromptCodeBlock(block CodeBlock, total int) Action {
 	fmt.Fprintf(os.Stderr, "\n┌─ Command %d/%d (%s) ", block.Index, total, block.Language)
-	fmt.Fprintf(os.Stderr, strings.Repeat("─", 50-len(fmt.Sprintf("Command %d/%d (%s) ", block.Index, total, block.Language))))
+	fmt.Fprintf(os.Stderr, "%s", strings.Repeat("─", 50-len(fmt.Sprintf("Command %d/%d (%s) ", block.Index, total, block.Language))))
 	fmt.Fprintf(os.Stderr, "\n│ %s\n", strings.ReplaceAll(block.Code, "\n", "\n│ "))
 	fmt.Fprintf(os.Stderr, "└")
-	fmt.Fprintf(os.Stderr, strings.Repeat("─", 63))
+	fmt.Fprintf(os.Stderr, "%s", strings.Repeat("─", 63))
 	fmt.Fprintf(os.Stderr, "\n")
 	fmt.Fprintf(os.Stderr, "[c] Copy  [r] Run  [e] Edit & Run  [s] Skip: ")
 

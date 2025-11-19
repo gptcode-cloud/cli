@@ -49,7 +49,7 @@ Focus on making the actual code changes described in the plan.`, string(planCont
 
 	editorModel := backendCfg.GetModelForAgent("editor")
 	editorAgent := agents.NewEditor(customExec, cwd, editorModel)
-	implementResult, err := editorAgent.Execute(context.Background(), implementPrompt)
+	implementResult, err := editorAgent.Execute(context.Background(), []llm.ChatMessage{{Role: "user", Content: implementPrompt}}, nil)
 	if err != nil {
 		return fmt.Errorf("implementation failed: %w", err)
 	}

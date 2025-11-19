@@ -28,24 +28,23 @@ const editorPrompt = `You are a code editor. Your ONLY job is to modify files.
 WORKFLOW:
 1. Call read_file to get current content
 2. Modify the content in your response
-3. Call write_file with the COMPLETE modified file
+3. Call apply_patch for small changes, or write_file for new files/large rewrites.
 
-CRITICAL RULES FOR write_file:
-- The "content" parameter MUST contain the ENTIRE file text
-- NEVER use placeholders like "[previous content]" or "[rest of file]"
-- NEVER use references like "[read_file path=...]"
-- You must provide EVERY LINE of the file, even unchanged lines
+CRITICAL RULES:
+- Use apply_patch whenever possible to save tokens and reduce risk.
+- For apply_patch, the "search" block must MATCH EXACTLY (including whitespace).
+- For write_file, provide the COMPLETE file content.
+- NEVER use placeholders like "[previous content]" or "[rest of file]".
 
-Example:
+Example (Patch):
 User: "Remove line 3 from test.go"
 You:
-1. read_file(path="test.go") → Returns 10 lines
-2. Remove line 3 from the text
-3. write_file(path="test.go", content="line1\nline2\nline4\nline5\n...line10")
+1. read_file(path="test.go")
+2. apply_patch(path="test.go", search="line3\n", replace="")
 
 Be direct. No explanations unless there's an error.`
 
-func (e *EditorAgent) Execute(ctx context.Context, userMessage string) (string, error) {
+func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, statusCallback StatusCallback) (string, error) {
 	toolDefs := []interface{}{
 		map[string]interface{}{
 			"type": "function",
@@ -102,14 +101,58 @@ func (e *EditorAgent) Execute(ctx context.Context, userMessage string) (string, 
 				},
 			},
 		},
+		map[string]interface{}{
+			"type": "function",
+			"function": map[string]interface{}{
+				"name":        "project_map",
+				"description": "Get project structure",
+				"parameters": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"max_depth": map[string]interface{}{
+							"type":        "integer",
+							"description": "Max depth",
+						},
+					},
+				},
+			},
+		},
+		map[string]interface{}{
+			"type": "function",
+			"function": map[string]interface{}{
+				"name":        "apply_patch",
+				"description": "Replace text block",
+				"parameters": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"path": map[string]interface{}{
+							"type":        "string",
+							"description": "File path",
+						},
+						"search": map[string]interface{}{
+							"type":        "string",
+							"description": "Exact text to replace",
+						},
+						"replace": map[string]interface{}{
+							"type":        "string",
+							"description": "New text",
+						},
+					},
+					"required": []string{"path", "search", "replace"},
+				},
+			},
+		},
 	}
 
-	messages := []llm.ChatMessage{
-		{Role: "user", Content: userMessage},
-	}
+	// Copy history to avoid mutating the original slice in the loop
+	messages := make([]llm.ChatMessage, len(history))
+	copy(messages, history)
 
 	maxIterations := 5
 	for i := 0; i < maxIterations; i++ {
+		if statusCallback != nil {
+			statusCallback(fmt.Sprintf("Editor: Thinking (Iteration %d/%d)...", i+1, maxIterations))
+		}
 		if os.Getenv("CHUCHU_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[EDITOR] Iteration %d/%d\n", i+1, maxIterations)
 		}
@@ -140,8 +183,11 @@ func (e *EditorAgent) Execute(ctx context.Context, userMessage string) (string, 
 				Name:      tc.Name,
 				Arguments: tc.Arguments,
 			}
+			if statusCallback != nil {
+				statusCallback(fmt.Sprintf("Editor: Executing %s...", tc.Name))
+			}
 			result := tools.ExecuteToolFromLLM(llmCall, e.cwd)
-			
+
 			content := result.Result
 			if result.Error != "" {
 				content = "Error: " + result.Error
@@ -149,7 +195,7 @@ func (e *EditorAgent) Execute(ctx context.Context, userMessage string) (string, 
 			if content == "" {
 				content = "Success"
 			}
-			
+
 			messages = append(messages, llm.ChatMessage{
 				Role:       "tool",
 				Content:    content,

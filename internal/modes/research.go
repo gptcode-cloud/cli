@@ -48,7 +48,7 @@ func RunResearch(args []string) error {
 
 	if len(urls) > 0 {
 		fmt.Fprintf(os.Stderr, "⠋ Fetching external documentation...\n")
-		
+
 		var orchestrator *llm.OrchestratorProvider
 		if backendCfg.Type == "ollama" {
 			customExec := llm.NewOllama(backendCfg.BaseURL)
@@ -57,11 +57,11 @@ func RunResearch(args []string) error {
 			customExec := llm.NewChatCompletion(backendCfg.BaseURL, backendName)
 			orchestrator = llm.NewOrchestrator(backendCfg.BaseURL, backendName, customExec, backendCfg.DefaultModel)
 		}
-		
+
 		researchAgent := agents.NewResearch(orchestrator)
 		for _, url := range urls {
 			docPrompt := fmt.Sprintf("Visit %s and summarize the key implementation details for: %s", url, question)
-			docResult, err := researchAgent.Execute(context.Background(), docPrompt)
+			docResult, err := researchAgent.Execute(context.Background(), []llm.ChatMessage{{Role: "user", Content: docPrompt}}, nil)
 			if err == nil {
 				externalDocs += fmt.Sprintf("\n\n## Documentation from %s\n\n%s", url, docResult)
 			}
@@ -69,17 +69,17 @@ func RunResearch(args []string) error {
 	}
 
 	fmt.Fprintf(os.Stderr, "⠋ Analyzing codebase...\n")
-	
+
 	var customExec llm.Provider
 	if backendCfg.Type == "ollama" {
 		customExec = llm.NewOllama(backendCfg.BaseURL)
 	} else {
 		customExec = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
 	}
-	
+
 	queryModel := backendCfg.GetModelForAgent("query")
 	queryAgent := agents.NewQuery(customExec, cwd, queryModel)
-	
+
 	codebasePrompt := fmt.Sprintf(`Brief codebase overview:
 
 1. List root directory files (use list_files on ".")
@@ -87,8 +87,8 @@ func RunResearch(args []string) error {
 3. Suggest 2-3 key directories for: %s
 
 Keep response under 150 words.`, question)
-	
-	codebaseAnalysis, err := queryAgent.Execute(context.Background(), codebasePrompt)
+
+	codebaseAnalysis, err := queryAgent.Execute(context.Background(), []llm.ChatMessage{{Role: "user", Content: codebasePrompt}}, nil)
 	if err != nil {
 		return fmt.Errorf("codebase analysis failed: %w", err)
 	}

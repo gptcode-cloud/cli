@@ -66,9 +66,12 @@ You stay in the editor, moving between tests and implementation, as you should.
 - **CLI (`chu`)**
   - `chu setup` – bootstrap `~/.chuchu` (profile + system prompt)
   - `chu chat` – code-focused chat
+  - `chu review` – code review for bugs, security, and quality
   - `chu tdd` – incremental TDD mode
-  - `chu feature-elixir` – ExUnit tests + module
-  - `chu feature-ts` – TS tests + implementation
+  - `chu research` – document codebase and understand architecture
+  - `chu plan` – create detailed implementation plan
+  - `chu implement` – execute plan with verification
+  - `chu feature` – generate tests + implementation (auto-detects language)
 
 - **Neovim plugin**
   - `:ChuchuFeature` – feature workflow with split layout
@@ -188,6 +191,14 @@ You run tests with Vitest or Jest, tweak behavior, and repeat.
 
 Chuchu is not your friend.  
 Chuchu is the strict reviewer sitting next to you, full-time.
+
+---
+
+## Documentation
+
+- [Commands Reference](./commands.html) – Complete guide to all CLI commands
+- [Research Mode](./research.html) – Research workflow details
+- [Plan Mode](./plan.html) – Planning workflow
 
 ---
 

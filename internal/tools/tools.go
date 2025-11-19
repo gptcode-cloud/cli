@@ -142,6 +142,47 @@ func GetAvailableTools() []map[string]interface{} {
 				},
 			},
 		},
+		{
+			"type": "function",
+			"function": map[string]interface{}{
+				"name":        "project_map",
+				"description": "Get a tree-like view of the project structure",
+				"parameters": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"max_depth": map[string]interface{}{
+							"type":        "integer",
+							"description": "Maximum depth to traverse (default 3)",
+						},
+					},
+				},
+			},
+		},
+		{
+			"type": "function",
+			"function": map[string]interface{}{
+				"name":        "apply_patch",
+				"description": "Replace a block of text in a file",
+				"parameters": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"path": map[string]interface{}{
+							"type":        "string",
+							"description": "File path",
+						},
+						"search": map[string]interface{}{
+							"type":        "string",
+							"description": "Exact text block to replace",
+						},
+						"replace": map[string]interface{}{
+							"type":        "string",
+							"description": "New text block",
+						},
+					},
+					"required": []string{"path", "search", "replace"},
+				},
+			},
+		},
 	}
 }
 
@@ -159,6 +200,10 @@ func ExecuteTool(call ToolCall, workdir string) ToolResult {
 		return readGuideline(call)
 	case "write_file":
 		return writeFile(call, workdir)
+	case "project_map":
+		return ProjectMap(call, workdir)
+	case "apply_patch":
+		return ApplyPatch(call, workdir)
 	default:
 		return ToolResult{
 			Tool:  call.Name,

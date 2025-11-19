@@ -33,7 +33,7 @@ You can:
 
 You CANNOT modify files. Be concise and direct in your explanations.`
 
-func (q *QueryAgent) Execute(ctx context.Context, userMessage string) (string, error) {
+func (q *QueryAgent) Execute(ctx context.Context, history []llm.ChatMessage, statusCallback StatusCallback) (string, error) {
 	toolDefs := []interface{}{
 		map[string]interface{}{
 			"type": "function",
@@ -93,14 +93,33 @@ func (q *QueryAgent) Execute(ctx context.Context, userMessage string) (string, e
 				},
 			},
 		},
+		map[string]interface{}{
+			"type": "function",
+			"function": map[string]interface{}{
+				"name":        "project_map",
+				"description": "Get project structure",
+				"parameters": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"max_depth": map[string]interface{}{
+							"type":        "integer",
+							"description": "Max depth",
+						},
+					},
+				},
+			},
+		},
 	}
 
-	messages := []llm.ChatMessage{
-		{Role: "user", Content: userMessage},
-	}
+	// Copy history
+	messages := make([]llm.ChatMessage, len(history))
+	copy(messages, history)
 
 	maxIterations := 3
 	for i := 0; i < maxIterations; i++ {
+		if statusCallback != nil {
+			statusCallback(fmt.Sprintf("Query: Thinking (Iteration %d/%d)...", i+1, maxIterations))
+		}
 		if os.Getenv("CHUCHU_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[QUERY] Iteration %d/%d\n", i+1, maxIterations)
 		}
@@ -131,8 +150,11 @@ func (q *QueryAgent) Execute(ctx context.Context, userMessage string) (string, e
 				Name:      tc.Name,
 				Arguments: tc.Arguments,
 			}
+			if statusCallback != nil {
+				statusCallback(fmt.Sprintf("Query: Executing %s...", tc.Name))
+			}
 			result := tools.ExecuteToolFromLLM(llmCall, q.cwd)
-			
+
 			content := result.Result
 			if result.Error != "" {
 				content = "Error: " + result.Error
@@ -140,7 +162,7 @@ func (q *QueryAgent) Execute(ctx context.Context, userMessage string) (string, e
 			if content == "" {
 				content = "Success"
 			}
-			
+
 			messages = append(messages, llm.ChatMessage{
 				Role:       "tool",
 				Content:    content,
