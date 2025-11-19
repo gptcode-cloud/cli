@@ -19,8 +19,7 @@
 local M = {}
 
 local config = {
-  -- Use explicit path to ensure we get the latest binary with status updates
-  chat_cmd = { vim.fn.expand("~/.local/bin/chu"), "chat" },
+  chat_cmd = { "chu", "chat" },
   keymaps = {
     chat          = "<leader>cd",
     verified      = "<leader>vf",
@@ -897,7 +896,7 @@ function M.shell_help()
       return
     end
 
-    local cmd = { vim.fn.expand("~/.local/bin/chu"), "chat" }
+    local cmd = { "chu", "chat" }
     local output = {}
 
     local job = vim.fn.jobstart(cmd, {
@@ -1007,6 +1006,23 @@ function M.start_code_conversation()
   end)
 end
 
+function M.handle_confirmation(prompt, id)
+  vim.schedule(function()
+    vim.ui.input({
+      prompt = prompt .. " [y/n]: ",
+      default = "y"
+    }, function(response)
+      if not response then response = "n" end
+      response = response:lower()
+      
+      if chat_state.job and chat_state.job > 0 then
+        local answer = (response == "y" or response == "yes") and "y\n" or "n\n"
+        vim.fn.chansend(chat_state.job, answer)
+      end
+    end)
+  end)
+end
+
 function M.send_to_llm(user_input)
   local cmd = vim.deepcopy(config.chat_cmd)
   local assistant_response = ""
@@ -1050,10 +1066,9 @@ function M.send_to_llm(user_input)
   table.insert(chat_state.conversation, "Assistant: ")
   local assistant_idx = #chat_state.conversation
 
-  -- Determine project root (where .git resides) to ensure tools can find source files
   local git_dir = vim.fn.finddir('.git', '.;')
   local project_root = git_dir ~= '' and vim.fn.fnamemodify(git_dir, ':h') or vim.fn.getcwd()
-  local job = vim.fn.jobstart(cmd, { cwd = project_root,
+  chat_state.job = vim.fn.jobstart(cmd, { cwd = project_root,
     stdout_buffered = false,
     on_stdout = function(_, data, _)
       if not data then return end
@@ -1107,20 +1122,80 @@ function M.send_to_llm(user_input)
     stdin = "pipe",
   })
 
-  if job <= 0 then
+  if chat_state.job <= 0 then
     vim.notify("Chuchu: failed to start command", vim.log.levels.ERROR)
     return
   end
 
-  vim.fn.chansend(job, history_json .. "\n")
-  vim.fn.chanclose(job, "stdin")
+  vim.schedule(function()
+    vim.fn.chansend(chat_state.job, history_json .. "\n")
+  end)
 end
 
 function M.handle_tool_event(event_json, assistant_idx)
+  if os.getenv("CHUCHU_DEBUG") == "1" then
+    print("[PLUGIN] Event: " .. event_json:sub(1, 100) .. " type=" .. (vim.fn.json_decode(event_json).type or "?"))
+  end
+  
   local ok, event = pcall(vim.fn.json_decode, event_json)
   if not ok then return end
   
-  if event.type == "tool_start" then
+  if event.type == "message" then
+    local msg = event.data and event.data.content or ""
+    table.insert(chat_state.conversation, "Assistant: " .. msg)
+    M.render_chat()
+    
+  elseif event.type == "status" then
+    local status = event.data and event.data.status or ""
+    chat_state.current_status = status
+    
+  elseif event.type == "confirm" then
+    local prompt = event.data and event.data.prompt or "Proceed?"
+    local id = event.data and event.data.id or "confirm"
+    M.handle_confirmation(prompt, id)
+    
+  elseif event.type == "open_plan" then
+    local path = event.data and event.data.path or ""
+    if path ~= "" then
+      vim.schedule(function()
+        vim.cmd("tabnew " .. vim.fn.fnameescape(path))
+      end)
+    end
+    
+  elseif event.type == "open_split" then
+    local test_file = event.data and event.data.test_file or ""
+    local impl_file = event.data and event.data.impl_file or ""
+    if test_file ~= "" and impl_file ~= "" then
+      vim.schedule(function()
+        vim.cmd("tabnew")
+        vim.cmd("edit " .. vim.fn.fnameescape(test_file))
+        vim.cmd("vsplit")
+        vim.cmd("wincmd l")
+        vim.cmd("edit " .. vim.fn.fnameescape(impl_file))
+        vim.cmd("wincmd h")
+      end)
+    end
+    
+  elseif event.type == "complete" then
+    table.insert(chat_state.conversation, "Assistant: ✅ Complete")
+    M.render_chat()
+    
+  elseif event.type == "notify" then
+    local message = event.data and event.data.message or ""
+    local level = event.data and event.data.level or "info"
+    local vim_level = vim.log.levels.INFO
+    
+    if level == "warn" then
+      vim_level = vim.log.levels.WARN
+    elseif level == "error" then
+      vim_level = vim.log.levels.ERROR
+    end
+    
+    vim.schedule(function()
+      vim.notify(message, vim_level)
+    end)
+    
+  elseif event.type == "tool_start" then
     table.insert(chat_state.active_tools, event.tool)
     M.ensure_tools_window()
     M.append_tool_output("\n⚙ " .. event.tool .. "\n")

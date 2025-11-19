@@ -40,6 +40,13 @@ func (o *OrchestratorProvider) Chat(ctx context.Context, req ChatRequest) (*Chat
 	toolCallHistory := make(map[string]int)
 	conversation := append([]ChatMessage{}, req.Messages...)
 
+	if req.UserPrompt != "" {
+		conversation = append(conversation, ChatMessage{
+			Role:    "user",
+			Content: req.UserPrompt,
+		})
+	}
+
 	for iteration := 0; iteration < maxIterations; iteration++ {
 		if os.Getenv("CHUCHU_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[ORCHESTRATOR] Iteration %d/%d\n", iteration+1, maxIterations)

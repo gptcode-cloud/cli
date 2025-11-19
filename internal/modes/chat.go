@@ -22,6 +22,8 @@ type ChatHistory struct {
 }
 
 func Chat(input string, args []string) {
+	os.Stdout.Sync()
+	
 	if os.Getenv("CHUCHU_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[CHAT] Starting Chat function\n")
 	}
@@ -69,6 +71,22 @@ func Chat(input string, args []string) {
 	if len(history.Messages) == 0 || history.Messages[len(history.Messages)-1].Role != "user" {
 		fmt.Fprintln(os.Stderr, "\nERROR: Invalid message history")
 		fmt.Println("Erro: Invalid message history - must have at least one user message")
+		return
+	}
+
+	lastUserMessage := history.Messages[len(history.Messages)-1].Content
+
+	if IsComplexTask(lastUserMessage) {
+		fmt.Fprintln(os.Stderr, "[CHAT] Complexity detected, using guided mode")
+		queryModel := backendCfg.GetModelForAgent("query")
+		guided := NewGuidedMode(orchestrator, cwd, queryModel)
+		if err := guided.Execute(context.Background(), lastUserMessage); err != nil {
+			fmt.Fprintln(os.Stderr, "Guided mode error:", err)
+			fmt.Println("Erro:", err)
+		}
+		os.Stdout.Sync()
+		
+		io.Copy(io.Discard, os.Stdin)
 		return
 	}
 

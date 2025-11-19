@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 )
 
 type EventType string
@@ -16,6 +17,7 @@ const (
 	EventOpenPlan    EventType = "open_plan"
 	EventOpenSplit   EventType = "open_split"
 	EventComplete    EventType = "complete"
+	EventNotify      EventType = "notify"
 )
 
 type Event struct {
@@ -43,7 +45,14 @@ func (e *Emitter) Emit(eventType EventType, data map[string]interface{}) error {
 	}
 	
 	_, err = fmt.Fprintf(e.writer, "__EVENT__%s__EVENT__\n", string(jsonBytes))
-	return err
+	if err != nil {
+		return err
+	}
+	
+	if f, ok := e.writer.(*os.File); ok {
+		f.Sync()
+	}
+	return nil
 }
 
 func (e *Emitter) Message(content string) error {
@@ -87,4 +96,11 @@ func (e *Emitter) OpenSplit(testFile string, implFile string) error {
 
 func (e *Emitter) Complete() error {
 	return e.Emit(EventComplete, map[string]interface{}{})
+}
+
+func (e *Emitter) Notify(message string, level string) error {
+	return e.Emit(EventNotify, map[string]interface{}{
+		"message": message,
+		"level":   level,
+	})
 }

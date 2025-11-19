@@ -45,12 +45,73 @@ Complete guide to running Chuchu entirely on your local machine with Ollama. Inc
 
 ---
 
-## Coming Soon
+### [OpenRouter Multi-Provider Setup](2024-11-20-openrouter-multi-provider.md)
+*November 20, 2024*
 
-- **OpenRouter Multi-Provider Setup**: Use the best model from each provider
-- **Cost Tracking and Optimization**: Monitor and reduce your API spending
-- **Custom Agent Workflows**: Build specialized agent pipelines
-- **Model Performance Benchmarks**: Real-world coding task comparisons
+Use the best model from each provider: Groq for speed, OpenRouter for intelligence.
+
+---
+
+### [Cost Tracking and Optimization](2024-11-22-cost-tracking-optimization.md)
+*November 22, 2024*
+
+Monitor and reduce your API spending with built-in tracking and budget alerts.
+
+---
+
+### [Custom Agent Workflows](2024-11-25-custom-agent-workflows.md)
+*November 25, 2024*
+
+Build specialized agent pipelines to automate your unique development tasks.
+
+---
+
+### [Model Performance Benchmarks](2024-11-27-model-performance-benchmarks.md)
+*November 27, 2024*
+
+Real-world coding task comparisons between Llama 3.1, Claude 3.5 Sonnet, and GPT-4o.
+
+---
+
+### [Integrating Chuchu with CI/CD](2024-11-29-ci-cd-integration.md)
+*November 29, 2024*
+
+Automate code reviews and sanity checks in your GitHub Actions pipelines.
+
+---
+
+### [Advanced Context Management](2024-12-02-advanced-context-management.md)
+*December 2, 2024*
+
+Techniques for handling large repositories effectively with Smart Context Management.
+
+---
+
+### [Building a Custom Tool](2024-12-04-building-custom-tools.md)
+*December 4, 2024*
+
+Extend Chuchu's capabilities by building custom tools for your specific domain.
+
+---
+
+### [Hybrid Local/Cloud Architecture](2024-12-06-hybrid-cloud-local.md)
+*December 6, 2024*
+
+Combine the privacy of local Ollama models with the power of cloud AI.
+
+---
+
+### [Debugging with Chuchu](2024-12-09-debugging-with-chuchu.md)
+*December 9, 2024*
+
+A workflow for debugging complex issues, from stack trace to fix.
+
+---
+
+### [The Future of AI Pair Programming](2024-12-11-future-of-ai-pair-programming.md)
+*December 11, 2024*
+
+Our vision for the future: from smart autocomplete to autonomous engineering.
 
 ---
 
