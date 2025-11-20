@@ -24,8 +24,10 @@ type ChatHistory struct {
 func Chat(input string, args []string) {
 	os.Stdout.Sync()
 	
+	fmt.Fprintf(os.Stderr, "[CHAT] Starting Chat function, input len=%d\n", len(input))
+	
 	if os.Getenv("CHUCHU_DEBUG") == "1" {
-		fmt.Fprintf(os.Stderr, "[CHAT] Starting Chat function\n")
+		fmt.Fprintf(os.Stderr, "[CHAT] Input: %s\n", input[:min(100, len(input))])
 	}
 
 	setup, _ := config.LoadSetup()

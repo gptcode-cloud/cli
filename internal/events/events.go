@@ -6,6 +6,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 type EventType string
@@ -22,8 +23,9 @@ const (
 )
 
 type Event struct {
-	Type EventType              `json:"type"`
-	Data map[string]interface{} `json:"data"`
+	Type      EventType              `json:"type"`
+	Data      map[string]interface{} `json:"data"`
+	Timestamp int64                  `json:"timestamp"`
 }
 
 type Emitter struct {
@@ -43,8 +45,9 @@ func NewEmitter(w io.Writer) *Emitter {
 
 func (e *Emitter) Emit(eventType EventType, data map[string]interface{}) error {
 	event := Event{
-		Type: eventType,
-		Data: data,
+		Type:      eventType,
+		Data:      data,
+		Timestamp: time.Now().UnixMilli(),
 	}
 	
 	jsonBytes, err := json.Marshal(event)

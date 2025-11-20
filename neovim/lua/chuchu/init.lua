@@ -1163,7 +1163,8 @@ function M.send_to_llm(user_input)
   
   vim.schedule(function()
     vim.fn.chansend(chat_state.job, history_json .. "\n")
-    vim.notify("[DEBUG] Stdin sent, watcher active", vim.log.levels.INFO)
+    vim.fn.chanclose(chat_state.job, 'stdin')
+    vim.notify("[DEBUG] Stdin sent and closed, watcher active", vim.log.levels.INFO)
   end)
 end
 
