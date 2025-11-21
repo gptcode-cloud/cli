@@ -51,19 +51,18 @@ func DetectLanguage(path string) Language {
 		return Python
 	}
 
-	files, err := os.ReadDir(absPath)
-	if err != nil {
-		return Unknown
-	}
-
 	langCounts := make(map[Language]int)
-
-	for _, file := range files {
-		if file.IsDir() {
-			continue
+	
+	walkErr := filepath.Walk(absPath, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return nil
 		}
-
-		ext := strings.ToLower(filepath.Ext(file.Name()))
+		
+		if info.IsDir() {
+			return nil
+		}
+		
+		ext := strings.ToLower(filepath.Ext(path))
 		switch ext {
 		case ".ex", ".exs":
 			langCounts[Elixir]++
@@ -76,6 +75,12 @@ func DetectLanguage(path string) Language {
 		case ".py":
 			langCounts[Python]++
 		}
+		
+		return nil
+	})
+	
+	if walkErr != nil {
+		return Unknown
 	}
 
 	maxCount := 0
