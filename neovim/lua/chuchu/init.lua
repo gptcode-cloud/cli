@@ -529,16 +529,25 @@ function M.show_model_configuration_menu(backend)
   local profiles = M.list_profiles(backend)
   local options = {}
   
+  table.insert(options, "→ Create new profile")
+  table.insert(options, "")
+  
   for _, profile_name in ipairs(profiles) do
-    table.insert(options, string.format("%s", profile_name))
+    table.insert(options, string.format("  %s", profile_name))
   end
   
   print("")
   vim.ui.select(options, {
-    prompt = string.format("[%s] Select profile:", backend),
+    prompt = string.format("[%s] Profile Management:", backend),
   }, function(choice)
     if not choice then return end
-    M.load_profile(backend, choice)
+    
+    if choice:match("^→") then
+      M.create_profile_interactive(backend)
+    elseif choice ~= "" then
+      local profile_name = choice:match("^%s+(.+)$")
+      M.show_profile_actions(backend, profile_name)
+    end
   end)
 end
 
@@ -585,6 +594,130 @@ function M.list_profiles(backend)
   end
   
   return profiles
+end
+
+function M.create_profile_interactive(backend)
+  vim.ui.input({
+    prompt = string.format("[%s] New profile name: ", backend)
+  }, function(name)
+    if not name or name == "" then
+      vim.notify("Profile creation cancelled", vim.log.levels.WARN)
+      return
+    end
+    
+    if name == "default" then
+      vim.notify("Cannot create profile named 'default'", vim.log.levels.ERROR)
+      return
+    end
+    
+    local result = vim.fn.system({"chu", "profiles", "create", backend, name})
+    if vim.v.shell_error == 0 then
+      vim.notify(string.format("✓ Created profile: %s/%s", backend, name), vim.log.levels.INFO)
+      M.configure_profile_agents(backend, name)
+    else
+      vim.notify("Failed to create profile: " .. result, vim.log.levels.ERROR)
+    end
+  end)
+end
+
+function M.show_profile_actions(backend, profile_name)
+  local actions = {
+    "1. Load profile",
+    "2. Configure agents",
+    "3. Show details",
+    "4. Delete profile (if not default)"
+  }
+  
+  vim.ui.select(actions, {
+    prompt = string.format("[%s/%s]", backend, profile_name)
+  }, function(choice)
+    if not choice then return end
+    
+    if choice:match("^1") then
+      M.load_profile(backend, profile_name)
+    elseif choice:match("^2") then
+      M.configure_profile_agents(backend, profile_name)
+    elseif choice:match("^3") then
+      M.show_profile_details(backend, profile_name)
+    elseif choice:match("^4") then
+      M.delete_profile(backend, profile_name)
+    end
+  end)
+end
+
+function M.configure_profile_agents(backend, profile_name)
+  local agents = {"router", "query", "editor", "research"}
+  local agent_idx = 1
+  
+  local function configure_next_agent()
+    if agent_idx > #agents then
+      vim.notify(string.format("✓ Profile %s/%s configured", backend, profile_name), vim.log.levels.INFO)
+      M.load_profile(backend, profile_name)
+      return
+    end
+    
+    local agent = agents[agent_idx]
+    M.get_models_for_backend(backend, function(models)
+      if #models == 0 then
+        agent_idx = agent_idx + 1
+        configure_next_agent()
+        return
+      end
+      
+      local selected_model = models[1]
+      if selected_model then
+        vim.fn.system({"chu", "profiles", "set-agent", backend, profile_name, agent, selected_model})
+        agent_idx = agent_idx + 1
+        configure_next_agent()
+      end
+    end, agent)
+  end
+  
+  configure_next_agent()
+end
+
+function M.show_profile_details(backend, profile_name)
+  local output = vim.fn.system({"chu", "profiles", "show", backend, profile_name})
+  
+  if vim.v.shell_error == 0 then
+    local lines = vim.split(output, "\n")
+    local formatted = {}
+    table.insert(formatted, string.format("Profile: %s/%s", backend, profile_name))
+    table.insert(formatted, "")
+    
+    for _, line in ipairs(lines) do
+      if line ~= "" and not line:match("^Profile:") then
+        table.insert(formatted, line)
+      end
+    end
+    
+    vim.notify(table.concat(formatted, "\n"), vim.log.levels.INFO)
+  else
+    vim.notify("Failed to show profile details", vim.log.levels.ERROR)
+  end
+end
+
+function M.delete_profile(backend, profile_name)
+  if profile_name == "default" then
+    vim.notify("Cannot delete default profile", vim.log.levels.ERROR)
+    return
+  end
+  
+  vim.ui.input({
+    prompt = string.format("Delete profile %s/%s? (y/N): ", backend, profile_name),
+    default = "N"
+  }, function(response)
+    if response and response:lower() == "y" then
+      local result = vim.fn.system({"chu", "backend", "delete-profile", backend, profile_name})
+      if vim.v.shell_error == 0 then
+        vim.notify(string.format("✓ Deleted profile: %s/%s", backend, profile_name), vim.log.levels.INFO)
+      else
+        vim.notify("Note: Profile deletion via CLI not yet implemented. Edit setup.yaml manually.", vim.log.levels.WARN)
+      end
+    else
+      vim.notify("Deletion cancelled", vim.log.levels.INFO)
+    end
+  end)
 end
 
 function M.load_profile(backend, profile_name)

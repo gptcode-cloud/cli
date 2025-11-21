@@ -71,9 +71,15 @@ Add to your Neovim config:
 
 **Key Features:**
 - `<C-d>` - Open/close chat interface
-- `<C-m>` - Switch between backends and profiles
-- `<leader>ms` - Search models with filters (e.g., "ollama llama3", "groq coding fast")
-  - Shows pricing, context window, and installation status
+- `<C-m>` - Profile Management
+  - Create new profiles
+  - Load existing profiles
+  - Configure agent models (router, query, editor, research)
+  - Show profile details
+  - Delete profiles
+- `<leader>ms` - Search & Install Models
+  - Multi-term search (e.g., "ollama llama3", "groq coding fast")
+  - Shows pricing, context window, tags, and installation status (✓)
   - Auto-install Ollama models
   - Set as default or use for current session
 
