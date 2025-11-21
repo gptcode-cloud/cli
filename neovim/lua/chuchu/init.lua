@@ -552,44 +552,14 @@ function M.show_model_configuration_menu(backend)
 end
 
 function M.list_profiles(backend)
-  local setup_path = vim.fn.expand("~/.chuchu/setup.yaml")
-  if vim.fn.filereadable(setup_path) == 0 then
+  local output = vim.fn.system({"chu", "profiles", "list", backend})
+  
+  if vim.v.shell_error ~= 0 then
     return {"default"}
   end
   
-  local lines = vim.fn.readfile(setup_path)
-  local profiles = {}
-  local in_target_backend = false
-  local in_profiles = false
-  local has_backend_agent_models = false
-  
-  for _, line in ipairs(lines) do
-    if line:match("^%s%s%s%s" .. backend .. ":") then
-      in_target_backend = true
-    elseif line:match("^%s%s%s%s[a-z]") and in_target_backend then
-      in_target_backend = false
-      in_profiles = false
-    end
-    
-    if in_target_backend and line:match("^%s%s%s%s%s%s%s%sagent_models:") and not in_profiles then
-      has_backend_agent_models = true
-    end
-    
-    if in_target_backend and line:match("^%s%s%s%s%s%s%s%sprofiles:") then
-      in_profiles = true
-    elseif in_profiles and line:match("^%s%s%s%s%s%s%s%s%s%s%s%s([^:]+):") then
-      local profile_name = line:match("^%s%s%s%s%s%s%s%s%s%s%s%s([^:]+):")
-      table.insert(profiles, profile_name)
-    elseif in_profiles and not line:match("^%s%s%s%s%s%s%s%s%s%s%s%s") then
-      in_profiles = false
-    end
-  end
-  
-  if has_backend_agent_models then
-    table.insert(profiles, 1, "default")
-  end
-  
-  if #profiles == 0 then
+  local ok, profiles = pcall(vim.fn.json_decode, output)
+  if not ok or not profiles or #profiles == 0 then
     return {"default"}
   end
   
@@ -721,49 +691,17 @@ function M.delete_profile(backend, profile_name)
 end
 
 function M.load_profile(backend, profile_name)
-  local setup_path = vim.fn.expand("~/.chuchu/setup.yaml")
-  local lines = vim.fn.readfile(setup_path)
-  local new_lines = {}
-  local in_defaults = false
-  
-  for _, line in ipairs(lines) do
-    if line:match("^defaults:") then
-      in_defaults = true
-      table.insert(new_lines, line)
-    elseif line:match("^[a-z]") and not line:match("^%s") then
-      in_defaults = false
-      table.insert(new_lines, line)
-    elseif in_defaults then
-      if line:match("^%s+backend:") then
-        table.insert(new_lines, "    backend: " .. backend)
-      elseif line:match("^%s+profile:") then
-        table.insert(new_lines, "    profile: " .. profile_name)
-      else
-        table.insert(new_lines, line)
-      end
-    else
-      table.insert(new_lines, line)
-    end
+  vim.fn.system({"chu", "config", "set", "defaults.backend", backend})
+  if vim.v.shell_error ~= 0 then
+    vim.notify("Failed to set backend", vim.log.levels.ERROR)
+    return
   end
   
-  local has_profile_field = false
-  for _, line in ipairs(new_lines) do
-    if line:match("^%s+profile:") then
-      has_profile_field = true
-      break
-    end
+  vim.fn.system({"chu", "config", "set", "defaults.profile", profile_name})
+  if vim.v.shell_error ~= 0 then
+    vim.notify("Failed to set profile", vim.log.levels.ERROR)
+    return
   end
-  
-  if not has_profile_field then
-    for i, line in ipairs(new_lines) do
-      if line:match("^%s+backend:") then
-        table.insert(new_lines, i + 1, "    profile: " .. profile_name)
-        break
-      end
-    end
-  end
-  
-  vim.fn.writefile(new_lines, setup_path)
   
   M.load_profile_info()
   M.render_chat()
@@ -1115,32 +1053,17 @@ end
 
 
 function M.update_defaults(backend, model)
-  local setup_path = vim.fn.expand("~/.chuchu/setup.yaml")
-  local lines = vim.fn.readfile(setup_path)
-  local new_lines = {}
-  local in_defaults = false
-  
-  for _, line in ipairs(lines) do
-    if line:match("^defaults:") then
-      in_defaults = true
-      table.insert(new_lines, line)
-    elseif line:match("^[a-z]") and not line:match("^%s") then
-      in_defaults = false
-      table.insert(new_lines, line)
-    elseif in_defaults then
-      if line:match("^%s+backend:") then
-        table.insert(new_lines, "    backend: " .. backend)
-      elseif line:match("^%s+model:") then
-        table.insert(new_lines, "    model: " .. model)
-      else
-        table.insert(new_lines, line)
-      end
-    else
-      table.insert(new_lines, line)
-    end
+  vim.fn.system({"chu", "config", "set", "defaults.backend", backend})
+  if vim.v.shell_error ~= 0 then
+    vim.notify("Failed to set backend", vim.log.levels.ERROR)
+    return
   end
   
-  vim.fn.writefile(new_lines, setup_path)
+  vim.fn.system({"chu", "config", "set", "defaults.model", model})
+  if vim.v.shell_error ~= 0 then
+    vim.notify("Failed to set model", vim.log.levels.ERROR)
+    return
+  end
   
   chat_state.backend = backend
   chat_state.model = model
