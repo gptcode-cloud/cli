@@ -56,6 +56,8 @@ func getNestedValue(setup *Setup, key string) (interface{}, error) {
 			return setup.Defaults.SystemPromptFile, nil
 		case "ml_complex_threshold":
 			return setup.Defaults.MLComplexThreshold, nil
+		case "ml_intent_threshold":
+			return setup.Defaults.MLIntentThreshold, nil
 		default:
 			return nil, fmt.Errorf("unknown defaults field: %s", parts[1])
 		}
@@ -122,6 +124,12 @@ func setNestedValue(setup *Setup, key, value string) error {
 				return fmt.Errorf("invalid float value for ml_complex_threshold: %s", value)
 			}
 			setup.Defaults.MLComplexThreshold = f
+		case "ml_intent_threshold":
+			var f float64
+			if _, err := fmt.Sscan(value, &f); err != nil {
+				return fmt.Errorf("invalid float value for ml_intent_threshold: %s", value)
+			}
+			setup.Defaults.MLIntentThreshold = f
 		default:
 			return fmt.Errorf("unknown defaults field: %s", parts[1])
 		}

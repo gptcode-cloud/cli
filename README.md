@@ -83,40 +83,52 @@ Add to your Neovim config:
   - Auto-install Ollama models
   - Set as default or use for current session
 
-### ML-Driven Task Routing (Built-in)
+### ML-Powered Intelligence (Built-in)
 
-Chuchu embeds a compact ML model to decide when a request is complex or multistep and should trigger Guided Mode automatically in `chu chat` (CLI and Neovim). No external deps, zero runtime Python.
+Chuchu embeds two lightweight ML models for instant decision-making with zero external dependencies:
 
-Defaults
-- Threshold for "complex": 0.55 (can be changed in config)
-- "multistep" always triggers Guided Mode
+#### 1. Complexity Detection
+Automatically triggers Guided Mode for complex/multistep tasks in `chu chat`.
 
-Configure
+**Configuration:**
 ```bash
-# View threshold
+# View/set complexity threshold (default: 0.55)
 chu config get defaults.ml_complex_threshold
-
-# Set threshold (e.g. 0.6)
 chu config set defaults.ml_complex_threshold 0.6
 ```
 
-ML CLI
-```bash
-# New parent command
-chu ml                     # help
+#### 2. Intent Classifier
+Replaces LLM call with 1ms local inference to route requests (query/editor/research/review).
 
-# List models
+**Benefits:**
+- **500x faster**: 1ms vs 500ms LLM latency
+- **Cost savings**: Zero API calls for routing
+- **Fallback**: Uses LLM if confidence < threshold
+
+**Configuration:**
+```bash
+# View/set intent threshold (default: 0.7)
+chu config get defaults.ml_intent_threshold
+chu config set defaults.ml_intent_threshold 0.8
+```
+
+**ML CLI Commands:**
+```bash
+# List available models
 chu ml list
 
-# Train model (uses Python in repo only for training)
-chu ml train complexity_detection
+# Train models (uses Python)
+chu ml train complexity
+chu ml train intent
 
-# Test / Eval (Python)
-chu ml test complexity_detection "your task"
-chu ml eval complexity_detection -f ml/complexity_detection/data/eval.csv
+# Test models
+chu ml test intent "explain this code"
+chu ml eval intent -f ml/intent/data/eval.csv
 
-# Pure-Go inference (no Python)
-chu ml predict "your task description"
+# Pure-Go inference (no Python runtime)
+chu ml predict "your task"                    # complexity (default)
+chu ml predict complexity "implement oauth"   # explicit
+chu ml predict intent "explain this code"     # intent classification
 ```
 
 ## 📖 Usage

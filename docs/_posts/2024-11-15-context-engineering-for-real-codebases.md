@@ -109,9 +109,9 @@ Add user authentication with JWT tokens
 3. Protect routes with auth middleware
 
 ## Progress
-- ✅ User model created with tests
-- ✅ Password hashing working
-- 🔄 Currently: JWT middleware failing validation
+- [x] User model created with tests
+- [x] Password hashing working
+- [ ] Currently: JWT middleware failing validation
 
 ## Current Issue
 Token signature verification fails with RS256.
@@ -300,10 +300,10 @@ There's no magic prompt that solves everything. But proper context engineering m
 ## What Works
 
 With this approach, Chuchu can:
-- ✅ Work in brownfield codebases (not just toys)
-- ✅ Solve complex problems (not just CRUD)
-- ✅ Produce quality code (not slop)
-- ✅ Maintain mental alignment (not black box)
+- Work in brownfield codebases (not just toys)
+- Solve complex problems (not just CRUD)
+- Produce quality code (not slop)
+- Maintain mental alignment (not black box)
 
 And do it affordably:
 - Groq: $2-5/month typical usage

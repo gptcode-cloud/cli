@@ -907,17 +907,39 @@ var mlEvalCmd = &cobra.Command{
 }
 
 var mlPredictCmd = &cobra.Command{
-	Use:   "predict <text>",
-	Short: "Predict complexity using embedded Go model (no Python)",
+	Use:   "predict [model-name] <text>",
+	Short: "Predict using embedded Go model (no Python)",
+	Long: `Predict using embedded Go model (no Python).
+
+If model-name is omitted, defaults to 'complexity_detection'.
+
+Examples:
+  chu ml predict "fix typo in readme"
+  chu ml predict complexity_detection "implement oauth"
+  chu ml predict router_agent "explain this code"`,
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
-		p, err := ml.LoadEmbedded()
+		var modelName, text string
+		
+		if len(args) == 1 {
+			modelName = "complexity_detection"
+			text = args[0]
+		} else {
+			modelName = args[0]
+			text = strings.Join(args[1:], " ")
+		}
+		
+		p, err := ml.LoadEmbedded(modelName)
 		if err != nil { return err }
-		text := strings.Join(args, " ")
+		
 		label, probs := p.Predict(text)
+		fmt.Printf("Model: %s\n", modelName)
 		fmt.Printf("Prediction: %s\n", label)
 		fmt.Println("Probabilities:")
-		for k, v := range probs { fmt.Printf("  %s: %.1f%%\n", k, v*100) }
+		
+		for _, pair := range ml.SortedProbs(probs) {
+			fmt.Printf("  %-12s %s\n", pair[0]+":", pair[1])
+		}
 		return nil
 	},
 }

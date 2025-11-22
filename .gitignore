@@ -42,3 +42,7 @@ ml/complexity_detection/models/*.json
 ml/complexity_detection/data/training_data.csv
 ml/complexity_detection/venv/
 ml/complexity_detection/__pycache__/
+ml/intent/models/*.json
+ml/intent/data/training_data.csv
+ml/intent/venv/
+ml/intent/__pycache__/

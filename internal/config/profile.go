@@ -20,8 +20,9 @@ type Setup struct {
 		Profile           string  `yaml:"profile,omitempty"`
 		Model             string  `yaml:"model"`
 		Lang              string  `yaml:"lang"`
-		SystemPromptFile  string  `yaml:"system_prompt_file,omitempty"`
+		SystemPromptFile   string  `yaml:"system_prompt_file,omitempty"`
 		MLComplexThreshold float64 `yaml:"ml_complex_threshold,omitempty"`
+		MLIntentThreshold  float64 `yaml:"ml_intent_threshold,omitempty"`
 	} `yaml:"defaults"`
 	Backend map[string]BackendConfig `yaml:"backend"`
 }

@@ -10,10 +10,22 @@ import (
 
 // AvailableModels lists all trainable ML models
 var AvailableModels = map[string]ModelInfo{
-	"complexity_detection": {
-		Name:        "complexity_detection",
+	"complexity": {
+		Name:        "complexity",
 		Description: "Task complexity classifier (simple/complex/multistep)",
 		Path:        "ml/complexity_detection",
+		SetupScript: "setup_and_train.sh",
+	},
+	"complexity_detection": {
+		Name:        "complexity_detection",
+		Description: "Task complexity classifier (simple/complex/multistep) [deprecated: use 'complexity']",
+		Path:        "ml/complexity_detection",
+		SetupScript: "setup_and_train.sh",
+	},
+	"intent": {
+		Name:        "intent",
+		Description: "Intent classifier (query/editor/research/review)",
+		Path:        "ml/intent",
 		SetupScript: "setup_and_train.sh",
 	},
 }

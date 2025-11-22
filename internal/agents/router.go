@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"strings"
 
+	"chuchu/internal/config"
 	"chuchu/internal/llm"
+	"chuchu/internal/ml"
 )
 
 type Intent string
@@ -52,6 +54,25 @@ Examples:
 "add error handling to user.go" → edit`
 
 func (r *RouterAgent) ClassifyIntent(ctx context.Context, userMessage string) (Intent, error) {
+	p, err := ml.LoadEmbedded("intent")
+	if err == nil {
+		setup, _ := config.LoadSetup()
+		threshold := setup.Defaults.MLIntentThreshold
+		if threshold == 0 {
+			threshold = 0.7
+		}
+		
+		label, probs := p.Predict(userMessage)
+		confidence := probs[label]
+		
+		if confidence >= threshold {
+			intent := mapMLLabelToIntent(label)
+			if intent != "" {
+				return intent, nil
+			}
+		}
+	}
+	
 	resp, err := r.provider.Chat(ctx, llm.ChatRequest{
 		SystemPrompt: routerPrompt,
 		UserPrompt:   userMessage,
@@ -66,7 +87,7 @@ func (r *RouterAgent) ClassifyIntent(ctx context.Context, userMessage string) (I
 	switch intent {
 	case "query":
 		return IntentQuery, nil
-	case "edit":
+	case "edit", "editor":
 		return IntentEdit, nil
 	case "research":
 		return IntentResearch, nil
@@ -76,5 +97,22 @@ func (r *RouterAgent) ClassifyIntent(ctx context.Context, userMessage string) (I
 		return IntentReview, nil
 	default:
 		return IntentQuery, fmt.Errorf("unknown intent: %s", intent)
+	}
+}
+
+func mapMLLabelToIntent(label string) Intent {
+	switch label {
+	 case "router":
+		return IntentQuery
+	case "query":
+		return IntentQuery
+	case "editor":
+		return IntentEdit
+	case "research":
+		return IntentResearch
+	case "review":
+		return IntentReview
+	default:
+		return ""
 	}
 }

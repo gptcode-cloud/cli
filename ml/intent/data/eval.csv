@@ -1,0 +1,46 @@
+message,label
+"hi chu",router
+"what's up",router
+"please help",router
+"thanks a lot",router
+"goodbye",router
+"what does this code do",query
+"where can I find the database config",query
+"show me all the imports",query
+"which file contains the User type",query
+"list endpoints",query
+"how is authentication implemented",query
+"what's the purpose of this function",query
+"where is the logger initialized",query
+"find usages of GetConfig",query
+"show me the API routes",query
+"create a new API endpoint",editor
+"add error handling to this function",editor
+"fix the race condition",editor
+"implement user registration",editor
+"refactor the handler code",editor
+"write unit tests for auth",editor
+"update the dockerfile",editor
+"add input validation",editor
+"remove the debug statements",editor
+"optimize this database query",editor
+"how to implement middleware in gin",research
+"what are best practices for go testing",research
+"find examples of clean code",research
+"compare different caching strategies",research
+"what is the repository pattern",research
+"how to handle errors in go",research
+"search for websocket examples",research
+"what are the latest security practices",research
+"find documentation on postgres",research
+"research hexagonal architecture",research
+"review this code for security issues",review
+"check for potential bugs",review
+"analyze the test coverage",review
+"audit the authentication flow",review
+"look for performance problems",review
+"check if error handling is correct",review
+"review the API design",review
+"analyze code quality",review
+"check for memory leaks",review
+"audit the logging implementation",review

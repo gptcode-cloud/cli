@@ -195,6 +195,114 @@ Perfect for operational tasks without TDD ceremony.
 
 ---
 
+## Machine Learning Commands
+
+### `chu ml list`
+
+List available ML models.
+
+```bash
+chu ml list
+```
+
+Shows:
+- Model name
+- Description
+- Location
+- Status (trained/not trained)
+
+### `chu ml train <model>`
+
+Train an ML model using Python.
+
+```bash
+chu ml train complexity
+chu ml train intent
+```
+
+**Available models:**
+- `complexity` – Task complexity classifier (simple/complex/multistep)
+- `intent` – Intent classifier (query/editor/research/review)
+
+**Requirements:**
+- Python 3.8+
+- Will create venv and install dependencies automatically
+
+### `chu ml test <model> [query]`
+
+Test a trained model with a query.
+
+```bash
+chu ml test complexity "implement oauth"
+chu ml test intent "explain this code"
+```
+
+Shows prediction and probabilities for all classes.
+
+### `chu ml eval <model> [-f file]`
+
+Evaluate model performance on test dataset.
+
+```bash
+chu ml eval complexity
+chu ml eval intent -f ml/intent/data/eval.csv
+```
+
+Shows:
+- Accuracy
+- Precision/Recall/F1 per class
+- Confusion matrix
+- Low-confidence predictions
+
+### `chu ml predict [model] <text>`
+
+Make prediction using embedded Go model (no Python runtime).
+
+```bash
+chu ml predict "implement auth"               # uses complexity (default)
+chu ml predict complexity "fix typo"          # explicit model
+chu ml predict intent "explain this code"     # intent classification
+```
+
+**Fast path:**
+- 1ms inference (vs 500ms LLM)
+- Zero API cost
+- Pure Go, no Python runtime
+
+---
+
+## ML Configuration
+
+### Complexity Threshold
+
+Controls when Guided Mode is automatically activated.
+
+```bash
+# View current threshold (default: 0.55)
+chu config get defaults.ml_complex_threshold
+
+# Set threshold (0.0-1.0)
+chu config set defaults.ml_complex_threshold 0.6
+```
+
+Higher threshold = less sensitive (fewer Guided Mode triggers)
+
+### Intent Threshold
+
+Controls when ML router is used instead of LLM.
+
+```bash
+# View current threshold (default: 0.7)
+chu config get defaults.ml_intent_threshold
+
+# Set threshold (0.0-1.0)
+chu config set defaults.ml_intent_threshold 0.8
+```
+
+Higher threshold = more LLM fallbacks (more accurate but slower/expensive)
+
+---
+
 ## Command Comparison
 
 | Command | Purpose | When to Use |

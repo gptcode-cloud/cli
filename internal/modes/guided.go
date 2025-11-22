@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"chuchu/internal/agents"
+	"chuchu/internal/config"
 	"chuchu/internal/events"
 	"chuchu/internal/llm"
 	"chuchu/internal/ml"
-	"chuchu/internal/config"
 )
 
 type GuidedMode struct {
@@ -46,22 +46,22 @@ func (g *GuidedMode) Execute(ctx context.Context, userMessage string) error {
 
 	g.events.OpenPlan(draftPath)
 	g.events.Message("Draft plan created.")
-	
+
 	g.events.Status("Creating detailed plan...")
-	
+
 	fullPlan, err := g.createDetailedPlan(ctx, userMessage, draftPlan)
 	if err != nil {
 		return fmt.Errorf("failed to create plan: %w", err)
 	}
-	
+
 	planPath, err := g.savePlan(fullPlan)
 	if err != nil {
 		return fmt.Errorf("failed to save plan: %w", err)
 	}
-	
+
 	g.events.OpenPlan(planPath)
 	g.events.Message("Detailed plan ready. Send 'implement' to start implementation.")
-	
+
 	return nil
 }
 
@@ -91,10 +91,10 @@ Keep it concise - this is just a draft for user approval.`, task)
 
 func (g *GuidedMode) createDetailedPlan(ctx context.Context, task string, draft string) (string, error) {
 	research := "No research available"
-	
+
 	if orchestrator, ok := g.provider.(*llm.OrchestratorProvider); ok {
 		researchAgent := agents.NewResearch(orchestrator)
-		
+
 		statusCallback := func(status string) {
 			g.events.Status(status)
 		}
@@ -189,10 +189,10 @@ func (g *GuidedMode) savePlan(content string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	
+
 	currentPath := fmt.Sprintf("%s/.chuchu/current_plan.txt", home)
 	os.WriteFile(currentPath, []byte(content), 0644)
-	
+
 	return path, nil
 }
 
@@ -200,13 +200,13 @@ func (g *GuidedMode) waitForConfirmation(prompt string, id string) bool {
 	if err := g.events.Confirm(prompt, id); err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to emit confirm event: %v\n", err)
 	}
-	
+
 	os.Stdout.Sync()
 	time.Sleep(100 * time.Millisecond)
-	
+
 	responseChan := make(chan string, 1)
 	errorChan := make(chan error, 1)
-	
+
 	go func() {
 		reader := bufio.NewReader(os.Stdin)
 		response, err := reader.ReadString('\n')
@@ -216,7 +216,7 @@ func (g *GuidedMode) waitForConfirmation(prompt string, id string) bool {
 		}
 		responseChan <- response
 	}()
-	
+
 	timeout := time.After(120 * time.Second)
 	select {
 	case response := <-responseChan:
@@ -231,7 +231,8 @@ func (g *GuidedMode) waitForConfirmation(prompt string, id string) bool {
 }
 
 func IsComplexTask(message string) bool {
-	p, err := ml.LoadEmbedded()
+	// Try to load ML model
+	p, err := ml.LoadEmbedded("complexity_detection")
 	if err != nil {
 		return false
 	}

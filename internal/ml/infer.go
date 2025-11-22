@@ -16,25 +16,32 @@ type modelData struct {
 	} `json:"tfidf"`
 	Classifier struct {
 		Coefficients [][]float64 `json:"coefficients"`
-		Intercepts  []float64    `json:"intercepts"`
-		Classes     []string     `json:"classes"`
+		Intercepts   []float64   `json:"intercepts"`
+		Classes      []string    `json:"classes"`
 	} `json:"classifier"`
 }
 
 type Predictor struct {
-	vocab       map[string]int
-	idf         []float64
-	coefs       [][]float64
-	intercepts  []float64
-	classes     []string
+	modelName  string
+	vocab      map[string]int
+	idf        []float64
+	coefs      [][]float64
+	intercepts []float64
+	classes    []string
 }
 
-func LoadEmbedded() (*Predictor, error) {
+func LoadEmbedded(modelName string) (*Predictor, error) {
+	data, ok := embeddedModels[modelName]
+	if !ok {
+		return nil, fmt.Errorf("model '%s' not found in embedded assets", modelName)
+	}
+
 	var m modelData
-	if err := json.Unmarshal(embeddedModel, &m); err != nil {
-		return nil, err
+	if err := json.Unmarshal(data, &m); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal model '%s': %w", modelName, err)
 	}
 	return &Predictor{
+		modelName:  modelName,
 		vocab:      m.TFIDF.Vocabulary,
 		idf:        m.TFIDF.IDF,
 		coefs:      m.Classifier.Coefficients,
@@ -98,7 +105,9 @@ func (p *Predictor) vectorize(text string) []float64 {
 func softmax(x []float64) []float64 {
 	max := x[0]
 	for i := 1; i < len(x); i++ {
-		if x[i] > max { max = x[i] }
+		if x[i] > max {
+			max = x[i]
+		}
 	}
 	exp := make([]float64, len(x))
 	var sum float64
@@ -124,21 +133,28 @@ func (p *Predictor) Predict(text string) (string, map[string]float64) {
 		}
 		logits[c] = sum
 	}
-	lower := " " + strings.ToLower(text) + " "
-	idxComplex := indexOf(p.classes, "complex")
-	idxMulti := indexOf(p.classes, "multistep")
-	multiCues := []string{" then ", " and then ", ", then ", "; then ", " after ", " followed by ", " first ", " second ", " third "}
-	complexCues := []string{"oauth", "oauth2", "oidc", "migrate", "migration", "deploy", "docker", "kubectl", "k8s", "s3", "pipeline", "airflow", "terraform", "ansible", "kafka", "stripe", "payment", "upload", "script", "bash", "nginx", "logs"}
-	if anyContains(lower, multiCues) && idxMulti >= 0 {
-		logits[idxMulti] += 1.0
+
+	// Apply complexity-specific heuristics
+	if p.modelName == "complexity_detection" {
+		lower := " " + strings.ToLower(text) + " "
+		idxComplex := indexOf(p.classes, "complex")
+		idxMulti := indexOf(p.classes, "multistep")
+		multiCues := []string{" then ", " and then ", ", then ", "; then ", " after ", " followed by ", " first ", " second ", " third "}
+		complexCues := []string{"oauth", "oauth2", "oidc", "migrate", "migration", "deploy", "docker", "kubectl", "k8s", "s3", "pipeline", "airflow", "terraform", "ansible", "kafka", "stripe", "payment", "upload", "script", "bash", "nginx", "logs"}
+		if anyContains(lower, multiCues) && idxMulti >= 0 {
+			logits[idxMulti] += 1.0
+		}
+		if anyContains(lower, complexCues) && idxComplex >= 0 {
+			logits[idxComplex] += 1.5
+		}
 	}
-	if anyContains(lower, complexCues) && idxComplex >= 0 {
-		logits[idxComplex] += 1.5
-	}
+
 	probs := softmax(logits)
 	best := 0
 	for i := 1; i < len(probs); i++ {
-		if probs[i] > probs[best] { best = i }
+		if probs[i] > probs[best] {
+			best = i
+		}
 	}
 	out := map[string]float64{}
 	for i, c := range p.classes {
@@ -149,13 +165,19 @@ func (p *Predictor) Predict(text string) (string, map[string]float64) {
 
 func anyContains(s string, cues []string) bool {
 	for _, c := range cues {
-		if strings.Contains(s, c) { return true }
+		if strings.Contains(s, c) {
+			return true
+		}
 	}
 	return false
 }
 
 func indexOf(arr []string, val string) int {
-	for i, v := range arr { if v == val { return i } }
+	for i, v := range arr {
+		if v == val {
+			return i
+		}
+	}
 	return -1
 }
 

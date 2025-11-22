@@ -83,13 +83,13 @@ Mix and match. Change anytime. No vendor lock-in.
 
 Chuchu is perfect if you:
 
-- ✅ Can't afford $20+/month for AI coding tools
-- ✅ Want control over your AI spending
-- ✅ Prefer terminal/Neovim workflows
-- ✅ Care about test coverage
-- ✅ Want to learn TDD practices
-- ✅ Need offline/local AI options
-- ✅ Value transparency and open source
+- Can't afford $20+/month for AI coding tools
+- Want control over your AI spending
+- Prefer terminal/Neovim workflows
+- Care about test coverage
+- Want to learn TDD practices
+- Need offline/local AI options
+- Value transparency and open source
 
 ## The Vision
 

@@ -255,13 +255,13 @@ See our [Hybrid Cloud/Local guide](2024-12-06-hybrid-cloud-local) for detailed s
 
 | Aspect | Ollama (Local) | Groq (Cloud) |
 |--------|----------------|--------------|
-| Privacy | ✅ Complete | ❌ Code sent to API |
-| Cost | ✅ Free | 💰 Pay per token |
-| Speed (first run) | ⚠️ Model load time | ✅ Instant |
-| Speed (loaded) | ✅ No network | ✅ Very fast |
-| Model quality | ⚠️ Limited by RAM | ✅ Largest models |
-| Offline | ✅ Works offline | ❌ Requires internet |
-| Setup | ⚠️ Download models | ✅ Just API key |
+| Privacy | Complete | Code sent to API |
+| Cost | Free | Pay per token |
+| Speed (first run) | Model load time | Instant |
+| Speed (loaded) | No network | Very fast |
+| Model quality | Limited by RAM | Largest models |
+| Offline | Works offline | Requires internet |
+| Setup | Download models | Just API key |
 
 ## Model Discovery and Installation
 
