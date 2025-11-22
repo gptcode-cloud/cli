@@ -32,7 +32,7 @@ func NewGuidedMode(provider llm.Provider, cwd string, model string) *GuidedMode 
 }
 
 func (g *GuidedMode) Execute(ctx context.Context, userMessage string) error {
-	g.events.Status("Analyzing task...")
+	_ = g.events.Status("Analyzing task...")
 
 	draftPlan, err := g.createDraftPlan(ctx, userMessage)
 	if err != nil {
@@ -44,10 +44,10 @@ func (g *GuidedMode) Execute(ctx context.Context, userMessage string) error {
 		return fmt.Errorf("failed to save draft: %w", err)
 	}
 
-	g.events.OpenPlan(draftPath)
-	g.events.Message("Draft plan created.")
+	_ = g.events.OpenPlan(draftPath)
+	_ = g.events.Message("Draft plan created.")
 
-	g.events.Status("Creating detailed plan...")
+	_ = g.events.Status("Creating detailed plan...")
 
 	fullPlan, err := g.createDetailedPlan(ctx, userMessage, draftPlan)
 	if err != nil {
@@ -59,8 +59,8 @@ func (g *GuidedMode) Execute(ctx context.Context, userMessage string) error {
 		return fmt.Errorf("failed to save plan: %w", err)
 	}
 
-	g.events.OpenPlan(planPath)
-	g.events.Message("Detailed plan ready. Send 'implement' to start implementation.")
+	_ = g.events.OpenPlan(planPath)
+	_ = g.events.Message("Detailed plan ready. Send 'implement' to start implementation.")
 
 	return nil
 }
@@ -96,7 +96,7 @@ func (g *GuidedMode) createDetailedPlan(ctx context.Context, task string, draft 
 		researchAgent := agents.NewResearch(orchestrator)
 
 		statusCallback := func(status string) {
-			g.events.Status(status)
+			_ = g.events.Status(status)
 		}
 
 		history := []llm.ChatMessage{
@@ -158,7 +158,7 @@ func (g *GuidedMode) Implement(ctx context.Context, plan string) error {
 	editorAgent := agents.NewEditor(g.provider, g.cwd, g.model)
 
 	statusCallback := func(status string) {
-		g.events.Status(status)
+		_ = g.events.Status(status)
 	}
 
 	history := []llm.ChatMessage{
@@ -172,7 +172,7 @@ func (g *GuidedMode) Implement(ctx context.Context, plan string) error {
 func (g *GuidedMode) saveDraft(content string) (string, error) {
 	home, _ := os.UserHomeDir()
 	dir := fmt.Sprintf("%s/.chuchu/plans", home)
-	os.MkdirAll(dir, 0755)
+	_ = os.MkdirAll(dir, 0755)
 
 	path := fmt.Sprintf("%s/draft.md", dir)
 	return path, os.WriteFile(path, []byte(content), 0644)
@@ -181,7 +181,7 @@ func (g *GuidedMode) saveDraft(content string) (string, error) {
 func (g *GuidedMode) savePlan(content string) (string, error) {
 	home, _ := os.UserHomeDir()
 	dir := fmt.Sprintf("%s/.chuchu/plans", home)
-	os.MkdirAll(dir, 0755)
+	_ = os.MkdirAll(dir, 0755)
 
 	timestamp := time.Now().Format("2006-01-02-150405")
 	path := fmt.Sprintf("%s/%s-plan.md", dir, timestamp)
@@ -191,7 +191,7 @@ func (g *GuidedMode) savePlan(content string) (string, error) {
 	}
 
 	currentPath := fmt.Sprintf("%s/.chuchu/current_plan.txt", home)
-	os.WriteFile(currentPath, []byte(content), 0644)
+	_ = os.WriteFile(currentPath, []byte(content), 0644)
 
 	return path, nil
 }
@@ -225,7 +225,7 @@ func (g *GuidedMode) waitForConfirmation(prompt string, id string) bool {
 	case <-errorChan:
 		return false
 	case <-timeout:
-		g.events.Notify("Timeout waiting for confirmation", "warn")
+		_ = g.events.Notify("Timeout waiting for confirmation", "warn")
 		return false
 	}
 }

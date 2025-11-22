@@ -96,18 +96,18 @@ func Chat(input string, args []string) {
 		queryModel := backendCfg.GetModelForAgent("query")
 		guided := NewGuidedMode(orchestrator, cwd, queryModel)
 
-		guided.events.Status("Implementing plan...")
+		_ = guided.events.Status("Implementing plan...")
 		if err := guided.Implement(context.Background(), string(planContent)); err != nil {
 			fmt.Fprintln(os.Stderr, "Implementation error:", err)
 			fmt.Println("Error:", err)
 		} else {
-			guided.events.Complete()
-			guided.events.Message("Implementation complete. Review files and run tests.")
+			_ = guided.events.Complete()
+			_ = guided.events.Message("Implementation complete. Review files and run tests.")
 		}
 
 		os.Stdout.Sync()
 		time.Sleep(200 * time.Millisecond)
-		io.Copy(io.Discard, os.Stdin)
+		_, _ = io.Copy(io.Discard, os.Stdin)
 		return
 	}
 
@@ -124,7 +124,7 @@ func Chat(input string, args []string) {
 
 		time.Sleep(200 * time.Millisecond)
 
-		io.Copy(io.Discard, os.Stdin)
+		_, _ = io.Copy(io.Discard, os.Stdin)
 		return
 	}
 
@@ -249,7 +249,7 @@ func Chat(input string, args []string) {
 		if len(parsed.CodeBlocks) > 0 {
 			for _, block := range parsed.CodeBlocks {
 				action := output.PromptCodeBlock(block, len(parsed.CodeBlocks))
-				output.HandleCodeBlock(action, block.Code)
+				_ = output.HandleCodeBlock(action, block.Code)
 			}
 			fmt.Fprintln(os.Stderr, "")
 			fmt.Fprintln(os.Stderr, output.Success("All commands processed."))

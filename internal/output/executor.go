@@ -36,7 +36,7 @@ func HandleCodeBlock(action Action, code string) error {
 
 		fmt.Fprintf(os.Stderr, "\nEdited command:\n%s\n\nRun this? [y/N]: ", edited)
 		var confirm string
-		fmt.Scanln(&confirm)
+	_, _ = fmt.Scanln(&confirm)
 		if confirm == "y" || confirm == "Y" {
 			cmd := exec.Command("sh", "-c", edited)
 			cmd.Stdout = os.Stdout

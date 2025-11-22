@@ -36,7 +36,7 @@ type Emitter struct {
 func NewEmitter(w io.Writer) *Emitter {
 	home, _ := os.UserHomeDir()
 	eventLog := filepath.Join(home, ".chuchu", "events.jsonl")
-	os.MkdirAll(filepath.Dir(eventLog), 0755)
+	_ = os.MkdirAll(filepath.Dir(eventLog), 0755)
 	return &Emitter{
 		writer:   w,
 		eventLog: eventLog,
@@ -61,7 +61,7 @@ func (e *Emitter) Emit(eventType EventType, data map[string]interface{}) error {
 	}
 	
 	if f, ok := e.writer.(*os.File); ok {
-		f.Sync()
+		_ = f.Sync()
 	}
 	
 	f, err := os.OpenFile(e.eventLog, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)

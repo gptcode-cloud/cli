@@ -304,7 +304,7 @@ func saveAPIKeyToKeysFile(backendName, apiKey string) error {
 	
 	keys := make(map[string]string)
 	if data, err := os.ReadFile(keysPath); err == nil {
-		yaml.Unmarshal(data, &keys)
+	_ = yaml.Unmarshal(data, &keys)
 	}
 	
 	keys[backendName] = apiKey

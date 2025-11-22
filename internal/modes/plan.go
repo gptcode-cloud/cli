@@ -171,7 +171,7 @@ Create a structured plan with:
 
 	home, _ := os.UserHomeDir()
 	plansDir := filepath.Join(home, ".chuchu", "plans")
-	os.MkdirAll(plansDir, 0755)
+	_ = os.MkdirAll(plansDir, 0755)
 
 	if term.IsTerminal(int(os.Stdout.Fd())) {
 		rendered, err := output.RenderMarkdown(planResult)

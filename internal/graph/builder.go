@@ -67,7 +67,7 @@ func (b *Builder) Build() (*Graph, error) {
 	})
 
 	if err == nil {
-		b.cache.Set(b.root, b.graph)
+	_ = b.cache.Set(b.root, b.graph)
 	}
 
 	return b.graph, err

@@ -98,7 +98,7 @@ func RunExecute(builder *prompt.Builder, provider llm.Provider, model string, ar
 
 		for _, tc := range resp.ToolCalls {
 			var args map[string]interface{}
-			json.Unmarshal([]byte(tc.Arguments), &args)
+			_ = json.Unmarshal([]byte(tc.Arguments), &args)
 
 			toolCall := tools.ToolCall{
 				Name:      tc.Name,

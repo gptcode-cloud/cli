@@ -123,7 +123,7 @@ func (o *OllamaProvider) Chat(ctx context.Context, req ChatRequest) (*ChatRespon
 			for i, tc := range msg.ToolCalls {
 				ollamaMsg.ToolCalls[i].Function.Name = tc.Name
 				var args map[string]interface{}
-				json.Unmarshal([]byte(tc.Arguments), &args)
+			_ = json.Unmarshal([]byte(tc.Arguments), &args)
 				ollamaMsg.ToolCalls[i].Function.Arguments = args
 			}
 		}

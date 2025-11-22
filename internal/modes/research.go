@@ -95,7 +95,7 @@ Keep response under 150 words.`, question)
 
 	home, _ := os.UserHomeDir()
 	researchDir := filepath.Join(home, ".chuchu", "research")
-	os.MkdirAll(researchDir, 0755)
+	_ = os.MkdirAll(researchDir, 0755)
 
 	fullResearch := fmt.Sprintf(`# Research: %s
 
