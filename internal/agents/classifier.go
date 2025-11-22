@@ -20,13 +20,13 @@ const (
 	IntentReview   Intent = "review"
 )
 
-type RouterAgent struct {
+type Classifier struct {
 	provider llm.Provider
 	model    string
 }
 
-func NewRouter(provider llm.Provider, model string) *RouterAgent {
-	return &RouterAgent{
+func NewClassifier(provider llm.Provider, model string) *Classifier {
+	return &Classifier{
 		provider: provider,
 		model:    model,
 	}
@@ -53,7 +53,7 @@ Examples:
 "explain how authentication works" → query
 "add error handling to user.go" → edit`
 
-func (r *RouterAgent) ClassifyIntent(ctx context.Context, userMessage string) (Intent, error) {
+func (c *Classifier) ClassifyIntent(ctx context.Context, userMessage string) (Intent, error) {
 	p, err := ml.LoadEmbedded("intent")
 	if err == nil {
 		setup, _ := config.LoadSetup()
@@ -73,10 +73,10 @@ func (r *RouterAgent) ClassifyIntent(ctx context.Context, userMessage string) (I
 		}
 	}
 	
-	resp, err := r.provider.Chat(ctx, llm.ChatRequest{
+	resp, err := c.provider.Chat(ctx, llm.ChatRequest{
 		SystemPrompt: routerPrompt,
 		UserPrompt:   userMessage,
-		Model:        r.model,
+		Model:        c.model,
 	})
 	if err != nil {
 		return "", err

@@ -1,10 +1,15 @@
 package ollama
 
 import (
+	"os"
 	"testing"
 )
 
 func TestIsInstalled(t *testing.T) {
+	if os.Getenv("CI") == "true" {
+		t.Skip("Skipping integration test in CI (requires Ollama service)")
+	}
+	
 	tests := []struct {
 		name         string
 		modelName    string
@@ -45,6 +50,10 @@ func TestIsInstalled(t *testing.T) {
 }
 
 func TestCheckAndInstall(t *testing.T) {
+	if os.Getenv("CI") == "true" {
+		t.Skip("Skipping integration test in CI (requires Ollama service)")
+	}
+	
 	tests := []struct {
 		name        string
 		modelName   string

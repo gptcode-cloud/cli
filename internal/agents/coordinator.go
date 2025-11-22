@@ -9,11 +9,11 @@ import (
 )
 
 type Coordinator struct {
-	router   *RouterAgent
-	editor   *EditorAgent
-	query    *QueryAgent
-	research *ResearchAgent
-	review   *ReviewAgent
+	classifier *Classifier
+	editor     *EditorAgent
+	query      *QueryAgent
+	research   *ResearchAgent
+	review     *ReviewAgent
 }
 
 func NewCoordinator(
@@ -26,11 +26,11 @@ func NewCoordinator(
 	researchModel string,
 ) *Coordinator {
 	return &Coordinator{
-		router:   NewRouter(provider, routerModel),
-		editor:   NewEditor(provider, cwd, editorModel),
-		query:    NewQuery(provider, cwd, queryModel),
-		research: NewResearch(orchestrator),
-		review:   NewReview(provider, cwd, queryModel), // Use query model for review as it needs good reasoning
+		classifier: NewClassifier(provider, routerModel),
+		editor:     NewEditor(provider, cwd, editorModel),
+		query:      NewQuery(provider, cwd, queryModel),
+		research:   NewResearch(orchestrator),
+		review:     NewReview(provider, cwd, queryModel),
 	}
 }
 
@@ -45,13 +45,13 @@ func (c *Coordinator) Execute(ctx context.Context, history []llm.ChatMessage, st
 	}
 
 	if statusCallback != nil {
-		statusCallback("Router: Classifying intent...")
+		statusCallback("Classifier: Analyzing intent...")
 	}
 
-	intent, err := c.router.ClassifyIntent(ctx, lastMessage)
+	intent, err := c.classifier.ClassifyIntent(ctx, lastMessage)
 	if err != nil {
 		if os.Getenv("CHUCHU_DEBUG") == "1" {
-			fmt.Fprintf(os.Stderr, "[COORDINATOR] Router error: %v, defaulting to query\n", err)
+			fmt.Fprintf(os.Stderr, "[COORDINATOR] Classifier error: %v, defaulting to query\n", err)
 		}
 		intent = IntentQuery
 	}

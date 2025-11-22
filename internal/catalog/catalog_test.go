@@ -8,6 +8,10 @@ import (
 )
 
 func TestCatalogSearch(t *testing.T) {
+	if os.Getenv("CI") == "true" {
+		t.Skip("Skipping integration test in CI (requires models.json)")
+	}
+	
 	homeDir, _ := os.UserHomeDir()
 	catalogPath := homeDir + "/.chuchu/models.json"
 	
@@ -75,6 +79,10 @@ func TestCatalogSearch(t *testing.T) {
 }
 
 func TestSearchModelsMulti(t *testing.T) {
+	if os.Getenv("CI") == "true" {
+		t.Skip("Skipping integration test in CI (requires models.json)")
+	}
+	
 	t.Run("backend auto-detection", func(t *testing.T) {
 		models, err := SearchModelsMulti("", []string{"groq", "llama"}, "")
 		if err != nil {

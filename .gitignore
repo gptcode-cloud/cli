@@ -37,6 +37,9 @@ Thumbs.db
 # User config (should stay local)
 .chuchu/
 
+# Temporary planning documents (evolving practices)
+docs/plans/
+
 # ML artifacts
 ml/complexity_detection/models/*.json
 ml/complexity_detection/data/training_data.csv
