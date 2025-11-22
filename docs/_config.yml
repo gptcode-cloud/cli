@@ -1,7 +1,7 @@
 title: Chuchu
 description: An affordable, TDD-first AI coding assistant for Neovim
-baseurl: ""
-url: "http://localhost:4040"
+baseurl: "/chuchu"
+url: "https://jadercorrea.github.io"
 
 theme: minima
 
