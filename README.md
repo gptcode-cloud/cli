@@ -4,29 +4,29 @@
 
 [![Go Version](https://img.shields.io/github/go-mod/go-version/jadercorrea/chuchu)](go.mod)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub Discussions](https://img.shields.io/github/discussions/jadercorrea/chuchu)](https://github.com/jadercorrea/chuchu/discussions)
+[![GitHub Issues](https://img.shields.io/github/issues/jadercorrea/chuchu)](https://github.com/jadercorrea/chuchu/issues)
 
 Chuchu (pronounced "shoo-shoo", Brazilian slang for something small and cute) is a command-line AI coding assistant that helps you write better code through Test-Driven Development—without breaking the bank.
 
-## 💰 Why Chuchu?
+## Why Chuchu?
 
 **Radically affordable**: Use Groq for $2-5/month or Ollama for **$0/month**. Compare that to $20-30/month subscriptions.
 
 [Read the full story →](https://jadercorrea.github.io/chuchu/blog/2025-11-13-why-chuchu)
 
-## ✨ Features
+## Features
 
-- **🧪 TDD-First**: Writes tests before implementation
-- **🎯 Multi-Agent Architecture**: Router, Query, Editor, and Research agents
-- **💸 Cost Control**: Mix and match cheap/free models per agent
-- **📋 Profile Management**: Switch between multiple model configurations
-- **🔌 Model Flexibility**: Groq, Ollama, OpenRouter, OpenAI, Anthropic
-- **📦 Neovim Native**: Deep integration with LSP, Tree-sitter, file navigation
-- **🌐 Web Search**: Research agent can search and summarize web content
-- **🚀 Auto-Install Models**: Discover and install 193+ Ollama models from Neovim
-- **📊 Feedback & Learning**: Track model performance and improve recommendations
+- **TDD-First**: Writes tests before implementation
+- **Multi-Agent Architecture**: Router, Query, Editor, and Research agents
+- **Cost Control**: Mix and match cheap/free models per agent
+- **Profile Management**: Switch between multiple model configurations
+- **Model Flexibility**: Groq, Ollama, OpenRouter, OpenAI, Anthropic
+- **Neovim Native**: Deep integration with LSP, Tree-sitter, file navigation
+- **Web Search**: Research agent can search and summarize web content
+- **Auto-Install Models**: Discover and install 193+ Ollama models from Neovim
+- **Feedback & Learning**: Track model performance and improve recommendations
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Installation
 
@@ -169,7 +169,7 @@ chu chat "fix bug in authentication"
 # With graph: Sends auth.go + user.go + middleware.go + session.go + config.go (18k tokens)
 ```
 
-## 📖 Usage
+## Usage
 
 
 ### Chat Mode
@@ -256,7 +256,7 @@ chu feedback stats
 
 Chuchu learns from your feedback to recommend better models over time.
 
-## 💡 Configuration Examples
+## Configuration Examples
 
 ### Budget Setup ($2-5/month)
 
@@ -314,7 +314,7 @@ backend:
 
 [See more configurations →](https://jadercorrea.github.io/chuchu/blog/2025-11-15-groq-optimal-configs)
 
-## 🏗️ Architecture
+## Architecture
 
 Chuchu uses specialized agents for different tasks:
 
@@ -325,11 +325,42 @@ Chuchu uses specialized agents for different tasks:
 
 Each agent can use a different model, optimizing for cost vs capability.
 
-## 🤝 Contributing
+## Contributing
 
 We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
-## 📝 Documentation & Blog
+## Releases & Versioning
+
+Chuchu follows [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH).
+
+### Automatic Releases
+
+When code is merged to `main` and CI passes, a new **patch version** is automatically created:
+- `v0.0.1` → `v0.0.2` → `v0.0.3`
+
+Weekly (Mondays 9AM UTC), the model catalog is updated. If models change, a new patch release is created automatically.
+
+### Manual Releases (Major/Minor)
+
+For breaking changes or new features, create a tag manually:
+
+```bash
+# Minor version (new features, backwards compatible)
+git tag -a v0.2.0 -m "Release v0.2.0: Add profile management"
+git push origin v0.2.0
+
+# Major version (breaking changes)
+git tag -a v1.0.0 -m "Release v1.0.0: Stable API"
+git push origin v1.0.0
+
+# Specific patch (bug fixes)
+git tag -a v1.0.1 -m "Release v1.0.1: Fix authentication bug"
+git push origin v1.0.1
+```
+
+The CD pipeline will automatically build binaries and create a GitHub release.
+
+## Documentation & Blog
 
 The website and blog are built with Jekyll and hosted on GitHub Pages.
 
@@ -385,21 +416,19 @@ The site auto-deploys via GitHub Actions when changes are merged to `main`.
 
 **Note:** Posts with future dates won't appear until that date.
 
-## 📝 License
+## License
 
 MIT License - see [LICENSE](LICENSE) for details.
 
-## 🔗 Links
+## Links
 
 - **Website**: [jadercorrea.github.io/chuchu](https://jadercorrea.github.io/chuchu)
 - **Blog**: [jadercorrea.github.io/chuchu/blog](https://jadercorrea.github.io/chuchu/blog)
-- **Discussions**: [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)
 - **Issues**: [GitHub Issues](https://github.com/jadercorrea/chuchu/issues)
 
-## 💬 Community
+## Community
 
-- Ask questions in [Discussions](https://github.com/jadercorrea/chuchu/discussions)
-- Share your configs in [Show and Tell](https://github.com/jadercorrea/chuchu/discussions/categories/show-and-tell)
+- Ask questions in [Issues](https://github.com/jadercorrea/chuchu/issues)
 - Report bugs in [Issues](https://github.com/jadercorrea/chuchu/issues)
 
 ---

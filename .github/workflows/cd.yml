@@ -1,6 +1,11 @@
 name: Continuous Delivery
 
 on:
+  workflow_run:
+    workflows: ["Continuous Integration"]
+    types:
+      - completed
+    branches: [main]
   schedule:
     # Run every Monday at 9 AM UTC
     - cron: '0 9 * * 1'
@@ -14,6 +19,8 @@ jobs:
     name: Update Model Catalog
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    outputs:
+      models_changed: ${{ steps.git-check.outputs.changed }}
     
     steps:
       - name: Checkout code
@@ -58,22 +65,77 @@ jobs:
           git commit -m "chore: update model catalog [skip ci]"
           git push
 
+  check-models:
+    name: Check if should release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule'
+    needs: [update-models]
+    outputs:
+      should_release: ${{ steps.check.outputs.should_release }}
+    steps:
+      - name: Check if models changed
+        id: check
+        run: |
+          if [ "${{ needs.update-models.outputs.models_changed }}" == "true" ]; then
+            echo "should_release=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_release=false" >> $GITHUB_OUTPUT
+          fi
+
   release:
     name: Create Release
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: |
+      always() &&
+      (
+        startsWith(github.ref, 'refs/tags/v') ||
+        (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
+        (github.event_name == 'schedule' && needs.check-models.result == 'success' && needs.check-models.outputs.should_release == 'true')
+      )
+    needs: [check-models]
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
       
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
           go-version: '1.24'
           cache: true
+      
+      - name: Generate version tag
+        id: version
+        run: |
+          # If already a tag push, use that tag
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "tag=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+            echo "auto_generated=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Get latest tag
+          LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "v0.0.0")
+          echo "Latest tag: $LATEST_TAG"
+          
+          # Increment patch version
+          VERSION=${LATEST_TAG#v}
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$VERSION"
+          NEW_PATCH=$((PATCH + 1))
+          NEW_TAG="v${MAJOR}.${MINOR}.${NEW_PATCH}"
+          
+          echo "New tag: $NEW_TAG"
+          echo "tag=$NEW_TAG" >> $GITHUB_OUTPUT
+          echo "auto_generated=true" >> $GITHUB_OUTPUT
+          
+          # Create and push tag
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git tag -a "$NEW_TAG" -m "Automated release $NEW_TAG"
+          git push origin "$NEW_TAG"
       
       - name: Run tests
         run: go test -v ./...
@@ -90,13 +152,17 @@ jobs:
       - name: Generate changelog
         id: changelog
         run: |
-          # Get previous tag
-          PREV_TAG=$(git describe --tags --abbrev=0 ${{ github.ref }}^ 2>/dev/null || echo "")
+          CURRENT_TAG="${{ steps.version.outputs.tag }}"
+          
+          # Get previous tag (excluding current if it was just created)
+          PREV_TAG=$(git tag --sort=-v:refname | grep -v "^${CURRENT_TAG}$" | head -n 1 || echo "")
+          
           if [ -z "$PREV_TAG" ]; then
-            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges)
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges -n 20)
           else
-            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges ${PREV_TAG}..${{ github.ref }})
+            CHANGELOG=$(git log --pretty=format:"- %s (%h)" --no-merges ${PREV_TAG}..HEAD)
           fi
+          
           echo "changelog<<EOF" >> $GITHUB_OUTPUT
           echo "$CHANGELOG" >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
@@ -104,6 +170,8 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Release ${{ steps.version.outputs.tag }}
           body: |
             ## Changes
             ${{ steps.changelog.outputs.changelog }}
@@ -115,6 +183,8 @@ jobs:
             ```bash
             chu --version
             ```
+            
+            ${{ steps.version.outputs.auto_generated == 'true' && '> ⚡ Automated release triggered by CI' || '' }}
           files: |
             bin/chu-linux-amd64
             bin/chu-linux-arm64
@@ -122,6 +192,6 @@ jobs:
             bin/chu-darwin-arm64
             bin/chu-windows-amd64.exe
           draft: false
-          prerelease: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          prerelease: false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
