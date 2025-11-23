@@ -72,6 +72,40 @@ graph TB
   </div>
 </div>
 
+<div class="section">
+  <h2 class="section-title">Structured Workflow: Research → Plan → Implement</h2>
+  <p class="section-subtitle">Go from feature idea to tested code with AI assistance at each step</p>
+  
+  <div class="workflow-steps">
+    <div class="workflow-step">
+      <h3>🔍 Research</h3>
+      <p>Understand your codebase before making changes</p>
+      <pre><code>chu research "How does authentication work?"</code></pre>
+      <p>Chuchu searches semantically, reads relevant files, and documents findings in <code>~/.chuchu/research/</code></p>
+    </div>
+    
+    <div class="workflow-step">
+      <h3>📋 Plan</h3>
+      <p>Create detailed implementation plan with phases</p>
+      <pre><code>chu plan "Add password reset feature"</code></pre>
+      <p>Generates step-by-step plan with clear goals, file changes, and test requirements</p>
+    </div>
+    
+    <div class="workflow-step">
+      <h3>⚡ Implement</h3>
+      <p>Execute plan interactively or autonomously</p>
+      <pre><code>chu implement plan.md
+chu implement plan.md --auto</code></pre>
+      <p>Interactive mode for control, autonomous mode for speed with automatic verification and retry</p>
+    </div>
+  </div>
+  
+  <p style="text-align: center; margin-top: 2rem;">
+    <a href="/workflow-guide" class="btn btn-primary">Complete Workflow Guide</a>
+    <a href="/blog/2025-11-24-complete-workflow-guide" class="btn btn-secondary">Read Tutorial</a>
+  </p>
+</div>
+
 <div class="section" id="quick-start">
   <h2 class="section-title">Quick Start</h2>
   

@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Complete Workflow: From Feature Idea to Implementation"
-date: 2025-01-23
+date: 2025-11-24
 categories: [guides, workflow]
 ---
 

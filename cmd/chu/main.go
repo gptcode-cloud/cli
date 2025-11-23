@@ -124,13 +124,13 @@ func newBuilderAndLLM(lang, mode, hint string) (*prompt.Builder, llm.Provider, s
 	if strings.Contains(model, "compound") {
 		var customExec llm.Provider
 		customModel := backendCfg.DefaultModel
-		
+
 		if backendCfg.Type == "ollama" {
 			customExec = llm.NewOllama(backendCfg.BaseURL)
 		} else {
 			customExec = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
 		}
-		
+
 		provider = llm.NewOrchestrator(backendCfg.BaseURL, backendName, customExec, customModel)
 	} else {
 		if backendCfg.Type == "ollama" {
@@ -174,10 +174,10 @@ var backendListCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to list backends: %w", err)
 		}
-		
+
 		setup, _ := config.LoadSetup()
 		defaultBackend := setup.Defaults.Backend
-		
+
 		for _, name := range backends {
 			if name == defaultBackend {
 				fmt.Printf("%s (default)\n", name)
@@ -199,20 +199,20 @@ Type must be: openai, ollama
 Examples:
   chu backend create mygroq openai https://api.groq.com/openai/v1
   chu backend create local ollama http://localhost:11434`,
-	Args:  cobra.ExactArgs(3),
+	Args: cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
 		backendType := args[1]
 		baseURL := args[2]
-		
+
 		if backendType != "openai" && backendType != "ollama" {
 			return fmt.Errorf("type must be 'openai' or 'ollama'")
 		}
-		
+
 		if err := config.CreateBackend(name, backendType, baseURL); err != nil {
 			return err
 		}
-		
+
 		fmt.Printf("✓ Created backend: %s\n", name)
 		fmt.Println("\nNext steps:")
 		if backendType == "openai" {
@@ -230,11 +230,11 @@ var backendDeleteCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
-		
+
 		if err := config.DeleteBackend(name); err != nil {
 			return err
 		}
-		
+
 		fmt.Printf("✓ Deleted backend: %s\n", name)
 		return nil
 	},
@@ -254,7 +254,7 @@ Examples:
   chu config get defaults.backend
   chu config get defaults.profile
   chu config get backend.groq.default_model`,
-	Args:  cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key := args[0]
 		value, err := config.GetConfig(key)
@@ -275,7 +275,7 @@ Examples:
   chu config set defaults.backend groq
   chu config set defaults.profile speed
   chu config set backend.groq.default_model llama-3.3-70b-versatile`,
-	Args:  cobra.ExactArgs(2),
+	Args: cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key := args[0]
 		value := args[1]
@@ -305,7 +305,7 @@ Examples:
   chu detect-language
   chu detect-language /path/to/project
   chu detect-language .`,
-	Args:  cobra.MaximumNArgs(1),
+	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		path := "."
 		if len(args) > 0 {
@@ -327,14 +327,14 @@ var modelsUpdateCmd = &cobra.Command{
 	Short: "Update model catalog from multiple sources",
 	RunE: func(cmd *cobra.Command, args []string) error {
 		fmt.Println("Fetching models from available sources...")
-		
+
 		apiKeys := map[string]string{
 			"groq":      os.Getenv("GROQ_API_KEY"),
 			"openai":    os.Getenv("OPENAI_API_KEY"),
 			"anthropic": os.Getenv("ANTHROPIC_API_KEY"),
 			"cohere":    os.Getenv("COHERE_API_KEY"),
 		}
-		
+
 		catalogPath := catalog.GetCatalogPath()
 		if err := catalog.FetchAndSave(catalogPath, apiKeys); err != nil {
 			return fmt.Errorf("failed to update catalog: %w", err)
@@ -362,17 +362,17 @@ Flags override positional backend:
 	RunE: func(cmd *cobra.Command, args []string) error {
 		backendFlag, _ := cmd.Flags().GetString("backend")
 		agentFlag, _ := cmd.Flags().GetString("agent")
-		
+
 		var queryTerms []string
 		if len(args) > 0 {
 			queryTerms = args
 		}
-		
+
 		models, err := catalog.SearchModelsMulti(backendFlag, queryTerms, agentFlag)
 		if err != nil {
 			return fmt.Errorf("search failed: %w", err)
 		}
-		
+
 		type ModelJSON struct {
 			ID            string   `json:"id"`
 			Name          string   `json:"name"`
@@ -384,7 +384,7 @@ Flags override positional backend:
 			Installed     bool     `json:"installed"`
 			FeedbackScore float64  `json:"feedback_score"`
 		}
-		
+
 		result := make([]ModelJSON, 0, len(models))
 		for _, m := range models {
 			recommended := false
@@ -396,7 +396,7 @@ Flags override positional backend:
 					}
 				}
 			}
-			
+
 			result = append(result, ModelJSON{
 				ID:            m.ID,
 				Name:          m.Name,
@@ -409,13 +409,13 @@ Flags override positional backend:
 				FeedbackScore: m.FeedbackScore,
 			})
 		}
-		
+
 		encoder := json.NewEncoder(os.Stdout)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(result); err != nil {
 			return fmt.Errorf("failed to encode JSON: %w", err)
 		}
-		
+
 		return nil
 	},
 }
@@ -426,26 +426,26 @@ var modelsInstallCmd = &cobra.Command{
 	Args:  cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		modelName := args[0]
-		
+
 		installed, err := ollama.IsInstalled(modelName)
 		if err != nil {
 			return fmt.Errorf("failed to check model status: %w", err)
 		}
-		
+
 		if installed {
 			fmt.Printf("✓ Model %s already installed\n", modelName)
 			return nil
 		}
-		
+
 		fmt.Printf("Installing model %s...\n", modelName)
 		progressCallback := func(status string) {
 			fmt.Println(status)
 		}
-		
+
 		if err := ollama.Install(modelName, progressCallback); err != nil {
 			return fmt.Errorf("failed to install model: %w", err)
 		}
-		
+
 		fmt.Printf("✓ Model %s installed successfully\n", modelName)
 		return nil
 	},
@@ -466,7 +466,7 @@ var profilesListCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to list profiles: %w", err)
 		}
-		
+
 		encoder := json.NewEncoder(os.Stdout)
 		if err := encoder.Encode(profiles); err != nil {
 			return fmt.Errorf("failed to encode JSON: %w", err)
@@ -482,12 +482,12 @@ var profilesShowCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		backend := args[0]
 		profileName := args[1]
-		
+
 		profile, err := config.GetBackendProfile(backend, profileName)
 		if err != nil {
 			return fmt.Errorf("failed to get profile: %w", err)
 		}
-		
+
 		fmt.Printf("Profile: %s/%s\n", backend, profile.Name)
 		if len(profile.AgentModels) == 0 {
 			fmt.Println("  (no agent models configured)")
@@ -507,11 +507,11 @@ var profilesCreateCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		backend := args[0]
 		name := args[1]
-		
+
 		if err := config.CreateBackendProfile(backend, name); err != nil {
 			return fmt.Errorf("failed to create profile: %w", err)
 		}
-		
+
 		fmt.Printf("✓ Created profile: %s/%s\n", backend, name)
 		fmt.Println("\nConfigure agent models using:")
 		fmt.Printf("  chu profiles set-agent %s %s router <model>\n", backend, name)
@@ -531,17 +531,17 @@ Agent types: router, query, editor, research
 
 Example:
   chu profiles set-agent openrouter free router google/gemini-2.0-flash-exp:free`,
-	Args:  cobra.ExactArgs(4),
+	Args: cobra.ExactArgs(4),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		backend := args[0]
 		profile := args[1]
 		agent := args[2]
 		model := args[3]
-		
+
 		if err := config.SetProfileAgentModel(backend, profile, agent, model); err != nil {
 			return fmt.Errorf("failed to set agent model: %w", err)
 		}
-		
+
 		fmt.Printf("✓ Set %s/%s %s = %s\n", backend, profile, agent, model)
 		return nil
 	},
@@ -554,11 +554,11 @@ var profilesDeleteCmd = &cobra.Command{
 	RunE: func(cmd *cobra.Command, args []string) error {
 		backend := args[0]
 		profile := args[1]
-		
+
 		if err := config.DeleteBackendProfile(backend, profile); err != nil {
 			return fmt.Errorf("failed to delete profile: %w", err)
 		}
-		
+
 		fmt.Printf("✓ Deleted profile: %s/%s\n", backend, profile)
 		return nil
 	},
@@ -577,7 +577,7 @@ var feedbackGoodCmd = &cobra.Command{
 		model, _ := cmd.Flags().GetString("model")
 		agent, _ := cmd.Flags().GetString("agent")
 		context, _ := cmd.Flags().GetString("context")
-		
+
 		event := feedback.Event{
 			Sentiment: feedback.SentimentGood,
 			Backend:   backend,
@@ -585,11 +585,11 @@ var feedbackGoodCmd = &cobra.Command{
 			Agent:     agent,
 			Context:   context,
 		}
-		
+
 		if err := feedback.Record(event); err != nil {
 			return fmt.Errorf("failed to record feedback: %w", err)
 		}
-		
+
 		fmt.Println("✓ Positive feedback recorded")
 		return nil
 	},
@@ -603,7 +603,7 @@ var feedbackBadCmd = &cobra.Command{
 		model, _ := cmd.Flags().GetString("model")
 		agent, _ := cmd.Flags().GetString("agent")
 		context, _ := cmd.Flags().GetString("context")
-		
+
 		event := feedback.Event{
 			Sentiment: feedback.SentimentBad,
 			Backend:   backend,
@@ -611,11 +611,11 @@ var feedbackBadCmd = &cobra.Command{
 			Agent:     agent,
 			Context:   context,
 		}
-		
+
 		if err := feedback.Record(event); err != nil {
 			return fmt.Errorf("failed to record feedback: %w", err)
 		}
-		
+
 		fmt.Println("✓ Negative feedback recorded")
 		return nil
 	},
@@ -629,20 +629,20 @@ var feedbackStatsCmd = &cobra.Command{
 		if err != nil {
 			return fmt.Errorf("failed to load feedback: %w", err)
 		}
-		
+
 		if len(events) == 0 {
 			fmt.Println("No feedback recorded yet")
 			return nil
 		}
-		
+
 		stats := feedback.Analyze(events)
-		
+
 		encoder := json.NewEncoder(os.Stdout)
 		encoder.SetIndent("", "  ")
 		if err := encoder.Encode(stats); err != nil {
 			return fmt.Errorf("failed to encode stats: %w", err)
 		}
-		
+
 		return nil
 	},
 }
@@ -651,36 +651,36 @@ func init() {
 	backendCmd.AddCommand(backendListCmd)
 	backendCmd.AddCommand(backendCreateCmd)
 	backendCmd.AddCommand(backendDeleteCmd)
-	
+
 	configCmd.AddCommand(configGetCmd)
 	configCmd.AddCommand(configSetCmd)
-	
+
 	rootCmd.AddCommand(profilesCmd)
 	profilesCmd.AddCommand(profilesListCmd)
 	profilesCmd.AddCommand(profilesShowCmd)
 	profilesCmd.AddCommand(profilesCreateCmd)
 	profilesCmd.AddCommand(profilesSetAgentCmd)
 	profilesCmd.AddCommand(profilesDeleteCmd)
-	
+
 	rootCmd.AddCommand(feedbackCmd)
 	feedbackCmd.AddCommand(feedbackGoodCmd)
 	feedbackCmd.AddCommand(feedbackBadCmd)
 	feedbackCmd.AddCommand(feedbackStatsCmd)
-	
+
 	feedbackGoodCmd.Flags().String("backend", "", "Backend used")
 	feedbackGoodCmd.Flags().String("model", "", "Model used")
 	feedbackGoodCmd.Flags().String("agent", "", "Agent type (router, query, editor, research)")
 	feedbackGoodCmd.Flags().String("context", "", "Additional context")
-	
+
 	feedbackBadCmd.Flags().String("backend", "", "Backend used")
 	feedbackBadCmd.Flags().String("model", "", "Model used")
 	feedbackBadCmd.Flags().String("agent", "", "Agent type (router, query, editor, research)")
 	feedbackBadCmd.Flags().String("context", "", "Additional context")
-	
+
 	modelsCmd.AddCommand(modelsUpdateCmd)
 	modelsCmd.AddCommand(modelsSearchCmd)
 	modelsCmd.AddCommand(modelsInstallCmd)
-	
+
 	modelsSearchCmd.Flags().StringP("backend", "b", "openrouter", "Backend to search (openrouter, groq, ollama, etc)")
 	modelsSearchCmd.Flags().StringP("agent", "a", "", "Agent type (router, query, editor, research)")
 }
@@ -741,7 +741,6 @@ Example: chu plan "Add user authentication"`,
 	},
 }
 
-
 var runCmd = &cobra.Command{
 	Use:   "run [task]",
 	Short: "Execute general tasks: HTTP requests, CLI commands, devops actions",
@@ -782,7 +781,7 @@ var featureCmd = &cobra.Command{
 		if lang == "elixir" {
 			return elixir.RunFeatureElixir(builder, provider, model)
 		}
-		
+
 		// Default to generic TDD for other languages
 		return modes.RunTDD(builder, provider, model, args[0])
 	},
@@ -825,20 +824,20 @@ var mlTrainCmd = &cobra.Command{
 
 Examples:
   chu ml train complexity_detection`,
-	Args:  cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cwd, err := os.Getwd()
 		if err != nil {
 			return fmt.Errorf("failed to get current directory: %w", err)
 		}
-		
+
 		trainer := ml.NewTrainer(cwd)
 		modelName := args[0]
-		
+
 		if err := trainer.Train(modelName); err != nil {
 			return fmt.Errorf("training failed: %w", err)
 		}
-		
+
 		return nil
 	},
 }
@@ -855,25 +854,25 @@ Examples:
   chu ml test complexity_detection
   chu ml test complexity_detection "fix typo in readme"
   chu ml test complexity_detection "implement oauth2 with google"`,
-	Args:  cobra.MinimumNArgs(1),
+	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cwd, err := os.Getwd()
 		if err != nil {
 			return fmt.Errorf("failed to get current directory: %w", err)
 		}
-		
+
 		trainer := ml.NewTrainer(cwd)
 		modelName := args[0]
-		
+
 		var query string
 		if len(args) > 1 {
 			query = args[1]
 		}
-		
+
 		if err := trainer.Test(modelName, query); err != nil {
 			return fmt.Errorf("test failed: %w", err)
 		}
-		
+
 		return nil
 	},
 }
@@ -907,10 +906,10 @@ Examples:
   chu ml predict "fix typo in readme"
   chu ml predict complexity_detection "implement oauth"
   chu ml predict router_agent "explain this code"`,
-	Args:  cobra.MinimumNArgs(1),
+	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var modelName, text string
-		
+
 		if len(args) == 1 {
 			modelName = "complexity_detection"
 			text = args[0]
@@ -918,15 +917,17 @@ Examples:
 			modelName = args[0]
 			text = strings.Join(args[1:], " ")
 		}
-		
+
 		p, err := ml.LoadEmbedded(modelName)
-		if err != nil { return err }
-		
+		if err != nil {
+			return err
+		}
+
 		label, probs := p.Predict(text)
 		fmt.Printf("Model: %s\n", modelName)
 		fmt.Printf("Prediction: %s\n", label)
 		fmt.Println("Probabilities:")
-		
+
 		for _, pair := range ml.SortedProbs(probs) {
 			fmt.Printf("  %-12s %s\n", pair[0]+":", pair[1])
 		}

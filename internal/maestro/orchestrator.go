@@ -45,13 +45,13 @@ func NewMaestro(provider llm.Provider, cwd, model string) *Maestro {
 func (m *Maestro) ExecutePlan(ctx context.Context, planContent string) error {
 	m.CurrentStepIdx = 0
 	m.ModifiedFiles = nil
-m.Events.Status("\u001b[36mStarting autonomous execution...\u001b[0m")
+	_ = m.Events.Status("\u001b[36mStarting autonomous execution...\u001b[0m")
 
 	// Parse plan into steps (simple version: split by phases)
 	steps := m.parsePlan(planContent)
 
 	for stepIdx, step := range steps {
-m.Events.Status(fmt.Sprintf("\u001b[34mStep %d/%d\u001b[0m: %s", stepIdx+1, len(steps), step.Title))
+		_ = m.Events.Status(fmt.Sprintf("\u001b[34mStep %d/%d\u001b[0m: %s", stepIdx+1, len(steps), step.Title))
 
 		var lastCheckpoint *Checkpoint
 		var err error
@@ -59,7 +59,7 @@ m.Events.Status(fmt.Sprintf("\u001b[34mStep %d/%d\u001b[0m: %s", stepIdx+1, len(
 		// Try execution with retries
 		for attempt := 0; attempt < m.MaxRetries; attempt++ {
 			if attempt > 0 {
-				m.Events.Status(fmt.Sprintf("Retry %d/%d", attempt, m.MaxRetries))
+				_ = m.Events.Status(fmt.Sprintf("Retry %d/%d", attempt, m.MaxRetries))
 			}
 
 			// Execute the step
@@ -69,30 +69,30 @@ m.Events.Status(fmt.Sprintf("\u001b[34mStep %d/%d\u001b[0m: %s", stepIdx+1, len(
 			after := m.gitChangedFiles()
 			m.ModifiedFiles = diffStringSlices(before, after)
 			if err != nil {
-m.Events.Notify(fmt.Sprintf("\u001b[31mExecution failed\u001b[0m: %v", err), "error")
+				_ = m.Events.Notify(fmt.Sprintf("\u001b[31mExecution failed\u001b[0m: %v", err), "error")
 				continue
 			}
 
 			// Verify the changes
 			verifyResult, verifyErr := m.verify(ctx)
 			if verifyErr != nil {
-m.Events.Notify(fmt.Sprintf("\u001b[31mVerification error\u001b[0m: %v", verifyErr), "error")
+				_ = m.Events.Notify(fmt.Sprintf("\u001b[31mVerification error\u001b[0m: %v", verifyErr), "error")
 				err = verifyErr
 				continue
 			}
 
 			if !verifyResult.Success {
-m.Events.Notify(fmt.Sprintf("\u001b[33mVerification failed\u001b[0m: %s", verifyResult.Output), "warn")
+				_ = m.Events.Notify(fmt.Sprintf("\u001b[33mVerification failed\u001b[0m: %s", verifyResult.Output), "warn")
 
 				// Classify error and decide recovery strategy
 				errorType := ClassifyError(verifyResult.Output)
-				m.Events.Status(fmt.Sprintf("Error type: %s, attempting recovery...", errorType))
+				_ = m.Events.Status(fmt.Sprintf("Error type: %s, attempting recovery...", errorType))
 
 				// For build errors, rollback if we have a checkpoint
 				if errorType == ErrorBuild && lastCheckpoint != nil {
-m.Events.Status("\u001b[35mRolling back to last checkpoint...\u001b[0m")
+					_ = m.Events.Status("\u001b[35mRolling back to last checkpoint...\u001b[0m")
 					if rollbackErr := m.Recovery.Rollback(lastCheckpoint.ID); rollbackErr != nil {
-						m.Events.Notify(fmt.Sprintf("Rollback failed: %v", rollbackErr), "error")
+						_ = m.Events.Notify(fmt.Sprintf("Rollback failed: %v", rollbackErr), "error")
 					}
 				}
 
@@ -101,22 +101,22 @@ m.Events.Status("\u001b[35mRolling back to last checkpoint...\u001b[0m")
 			}
 
 			// Success! Save checkpoint
-m.Events.Status("\u001b[32mVerification passed\u001b[0m, saving checkpoint...")
-			lastCheckpoint, err = m.Checkpoints.Save(stepIdx, m.ModifiedFiles)
+			_ = m.Events.Status("\u001b[32mVerification passed\u001b[0m, saving checkpoint...")
+			_, err = m.Checkpoints.Save(stepIdx, m.ModifiedFiles)
 			if err != nil {
-				m.Events.Notify(fmt.Sprintf("Checkpoint save failed: %v", err), "warn")
+				_ = m.Events.Notify(fmt.Sprintf("Checkpoint save failed: %v", err), "warn")
 			}
 
-			m.Events.Complete()
+			_ = m.Events.Complete()
 			break
 		}
 
 		if err != nil {
-			return fmt.Errorf("step %d failed after %d retries: %w", stepIdx, m.MaxRetries, err)
+		return fmt.Errorf("step %d failed after %d retries: %w", stepIdx, m.MaxRetries, err)
 		}
 	}
 
-m.Events.Message("\u001b[32mAutonomous execution completed successfully!\u001b[0m")
+	_ = m.Events.Message("\u001b[32mAutonomous execution completed successfully!\u001b[0m")
 	return nil
 }
 
