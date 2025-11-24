@@ -13,7 +13,7 @@ One of the biggest challenges in AI coding is the **Context Window**.
 
 ## How Chuchu Manages Context
 
-Chuchu uses **Retrieval-Augmented Generation (RAG)** to fetch only relevant information:
+Chuchu uses **Retrieval-Augmented Generation (RAG)**[^1] to fetch only relevant information:
 
 1.  **Project Map**: The `project_map` tool generates a tree-like view of your project structure in ~500 tokens, giving the model a "mental map" of where things are.
 
@@ -90,6 +90,10 @@ Each command starts with fresh context, preventing pollution.
 **Codebase indexing**: Pre-indexing repositories for faster symbol lookup and cross-reference navigation.
 
 **Adaptive context**: Dynamic context window management based on task complexity and available token budget.
+
+## References
+
+[^1]: Lewis, P., Perez, E., Piktus, A., et al. (2020). Retrieval-augmented generation for knowledge-intensive NLP tasks. *NeurIPS 2020*. https://arxiv.org/abs/2005.11401
 
 ## Related Posts
 

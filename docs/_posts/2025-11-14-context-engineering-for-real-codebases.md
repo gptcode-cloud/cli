@@ -165,7 +165,7 @@ Chuchu's multi-agent architecture is designed around this principle:
 - Routes to appropriate specialized agent
 
 **Query Agent** (reasoning model)
-- Research and codebase analysis
+- Research and codebase analysis[^1]
 - Reads files, searches patterns
 - Compacts findings into structured output
 - Fresh context for each analysis
@@ -319,6 +319,12 @@ In future posts we'll cover:
 - Advanced prompting techniques for TDD
 
 But the foundation is always the same: **manage your context window like your productivity depends on it**—because it does.
+
+---
+
+## References
+
+[^1]: Lewis, P., Perez, E., Piktus, A., et al. (2020). Retrieval-augmented generation for knowledge-intensive NLP tasks. *NeurIPS 2020*. https://arxiv.org/abs/2005.11401
 
 ---
 

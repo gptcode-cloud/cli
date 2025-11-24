@@ -38,9 +38,15 @@ Imagine this workflow:
 
 ## Chuchu's Roadmap
 
-We are building towards Phase 3.
+We are building towards Phase 3, inspired by recent advances in multi-agent systems[^1][^2].
 -   **Memory**: Long-term memory of your coding style and architectural decisions.
 -   **Proactivity**: Agents that run in the background, running tests and fixing lint errors before you even see them.
 -   **Collaboration**: Agents that can comment on PRs and discuss architecture with other agents.
 
 The goal is not to replace the developer, but to elevate them. You become the **Architect**, and AI becomes your **Engineering Team**.
+
+## References
+
+[^1]: Qian, C., Cong, X., Yang, C., et al. (2023). Communicative Agents for Software Development. *arXiv preprint arXiv:2307.07924*. https://arxiv.org/abs/2307.07924
+
+[^2]: Hong, S., Zheng, X., Chen, J., et al. (2023). MetaGPT: Meta Programming for Multi-Agent Collaborative Framework. *arXiv preprint arXiv:2308.00352*. https://arxiv.org/abs/2308.00352

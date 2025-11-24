@@ -28,10 +28,10 @@ Traditional AI coding assistants give you code immediately. Sometimes that works
 ❌ No incremental verification  
 ❌ No way to course-correct  
 
-Chuchu's workflow solves this:
+Chuchu's workflow[^1] solves this:
 
 ✅ Research phase builds context  
-✅ Planning ensures coherent approach  
+✅ Planning ensures coherent approach[^2]  
 ✅ Implementation is incremental and verified  
 ✅ You control the pace (interactive or autonomous)
 
@@ -237,6 +237,14 @@ Implementation itself works for any language (LLM-based), but build/test verific
 - [💰 Cost Optimization Guide](2024-11-22-cost-tracking-optimization.md)
 - [⚙️ Groq Model Configs](2025-11-18-groq-optimal-configs.md)
 - [🏠 Local Setup with Ollama](2024-11-19-ollama-local-setup.md)
+
+---
+
+## References
+
+[^1]: Beck, K. (2003). *Test-Driven Development: By Example*. Addison-Wesley Professional. ISBN: 978-0321146533
+
+[^2]: Fowler, M. (2018). *Refactoring: Improving the Design of Existing Code* (2nd ed.). Addison-Wesley Professional. ISBN: 978-0134757599
 
 ---
 

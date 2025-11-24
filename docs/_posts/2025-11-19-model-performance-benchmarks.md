@@ -11,7 +11,8 @@ tags: [benchmarks, performance, models, comparison]
 
 *Updated January 2025*
 
-**Important**: AI models evolve rapidly.
+**Important**: AI models evolve rapidly. Benchmark your models using established coding benchmarks like HumanEval[^1], SWE-Bench[^2], and LiveCodeBench[^3].
+
 1. Testing models with your specific workload
 2. Checking [Groq configurations]({% post_url 2025-11-15-groq-optimal-configs %}) for current recommendations
 3. Exploring [OpenRouter guide]({% post_url 2025-11-16-openrouter-multi-provider %}) for latest models
@@ -102,3 +103,11 @@ chu models search --agent editor openrouter
 ```
 
 See our [detailed configuration guides]({% post_url 2025-11-15-groq-optimal-configs %}) for setup instructions and cost breakdowns.
+
+## References
+
+[^1]: Chen, M., Tworek, J., Jun, H., Yuan, Q., et al. (2021). Evaluating large language models trained on code. *arXiv preprint arXiv:2107.03374*. https://arxiv.org/abs/2107.03374
+
+[^2]: Jimenez, C. E., Yang, J., Wettig, A., et al. (2024). SWE-bench: Can Language Models Resolve Real-World GitHub Issues? *ICLR 2024*. https://arxiv.org/abs/2310.06770
+
+[^3]: Jain, N., Han, K., Gu, A., et al. (2024). LiveCodeBench: Holistic and Contamination Free Evaluation of Large Language Models for Code. *arXiv preprint arXiv:2403.07974*. https://arxiv.org/abs/2403.07974

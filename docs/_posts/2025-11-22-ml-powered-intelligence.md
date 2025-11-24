@@ -84,7 +84,7 @@ User Input
     ↓
 TF-IDF Vectorization (1-3 grams)
     ↓
-Logistic Regression
+Logistic Regression[^1]
     ↓
 Confidence Score
     ↓
@@ -292,7 +292,7 @@ $ chu chat
 Pure ML would be faster but less accurate.
 Pure LLM would be more accurate but slower and expensive.
 
-**Hybrid ML + LLM** gives you the best of both worlds:
+**Hybrid ML + LLM**[^2] gives you the best of both worlds:
 - Fast path for confident decisions (80-90% of requests)
 - Smart fallback for edge cases
 - Configurable balance between speed and accuracy
@@ -354,6 +354,12 @@ But the foundation is here today: fast, cheap, accurate routing powered by embed
 ---
 
 *Have questions about the ML system? Check out the [full documentation](../ml-features) or ask in [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)!*
+
+## References
+
+[^1]: Fan, R. E., Chang, K. W., Hsieh, C. J., Wang, X. R., & Lin, C. J. (2008). LIBLINEAR: A library for large linear classification. *Journal of Machine Learning Research*, 9(Aug), 1871-1874. https://www.jmlr.org/papers/v9/fan08a.html
+
+[^2]: Teerapittayanon, S., McDanel, B., & Kung, H. T. (2016). BranchyNet: Fast inference via early exiting from deep neural networks. *ICPR 2016*. https://arxiv.org/abs/1709.01686
 
 ## See Also
 
