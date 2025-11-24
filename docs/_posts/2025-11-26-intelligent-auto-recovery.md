@@ -425,10 +425,18 @@ Current version uses simple success rate calculation. Planned improvements:
 
 ### 4. Advanced ML Models
 - XGBoost ensemble
-- KAN (Kolmogorov-Arnold Networks)
+- KAN (Kolmogorov-Arnold Networks)[^1][^2]
 - Multi-objective optimization
 
 See [Intelligence Layers notebook](../notebooks/intelligence-layers.md) for the full ML roadmap.
+
+---
+
+## References
+
+[^1]: Liu, Z., Wang, Y., Vaidya, S., Ruehle, F., Halverson, J., Soljačić, M., Hou, T. Y., & Tegmark, M. (2024). KAN: Kolmogorov-Arnold Networks. arXiv:2404.19756 [cs.LG]. [https://arxiv.org/abs/2404.19756](https://arxiv.org/abs/2404.19756)
+
+[^2]: Liu, Z., Ma, P., Wang, Y., Matusik, W., & Tegmark, M. (2024). KAN 2.0: Kolmogorov-Arnold Networks Meet Science. arXiv:2408.10205 [cs.LG]. [https://arxiv.org/abs/2408.10205](https://arxiv.org/abs/2408.10205)
 
 ## Comparison: chu do vs chu guided
 

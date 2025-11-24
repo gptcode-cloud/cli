@@ -18,7 +18,7 @@ But how do we make that decision? And more importantly, how do we combine differ
 We didn't want to rely on a single algorithm. Instead, we chose an **Ensemble** approach, combining two very different powerful models:
 
 1.  **XGBoost**: The industry standard for tabular data. It's fast, robust, and incredibly accurate for feature-based classification.
-2.  **KAN (Kolmogorov-Arnold Networks)**: A novel neural network architecture based on the Kolmogorov-Arnold representation theorem. Unlike traditional MLPs, KANs learn activation functions on edges, offering superior **interpretability**. We want to know *why* a task is considered complex.
+2.  **KAN (Kolmogorov-Arnold Networks)**: A novel neural network architecture based on the Kolmogorov-Arnold representation theorem[^2]. Unlike traditional MLPs, KANs learn activation functions on edges, offering superior **interpretability**[^3]. We want to know *why* a task is considered complex.
 
 ## The Problem: How to Mix Them?
 
@@ -32,7 +32,7 @@ Guessing these weights ($w_1, w_2$) is prone to bias. We needed a mathematical w
 
 We implemented a sophisticated sampling algorithm (often called "stick-breaking") to generate **unbiased random weights** that always sum to 1.0.
 
-Mathematically, we are sampling uniformly from the standard $(N-1)$-simplex.
+Mathematically, we are sampling uniformly from the standard $(N-1)$-simplex. This approach is based on the work by Henzi et al. (2021) on unbiased sampling of summative weights[^1].
 
 ### How it Works in Chuchu
 
@@ -60,3 +60,13 @@ This isn't just math for math's sake. This approach gives us:
 By combining the raw performance of **XGBoost**, the explainability of **KANs**, and the mathematical rigor of **Unbiased Sampling**, Chuchu's Intelligence Layer doesn't just guess—it *learns* the optimal strategy for your specific codebase.
 
 This is how we move from "Artificial Intelligence" to **"Optimized Intelligence"**.
+
+---
+
+## References
+
+[^1]: Henzi, A., Ziegel, J. F., & Gneiting, T. (2021). The pie sharing problem: Unbiased sampling of N+1 summative weights. *Environmental Modelling & Software*, 145, 105185. [https://doi.org/10.1016/j.envsoft.2021.105185](https://doi.org/10.1016/j.envsoft.2021.105185) (Creative Commons license)
+
+[^2]: Liu, Z., Wang, Y., Vaidya, S., Ruehle, F., Halverson, J., Soljačić, M., Hou, T. Y., & Tegmark, M. (2024). KAN: Kolmogorov-Arnold Networks. arXiv:2404.19756 [cs.LG]. [https://arxiv.org/abs/2404.19756](https://arxiv.org/abs/2404.19756)
+
+[^3]: Liu, Z., Ma, P., Wang, Y., Matusik, W., & Tegmark, M. (2024). KAN 2.0: Kolmogorov-Arnold Networks Meet Science. arXiv:2408.10205 [cs.LG]. [https://arxiv.org/abs/2408.10205](https://arxiv.org/abs/2408.10205)
