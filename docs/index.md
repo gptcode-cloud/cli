@@ -1,12 +1,12 @@
 ---
 layout: default
 title: Chuchu
-description: An affordable, TDD-first AI coding assistant for Neovim
+description: AI coding assistant with specialized agents and validation
 ---
 
 <div class="hero">
-  <h1>AI Coding Assistant<br/>You Can Actually Afford</h1>
-  <p>Test-driven development with multi-agent AI. Deep Neovim integration. Mix cheap and free models. $2-5/month with Groq or $0 with Ollama.</p>
+  <h1>AI Coding Assistant<br/>with Specialized Agents</h1>
+  <p>Autonomous execution with validation. <strong>Analyzer → Planner → Editor → Validator</strong>. File validation prevents mistakes. Success criteria with auto-retry. $0-5/month vs $20-30/month subscriptions.</p>
   <div class="hero-cta">
     <a href="#quick-start" class="btn btn-primary">Get Started</a>
     <a href="https://github.com/jadercorrea/chuchu" class="btn btn-secondary">View on GitHub</a>
@@ -14,61 +14,60 @@ description: An affordable, TDD-first AI coding assistant for Neovim
 </div>
 
 <div class="features">
-  <a href="/features#tdd-first-workflow" class="feature-card">
-    <h3>TDD-First Workflow</h3>
-    <p>Writes tests before implementation. Focuses on small, testable functions. Keeps you honest with clear requirements.</p>
+  <a href="/features#agent-orchestration" class="feature-card">
+    <h3>🤖 Agent Orchestration</h3>
+    <p>4 specialized agents working in sequence: Analyzer understands code, Planner creates minimal plans, Editor executes changes, Validator verifies success.</p>
   </a>
   
-  <a href="/features#multi-agent-architecture" class="feature-card">
-    <h3>Multi-Agent Architecture</h3>
-    <p>Router, Query, Editor, and Research agents. Each specialized for its task. Mix models based on cost and quality needs.</p>
+  <a href="/features#file-validation" class="feature-card">
+    <h3>🛡️ File Validation</h3>
+    <p>Prevents creating unintended files. Editor can only modify files explicitly mentioned in the plan. No surprise scripts or configs.</p>
   </a>
   
-  <a href="/features#cost-optimization" class="feature-card">
-    <h3>Radically Affordable</h3>
-    <p>Use Groq for $2-5/month or Ollama locally for free. Configure per-agent models to optimize cost vs performance.</p>
+  <a href="/features#success-validation" class="feature-card">
+    <h3>✅ Success Criteria Validation</h3>
+    <p>Auto-verifies results against success criteria. Retries automatically if validation fails (max 2 attempts). Ensures task completion.</p>
   </a>
   
-  <a href="/features#ml-powered-intelligence" class="feature-card">
-    <h3>ML-Powered Routing</h3>
-    <p>Intent classification in 1ms (500x faster than LLM). Complexity detection auto-triggers planning mode. Zero external dependencies.</p>
+  <a href="/features#execution-modes" class="feature-card">
+    <h3>⚙️ Supervised vs Autonomous</h3>
+    <p>Choose your control level. Autonomous mode for speed with validation. Supervised mode for critical tasks with manual approval.</p>
   </a>
   
-  <a href="/features#smart-context-selection" class="feature-card">
-    <h3>Smart Context Selection</h3>
+  <a href="/features#smart-context" class="feature-card">
+    <h3>🧠 Intelligent Context</h3>
     <p>Dependency graph + PageRank identifies relevant files. 5x token reduction (100k → 20k). Better responses, lower costs.</p>
   </a>
   
-  <a href="/features#neovim-integration" class="feature-card">
-    <h3>Deep Neovim Integration</h3>
-    <p>Native chat interface. Profile management UI. Model search and auto-install. LSP and Tree-sitter aware.</p>
+  <a href="/features#cost-optimization" class="feature-card">
+    <h3>💰 Radically Affordable</h3>
+    <p>Use Groq for $2-5/month or Ollama locally for free. Mix models per agent to optimize cost vs performance.</p>
   </a>
 </div>
 
 <div class="section">
   <h2 class="section-title">How It Works</h2>
-  <p class="section-subtitle">Multi-agent system with intelligent routing and context optimization</p>
+  <p class="section-subtitle">Orchestrated agents with validation and auto-retry</p>
   
   <div class="mermaid">
 graph TB
-    User[User Query] --> ML[ML Intent Classifier<br/>1ms]
-    ML -->|query| QA[Query Agent<br/>Code Reading]
-    ML -->|edit| EA[Editor Agent<br/>Code Writing]
-    ML -->|research| RA[Research Agent<br/>Web Search]
-    ML -->|uncertain| LLM[LLM Fallback<br/>500ms]
-    LLM --> QA
-    LLM --> EA
-    LLM --> RA
+    User["chu do 'add feature'"] --> Orchestrator{Orchestrator}
     
-    Context[Dependency Graph<br/>Context Optimizer] --> QA
-    Context --> EA
+    Orchestrator --> Analyzer["🔍 Analyzer<br/>Understands codebase<br/>Reads relevant files"]
+    Analyzer --> Planner["📋 Planner<br/>Creates minimal plan<br/>Lists files to modify"]
+    Planner --> Validation["🛡️ File Validation<br/>Extracts allowed files<br/>Blocks extras"]
+    Validation --> Editor["✏️ Editor<br/>Executes changes<br/>ONLY planned files"]
+    Editor --> Validator["✅ Validator<br/>Checks success criteria<br/>Validates results"]
     
-    QA --> Response[Response]
-    EA --> Response
-    RA --> Response
+    Validator -->|Success| Done["✓ Task Complete"]
+    Validator -->|Fail| Retry["Auto-retry<br/>(max 2x)<br/>with feedback"]
+    Retry --> Editor
     
-    style ML fill:#16a34a
-    style Context fill:#2563eb
+    style Analyzer fill:#3b82f6,color:#fff
+    style Planner fill:#8b5cf6,color:#fff  
+    style Editor fill:#10b981,color:#fff
+    style Validator fill:#f59e0b,color:#fff
+    style Validation fill:#ef4444,color:#fff
   </div>
 </div>
 
@@ -176,14 +175,15 @@ chu plan "implement rate limiting"</code></pre>
 <div class="section">
   <h2 class="section-title">Why Chuchu?</h2>
   
-  <p>Most AI coding assistants lock you into expensive subscriptions ($20-30/month) with black-box model selection. Chuchu gives you:</p>
+  <p>Most AI coding assistants lock you into expensive subscriptions ($20-30/month) with black-box model selection and no validation. Chuchu gives you:</p>
   
   <ul>
-    <li><strong>Full control</strong>: Choose any OpenAI-compatible provider</li>
-    <li><strong>Cost transparency</strong>: See exactly what you're paying per token</li>
-    <li><strong>Flexibility</strong>: Mix models based on task complexity</li>
-    <li><strong>Local option</strong>: Run completely offline with Ollama</li>
-    <li><strong>TDD focus</strong>: Tests first, implementation second</li>
+    <li><strong>Specialized agents</strong>: 4 agents working together with validation</li>
+    <li><strong>Safety first</strong>: File validation + success criteria prevent mistakes</li>
+    <li><strong>Full control</strong>: Supervised vs autonomous modes, any OpenAI-compatible provider</li>
+    <li><strong>Radically affordable</strong>: $0-5/month vs $20-30/month subscriptions</li>
+    <li><strong>Local option</strong>: Run completely offline with Ollama for $0</li>
+    <li><strong>TDD support</strong>: Write tests first when you want (<code>chu tdd</code>)</li>
   </ul>
   
   <p>Read the full story: <a href="/blog/2025-11-13-why-chuchu">Why Chuchu?</a></p>
