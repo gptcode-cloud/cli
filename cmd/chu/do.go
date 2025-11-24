@@ -234,7 +234,7 @@ func runDoExecution(task string, verbose bool, setup *config.Setup, backendName 
 		fmt.Fprintf(os.Stderr, "Plan created. Starting implementation...\n")
 	}
 
-	guidedWithCustomEditor := modes.NewGuidedModeWithCustomModel(orchestrator, cwd, queryModel, editorModel)
+	guidedWithCustomEditor := modes.NewGuidedModeWithCustomModel(orchestrator, provider, cwd, queryModel, editorModel)
 
 	if err := guidedWithCustomEditor.Implement(context.Background(), planContent); err != nil {
 		return fmt.Errorf("implementation failed: %w", err)

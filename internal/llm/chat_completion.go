@@ -180,7 +180,7 @@ if isCompound {
 		Messages: messages,
 		CompoundCustom: &compoundCustom{
 			Tools: &compoundTools{
-				EnabledTools: append([]string{"web_search", "code_interpreter"}, toolNames...),
+				EnabledTools: toolNames,
 			},
 		},
 		Stream:      true,
@@ -295,7 +295,7 @@ if isCompound {
 		Messages: messages,
 		CompoundCustom: &compoundCustom{
 			Tools: &compoundTools{
-				EnabledTools: append([]string{"web_search", "code_interpreter"}, toolNames...),
+				EnabledTools: toolNames,
 			},
 		},
 		Temperature: 0.0,

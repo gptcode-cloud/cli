@@ -157,6 +157,13 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 			fmt.Fprintf(os.Stderr, "[EDITOR] Iteration %d/%d\n", i+1, maxIterations)
 		}
 
+		if os.Getenv("CHUCHU_DEBUG") == "1" && i == 0 {
+			fmt.Fprintf(os.Stderr, "[EDITOR] Messages count: %d\n", len(messages))
+			if len(messages) > 0 {
+				fmt.Fprintf(os.Stderr, "[EDITOR] First message: %s...\n", messages[0].Content[:min(200, len(messages[0].Content))])
+			}
+		}
+
 		resp, err := e.provider.Chat(ctx, llm.ChatRequest{
 			SystemPrompt: editorPrompt,
 			Messages:     messages,
@@ -165,6 +172,14 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 		})
 		if err != nil {
 			return "", err
+		}
+
+		if os.Getenv("CHUCHU_DEBUG") == "1" {
+			fmt.Fprintf(os.Stderr, "[EDITOR] Response text length: %d\n", len(resp.Text))
+			fmt.Fprintf(os.Stderr, "[EDITOR] Tool calls: %d\n", len(resp.ToolCalls))
+			if len(resp.Text) > 0 {
+				fmt.Fprintf(os.Stderr, "[EDITOR] Response preview: %s...\n", resp.Text[:min(200, len(resp.Text))])
+			}
 		}
 
 		if len(resp.ToolCalls) == 0 {

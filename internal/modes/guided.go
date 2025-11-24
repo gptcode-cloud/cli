@@ -16,30 +16,33 @@ import (
 )
 
 type GuidedMode struct {
-	events      *events.Emitter
-	provider    llm.Provider
-	cwd         string
-	model       string
-	editorModel string
+	events       *events.Emitter
+	provider     llm.Provider
+	baseProvider llm.Provider
+	cwd          string
+	model        string
+	editorModel  string
 }
 
 func NewGuidedMode(provider llm.Provider, cwd string, model string) *GuidedMode {
 	return &GuidedMode{
-		events:      events.NewEmitter(os.Stderr),
-		provider:    provider,
-		cwd:         cwd,
-		model:       model,
-		editorModel: model,
+		events:       events.NewEmitter(os.Stderr),
+		provider:     provider,
+		baseProvider: provider,
+		cwd:          cwd,
+		model:        model,
+		editorModel:  model,
 	}
 }
 
-func NewGuidedModeWithCustomModel(provider llm.Provider, cwd string, model string, editorModel string) *GuidedMode {
+func NewGuidedModeWithCustomModel(provider llm.Provider, baseProvider llm.Provider, cwd string, model string, editorModel string) *GuidedMode {
 	return &GuidedMode{
-		events:      events.NewEmitter(os.Stderr),
-		provider:    provider,
-		cwd:         cwd,
-		model:       model,
-		editorModel: editorModel,
+		events:       events.NewEmitter(os.Stderr),
+		provider:     provider,
+		baseProvider: baseProvider,
+		cwd:          cwd,
+		model:        model,
+		editorModel:  editorModel,
 	}
 }
 
@@ -172,18 +175,45 @@ Create a structured plan with:
 }
 
 func (g *GuidedMode) Implement(ctx context.Context, plan string) error {
-	editorAgent := agents.NewEditor(g.provider, g.cwd, g.editorModel)
+	editorAgent := agents.NewEditor(g.baseProvider, g.cwd, g.editorModel)
 
 	statusCallback := func(status string) {
 		_ = g.events.Status(status)
 	}
 
+	implementPrompt := fmt.Sprintf(`Implement this approved technical plan:
+
+---
+%s
+---
+
+Execute the plan step by step:
+1. Read all files mentioned in the plan
+2. Make the required code changes
+3. Verify changes work (read files to confirm)
+4. Create any new directories/files as specified
+
+Focus on making the actual code changes described in the plan.`, plan)
+
 	history := []llm.ChatMessage{
-		{Role: "user", Content: fmt.Sprintf("Implement this plan:\n\n%s", plan)},
+		{Role: "user", Content: implementPrompt},
 	}
 
-	_, err := editorAgent.Execute(ctx, history, statusCallback)
-	return err
+	result, err := editorAgent.Execute(ctx, history, statusCallback)
+	if err != nil {
+		return err
+	}
+	
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[IMPLEMENT] Editor result: %s\n", result)
+	}
+	
+	// Check if editor just returned without doing anything meaningful
+	if strings.Contains(result, "reached max iterations") {
+		return fmt.Errorf("editor reached max iterations without completing task")
+	}
+	
+	return nil
 }
 
 func (g *GuidedMode) saveDraft(content string) (string, error) {

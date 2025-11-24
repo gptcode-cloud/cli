@@ -47,7 +47,15 @@ Execute the plan phase by phase:
 
 Focus on making the actual code changes described in the plan.`, string(planContent))
 
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[IMPLEMENT] Plan length: %d bytes\n", len(planContent))
+		fmt.Fprintf(os.Stderr, "[IMPLEMENT] Prompt preview: %s...\n", implementPrompt[:min(200, len(implementPrompt))])
+	}
+
 	editorModel := backendCfg.GetModelForAgent("editor")
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[IMPLEMENT] Using editor model: %s\n", editorModel)
+	}
 	editorAgent := agents.NewEditor(customExec, cwd, editorModel)
 	implementResult, err := editorAgent.Execute(context.Background(), []llm.ChatMessage{{Role: "user", Content: implementPrompt}}, nil)
 	if err != nil {
@@ -73,4 +81,11 @@ Focus on making the actual code changes described in the plan.`, string(planCont
 	fmt.Fprintf(os.Stderr, "  3. Run linting: make lint\n")
 
 	return nil
+}
+
+func min(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
