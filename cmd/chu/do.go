@@ -225,7 +225,8 @@ func runDoExecution(task string, verbose bool, setup *config.Setup, backendName 
 		fmt.Fprintf(os.Stderr, "Creating plan...\n")
 	}
 
-	if err := guided.Execute(context.Background(), task); err != nil {
+	planContent, err := guided.ExecuteAndReturnPlan(context.Background(), task)
+	if err != nil {
 		return fmt.Errorf("plan creation failed: %w", err)
 	}
 
@@ -235,7 +236,7 @@ func runDoExecution(task string, verbose bool, setup *config.Setup, backendName 
 
 	guidedWithCustomEditor := modes.NewGuidedModeWithCustomModel(orchestrator, cwd, queryModel, editorModel)
 
-	if err := guidedWithCustomEditor.Implement(context.Background(), task); err != nil {
+	if err := guidedWithCustomEditor.Implement(context.Background(), planContent); err != nil {
 		return fmt.Errorf("implementation failed: %w", err)
 	}
 

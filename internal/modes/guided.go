@@ -44,16 +44,21 @@ func NewGuidedModeWithCustomModel(provider llm.Provider, cwd string, model strin
 }
 
 func (g *GuidedMode) Execute(ctx context.Context, userMessage string) error {
+	_, err := g.ExecuteAndReturnPlan(ctx, userMessage)
+	return err
+}
+
+func (g *GuidedMode) ExecuteAndReturnPlan(ctx context.Context, userMessage string) (string, error) {
 	_ = g.events.Status("Analyzing task...")
 
 	draftPlan, err := g.createDraftPlan(ctx, userMessage)
 	if err != nil {
-		return fmt.Errorf("failed to create draft: %w", err)
+		return "", fmt.Errorf("failed to create draft: %w", err)
 	}
 
 	draftPath, err := g.saveDraft(draftPlan)
 	if err != nil {
-		return fmt.Errorf("failed to save draft: %w", err)
+		return "", fmt.Errorf("failed to save draft: %w", err)
 	}
 
 	_ = g.events.OpenPlan(draftPath)
@@ -63,18 +68,18 @@ func (g *GuidedMode) Execute(ctx context.Context, userMessage string) error {
 
 	fullPlan, err := g.createDetailedPlan(ctx, userMessage, draftPlan)
 	if err != nil {
-		return fmt.Errorf("failed to create plan: %w", err)
+		return "", fmt.Errorf("failed to create plan: %w", err)
 	}
 
 	planPath, err := g.savePlan(fullPlan)
 	if err != nil {
-		return fmt.Errorf("failed to save plan: %w", err)
+		return "", fmt.Errorf("failed to save plan: %w", err)
 	}
 
 	_ = g.events.OpenPlan(planPath)
 	_ = g.events.Message("Detailed plan ready. Send 'implement' to start implementation.")
 
-	return nil
+	return fullPlan, nil
 }
 
 func (g *GuidedMode) createDraftPlan(ctx context.Context, task string) (string, error) {
