@@ -16,18 +16,30 @@ import (
 )
 
 type GuidedMode struct {
-	events   *events.Emitter
-	provider llm.Provider
-	cwd      string
-	model    string
+	events      *events.Emitter
+	provider    llm.Provider
+	cwd         string
+	model       string
+	editorModel string
 }
 
 func NewGuidedMode(provider llm.Provider, cwd string, model string) *GuidedMode {
 	return &GuidedMode{
-		events:   events.NewEmitter(os.Stderr),
-		provider: provider,
-		cwd:      cwd,
-		model:    model,
+		events:      events.NewEmitter(os.Stderr),
+		provider:    provider,
+		cwd:         cwd,
+		model:       model,
+		editorModel: model,
+	}
+}
+
+func NewGuidedModeWithCustomModel(provider llm.Provider, cwd string, model string, editorModel string) *GuidedMode {
+	return &GuidedMode{
+		events:      events.NewEmitter(os.Stderr),
+		provider:    provider,
+		cwd:         cwd,
+		model:       model,
+		editorModel: editorModel,
 	}
 }
 
@@ -155,7 +167,7 @@ Create a structured plan with:
 }
 
 func (g *GuidedMode) Implement(ctx context.Context, plan string) error {
-	editorAgent := agents.NewEditor(g.provider, g.cwd, g.model)
+	editorAgent := agents.NewEditor(g.provider, g.cwd, g.editorModel)
 
 	statusCallback := func(status string) {
 		_ = g.events.Status(status)
