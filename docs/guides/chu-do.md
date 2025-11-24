@@ -1,8 +1,8 @@
-# chu do - Autonomous Task Execution with Self-Healing
+# chu do - Intelligent Task Execution with Efficiency Optimization
 
 ## Overview
 
-`chu do` executes tasks autonomously with intelligent auto-recovery. When a model fails, the system automatically learns from the error, recommends an alternative model, and retries—all without user intervention.
+`chu do` executes tasks autonomously with **intelligent efficiency optimization**. The system evaluates all available models across cost, speed, reliability, and availability to find the optimal path. When obstacles appear (failures, rate limits, high costs), it automatically adapts and finds a better route.
 
 ## Basic Usage
 
@@ -14,7 +14,14 @@ chu do "unify all feature files in /guides"
 
 ## Intelligence System
 
-Unlike traditional fallback systems with hardcoded alternatives, `chu do` uses **machine learning** to recommend models based on actual execution history.
+Unlike traditional fallback systems with hardcoded alternatives, `chu do` uses **multi-criteria optimization** to find the most efficient model:
+
+**Evaluated Criteria:**
+- Success Rate (50%) - Reliability from historical data
+- Speed (20%) - Tokens per second
+- Cost (20%) - Prefer free models when viable
+- Availability (10%) - Rate limits, quotas
+- Latency - Real execution time tracking
 
 ### How It Learns
 
@@ -40,15 +47,17 @@ Unlike traditional fallback systems with hardcoded alternatives, `chu do` uses *
 **First execution:**
 ```
 💡 Intelligence recommends: openrouter/moonshotai/kimi-k2:free
-   Confidence: 50%
-   Reason: Known to support function calling
+   Overall Score: 0.76
+   Success Rate: 50% | Speed: 300 TPS | Cost: $0.000/1M | Latency: 0ms
+   Reason: Known capable, Speed: 300 TPS, Cost: $0.00/1M
 ```
 
-**After 3 successful tasks:**
+**After 4 successful tasks:**
 ```
 💡 Intelligence recommends: openrouter/moonshotai/kimi-k2:free
-   Confidence: 100%
-   Reason: Historical success rate: 100% (3 tasks)
+   Overall Score: 0.88
+   Success Rate: 100% | Speed: 300 TPS | Cost: $0.000/1M | Latency: 20191ms
+   Reason: Success: 100% (4 tasks), Speed: 300 TPS, Cost: $0.00/1M
 ```
 
 ## Auto-Recovery Flow

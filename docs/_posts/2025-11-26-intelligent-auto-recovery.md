@@ -1,28 +1,27 @@
 ---
 layout: post
-title: "Intelligent Auto-Recovery: chu do That Learns From Failures"
+title: "Intelligent Efficiency: chu do Finds The Optimal Path"
 date: 2025-11-26
 categories: features ml
 ---
 
-# Intelligent Auto-Recovery: `chu do` That Learns From Failures
+# Intelligent Efficiency: `chu do` Finds The Optimal Path
 
-Today we're releasing `chu do`—but this isn't just another autonomous execution command. It's a self-healing system that **learns from failures** and gets smarter with every task you run.
+Today we're releasing `chu do`—an autonomous execution system that doesn't just recover from failures, it actively **optimizes for efficiency**. The system evaluates cost, speed, reliability, and availability to find the best route to complete your task.
 
 ## The Problem
 
-You run a command. It fails because the model doesn't support the required tools. What happens next?
+You want to complete a task. The system could use:
+- An expensive premium model that works
+- A fast but unreliable model
+- A free model that might be slow
+- A local model that's private but limited
 
-**Traditional approach:**
-1. Read error message
-2. Google which models support function calling
-3. Manually change config
-4. Run command again
-5. Hope it works this time
+**Traditional approach:** Pick one and hope it works.
 
-**What if the system could do all of this automatically?**
+**What if the system could evaluate all options and choose the most efficient path automatically?**
 
-## Enter: Intelligent Auto-Recovery
+## Enter: Intelligent Efficiency
 
 ```bash
 $ chu do "create a hello.txt file with Hello World" --verbose
@@ -32,13 +31,14 @@ Editor Model: moonshotai/kimi-k2-instruct-0905
 
 ❌ Attempt 1 failed: tool 'read_file' not available
 
-🤔 Asking intelligence system for alternative model...
+🤔 Evaluating all available options...
 
 💡 Intelligence recommends: openrouter/moonshotai/kimi-k2:free
-   Confidence: 100%
-   Reason: Historical success rate: 100% (3 tasks)
+   Overall Score: 0.88
+   Success Rate: 100% | Speed: 300 TPS | Cost: $0.000/1M | Latency: 20191ms
+   Reason: Success: 100% (4 tasks), Speed: 300 TPS, Cost: $0.00/1M
 
-🔄 Retrying with recommended model...
+🔄 Switching to optimal model...
 
 === Attempt 2/3 ===
 ✓ Task completed successfully
@@ -46,9 +46,10 @@ Editor Model: moonshotai/kimi-k2-instruct-0905
 
 No user intervention. No config editing. The system:
 - Detected the failure
-- Consulted its intelligence layer
-- Recommended an alternative based on **learned success rates**
-- Retried automatically
+- **Evaluated all available options** across backends
+- Calculated efficiency scores considering: success rate, speed, cost, latency
+- Chose the **optimal model** (free, fast, 100% success)
+- Switched automatically
 - Succeeded
 
 ## How It Works
@@ -96,6 +97,40 @@ openrouter/moonshotai/kimi-k2:free: 100% (4 successes)
 ```
 
 The system **improves recommendations over time** based on your actual usage patterns.
+
+## Multi-Criteria Optimization
+
+The system doesn't just pick "any working model"—it finds the **most efficient** one.
+
+### Scoring Formula
+
+```
+Score = 0.5 * SuccessRate + 0.2 * Speed + 0.2 * Cost + 0.1 * Availability
+```
+
+**Weights explained:**
+- **50% Success Rate**: Reliability is most important
+- **20% Speed**: Fast models = better UX
+- **20% Cost**: Free models preferred when viable
+- **10% Availability**: Rate limits matter
+
+### Example Calculation
+
+**openrouter/kimi:free**:
+- Success: 100% = 0.50
+- Speed: 300 TPS = 0.06 (300/1000 * 0.2)
+- Cost: $0/1M = 0.20 (free = max score)
+- Availability: 100% = 0.10
+- **Total: 0.86**
+
+**groq/llama-70b**:
+- Success: 0% = 0.00
+- Speed: 500 TPS = 0.10
+- Cost: $0/1M = 0.20
+- Availability: 100% = 0.10  
+- **Total: 0.40**
+
+→ System chooses openrouter/kimi:free (higher score)
 
 ## Not Just Fallback Logic
 
