@@ -95,10 +95,42 @@ Unlike traditional fallback systems with hardcoded alternatives, `chu do` uses *
 └─────────────────────────────────────────────┘
 ```
 
+## Execution Modes
+
+### Autonomous Mode (Default)
+Uses **orchestrated agent decomposition** for better results:
+
+1. **Analyzer Agent** - Understands codebase context
+2. **Planner Agent** - Creates minimal, focused plan
+3. **Editor Agent** - Executes ONLY planned changes
+4. **Validator Agent** - Verifies success criteria
+
+```bash
+chu do "add debug flag to config.ini"
+```
+
+**Benefits:**
+- File validation prevents unintended changes
+- Success criteria validation with auto-retry (max 2 attempts)
+- Over-engineering protection (no helper scripts unless requested)
+
+### Supervised Mode
+Requires manual plan approval before execution:
+
+```bash
+chu do --supervised "refactor authentication module"
+```
+
+**Use when:**
+- Task affects critical code
+- You want to review the plan first
+- Changes involve >5 files
+
 ## Command Flags
 
 | Flag | Shorthand | Description | Default |
 |------|-----------|-------------|---------|
+| `--supervised` | | Require manual plan approval | false |
 | `--dry-run` | | Show analysis without executing | false |
 | `--verbose` | `-v` | Show intelligence decisions and retries | false |
 | `--max-attempts` | | Maximum retry attempts | 3 |

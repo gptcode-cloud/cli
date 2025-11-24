@@ -264,7 +264,7 @@ func min(a, b int) int {
 }
 
 func (e *EditorAgent) validateFileWrite(args map[string]interface{}) error {
-	if e.allowedFiles == nil || len(e.allowedFiles) == 0 {
+	if len(e.allowedFiles) == 0 {
 		return nil
 	}
 
