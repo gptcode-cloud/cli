@@ -43,10 +43,11 @@ func RecordExecution(exec TaskExecution) error {
 }
 
 type ModelSuccess struct {
-	Backend string
-	Model   string
+	Backend     string
+	Model       string
 	SuccessRate float64
 	TotalTasks  int
+	AvgLatency  int64
 }
 
 func GetRecentModelPerformance(taskType string, limit int) ([]ModelSuccess, error) {
@@ -78,35 +79,48 @@ func GetRecentModelPerformance(taskType string, limit int) ([]ModelSuccess, erro
 	}
 
 	stats := make(map[string]*struct {
-		successes int
-		total     int
-		backend   string
-		model     string
+		successes   int
+		total       int
+		backend     string
+		model       string
+		totalLatency int64
+		latencyCount int
 	})
 
 	for _, exec := range lines {
 		key := exec.Backend + "/" + exec.Model
 		if stats[key] == nil {
 			stats[key] = &struct {
-				successes int
-				total     int
-				backend   string
-				model     string
-			}{backend: exec.Backend, model: exec.Model}
+			successes    int
+			total        int
+			backend      string
+			model        string
+			totalLatency int64
+			latencyCount int
+		}{backend: exec.Backend, model: exec.Model}
 		}
 		stats[key].total++
 		if exec.Success {
 			stats[key].successes++
 		}
+		if exec.LatencyMs > 0 {
+			stats[key].totalLatency += exec.LatencyMs
+			stats[key].latencyCount++
+		}
 	}
 
 	results := make([]ModelSuccess, 0, len(stats))
 	for _, s := range stats {
+		avgLatency := int64(0)
+		if s.latencyCount > 0 {
+			avgLatency = s.totalLatency / int64(s.latencyCount)
+		}
 		results = append(results, ModelSuccess{
 			Backend:     s.backend,
 			Model:       s.model,
 			SuccessRate: float64(s.successes) / float64(s.total),
 			TotalTasks:  s.total,
+			AvgLatency:  avgLatency,
 		})
 	}
 

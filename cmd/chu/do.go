@@ -173,7 +173,12 @@ func runDoExecutionWithRetry(task string, verbose bool, maxAttempts int) error {
 
 		if verbose {
 			fmt.Fprintf(os.Stderr, "\n💡 Intelligence recommends: %s/%s\n", rec.Backend, rec.Model)
-			fmt.Fprintf(os.Stderr, "   Confidence: %.0f%%\n", rec.Confidence*100)
+			fmt.Fprintf(os.Stderr, "   Overall Score: %.2f\n", rec.Score)
+			fmt.Fprintf(os.Stderr, "   Success Rate: %.0f%% | Speed: %d TPS | Cost: $%.3f/1M | Latency: %dms\n",
+				rec.Metrics.SuccessRate*100,
+				rec.Metrics.SpeedTPS,
+				rec.Metrics.CostPer1M,
+				rec.Metrics.AvgLatencyMs)
 			fmt.Fprintf(os.Stderr, "   Reason: %s\n", rec.Reason)
 			fmt.Fprintf(os.Stderr, "\n🔄 Retrying with recommended model...\n")
 		}
