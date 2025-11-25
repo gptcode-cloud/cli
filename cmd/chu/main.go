@@ -703,7 +703,7 @@ REPL Commands:
   /help          - Show help`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		once, _ := cmd.Flags().GetBool("once")
-		
+
 		// Check if we have a message argument or stdin input, or if we're in an interactive TTY
 		var input string
 		if len(args) > 0 && args[0] != "" {
@@ -713,16 +713,12 @@ REPL Commands:
 			// Check for piped input
 			stdinBytes, _ := io.ReadAll(os.Stdin)
 			input = string(stdinBytes)
-		} else {
-			// No input and we're in an interactive TTY, use REPL mode
-			// Even if there's piped input, if we're in TTY, we still want REPL
 		}
-		
 		// If we have input or --once flag, use single-shot mode
 		if input != "" || once {
 			return repl.RunSingleShot(input, args)
 		}
-		
+
 		// Otherwise, start REPL mode
 		repl, err := repl.NewChatREPL(8000, 50) // 8k tokens, 50 messages
 		if err != nil {
@@ -784,26 +780,82 @@ Example: chu plan "Add user authentication"`,
 
 var runCmd = &cobra.Command{
 	Use:   "run [task]",
-	Short: "Execute general tasks: HTTP requests, CLI commands, devops actions",
-	Long: `Execute mode for general operational tasks without TDD ceremony.
+	Short: "Execute tasks with follow-up support",
+	Long: `Execute mode for general operational tasks with AI assistance or direct command execution.
 
-Perfect for:
-- HTTP requests (curl, API calls)
-- CLI tools (fly, docker, kubectl, gh)
-- DevOps tasks (deployments, infrastructure checks)
-- Any command execution or task automation
+Two modes available:
+
+1. AI-assisted mode (new, default when no args provided):
+   chu run
+   chu run --help  # Show REPL commands
+   chu run --once   # Force single-shot AI mode
+
+2. Direct REPL mode with command history:
+   chu run "command and args" --raw
+   chu run "curl https://api.github.com" --raw
+
+AI-assisted mode provides:
+- Command suggestions and execution
+- Follow-up support with context preservation
+- Command history and output reference ($1, $2, $last)
+- Directory and environment variable management
+
+REPL Commands:
+  /exit, /quit   - Exit run session
+  /help          - Show help
+  /history       - Show command history
+  /output <id>   - Show output of previous command
+  /cd <dir>      - Change directory
+  /env           - Show/set environment variables
 
 Examples:
-  chu run "make a GET request to https://api.github.com/users/octocat"
-  chu run "deploy to staging using fly deploy"
-  chu run "check if postgres is running"`,
+  chu run                # Start AI-assisted mode
+  chu run "deploy to staging" --once  # Single AI execution
+  chu run "docker ps"    --raw     # Direct command REPL`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		builder, provider, model, err := newBuilderAndLLM("general", "run", "")
-		if err != nil {
-			return err
+		raw, _ := cmd.Flags().GetBool("raw")
+		once, _ := cmd.Flags().GetBool("once")
+
+		// Raw mode with command references
+		if raw {
+			// If we have a task, we want to run it and exit
+			if len(args) > 0 && args[0] != "" {
+				task := strings.Join(args, " ")
+				return repl.RunSingleShotCommand(task)
+			}
+			// Start raw REPL mode (no AI, just command execution)
+			repl := repl.NewRunREPL(20) // Track last 20 commands
+			return repl.Run()
 		}
-		return modes.RunExecute(builder, provider, model, args)
+
+		// Check if we have a task argument or stdin input, or if we're in an interactive TTY
+		var input string
+		if len(args) > 0 && args[0] != "" {
+			input = strings.Join(args, " ")
+		} else if !isInteractiveTTY() {
+			// Check for piped input
+			stdinBytes, _ := io.ReadAll(os.Stdin)
+			input = string(stdinBytes)
+		}
+
+		// If we have input or --once flag, use single-shot AI mode
+		if input != "" || once {
+			builder, provider, model, err := newBuilderAndLLM("general", "run", "")
+			if err != nil {
+				return err
+			}
+			return modes.RunExecute(builder, provider, model, strings.Fields(input))
+		}
+
+		// Start AI-assisted REPL mode - combine run REPL with AI processing
+		repl := repl.NewRunREPL(20)
+		return repl.Run()
 	},
+}
+
+func init() {
+	runCmd.Flags().Bool("raw", false, "Run direct command REPL mode (no AI)")
+	runCmd.Flags().Bool("once", false, "Run single-shot mode")
 }
 
 var featureCmd = &cobra.Command{

@@ -312,15 +312,88 @@ chu feature "slugify with unicode support and max length"
 
 ### `chu run [task]`
 
-Execute general tasks: HTTP requests, CLI commands, DevOps actions.
+Execute tasks with follow-up support. Two modes available:
 
+**1. AI-assisted mode (default when no args provided):**
 ```bash
-chu run "make a GET request to https://api.github.com/users/octocat"
-chu run "deploy to staging using fly deploy"
-chu run "check if postgres is running"
+chu run                                    # Start interactive session
+chu run "deploy to staging" --once         # Single AI execution
 ```
 
-Perfect for operational tasks without TDD ceremony.
+**2. Direct REPL mode with command history:**
+```bash
+chu run --raw                              # Interactive command execution
+chu run "docker ps" --raw                  # Execute command and exit
+```
+
+#### AI-Assisted Mode
+
+Provides intelligent command suggestions and execution:
+- Command history tracking
+- Output reference ($1, $2, $last)
+- Directory and environment management
+- Context preservation across commands
+
+```bash
+chu run
+> deploy to staging
+[AI executes fly deploy command]
+> check if it's running
+[AI executes status check]
+> roll back if there are errors
+[AI conditionally executes rollback]
+```
+
+#### Direct REPL Mode
+
+Direct shell command execution with enhanced features:
+```bash
+chu run --raw
+> ls -la
+> cat $1                    # Reference previous command
+> /history                  # Show command history
+> /output 1                 # Show output of command 1
+> /cd /tmp                  # Change directory
+> /env MY_VAR=value         # Set environment variable
+> /exit                     # Exit REPL
+```
+
+**REPL Commands:**
+- `/exit`, `/quit` - Exit run session
+- `/help` - Show available commands
+- `/history` - Show command history
+- `/output <id>` - Show output of previous command
+- `/cd <dir>` - Change working directory
+- `/env [key[=value]]` - Show/set environment variables
+
+**Command References:**
+- `$last` - Reference the last command
+- `$1`, `$2`, ... - Reference command by ID
+
+#### Examples
+
+```bash
+# AI-assisted operational tasks
+chu run "check postgres status"
+chu run "make GET request to api.github.com/users/octocat"
+
+# Direct command REPL for DevOps
+chu run --raw
+> docker ps
+> docker logs $1            # Reference container from previous output
+> /cd /var/log
+> tail -f app.log
+
+# Single-shot with piped input
+echo "deploy to production" | chu run --once
+```
+
+#### Flags
+
+- `--raw` - Use direct command REPL mode (no AI)
+- `--once` - Force single-shot mode (backwards compatible)
+
+Perfect for operational tasks, DevOps workflows, and command execution with history.
 
 ---
 

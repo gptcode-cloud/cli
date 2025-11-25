@@ -83,12 +83,16 @@ func (cm *ContextManager) GetContext() string {
 
 	for _, msg := range cm.messages {
 		role := msg.Role
-		if role == "user" {
+		switch role {
+		case "user":
 			role = "User"
-		} else if role == "assistant" {
+		case "assistant":
 			role = "Assistant"
-		} else {
-			role = strings.Title(role)
+		default:
+			// Capitalize first letter for other roles
+			if len(role) > 0 {
+				role = strings.ToUpper(role[:1]) + role[1:]
+			}
 		}
 		part := fmt.Sprintf("%s: %s", role, msg.Content)
 		parts = append(parts, part)

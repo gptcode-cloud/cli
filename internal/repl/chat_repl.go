@@ -56,7 +56,7 @@ func NewChatREPL(maxTokens, maxMessages int) (*ChatREPL, error) {
 		backendName := setup.Defaults.Backend
 		modelAlias := setup.Defaults.Model
 		backendCfg := setup.Backend[backendName]
-		
+
 		model = backendCfg.DefaultModel
 		if alias, ok := backendCfg.Models[modelAlias]; ok {
 			model = alias
@@ -65,7 +65,7 @@ func NewChatREPL(maxTokens, maxMessages int) (*ChatREPL, error) {
 		}
 	}
 
-// Initialize builder
+	// Initialize builder
 	builder := prompt.NewDefaultBuilder(nil)
 
 	ctxMgr := NewContextManager(maxTokens, maxMessages)
@@ -73,7 +73,7 @@ func NewChatREPL(maxTokens, maxMessages int) (*ChatREPL, error) {
 	return &ChatREPL{
 		rl:      rl,
 		ctxMgr:  ctxMgr,
-		builder:  builder,
+		builder: builder,
 		model:   model,
 	}, nil
 }
@@ -91,12 +91,12 @@ func filterInput(r rune) (rune, bool) {
 func (r *ChatREPL) Run() error {
 	fmt.Println("Chuchu Chat REPL - Type /help for commands")
 	fmt.Println("")
-	
+
 	// Update file context initially
 	if err := r.ctxMgr.UpdateFileContext(); err != nil {
 		fmt.Printf("Warning: Failed to load file context: %v\n", err)
 	}
-	
+
 	for {
 		// Read input
 		line, err := r.rl.Readline()
@@ -258,14 +258,18 @@ func (r *ChatREPL) showHistory() {
 	fmt.Printf("Last %d messages:\n", len(messages))
 	for _, msg := range messages {
 		role := msg.Role
-		if role == "user" {
+		switch role {
+		case "user":
 			role = "User"
-		} else if role == "assistant" {
+		case "assistant":
 			role = "Assistant"
-		} else {
-			role = strings.Title(role)
+		default:
+			// Capitalize first letter for other roles
+			if len(role) > 0 {
+				role = strings.ToUpper(role[:1]) + role[1:]
+			}
 		}
-		fmt.Printf("[%s] %s: %s\n", 
+		fmt.Printf("[%s] %s: %s\n",
 			msg.Timestamp.Format("15:04"),
 			role,
 			msg.Content)
