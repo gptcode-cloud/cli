@@ -92,6 +92,52 @@ document.addEventListener('DOMContentLoaded', function() {
 
 ---
 
+## `chu do` - Autonomous Execution
+
+**The flagship copilot command.** Orchestrates 4 specialized agents to autonomously complete tasks with validation and auto-retry.
+
+### How It Works
+
+```bash
+chu do "add JWT authentication"
+```
+
+**Agent Flow:**
+1. **Analyzer** - Understands codebase using dependency graph, reads relevant files
+2. **Planner** - Creates minimal implementation plan, lists files to modify
+3. **File Validation** - Extracts allowed files, blocks extras
+4. **Editor** - Executes changes ONLY on planned files
+5. **Validator** - Checks success criteria, triggers auto-retry if validation fails
+
+### Examples
+
+```bash
+chu do "fix authentication bug in login handler"
+chu do "refactor error handling to use custom types"
+chu do "add rate limiting to API endpoints" --supervised
+chu do "optimize database queries" --interactive
+```
+
+### Flags
+
+- `--supervised` - Require manual approval before implementation (critical tasks)
+- `--interactive` - Prompt when model selection is ambiguous
+- `--dry-run` - Show plan only, don't execute
+- `-v` / `--verbose` - Show model selection and agent decisions
+- `--max-attempts N` - Maximum retry attempts (default: 3)
+
+### Benefits
+
+- Automatic model selection: queries performance history and picks the best model per agent  
+- Auto-retry with feedback: switches to better models when validation fails  
+- File validation: prevents creating unintended files or modifying wrong code  
+- Success criteria: verifies task completion before finishing  
+- Cost optimized: uses cheaper models for routing, better models for editing  
+
+[See full agent architecture →](/features#agent-based-architecture)
+
+---
+
 ## Setup Commands
 
 ### `chu setup`

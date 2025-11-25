@@ -3,7 +3,7 @@ layout: post
 title: "Why Chuchu? Building an Affordable AI Coding Assistant"
 date: 2025-11-13
 author: Jader Correa
-description: "AI coding assistants cost $20-30/month. Chuchu offers TDD-first AI assistance for $2-5/month with Groq or $0/month with Ollama. Radically affordable without compromise."
+description: "AI coding assistants cost $20-30/month. Chuchu offers AI assistance with validation for $2-5/month with Groq or $0/month with Ollama. Radically affordable without compromise."
 tags: [introduction, affordability, philosophy, open-source]
 ---
 
@@ -26,7 +26,7 @@ For many developers—especially students, open-source contributors, or those in
 
 ## The Solution: Chuchu
 
-Chuchu is a **TDD-first AI coding assistant** designed to be:
+Chuchu is a **AI coding assistant with specialized agents and validation** designed to be:
 
 ### 1. **Radically Affordable**
 
@@ -42,7 +42,7 @@ Use the LLM providers you want:
 - Chuchu with Groq: **$2-5/month** typical usage = $24-60/year
 - Chuchu with Ollama: **$0/year** (hardware you already own)
 
-### 2. **TDD-First by Design**
+### 2. **Validation ### 2. **TDD-First by Design** Safety First**
 
 Unlike chat-based assistants, Chuchu follows Test-Driven Development:
 
@@ -89,7 +89,7 @@ Chuchu is perfect if you:
 - Want control over your AI spending
 - Prefer terminal/Neovim workflows
 - Care about test coverage
-- Want to learn TDD practices
+- Want to ensure code quality
 - Need offline/local AI options
 - Value transparency and open source
 
@@ -99,7 +99,7 @@ We believe AI coding assistance should be:
 
 1. **Accessible**: No one should be priced out of productivity tools
 2. **Transparent**: Know what you're paying, what models you're using
-3. **Educational**: Learn TDD while getting work done
+3. **Educational**: Learn best practices while getting work done
 4. **Privacy-Conscious**: Local models = your code stays yours
 
 Chuchu isn't trying to replace paid tools for everyone. If Cursor works for you and the cost is fine, that's great! But for the millions of developers who can't afford subscriptions, or who want more control, Chuchu offers a real alternative.

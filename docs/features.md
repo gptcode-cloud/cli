@@ -6,6 +6,64 @@ description: Complete feature set of Chuchu AI coding assistant
 
 # Features
 
+## Agent-Based Architecture
+
+### Autonomous Execution with `chu do`
+
+The flagship command that orchestrates 4 specialized agents working in sequence:
+
+1. **Analyzer**: Understands codebase, reads relevant files using dependency graph
+2. **Planner**: Creates minimal implementation plan, lists files to modify
+3. **Editor**: Executes changes ONLY on planned files (file validation)
+4. **Validator**: Verifies success criteria, triggers auto-retry if needed
+
+**Usage:**
+```bash
+chu do "add JWT authentication"
+chu do "fix bug in payment processing" --supervised
+chu do "refactor error handling" --interactive
+```
+
+**Flags:**
+- `--supervised` - Manual approval before implementation
+- `--interactive` - Prompt when model selection is ambiguous
+- `--dry-run` - Show plan only
+- `-v` - Verbose (show model selection)
+- `--max-attempts N` - Max retry attempts (default 3)
+
+**Benefits:**
+- Automatic model selection per agent (queries performance history)
+- Auto-retry with better models when validation fails
+- File validation prevents unintended changes
+- Success criteria checked before completion
+
+[See full agent flow diagram on homepage →](/)
+
+---
+
+## Validation & Safety
+
+### File Validation
+The Editor agent can **only** modify files explicitly mentioned in the Planner's output. This prevents:
+- Creating unexpected configuration files
+- Modifying unrelated code
+- Adding surprise scripts
+
+### Success Criteria Validation
+The Validator agent automatically:
+1. Checks if task completion criteria are met
+2. Runs tests if applicable
+3. Verifies file changes match plan
+4. Triggers retry with feedback if validation fails
+
+### Supervised vs Autonomous Modes
+- **Autonomous** (default): Fast execution with automatic validation
+- **Supervised** (`--supervised`): Manual approval before implementation
+
+Choose based on task criticality.
+
+---
+
 ## ML-Powered Intelligence
 
 ### Intent Classification

@@ -6,7 +6,9 @@ import (
 	"os"
 
 	"chuchu/internal/agents"
+	"chuchu/internal/config"
 	"chuchu/internal/events"
+	"chuchu/internal/intelligence"
 	"chuchu/internal/llm"
 )
 
@@ -17,9 +19,11 @@ type OrchestratedMode struct {
 	cwd          string
 	model        string
 	editorModel  string
+	setup        *config.Setup
 }
 
 func NewOrchestratedMode(provider llm.Provider, baseProvider llm.Provider, cwd string, model string, editorModel string) *OrchestratedMode {
+	setup, _ := config.LoadSetup()
 	return &OrchestratedMode{
 		events:       events.NewEmitter(os.Stderr),
 		provider:     provider,
@@ -27,6 +31,7 @@ func NewOrchestratedMode(provider llm.Provider, baseProvider llm.Provider, cwd s
 		cwd:          cwd,
 		model:        model,
 		editorModel:  editorModel,
+		setup:        setup,
 	}
 }
 
@@ -120,6 +125,22 @@ ONLY modify files listed in the plan. ONLY make changes described. NO extras.`, 
 			_ = o.events.Message(fmt.Sprintf("Validation failed. Retrying... (%d/%d)", attempt+2, maxRetries+1))
 			for _, issue := range validationResult.Issues {
 				_ = o.events.Message(fmt.Sprintf("  Issue: %s", issue))
+			}
+
+			// Try to get better model recommendation based on validation failure
+			if o.setup != nil {
+				currentBackend := o.setup.Defaults.Backend
+				recommendations, err := intelligence.RecommendModelForRetry(o.setup, "editor", currentBackend, o.editorModel, userMessage)
+				if err == nil && len(recommendations) > 0 {
+					rec := recommendations[0]
+					if rec.Model != o.editorModel {
+						_ = o.events.Message(fmt.Sprintf("💡 Validation suggests trying different model: %s/%s", rec.Backend, rec.Model))
+						_ = o.events.Message(fmt.Sprintf("   Reason: %s", rec.Reason))
+
+						// Update editor model for next attempt
+						o.editorModel = rec.Model
+					}
+				}
 			}
 
 			editorAgent = agents.NewEditorWithFileValidation(o.baseProvider, o.cwd, o.editorModel, allowedFiles)

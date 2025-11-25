@@ -34,6 +34,7 @@ Examples:
 		verbose, _ := cmd.Flags().GetBool("verbose")
 		maxAttempts, _ := cmd.Flags().GetInt("max-attempts")
 		supervised, _ := cmd.Flags().GetBool("supervised")
+		interactive, _ := cmd.Flags().GetBool("interactive")
 
 		if verbose {
 			fmt.Fprintf(os.Stderr, "Task: %s\n", task)
@@ -45,7 +46,7 @@ Examples:
 			return runDoAnalysis(task, verbose)
 		}
 
-		return runDoExecutionWithRetry(task, verbose, maxAttempts, supervised)
+		return runDoExecutionWithRetry(task, verbose, maxAttempts, supervised, interactive)
 	},
 }
 
@@ -56,6 +57,7 @@ func init() {
 	doCmd.Flags().BoolP("verbose", "v", false, "Show detailed progress")
 	doCmd.Flags().Int("max-attempts", 3, "Maximum retry attempts with different models")
 	doCmd.Flags().Bool("supervised", false, "Require manual approval before implementation")
+	doCmd.Flags().BoolP("interactive", "i", false, "Prompt for model selection when multiple options are similar")
 }
 
 func runDoAnalysis(task string, verbose bool) error {
@@ -107,15 +109,37 @@ Provide a brief analysis.`, task)
 	return nil
 }
 
-func runDoExecutionWithRetry(task string, verbose bool, maxAttempts int, supervised bool) error {
+func runDoExecutionWithRetry(task string, verbose bool, maxAttempts int, supervised bool, interactive bool) error {
 	setup, err := config.LoadSetup()
 	if err != nil {
 		return fmt.Errorf("failed to load setup: %w", err)
 	}
 
-	currentBackend := setup.Defaults.Backend
-	currentBackendCfg := setup.Backend[currentBackend]
-	currentEditorModel := currentBackendCfg.GetModelForAgent("editor")
+	editorBackend, editorModel, editorReason, err := intelligence.SelectBestModelForAgent(setup, "editor")
+	if err != nil {
+		editorBackend = setup.Defaults.Backend
+		backendCfg := setup.Backend[editorBackend]
+		editorModel = backendCfg.GetModelForAgent("editor")
+		editorReason = "Fallback to default"
+	}
+
+	queryBackend, queryModel, queryReason, err := intelligence.SelectBestModelForAgent(setup, "query")
+	if err != nil {
+		queryBackend = setup.Defaults.Backend
+		backendCfg := setup.Backend[queryBackend]
+		queryModel = backendCfg.GetModelForAgent("query")
+		queryReason = "Fallback to default"
+	}
+
+	if verbose {
+		fmt.Fprintf(os.Stderr, "🤖 Auto-selected models:\n")
+		fmt.Fprintf(os.Stderr, "   Editor: %s/%s - %s\n", editorBackend, editorModel, editorReason)
+		fmt.Fprintf(os.Stderr, "   Query: %s/%s - %s\n", queryBackend, queryModel, queryReason)
+		fmt.Fprintf(os.Stderr, "\n")
+	}
+
+	currentBackend := editorBackend
+	currentEditorModel := editorModel
 
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		if attempt > 1 && verbose {
@@ -188,7 +212,6 @@ func runDoExecutionWithRetry(task string, verbose bool, maxAttempts int, supervi
 		if rec.Backend != currentBackend {
 			if _, exists := setup.Backend[rec.Backend]; exists {
 				currentBackend = rec.Backend
-				currentBackendCfg = setup.Backend[currentBackend]
 			}
 		}
 

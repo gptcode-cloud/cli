@@ -22,6 +22,10 @@ type ValidationResult struct {
 	Suggestions string
 }
 
+type ValidatorConfig struct {
+	OnValidationFail func(issues []string) (shouldRetry bool, newBackend string, newModel string)
+}
+
 func NewValidator(provider llm.Provider, cwd string, model string) *ValidatorAgent {
 	return &ValidatorAgent{
 		provider: provider,

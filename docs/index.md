@@ -14,34 +14,34 @@ description: AI coding assistant with specialized agents and validation
 </div>
 
 <div class="features">
-  <a href="/features#agent-orchestration" class="feature-card">
-    <h3>Agent Orchestration</h3>
-    <p>4 specialized agents working in sequence: Analyzer understands code, Planner creates minimal plans, Editor executes changes, Validator verifies success.</p>
+  <a href="/features#agent-based-architecture" class="feature-card">
+    <h3>Autonomous Execution</h3>
+    <p><code>chu do "task"</code> orchestrates 4 specialized agents: Analyzer → Planner → Editor → Validator. Auto-retry with model switching when validation fails.</p>
   </a>
   
   <a href="/features#file-validation" class="feature-card">
-    <h3>File Validation</h3>
-    <p>Prevents creating unintended files. Editor can only modify files explicitly mentioned in the plan. No surprise scripts or configs.</p>
-  </a>
-  
-  <a href="/features#success-validation" class="feature-card">
-    <h3>Success Criteria Validation</h3>
-    <p>Auto-verifies results against success criteria. Retries automatically if validation fails. Ensures task completion.</p>
-  </a>
-  
-  <a href="/features#execution-modes" class="feature-card">
-    <h3>Supervised vs Autonomous</h3>
-    <p>Choose your control level. Autonomous mode for speed with validation. Supervised mode for critical tasks with manual approval.</p>
+    <h3>Validation & Safety</h3>
+    <p>File validation prevents creating unintended files. Success criteria auto-verified. No surprise scripts or configs. Supervised vs autonomous modes.</p>
   </a>
   
   <a href="/features#smart-context" class="feature-card">
     <h3>Intelligent Context</h3>
-    <p>Dependency graph + PageRank identifies relevant files. 5x token reduction (100k → 20k). Better responses, lower costs.</p>
+    <p>Dependency graph + PageRank identifies relevant files. 5x token reduction (100k → 20k). ML intent classification (1ms routing).</p>
   </a>
   
   <a href="/features#cost-optimization" class="feature-card">
     <h3>Radically Affordable</h3>
-    <p>Use Groq for $2-5/month or Ollama locally for free. Mix models per agent to optimize cost vs performance.</p>
+    <p>$0-5/month vs $20-30/month subscriptions. Use Groq for speed, Ollama for free. Auto-selects best models per agent.</p>
+  </a>
+  
+  <a href="/commands#interactive-modes" class="feature-card">
+    <h3>Interactive Modes</h3>
+    <p><code>chu chat</code> for conversations. <code>chu run</code> for tasks with follow-up. Context-aware from CLI or Neovim plugin.</p>
+  </a>
+  
+  <a href="/commands#workflow-commands-research--plan--implement" class="feature-card">
+    <h3>Manual Workflow</h3>
+    <p>Break down complex tasks: <code>chu research</code> → <code>chu plan</code> → <code>chu implement</code>. Full control when you need it.</p>
   </a>
 </div>
 

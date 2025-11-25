@@ -30,54 +30,47 @@ func main() {
 
 var rootCmd = &cobra.Command{
 	Use:   "chu",
-	Short: "Chuchu – strict TDD-first coding companion",
-	Long: `Chuchu – strict TDD-first coding companion
+	Short: "Chuchu – AI Coding Assistant with Specialized Agents",
+	Long: `Chuchu – AI Coding Assistant with Specialized Agents
 
-No bullshit, no giant blobs of code, no skipping tests.
+Autonomous execution with validation. Analyzer → Planner → Editor → Validator.
+$0-5/month vs $20-30/month subscriptions.
 
-General execution:
-  chu run "task"           - Execute tasks: HTTP requests, CLI commands, devops
+## COPILOT (Autonomous)
+  chu do "task" [--supervised] [--interactive]  - Autonomous execution with agent orchestration
 
-Workflow modes (research → plan → implement):
-  chu research \"question\"  - Document codebase and understand architecture
-  chu plan \"task\"          - Create detailed implementation plan
-  chu implement plan.md    - Execute plan step-by-step (interactive)
-  chu implement plan.md --auto  - Autonomous execution with verification
+## INTERACTIVE (Conversational)
+  chu chat                - Code-focused conversation (CLI or Neovim)
+  chu run "task"          - Execute tasks with follow-up
 
-Code quality:
-  chu review [target]      - Review code for bugs, security, and improvements
+## WORKFLOW (Manual Control)
+  chu research "question" - Document codebase and architecture
+  chu plan "task"         - Create implementation plan
+  chu implement plan.md   - Execute plan step-by-step
 
-Interactive modes:
-  chu chat                 - Code-focused conversation (use from CLI or Neovim)
-  chu tdd                  - TDD mode (tests → implementation → refine)
+## SPECIALIZED TOOLS
+  chu tdd                 - Test-driven development mode
+  chu feature "desc"      - Generate tests + implementation
+  chu review [target]     - Code review for bugs, security, improvements
 
-Feature generation:
-  chu feature "desc"       - Generate tests + implementation (auto-detects language)
+## MODEL MANAGEMENT
+  chu model list [--recommended]   - List models from catalog
+  chu model recommend [agent]      - Get model recommendations
+  chu model install <model>        - Install Ollama model
+  chu model update [--all]         - Update catalog from providers
 
-Setup:
+## CONFIGURATION
   chu setup                - Initialize ~/.chuchu configuration
-  chu key [backend]        - Add/update API key for backend
+  chu key [backend]        - Add/update API key
   chu backend list         - List configured backends
-  chu backend create <name> <type> <base-url> - Create new backend
-  chu backend delete <name> - Delete backend
   chu config get <key>     - Get configuration value
   chu config set <key> <value> - Set configuration value
-  chu detect-language [path] - Detect project language
-  chu models update        - Update model catalog from OpenRouter API
-  chu models install <model> - Install Ollama model if not present
-  chu profiles list <backend>              - List profiles for backend
-  chu profiles show <backend> <profile>    - Show profile configuration
-  chu profiles create <backend> <profile>  - Create new profile
-  chu profiles set-agent <backend> <profile> <agent> <model>  - Set agent model
-  chu feedback good|bad [--backend] [--model] [--agent] [--context] - Record feedback
-  chu feedback stats               - View feedback statistics
 
-Machine Learning:
-  chu ml list                      - List available ML models
-  chu ml train <model>             - Train ML model
-  chu ml test <model> [query]      - Test ML model
-  chu ml eval <model> [-f file]    - Evaluate model on dataset
-  chu ml predict <text>            - Predict using embedded Go model`,
+## ADVANCED
+  chu ml list|train|test|eval|predict - Machine learning features
+  chu graph build|query    - Dependency graph analysis
+  chu feedback good|bad    - User feedback tracking
+  chu detect-language      - Detect project language`,
 }
 
 func init() {
@@ -86,10 +79,7 @@ func init() {
 	rootCmd.AddCommand(backendCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(detectLanguageCmd)
-	rootCmd.AddCommand(modelsCmd)
-	rootCmd.AddCommand(feedbackCmd)
 	rootCmd.AddCommand(mlCmd)
-	rootCmd.AddCommand(graphCmd)
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(chatCmd)
 	rootCmd.AddCommand(tddCmd)
