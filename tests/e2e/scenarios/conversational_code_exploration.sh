@@ -69,34 +69,34 @@ func main() {
 EOF
 
 echo ""
-echo "Step 2: Ask about User struct"
-echo "-----------------------------"
-run_chu_command_with_timeout "chat" "Explain the User struct and its methods" "--once"
+echo "Step 2: Ask about User struct in main.go"
+echo "------------------------------------------"
+run_chu_command_with_timeout "chat" "Explain the User struct and its methods in main.go" "--once"
 assert_exit_code 0
 assert_contains "$OUTPUT" "User"
 assert_not_contains "$OUTPUT" "Error"
 
 echo ""
-echo "Step 3: Ask about authorization logic"
-echo "--------------------------------------"
-run_chu_command_with_timeout "chat" "How does the authorization work in this code?" "--once"
+echo "Step 3: Ask about authorization logic in main.go"
+echo "--------------------------------------------------"
+run_chu_command_with_timeout "chat" "How does the AuthorizeAction function work in main.go?" "--once"
 assert_exit_code 0
 assert_contains "$OUTPUT" "AuthorizeAction"
 assert_not_contains "$OUTPUT" "Error"
 
 echo ""
-echo "Step 4: Ask about improvements"
-echo "-------------------------------"
-run_chu_command_with_timeout "chat" "What improvements could be made to the authorization system?" "--once"
+echo "Step 4: Ask about improvements to main.go"
+echo "------------------------------------------"
+run_chu_command_with_timeout "chat" "What improvements could be made to the authorization in main.go?" "--once"
 assert_exit_code 0
 # Should mention security or extensibility concerns
 assert_not_contains "$OUTPUT" "Error"
 
 echo ""
-echo "Step 5: Verify file context is being used"
-echo "------------------------------------------"
+echo "Step 5: Verify file context in main.go is being used"
+echo "-------------------------------------------------------"
 # The responses should reference the actual code structure
-run_chu_command_with_timeout "chat" "What parameters does the FullInfo method take?" "--once"
+run_chu_command_with_timeout "chat" "What parameters does the FullInfo method take in main.go?" "--once"
 assert_exit_code 0
 # Should understand it's a receiver method with no additional params
 assert_not_contains "$OUTPUT" "Error"

@@ -430,12 +430,180 @@ The CD pipeline will automatically build binaries and create a GitHub release.
 
 The website and blog are built with Jekyll and hosted on GitHub Pages.
 
-## Adding New E2E Test Scenarios
+## End-to-End Testing
 
-To add a new end‑to‑end test scenario, create a shell script in `tests/e2e/scenarios/` following the existing naming convention, make it executable (`chmod +x`), and ensure it exits with status 0 on success. Update `docs/plans/E2E_ROADMAP.md` with a brief description of the scenario. The CI workflow runs all scripts with:
+Chuchu includes a comprehensive E2E testing framework that validates real-world workflows using **local Ollama models** (zero API costs, privacy-preserving).
+
+### Requirements
+
+**Software:**
+- Ollama installed and running (`brew install ollama` on macOS)
+- Required models for 'local' profile:
+  - `llama3.1:8b` (4.7GB) - router agent
+  - `qwen3-coder:latest` (18GB) - editor agent  
+  - `gpt-oss:latest` (13GB) - query/research agents
+- Go 1.22+ for building chu
+- Bash 4+ for test scripts
+
+**Installation:**
 ```bash
-chmod +x tests/e2e/scenarios/*.sh && ./tests/e2e/scenarios/*.sh
+# 1. Install Ollama
+brew install ollama  # macOS
+# or visit https://ollama.ai for other platforms
+
+# 2. Pull required models
+ollama pull llama3.1:8b
+ollama pull qwen3-coder:latest
+ollama pull gpt-oss:latest
+
+# 3. Verify
+ollama list | grep -E '(llama3.1|qwen3-coder|gpt-oss)'
 ```
+
+### Running Tests
+
+**Full test suite:**
+```bash
+cd /path/to/chuchu
+./tests/e2e.sh
+```
+
+**Single scenario:**
+```bash
+./tests/e2e/scenarios/devops_command_execution_with_history.sh
+```
+
+**With custom model:**
+```bash
+CHUCHU_E2E_MODEL=qwen3-coder:latest ./tests/e2e.sh
+```
+
+**With custom timeout (default 180s):**
+```bash
+CHUCHU_E2E_TIMEOUT=300 ./tests/e2e.sh
+```
+
+**Debug mode:**
+```bash
+CHUCHU_DEBUG=1 ./tests/e2e/scenarios/working_directory_and_environment_management.sh
+```
+
+### Test Configuration
+
+**Environment Variables:**
+- `CHUCHU_E2E_BACKEND` - Backend to use (default: `ollama`)
+- `CHUCHU_E2E_PROFILE` - Profile to use (default: `local`)
+- `CHUCHU_E2E_TIMEOUT` - Timeout per command in seconds (default: `180`)
+- `CHUCHU_DEBUG` - Enable debug output (`1` to enable)
+
+**Backend Setup:**
+Tests automatically configure Chuchu to use Ollama with 'local' profile:
+```bash
+chu config set defaults.backend ollama
+chu config set defaults.profile local
+```
+
+The 'local' profile optimally distributes models across agents:
+- **Router**: `llama3.1:8b` (fast intent classification)
+- **Query**: `gpt-oss:latest` (code understanding, reasoning)
+- **Editor**: `qwen3-coder:latest` (code generation)
+- **Research**: `gpt-oss:latest` (analysis, reasoning)
+
+### Current Test Coverage
+
+**Phase 1: Run Command (3/3 passing ✅)**
+- `devops_command_execution_with_history.sh` - Command history tracking
+- `working_directory_and_environment_management.sh` - Directory navigation
+- `single_shot_command_for_automation.sh` - Single-shot execution
+
+**Phase 2: Chat/LLM Tests (1/3 passing ⚠️)**
+- `conversational_code_exploration.sh` - Partially passing (4/5 steps, 1 Ollama timeout)
+- `research_and_planning_workflow.sh` - Partially passing (3/4 steps, 1 timeout on plan generation)
+- `tdd_new_feature_development.sh` - Not yet tested
+
+**Known Limitations:**
+- Ollama models are slow (~30-60s per query) - tests take 10-15 minutes
+- Some steps timeout due to Ollama's slower inference compared to cloud APIs
+- Local models work but require patience and longer timeouts
+- Recommended: Run tests overnight or use `CHUCHU_E2E_TIMEOUT=300` for complex scenarios
+
+### Local Profile Model Allocation
+
+The 'local' profile uses different models for each agent type, optimizing for their specific tasks:
+
+| Agent | Model | Size | Why |
+|-------|-------|------|-----|
+| Router | `llama3.1:8b` | 4.7GB | Fast intent classification (query vs edit vs research) |
+| Query | `gpt-oss:latest` | 13GB | Code analysis, understanding, reasoning |
+| Editor | `qwen3-coder:latest` | 18GB | Code generation, modifications |
+| Research | `gpt-oss:latest` | 13GB | Codebase analysis, planning |
+
+This allocation balances speed (router) with capability (query/editor/research) for realistic testing.
+
+### Adding New Test Scenarios
+
+1. Create script in `tests/e2e/scenarios/`:
+```bash
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+source "$SCRIPT_DIR/lib/helpers.sh"
+
+TEST_NAME="Your Test Name"
+setup_e2e_backend
+setup_test_dir "$TEST_NAME"
+
+# Your test logic here
+run_chu_command "run" "echo hello"
+assert_exit_code 0
+assert_contains "$OUTPUT" "hello"
+
+cleanup_test_dir
+echo "✅ Scenario passed: $TEST_NAME"
+```
+
+2. Make executable:
+```bash
+chmod +x tests/e2e/scenarios/your_test.sh
+```
+
+3. Test locally:
+```bash
+./tests/e2e/scenarios/your_test.sh
+```
+
+4. Update `tests/E2E_ROADMAP.md` with description
+
+### Helper Functions
+
+**Setup/Teardown:**
+- `setup_e2e_backend` - Configure Ollama backend
+- `setup_test_dir "name"` - Create isolated test directory
+- `cleanup_test_dir` - Remove test directory
+
+**Execution:**
+- `run_chu_command "cmd" "arg1" "arg2"` - Run chu command
+- `run_chu_command_with_timeout "cmd" "arg"` - With 90s timeout
+- `run_chu_with_input "cmd" "input"` - With stdin
+
+**Assertions:**
+- `assert_exit_code 0` - Check exit code
+- `assert_contains "$OUTPUT" "text"` - Check output contains
+- `assert_not_contains "$OUTPUT" "text"` - Check output doesn't contain
+- `assert_file_exists "path"` - Check file exists
+- `assert_dir_exists "path"` - Check directory exists
+
+**Test Utilities:**
+- `create_test_file "name" "content"` - Create file
+- `create_go_project "name"` - Create Go project structure
+
+### Documentation
+
+For detailed test strategy and roadmap:
+- `tests/E2E_STATUS.md` - Current state and results
+- `tests/E2E_ROADMAP.md` - Long-term vision
+- `tests/E2E_COVERAGE_PLAN.md` - Detailed implementation plan
 ### Running Locally
 
 ```bash

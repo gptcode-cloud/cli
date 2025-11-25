@@ -7,12 +7,13 @@ OUTPUT=""
 EXIT_CODE=0
 
 # E2E Test Configuration
-# Recommended Ollama models for testing (in order of preference):
-# - llama3.1:8b (good general model, ~4.7GB) - USING THIS
-# - qwen3-coder:latest (code-focused, larger)
-# - gpt-oss:latest (larger model, more capable)
+# Uses 'local' profile with optimized model allocation:
+#   router: llama3.1:8b (fast)
+#   query: gpt-oss:latest (reasoning)
+#   editor: qwen3-coder:latest (coding)
+#   research: gpt-oss:latest (reasoning)
 CHUCHU_E2E_BACKEND="${CHUCHU_E2E_BACKEND:-ollama}"
-CHUCHU_E2E_MODEL="${CHUCHU_E2E_MODEL:-llama3.1:8b}"
+CHUCHU_E2E_PROFILE="${CHUCHU_E2E_PROFILE:-local}"
 
 setup_e2e_backend() {
     echo "🔧 Configuring E2E test backend..."
@@ -34,29 +35,43 @@ setup_e2e_backend() {
     
     echo "✓ Ollama found"
     
-    # Check if the recommended model is available
-    if ! ollama list | grep -q "$CHUCHU_E2E_MODEL"; then
+    # Check if required models are available
+    local required_models=("llama3.1:8b" "qwen3-coder:latest" "gpt-oss:latest")
+    local missing_models=()
+    
+    set +e +o pipefail
+    for model in "${required_models[@]}"; do
+        ollama list | grep -q "$model"
+        if [ $? -ne 0 ]; then
+            missing_models+=("$model")
+        fi
+    done
+    set -e -o pipefail
+    
+    if [ ${#missing_models[@]} -gt 0 ]; then
         echo ""
-        echo "❌ ERROR: Required model '$CHUCHU_E2E_MODEL' not found"
+        echo "❌ ERROR: Missing required models for 'local' profile:"
+        for model in "${missing_models[@]}"; do
+            echo "  - $model"
+        done
         echo ""
-        echo "Please pull the model with:"
-        echo "  ollama pull $CHUCHU_E2E_MODEL"
-        echo ""
-        echo "Alternative models (set CHUCHU_E2E_MODEL env var):"
-        echo "  - llama3.1:8b (good general model, ~4.7GB)"
-        echo "  - codellama:7b (code-specific, ~3.8GB)"
+        echo "Please pull the missing models:"
+        for model in "${missing_models[@]}"; do
+            echo "  ollama pull $model"
+        done
         echo ""
         exit 1
     fi
     
-    echo "✓ Model $CHUCHU_E2E_MODEL is available"
+    echo "✓ All required models available (llama3.1:8b, qwen3-coder:latest, gpt-oss:latest)"
     
-    # Configure Chuchu to use Ollama
+    # Configure Chuchu to use Ollama with local profile
     export CHUCHU_BACKEND="$CHUCHU_E2E_BACKEND"
     chu config set defaults.backend ollama 2>&1 > /dev/null || true
-    chu config set backend.ollama.default_model "$CHUCHU_E2E_MODEL" 2>&1 > /dev/null || true
+    chu config set defaults.profile "$CHUCHU_E2E_PROFILE" 2>&1 > /dev/null || true
     
-    echo "✓ Backend configured: $CHUCHU_E2E_BACKEND with model $CHUCHU_E2E_MODEL"
+    echo "✓ Backend configured: $CHUCHU_E2E_BACKEND with profile $CHUCHU_E2E_PROFILE"
+    echo "  Router: llama3.1:8b | Query: gpt-oss:latest | Editor: qwen3-coder:latest"
     echo ""
 }
 
@@ -90,7 +105,7 @@ run_chu_command() {
 }
 
 run_chu_command_with_timeout() {
-    local timeout_seconds="${CHUCHU_E2E_TIMEOUT:-30}"
+    local timeout_seconds="${CHUCHU_E2E_TIMEOUT:-180}"
     local cmd="$1"
     shift
     
@@ -100,9 +115,12 @@ run_chu_command_with_timeout() {
     set -e
     
     if [ "$EXIT_CODE" -eq 124 ]; then
-        echo "⏱️  Command timed out after ${timeout_seconds}s (this is expected for LLM tests without backend configured)"
-        EXIT_CODE=0
-        OUTPUT="Command timed out (no backend configured)"
+        echo "❌ Command timed out after ${timeout_seconds}s"
+        echo "This usually means:"
+        echo "  - Backend not properly configured"
+        echo "  - Model taking too long to respond"
+        echo "  - Network issues"
+        exit 1
     fi
     
     echo "📤 Command output:"
