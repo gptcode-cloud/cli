@@ -38,7 +38,7 @@ Thumbs.db
 .chuchu/
 
 # Temporary planning documents (evolving practices)
-docs/plans/
+# docs/plans/
 
 # ML artifacts
 ml/complexity_detection/models/*.json

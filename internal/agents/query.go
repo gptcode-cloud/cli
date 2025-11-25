@@ -170,19 +170,29 @@ func (q *QueryAgent) Execute(ctx context.Context, history []llm.ChatMessage, sta
 				ToolCallID: tc.ID,
 			})
 		}
+	}
 
-		if i >= 1 {
-			finalResp, err := q.provider.Chat(ctx, llm.ChatRequest{
-				SystemPrompt: queryPrompt + "\n\nProvide your final answer based on the tool results above. Do NOT call more tools.",
-				Messages:     messages,
-				Model:        q.model,
-			})
-			if err != nil {
-				return "", err
-			}
-			return finalResp.Text, nil
+	if statusCallback != nil {
+		statusCallback("Query: Generating response...")
+	}
+
+	finalMessages := make([]llm.ChatMessage, len(messages))
+	copy(finalMessages, messages)
+	for i := range finalMessages {
+		if finalMessages[i].Role == "assistant" && len(finalMessages[i].ToolCalls) > 0 {
+			finalMessages[i].ToolCalls = nil
+			finalMessages[i].Content = ""
 		}
 	}
 
-	return "Query reached max iterations", nil
+	finalResp, err := q.provider.Chat(ctx, llm.ChatRequest{
+		SystemPrompt: "Based on the tool execution results above, provide a clear and concise answer to the user's question. Answer directly without suggesting additional actions.",
+		Messages:     finalMessages,
+		Model:        q.model,
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return finalResp.Text, nil
 }

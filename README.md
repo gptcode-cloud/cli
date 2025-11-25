@@ -430,6 +430,12 @@ The CD pipeline will automatically build binaries and create a GitHub release.
 
 The website and blog are built with Jekyll and hosted on GitHub Pages.
 
+## Adding New E2E Test Scenarios
+
+To add a new end‑to‑end test scenario, create a shell script in `tests/e2e/scenarios/` following the existing naming convention, make it executable (`chmod +x`), and ensure it exits with status 0 on success. Update `docs/plans/E2E_ROADMAP.md` with a brief description of the scenario. The CI workflow runs all scripts with:
+```bash
+chmod +x tests/e2e/scenarios/*.sh && ./tests/e2e/scenarios/*.sh
+```
 ### Running Locally
 
 ```bash

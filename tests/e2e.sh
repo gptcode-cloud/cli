@@ -10,6 +10,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 E2E_DIR="$SCRIPT_DIR/e2e"
 
+source "$E2E_DIR/lib/helpers.sh"
+
 echo "🚀 Chuchu E2E Test Suite"
 echo "============================"
 echo ""
@@ -47,6 +49,7 @@ run_scenario() {
 
 main() {
     check_chu_installed
+    setup_e2e_backend
     
     local failed=0
     local passed=0

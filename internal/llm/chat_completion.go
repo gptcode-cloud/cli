@@ -39,7 +39,7 @@ type chatCompletionRequest struct {
 	Model       string              `json:"model"`
 	Messages    []chatCompletionMsg `json:"messages"`
 	Tools       []interface{}       `json:"tools,omitempty"`
-	ToolChoice  string              `json:"tool_choice,omitempty"`
+	ToolChoice  *string             `json:"tool_choice,omitempty"`
 	Stream      bool                `json:"stream,omitempty"`
 	Temperature float64             `json:"temperature"`
 }
@@ -164,9 +164,13 @@ func (c *ChatCompletionProvider) ChatStream(ctx context.Context, req ChatRequest
 		body := chatCompletionRequest{
 			Model:       req.Model,
 			Messages:    messages,
-			Tools:       req.Tools,
 			Stream:      true,
 			Temperature: 0.0,
+		}
+		if len(req.Tools) > 0 {
+			body.Tools = req.Tools
+			auto := "auto"
+			body.ToolChoice = &auto
 		}
 		b, _ = json.Marshal(body)
 	}
@@ -278,8 +282,12 @@ func (c *ChatCompletionProvider) Chat(ctx context.Context, req ChatRequest) (*Ch
 		body := chatCompletionRequest{
 			Model:       req.Model,
 			Messages:    messages,
-			Tools:       req.Tools,
 			Temperature: 0.0,
+		}
+		if len(req.Tools) > 0 {
+			body.Tools = req.Tools
+			auto := "auto"
+			body.ToolChoice = &auto
 		}
 		b, _ = json.Marshal(body)
 	}
