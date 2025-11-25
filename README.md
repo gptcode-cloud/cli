@@ -47,7 +47,7 @@ chu implement plan.md --auto       # Autonomous (fully automated)
 - ✅ Choose your control level (interactive or autonomous)
 - ✅ Lower costs through better planning
 
-📖 **[Read the Complete Workflow Guide](docs/workflow-guide.md)**
+**[Read the Complete Workflow Guide](docs/workflow-guide.md)**
 
 ## Quick Start
 
@@ -197,7 +197,7 @@ chu chat "fix bug in authentication"
 
 ## Usage
 
-**📖 [Complete Workflow Guide](docs/workflow-guide.md)** - Learn the full research → plan → implement workflow
+**[Complete Workflow Guide](docs/workflow-guide.md)** - Learn the full research → plan → implement workflow
 
 ### Chat Mode
 

@@ -21,9 +21,10 @@ type ToolCall struct {
 }
 
 type ToolResult struct {
-	Tool   string `json:"tool"`
-	Result string `json:"result"`
-	Error  string `json:"error,omitempty"`
+	Tool          string   `json:"tool"`
+	Result        string   `json:"result"`
+	Error         string   `json:"error,omitempty"`
+	ModifiedFiles []string `json:"modified_files,omitempty"`
 }
 
 func GetAvailableTools() []map[string]interface{} {
@@ -414,7 +415,8 @@ func writeFile(call ToolCall, workdir string) ToolResult {
 	}
 
 	return ToolResult{
-		Tool:   "write_file",
-		Result: fmt.Sprintf("File written successfully: %s (%d bytes)", path, len(content)),
+		Tool:          "write_file",
+		Result:        fmt.Sprintf("File written successfully: %s (%d bytes)", path, len(content)),
+		ModifiedFiles: []string{path},
 	}
 }

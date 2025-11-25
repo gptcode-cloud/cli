@@ -2,7 +2,9 @@
 layout: post
 title: "Intelligent Efficiency: chu do Finds The Optimal Path"
 date: 2025-11-26
-categories: features ml
+author: Jader Correa
+description: "chu do uses intelligent auto-recovery to find the optimal model path. Evaluates cost, speed, reliability across backends with real-time learning from execution history."
+tags: [features, ml, auto-recovery, intelligence, optimization]
 ---
 
 # Intelligent Efficiency: `chu do` Finds The Optimal Path

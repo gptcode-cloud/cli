@@ -265,14 +265,6 @@ func isInteractiveTerminal() bool {
 	return term.IsTerminal(int(os.Stdout.Fd()))
 }
 
-func getTerminalWidth() int {
-	width, _, err := term.GetSize(int(os.Stdout.Fd()))
-	if err != nil || width <= 0 {
-		return 80
-	}
-	return width
-}
-
 func showSpinner(done chan bool) {
 	spinner := []string{"⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏"}
 	i := 0

@@ -68,7 +68,8 @@ Create a brief plan:
 [If task asks to create file with content, create THAT file, NOT a script]
 
 ## Success Criteria
-[How to verify it worked]
+[2-5 specific, testable criteria to verify the changes work]
+[Examples: "Tests pass: make test", "File X contains Y", "Command Z produces output W"]
 
 REMEMBER:
 - NO scripts unless explicitly requested

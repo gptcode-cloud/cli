@@ -42,7 +42,11 @@ func ApplyPatch(call ToolCall, workdir string) ToolResult {
 		if err := os.WriteFile(fullPath, []byte(newContent), 0644); err != nil {
 			return ToolResult{Tool: "apply_patch", Error: err.Error()}
 		}
-		return ToolResult{Tool: "apply_patch", Result: "Patch applied successfully"}
+		return ToolResult{
+			Tool:          "apply_patch",
+			Result:        "Patch applied successfully",
+			ModifiedFiles: []string{path},
+		}
 	}
 
 	fuzzyMatch := findFuzzyMatch(normalizedContent, normalizedSearch)
@@ -51,7 +55,11 @@ func ApplyPatch(call ToolCall, workdir string) ToolResult {
 		if err := os.WriteFile(fullPath, []byte(newContent), 0644); err != nil {
 			return ToolResult{Tool: "apply_patch", Error: err.Error()}
 		}
-		return ToolResult{Tool: "apply_patch", Result: "Patch applied with fuzzy matching"}
+		return ToolResult{
+			Tool:          "apply_patch",
+			Result:        "Patch applied with fuzzy matching",
+			ModifiedFiles: []string{path},
+		}
 	}
 
 	return ToolResult{

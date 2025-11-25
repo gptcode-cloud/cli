@@ -233,10 +233,10 @@ Implementation itself works for any language (LLM-based), but build/test verific
 
 ## See Also
 
-- [📖 Complete Workflow Guide (docs)](../workflow-guide.md)
-- [💰 Cost Optimization Guide](2024-11-22-cost-tracking-optimization.md)
-- [⚙️ Groq Model Configs](2025-11-18-groq-optimal-configs.md)
-- [🏠 Local Setup with Ollama](2024-11-19-ollama-local-setup.md)
+- [Complete Workflow Guide (docs)](../workflow-guide.md)
+- [Cost Optimization Guide](2024-11-22-cost-tracking-optimization.md)
+- [Groq Model Configs](2025-11-18-groq-optimal-configs.md)
+- [Local Setup with Ollama](2024-11-19-ollama-local-setup.md)
 
 ---
 

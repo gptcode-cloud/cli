@@ -26,7 +26,7 @@ description: AI coding assistant with specialized agents and validation
   
   <a href="/features#success-validation" class="feature-card">
     <h3>Success Criteria Validation</h3>
-    <p>Auto-verifies results against success criteria. Retries automatically if validation fails (max 2 attempts). Ensures task completion.</p>
+    <p>Auto-verifies results against success criteria. Retries automatically if validation fails. Ensures task completion.</p>
   </a>
   
   <a href="/features#execution-modes" class="feature-card">
@@ -53,14 +53,14 @@ description: AI coding assistant with specialized agents and validation
 graph TB
     User["chu do 'add feature'"] --> Orchestrator{Orchestrator}
     
-    Orchestrator --> Analyzer["🔍 Analyzer<br/>Understands codebase<br/>Reads relevant files"]
-    Analyzer --> Planner["📋 Planner<br/>Creates minimal plan<br/>Lists files to modify"]
-    Planner --> Validation["🛡️ File Validation<br/>Extracts allowed files<br/>Blocks extras"]
-    Validation --> Editor["✏️ Editor<br/>Executes changes<br/>ONLY planned files"]
-    Editor --> Validator["✅ Validator<br/>Checks success criteria<br/>Validates results"]
+    Orchestrator --> Analyzer["Analyzer<br/>Understands codebase<br/>Reads relevant files"]
+    Analyzer --> Planner["Planner<br/>Creates minimal plan<br/>Lists files to modify"]
+    Planner --> Validation["File Validation<br/>Extracts allowed files<br/>Blocks extras"]
+    Validation --> Editor["Editor<br/>Executes changes<br/>ONLY planned files"]
+    Editor --> Validator["Validator<br/>Checks success criteria<br/>Validates results"]
     
-    Validator -->|Success| Done["✓ Task Complete"]
-    Validator -->|Fail| Retry["Auto-retry<br/>(max 2x)<br/>with feedback"]
+    Validator -->|Success| Done["Task Complete"]
+    Validator -->|Fail| Retry["Auto-retry<br/>with feedback"]
     Retry --> Editor
     
     style Analyzer fill:#3b82f6,color:#fff
@@ -77,21 +77,21 @@ graph TB
   
   <div class="workflow-steps">
     <div class="workflow-step">
-      <h3>🔍 Research</h3>
+      <h3>Research</h3>
       <p>Understand your codebase before making changes</p>
       <pre><code>chu research "How does authentication work?"</code></pre>
       <p>Chuchu searches semantically, reads relevant files, and documents findings in <code>~/.chuchu/research/</code></p>
     </div>
     
     <div class="workflow-step">
-      <h3>📋 Plan</h3>
+      <h3>Plan</h3>
       <p>Create detailed implementation plan with phases</p>
       <pre><code>chu plan "Add password reset feature"</code></pre>
       <p>Generates step-by-step plan with clear goals, file changes, and test requirements</p>
     </div>
     
     <div class="workflow-step">
-      <h3>⚡ Implement</h3>
+      <h3>Implement</h3>
       <p>Execute plan interactively or autonomously</p>
       <pre><code>chu implement plan.md
 chu implement plan.md --auto</code></pre>

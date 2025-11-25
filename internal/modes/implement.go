@@ -57,7 +57,7 @@ Focus on making the actual code changes described in the plan.`, string(planCont
 		fmt.Fprintf(os.Stderr, "[IMPLEMENT] Using editor model: %s\n", editorModel)
 	}
 	editorAgent := agents.NewEditor(customExec, cwd, editorModel)
-	implementResult, err := editorAgent.Execute(context.Background(), []llm.ChatMessage{{Role: "user", Content: implementPrompt}}, nil)
+	implementResult, _, err := editorAgent.Execute(context.Background(), []llm.ChatMessage{{Role: "user", Content: implementPrompt}}, nil)
 	if err != nil {
 		return fmt.Errorf("implementation failed: %w", err)
 	}

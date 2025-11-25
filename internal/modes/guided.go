@@ -1,7 +1,6 @@
 package modes
 
 import (
-	"bufio"
 	"context"
 	"fmt"
 	"os"
@@ -216,7 +215,7 @@ Execute the plan directly and minimally.`, plan)
 			{Role: "user", Content: implementPrompt},
 		}
 
-		result, err := editorAgent.Execute(ctx, history, statusCallback)
+		result, modifiedFiles, err := editorAgent.Execute(ctx, history, statusCallback)
 		if err != nil {
 			return err
 		}
@@ -229,7 +228,13 @@ Execute the plan directly and minimally.`, plan)
 			return fmt.Errorf("editor reached max iterations without completing task")
 		}
 
-		validationResult, err := validatorAgent.Validate(ctx, plan, allowedFiles, statusCallback)
+		// Use actually modified files for validation if available, otherwise fallback to plan files
+		filesToValidate := allowedFiles
+		if len(modifiedFiles) > 0 {
+			filesToValidate = modifiedFiles
+		}
+
+		validationResult, err := validatorAgent.Validate(ctx, plan, filesToValidate, statusCallback)
 		if err != nil {
 			if os.Getenv("CHUCHU_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[IMPLEMENT] Validation failed: %v\n", err)
@@ -293,40 +298,6 @@ func (g *GuidedMode) savePlan(content string) (string, error) {
 	_ = os.WriteFile(currentPath, []byte(content), 0644)
 
 	return path, nil
-}
-
-func (g *GuidedMode) waitForConfirmation(prompt string, id string) bool {
-	if err := g.events.Confirm(prompt, id); err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to emit confirm event: %v\n", err)
-	}
-
-	os.Stdout.Sync()
-	time.Sleep(100 * time.Millisecond)
-
-	responseChan := make(chan string, 1)
-	errorChan := make(chan error, 1)
-
-	go func() {
-		reader := bufio.NewReader(os.Stdin)
-		response, err := reader.ReadString('\n')
-		if err != nil {
-			errorChan <- err
-			return
-		}
-		responseChan <- response
-	}()
-
-	timeout := time.After(120 * time.Second)
-	select {
-	case response := <-responseChan:
-		response = strings.TrimSpace(strings.ToLower(response))
-		return response == "y" || response == "yes"
-	case <-errorChan:
-		return false
-	case <-timeout:
-		_ = g.events.Notify("Timeout waiting for confirmation", "warn")
-		return false
-	}
 }
 
 func IsComplexTask(message string) bool {

@@ -144,18 +144,20 @@ func Analyze(events []Event) Stats {
 	}
 
 	for _, e := range events {
-		if e.Sentiment == SentimentGood {
+		switch e.Sentiment {
+		case SentimentGood:
 			stats.GoodCount++
-		} else if e.Sentiment == SentimentBad {
+		case SentimentBad:
 			stats.BadCount++
 		}
 
 		if e.Backend != "" {
 			bs := stats.ByBackend[e.Backend]
 			bs.Total++
-			if e.Sentiment == SentimentGood {
+			switch e.Sentiment {
+			case SentimentGood:
 				bs.Good++
-			} else if e.Sentiment == SentimentBad {
+			case SentimentBad:
 				bs.Bad++
 			}
 			if bs.Total > 0 {
@@ -168,9 +170,10 @@ func Analyze(events []Event) Stats {
 			ms := stats.ByModel[e.Model]
 			ms.Total++
 			ms.Backend = e.Backend
-			if e.Sentiment == SentimentGood {
+			switch e.Sentiment {
+			case SentimentGood:
 				ms.Good++
-			} else if e.Sentiment == SentimentBad {
+			case SentimentBad:
 				ms.Bad++
 			}
 			if ms.Total > 0 {
@@ -182,9 +185,10 @@ func Analyze(events []Event) Stats {
 		if e.Agent != "" {
 			as := stats.ByAgent[e.Agent]
 			as.Total++
-			if e.Sentiment == SentimentGood {
+			switch e.Sentiment {
+			case SentimentGood:
 				as.Good++
-			} else if e.Sentiment == SentimentBad {
+			case SentimentBad:
 				as.Bad++
 			}
 			if as.Total > 0 {

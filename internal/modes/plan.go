@@ -164,7 +164,7 @@ Create a structured plan with:
 
 	editorModel := backendCfg.GetModelForAgent("editor")
 	editorAgent := agents.NewEditor(customExec, cwd, editorModel)
-	planResult, err := editorAgent.Execute(context.Background(), []llm.ChatMessage{{Role: "user", Content: planPrompt}}, nil)
+	planResult, _, err := editorAgent.Execute(context.Background(), []llm.ChatMessage{{Role: "user", Content: planPrompt}}, nil)
 	if err != nil {
 		return fmt.Errorf("plan generation failed: %w", err)
 	}

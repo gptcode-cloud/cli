@@ -163,7 +163,13 @@ func (m *Maestro) executeStep(ctx context.Context, step PlanStep) error {
 		{Role: "user", Content: fmt.Sprintf("Implement this step:\n\n# %s\n\n%s", step.Title, step.Content)},
 	}
 
-	_, err := editorAgent.Execute(ctx, history, statusCallback)
+	_, modifiedFiles, err := editorAgent.Execute(ctx, history, statusCallback)
+	// Track modified files in the maestro state if needed, but for now we rely on git diff in the outer loop
+	// or we could return them here.
+	// The outer loop uses gitChangedFiles(), but we should probably use these modifiedFiles too.
+	// However, executeStep returns error only.
+	// Let's just update the signature call for now.
+	_ = modifiedFiles
 	return err
 }
 

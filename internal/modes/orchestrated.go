@@ -91,7 +91,7 @@ ONLY modify files listed in the plan. ONLY make changes described. NO extras.`, 
 			{Role: "user", Content: implementPrompt},
 		}
 
-		result, err := editorAgent.Execute(ctx, history, statusCallback)
+		result, modifiedFiles, err := editorAgent.Execute(ctx, history, statusCallback)
 		if err != nil {
 			return fmt.Errorf("implementation failed: %w", err)
 		}
@@ -100,7 +100,13 @@ ONLY modify files listed in the plan. ONLY make changes described. NO extras.`, 
 			fmt.Fprintf(os.Stderr, "[ORCHESTRATED] Editor result: %s\n", result)
 		}
 
-		validationResult, err := validatorAgent.Validate(ctx, plan, allowedFiles, statusCallback)
+		// Use actually modified files for validation if available
+		filesToValidate := allowedFiles
+		if len(modifiedFiles) > 0 {
+			filesToValidate = modifiedFiles
+		}
+
+		validationResult, err := validatorAgent.Validate(ctx, plan, filesToValidate, statusCallback)
 		if err != nil {
 			return fmt.Errorf("validation failed: %w", err)
 		}

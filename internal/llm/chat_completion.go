@@ -60,33 +60,6 @@ type compoundTools struct {
 	EnabledTools []string `json:"enabled_tools,omitempty"`
 }
 
-func convertToolsToFunctions(tools []interface{}) []interface{} {
-	if len(tools) == 0 {
-		return nil
-	}
-
-	functions := make([]interface{}, 0, len(tools))
-	for _, tool := range tools {
-		toolMap, ok := tool.(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		if toolMap["type"] != "function" {
-			continue
-		}
-
-		funcDef, ok := toolMap["function"].(map[string]interface{})
-		if !ok {
-			continue
-		}
-
-		functions = append(functions, funcDef)
-	}
-
-	return functions
-}
-
 func extractToolNames(tools []interface{}) []string {
 	if len(tools) == 0 {
 		return nil

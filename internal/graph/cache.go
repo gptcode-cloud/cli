@@ -52,7 +52,7 @@ func (c *Cache) computeHash(root string) (string, error) {
 		if ext == ".go" || ext == ".py" || ext == ".js" || ext == ".ts" || ext == ".jsx" || ext == ".tsx" {
 			relPath, _ := filepath.Rel(root, path)
 			h.Write([]byte(relPath))
-			h.Write([]byte(fmt.Sprintf("%d", info.ModTime().Unix())))
+			fmt.Fprintf(h, "%d", info.ModTime().Unix())
 		}
 
 		return nil

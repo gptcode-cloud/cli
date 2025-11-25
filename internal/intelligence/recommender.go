@@ -3,7 +3,6 @@ package intelligence
 import (
 	"chuchu/internal/config"
 	"fmt"
-	"strings"
 )
 
 type ModelRecommendation struct {
@@ -23,31 +22,7 @@ type RecommendationMetrics struct {
 	SpeedTPS     int
 }
 
-var modelsWithFunctionCalling = map[string]map[string][]string{
-	"openrouter": {
-		"editor": []string{
-			"moonshotai/kimi-k2:free",
-			"google/gemini-2.0-flash-exp:free",
-			"anthropic/claude-3.5-sonnet",
-		},
-	},
-	"groq": {
-		"editor": []string{
-			"moonshotai/kimi-k2-instruct-0905",
-		},
-	},
-	"openai": {
-		"editor": []string{
-			"gpt-4-turbo",
-			"gpt-4",
-		},
-	},
-	"ollama": {
-		"editor": []string{
-			"qwen3-coder",
-		},
-	},
-}
+var DefaultCatalog = NewModelCatalog()
 
 func RecommendModelForRetry(setup *config.Setup, agentType string, failedBackend string, failedModel string, task string) ([]ModelRecommendation, error) {
 	recommendations := make([]ModelRecommendation, 0)
@@ -67,9 +42,14 @@ func RecommendModelForRetry(setup *config.Setup, agentType string, failedBackend
 		}
 	}
 
-	for backend, agents := range modelsWithFunctionCalling {
-		models, exists := agents[agentType]
-		if !exists {
+	// Use catalog instead of hardcoded map
+	candidateModels := DefaultCatalog.GetModelsForAgent(agentType)
+
+	for _, modelInfo := range candidateModels {
+		backend := modelInfo.Backend
+		model := modelInfo.Name
+
+		if backend == failedBackend && model == failedModel {
 			continue
 		}
 
@@ -78,48 +58,42 @@ func RecommendModelForRetry(setup *config.Setup, agentType string, failedBackend
 			continue
 		}
 
-		for _, model := range models {
-			if backend == failedBackend && model == failedModel {
-				continue
-			}
+		key := backend + "/" + model
+		h, hasHistory := historyMap[key]
 
-			key := backend + "/" + model
-			h, hasHistory := historyMap[key]
-
-			metrics := RecommendationMetrics{
-				SuccessRate:  0.5,
-				Availability: 1.0,
-				CostPer1M:    getModelCost(backend, model),
-				SpeedTPS:     getModelSpeed(backend, model),
-			}
-
-			if hasHistory && h.TotalTasks >= 3 {
-				metrics.SuccessRate = h.SuccessRate
-			}
-
-			if latency, ok := latencyMap[key]; ok {
-				metrics.AvgLatencyMs = latency
-			}
-
-			score := calculateScore(metrics, backend == failedBackend)
-			confidence := metrics.SuccessRate
-
-			reason := buildReason(metrics, hasHistory, h.TotalTasks)
-
-			modelCfg, modelExists := backendCfg.Models[model]
-			if !modelExists {
-				modelCfg = model
-			}
-
-			recommendations = append(recommendations, ModelRecommendation{
-				Backend:    backend,
-				Model:      modelCfg,
-				Reason:     reason,
-				Confidence: confidence,
-				Score:      score,
-				Metrics:    metrics,
-			})
+		metrics := RecommendationMetrics{
+			SuccessRate:  0.5,
+			Availability: 1.0,
+			CostPer1M:    modelInfo.CostPer1M,
+			SpeedTPS:     modelInfo.SpeedTPS,
 		}
+
+		if hasHistory && h.TotalTasks >= 3 {
+			metrics.SuccessRate = h.SuccessRate
+		}
+
+		if latency, ok := latencyMap[key]; ok {
+			metrics.AvgLatencyMs = latency
+		}
+
+		score := calculateScore(metrics, backend == failedBackend)
+		confidence := metrics.SuccessRate
+
+		reason := buildReason(metrics, hasHistory, h.TotalTasks)
+
+		modelCfg, modelExists := backendCfg.Models[model]
+		if !modelExists {
+			modelCfg = model
+		}
+
+		recommendations = append(recommendations, ModelRecommendation{
+			Backend:    backend,
+			Model:      modelCfg,
+			Reason:     reason,
+			Confidence: confidence,
+			Score:      score,
+			Metrics:    metrics,
+		})
 	}
 
 	sortByScore(recommendations)
@@ -170,44 +144,6 @@ func buildReason(m RecommendationMetrics, hasHistory bool, totalTasks int) strin
 	}
 	return fmt.Sprintf("Known capable, Speed: %d TPS, Cost: $%.2f/1M",
 		m.SpeedTPS, m.CostPer1M)
-}
-
-func getModelCost(backend, model string) float64 {
-	if strings.Contains(model, ":free") || strings.Contains(backend, "ollama") {
-		return 0.0
-	}
-
-	costs := map[string]float64{
-		"gpt-4-turbo":                 0.01,
-		"gpt-4":                       0.03,
-		"claude-3.5-sonnet":           0.003,
-		"moonshotai/kimi-k2-instruct": 0.002,
-		"llama-3.3-70b-versatile":     0.00,
-		"qwen3-coder":                 0.00,
-	}
-
-	for prefix, cost := range costs {
-		if strings.Contains(model, prefix) {
-			return cost
-		}
-	}
-
-	return 0.001
-}
-
-func getModelSpeed(backend, model string) int {
-	speeds := map[string]int{
-		"groq":       500,
-		"ollama":     200,
-		"openrouter": 300,
-		"openai":     400,
-	}
-
-	if speed, ok := speeds[backend]; ok {
-		return speed
-	}
-
-	return 300
 }
 
 func sortByScore(recs []ModelRecommendation) {

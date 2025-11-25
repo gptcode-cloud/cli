@@ -66,13 +66,15 @@ func (c *Coordinator) Execute(ctx context.Context, history []llm.ChatMessage, st
 
 	switch intent {
 	case IntentEdit:
-		return c.editor.Execute(ctx, history, statusCallback)
+		res, _, err := c.editor.Execute(ctx, history, statusCallback)
+		return res, err
 	case IntentQuery:
 		return c.query.Execute(ctx, history, statusCallback)
 	case IntentResearch:
 		return c.research.Execute(ctx, history, statusCallback)
 	case IntentTest:
-		return c.editor.Execute(ctx, history, statusCallback)
+		res, _, err := c.editor.Execute(ctx, history, statusCallback)
+		return res, err
 	case IntentReview:
 		return c.review.Execute(ctx, history, statusCallback)
 	default:

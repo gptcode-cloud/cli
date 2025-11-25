@@ -57,7 +57,8 @@ You:
 
 Be direct. No explanations unless there's an error.`
 
-func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, statusCallback StatusCallback) (string, error) {
+func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, statusCallback StatusCallback) (string, []string, error) {
+	var modifiedFiles []string
 	toolDefs := []interface{}{
 		map[string]interface{}{
 			"type": "function",
@@ -184,7 +185,7 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 			Model:        e.model,
 		})
 		if err != nil {
-			return "", err
+			return "", nil, err
 		}
 
 		if os.Getenv("CHUCHU_DEBUG") == "1" {
@@ -196,7 +197,7 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 		}
 
 		if len(resp.ToolCalls) == 0 {
-			return resp.Text, nil
+			return resp.Text, modifiedFiles, nil
 		}
 
 		messages = append(messages, llm.ChatMessage{
@@ -215,7 +216,7 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 				statusCallback(fmt.Sprintf("Editor: Executing %s...", tc.Name))
 			}
 
-			if tc.Name == "write_file" {
+			if tc.Name == "write_file" || tc.Name == "apply_patch" {
 				var argsMap map[string]interface{}
 				if err := json.Unmarshal([]byte(tc.Arguments), &argsMap); err == nil {
 					if err := e.validateFileWrite(argsMap); err != nil {
@@ -231,6 +232,9 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 			}
 
 			result := tools.ExecuteToolFromLLM(llmCall, e.cwd)
+			if len(result.ModifiedFiles) > 0 {
+				modifiedFiles = append(modifiedFiles, result.ModifiedFiles...)
+			}
 
 			content := result.Result
 			if result.Error != "" {
@@ -253,7 +257,7 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 		}
 	}
 
-	return "Editor reached max iterations", nil
+	return "Editor reached max iterations", modifiedFiles, nil
 }
 
 func min(a, b int) int {

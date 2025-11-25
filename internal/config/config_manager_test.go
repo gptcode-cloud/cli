@@ -9,11 +9,15 @@ import (
 func TestConfigGetSet(t *testing.T) {
 	tmpDir := t.TempDir()
 	originalHome := os.Getenv("HOME")
-	defer os.Setenv("HOME", originalHome)
+	defer func() { _ = os.Setenv("HOME", originalHome) }()
 
-	os.Setenv("HOME", tmpDir)
+	if err := os.Setenv("HOME", tmpDir); err != nil {
+		t.Fatalf("Failed to set HOME: %v", err)
+	}
 	chuchuDir := filepath.Join(tmpDir, ".chuchu")
-	os.MkdirAll(chuchuDir, 0755)
+	if err := os.MkdirAll(chuchuDir, 0755); err != nil {
+		t.Fatalf("Failed to create .chuchu dir: %v", err)
+	}
 
 	setupYAML := `defaults:
     backend: groq

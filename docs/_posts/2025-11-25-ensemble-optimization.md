@@ -65,7 +65,7 @@ This is how we move from "Artificial Intelligence" to **"Optimized Intelligence"
 
 ## References
 
-[^1]: Henzi, A., Ziegel, J. F., & Gneiting, T. (2021). The pie sharing problem: Unbiased sampling of N+1 summative weights. *Environmental Modelling & Software*, 145, 105185. [https://doi.org/10.1016/j.envsoft.2021.105185](https://doi.org/10.1016/j.envsoft.2021.105185) (Creative Commons license)
+[^1]: Henzi, A., Ziegel, J. F., & Gneiting, T. (2021). The pie sharing problem: Unbiased sampling of N+1 summative weights. *Environmental Modelling & Software*, 145, 105185. [https://doi.org/10.1016/j.envsoft.2021.105185](https://doi.org/10.1016/j.envsoft.2021.105185)
 
 [^2]: Liu, Z., Wang, Y., Vaidya, S., Ruehle, F., Halverson, J., Soljačić, M., Hou, T. Y., & Tegmark, M. (2024). KAN: Kolmogorov-Arnold Networks. arXiv:2404.19756 [cs.LG]. [https://arxiv.org/abs/2404.19756](https://arxiv.org/abs/2404.19756)
 

@@ -390,7 +390,7 @@ func saveAPIKeyToProfile(envVar, apiKey string) error {
 	if err != nil {
 		return err
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	if _, err := f.WriteString("\n# Chuchu API key\n" + exportLine); err != nil {
 		return err
