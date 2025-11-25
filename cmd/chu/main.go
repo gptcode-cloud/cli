@@ -5,9 +5,12 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/spf13/cobra"
+
+	"chuchu/internal/repl"
 
 	"chuchu/internal/catalog"
 	"chuchu/internal/config"
@@ -676,19 +679,67 @@ func init() {
 }
 
 var chatCmd = &cobra.Command{
-	Use:   "chat [message] [lang] [backend] [model]",
+	Use:   "chat [message]",
 	Short: "Chat mode (code-focused conversation)",
-	Run: func(cmd *cobra.Command, args []string) {
+	Long: `Chat mode with code-focused conversation. Two modes available:
+
+1. Single-shot mode (previous behavior):
+   chu chat "quick question"
+   echo "question" | chu chat
+
+2. REPL mode (new):
+   chu chat
+   chu chat --help  # Show REPL commands
+   chu chat --once     # Force single-shot mode
+
+REPL Commands:
+  /exit, /quit   - Exit chat
+  /clear         - Clear conversation history
+  /save <file>   - Save conversation
+  /load <file>   - Load conversation
+  /context       - Show context stats
+  /files         - List files in context
+  /history       - Show history
+  /help          - Show help`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		once, _ := cmd.Flags().GetBool("once")
+		
+		// Check if we have a message argument or stdin input, or if we're in an interactive TTY
 		var input string
 		if len(args) > 0 && args[0] != "" {
 			input = args[0]
 			args = args[1:]
-		} else {
+		} else if !isInteractiveTTY() {
+			// Check for piped input
 			stdinBytes, _ := io.ReadAll(os.Stdin)
 			input = string(stdinBytes)
+		} else {
+			// No input and we're in an interactive TTY, use REPL mode
+			// Even if there's piped input, if we're in TTY, we still want REPL
 		}
-		modes.Chat(input, args)
+		
+		// If we have input or --once flag, use single-shot mode
+		if input != "" || once {
+			return repl.RunSingleShot(input, args)
+		}
+		
+		// Otherwise, start REPL mode
+		repl, err := repl.NewChatREPL(8000, 50) // 8k tokens, 50 messages
+		if err != nil {
+			return fmt.Errorf("failed to initialize chat REPL: %w", err)
+		}
+		return repl.Run()
 	},
+}
+
+func init() {
+	chatCmd.Flags().Bool("once", false, "Run single-shot mode (disable REPL)")
+}
+
+// isInteractiveTTY returns true if we're running in an interactive terminal
+func isInteractiveTTY() bool {
+	cmd := exec.Command("tty", "-s")
+	return cmd.Run() == nil
 }
 
 var tddCmd = &cobra.Command{
