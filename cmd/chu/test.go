@@ -109,7 +109,7 @@ Or specify profile directly:
 		timeout = setup.E2E.Timeout
 	}
 	if timeout == 0 {
-		timeout = 180
+		timeout = 600
 	}
 
 	notify := notifyFlag || setup.E2E.Notify
