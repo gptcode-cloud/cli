@@ -68,6 +68,11 @@ func LoadSetup() (*Setup, error) {
 	return &s, nil
 }
 
+func SaveSetup(setup *Setup) error {
+	path := filepath.Join(configDir(), "setup.yaml")
+	return saveSetup(path, setup)
+}
+
 func interactiveSetup() *Setup {
 	reader := bufio.NewReader(os.Stdin)
 	setup := &Setup{

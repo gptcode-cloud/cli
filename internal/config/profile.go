@@ -25,6 +25,12 @@ type Setup struct {
 		MLIntentThreshold  float64 `yaml:"ml_intent_threshold,omitempty"`
 		GraphMaxFiles      int     `yaml:"graph_max_files,omitempty"`
 	} `yaml:"defaults"`
+	E2E struct {
+		DefaultProfile string `yaml:"default_profile,omitempty"`
+		Timeout        int    `yaml:"timeout,omitempty"`
+		Notify         bool   `yaml:"notify,omitempty"`
+		Parallel       int    `yaml:"parallel,omitempty"`
+	} `yaml:"e2e,omitempty"`
 	Backend map[string]BackendConfig `yaml:"backend"`
 }
 
