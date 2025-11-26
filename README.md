@@ -432,18 +432,17 @@ The website and blog are built with Jekyll and hosted on GitHub Pages.
 
 ## End-to-End Testing
 
-Chuchu includes a comprehensive E2E testing framework that validates real-world workflows using **local Ollama models** (zero API costs, privacy-preserving).
+Chuchu includes a comprehensive E2E testing framework using **Go tests** with real chu commands and **local Ollama models** (zero API costs, privacy-preserving).
 
 ### Requirements
 
 **Software:**
 - Ollama installed and running (`brew install ollama` on macOS)
-- Required models for 'local' profile:
+- At least one profile configured with Ollama models
+- Recommended 'local' profile models:
   - `llama3.1:8b` (4.7GB) - router agent
   - `qwen3-coder:latest` (18GB) - editor agent  
   - `gpt-oss:latest` (13GB) - query/research agents
-- Go 1.22+ for building chu
-- Bash 4+ for test scripts
 
 **Installation:**
 ```bash
@@ -456,154 +455,205 @@ ollama pull llama3.1:8b
 ollama pull qwen3-coder:latest
 ollama pull gpt-oss:latest
 
-# 3. Verify
-ollama list | grep -E '(llama3.1|qwen3-coder|gpt-oss)'
+# 3. Create E2E profile (if not exists)
+chu setup  # or manually configure ~/.chuchu/setup.yaml
 ```
 
 ### Running Tests
 
-**Full test suite:**
+**Interactive profile selection (first time):**
 ```bash
-cd /path/to/chuchu
-./tests/e2e.sh
+chu test e2e --interactive
+# Lists available profiles, saves selection as default
 ```
 
-**Single scenario:**
+**With default profile:**
 ```bash
-./tests/e2e/scenarios/devops_command_execution_with_history.sh
+chu test e2e              # Run all tests
+chu test e2e run          # Run only 'run' category tests
 ```
 
-**With custom model:**
+**With specific profile:**
 ```bash
-CHUCHU_E2E_MODEL=qwen3-coder:latest ./tests/e2e.sh
+chu test e2e --profile local
+chu test e2e run --profile local
 ```
 
-**With custom timeout (default 180s):**
+**With notifications (macOS):**
 ```bash
-CHUCHU_E2E_TIMEOUT=300 ./tests/e2e.sh
+chu test e2e --notify
+# Shows desktop notification when tests complete
 ```
 
-**Debug mode:**
+**Custom timeout:**
 ```bash
-CHUCHU_DEBUG=1 ./tests/e2e/scenarios/working_directory_and_environment_management.sh
+chu test e2e --timeout 600  # 10 minutes per test
 ```
+
+**Features:**
+- ⏱️ Real-time progress bar with countdown
+- 📊 Live test status (passed/failed counts)
+- 🔔 macOS desktop notifications on completion
+- ⚡ Automatically uses configured profile models
+- 📁 Tests run in isolated temp directories
 
 ### Test Configuration
 
-**Environment Variables:**
-- `CHUCHU_E2E_BACKEND` - Backend to use (default: `ollama`)
-- `CHUCHU_E2E_PROFILE` - Profile to use (default: `local`)
-- `CHUCHU_E2E_TIMEOUT` - Timeout per command in seconds (default: `180`)
-- `CHUCHU_DEBUG` - Enable debug output (`1` to enable)
+**Config file (`~/.chuchu/setup.yaml`):**
+```yaml
+e2e:
+  default_profile: local      # Profile to use for tests
+  timeout: 600                # Timeout per test (seconds)
+  notify: true                # Desktop notifications
+  parallel: 1                 # Parallel test execution (future)
 
-**Backend Setup:**
-Tests automatically configure Chuchu to use Ollama with 'local' profile:
-```bash
-chu config set defaults.backend ollama
-chu config set defaults.profile local
+backend:
+  ollama:
+    profiles:
+      local:
+        agent_models:
+          router: llama3.1:8b
+          query: gpt-oss:latest
+          editor: qwen3-coder:latest
+          research: gpt-oss:latest
 ```
 
-The 'local' profile optimally distributes models across agents:
-- **Router**: `llama3.1:8b` (fast intent classification)
-- **Query**: `gpt-oss:latest` (code understanding, reasoning)
-- **Editor**: `qwen3-coder:latest` (code generation)
-- **Research**: `gpt-oss:latest` (analysis, reasoning)
+**Environment variables (for tests):**
+- `E2E_BACKEND` - Backend being used (set by chu test e2e)
+- `E2E_PROFILE` - Profile being used (set by chu test e2e)
+- `E2E_TIMEOUT` - Timeout in seconds (set by chu test e2e)
+- `CHUCHU_NO_NOTIFY` - Set to disable notifications
 
 ### Current Test Coverage
 
-**Phase 1: Run Command (3/3 passing ✅)**
-- `devops_command_execution_with_history.sh` - Command history tracking
-- `working_directory_and_environment_management.sh` - Directory navigation
-- `single_shot_command_for_automation.sh` - Single-shot execution
-
-**Phase 2: Chat/LLM Tests (1/3 passing ⚠️)**
-- `conversational_code_exploration.sh` - Partially passing (4/5 steps, 1 Ollama timeout)
-- `research_and_planning_workflow.sh` - Partially passing (3/4 steps, 1 timeout on plan generation)
-- `tdd_new_feature_development.sh` - Not yet tested
+**Run Command Tests (tests/e2e/run/):**
+- ✅ `TestE2EConfiguration` - Validates E2E environment setup
+- ✅ `TestChuCommand` - Verifies chu binary availability
+- ✅ `TestChuDoCreateFile` - Tests file creation with specific content
+- ✅ `TestChuDoModifyFile` - Tests file modification
+- ✅ `TestChuDoNoUnintendedFiles` - Tests file validation (no extras)
+- ⏭️ `TestChuDoTimeout` - Validates execution timeout (skipped, too slow)
 
 **Known Limitations:**
-- Ollama models are slow (~30-60s per query) - tests take 10-15 minutes
-- Some steps timeout due to Ollama's slower inference compared to cloud APIs
-- Local models work but require patience and longer timeouts
-- Recommended: Run tests overnight or use `CHUCHU_E2E_TIMEOUT=300` for complex scenarios
+- Ollama models are slow (2-5 minutes per test with local models)
+- Tests use 10-minute timeout by default (600s)
+- Progress bar updates every second during test execution
+- Recommended for overnight runs or CI with longer timeouts
 
-### Local Profile Model Allocation
+### Recommended Profile Configuration
 
-The 'local' profile uses different models for each agent type, optimizing for their specific tasks:
+The 'local' profile uses different models per agent, optimizing for their specific tasks:
 
-| Agent | Model | Size | Why |
-|-------|-------|------|-----|
-| Router | `llama3.1:8b` | 4.7GB | Fast intent classification (query vs edit vs research) |
-| Query | `gpt-oss:latest` | 13GB | Code analysis, understanding, reasoning |
-| Editor | `qwen3-coder:latest` | 18GB | Code generation, modifications |
-| Research | `gpt-oss:latest` | 13GB | Codebase analysis, planning |
+| Agent | Model | Size | Purpose |
+|-------|-------|------|----------|
+| Router | `llama3.1:8b` | 4.7GB | Fast intent classification |
+| Query | `gpt-oss:latest` | 13GB | Code analysis, reasoning |
+| Editor | `qwen3-coder:latest` | 18GB | Code generation |
+| Research | `gpt-oss:latest` | 13GB | Codebase analysis |
 
-This allocation balances speed (router) with capability (query/editor/research) for realistic testing.
+**Why this matters:**
+- Router needs speed (8B) for quick routing
+- Editor needs coding capability (Qwen3-coder specializes in code)
+- Query/Research need reasoning (GPT-OSS balances capability and speed)
 
 ### Adding New Test Scenarios
 
-1. Create script in `tests/e2e/scenarios/`:
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
+1. Create test file in `tests/e2e/<category>/`:
+```go
+package category_test
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-source "$SCRIPT_DIR/lib/helpers.sh"
+import (
+	"os"
+	"os/exec"
+	"testing"
+)
 
-TEST_NAME="Your Test Name"
-setup_e2e_backend
-setup_test_dir "$TEST_NAME"
+func skipIfNoE2E(t *testing.T) {
+	if os.Getenv("E2E_BACKEND") == "" {
+		t.Skip("Skipping E2E test: run via 'chu test e2e'")
+	}
+}
 
-# Your test logic here
-run_chu_command "run" "echo hello"
-assert_exit_code 0
-assert_contains "$OUTPUT" "hello"
+func TestYourFeature(t *testing.T) {
+	skipIfNoE2E(t)
 
-cleanup_test_dir
-echo "✅ Scenario passed: $TEST_NAME"
+	tmpDir := t.TempDir()
+	
+	cmd := exec.Command("chu", "your", "command")
+	cmd.Dir = tmpDir
+	
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("Test failed: %v\nOutput: %s", err, output)
+	}
+	
+	// Your assertions here
+}
 ```
 
-2. Make executable:
+2. Run tests:
 ```bash
-chmod +x tests/e2e/scenarios/your_test.sh
+chu test e2e <category>
 ```
 
-3. Test locally:
+3. Categories:
+- `run` - Single-shot commands
+- `chat` - Interactive chat mode  
+- `tdd` - Test-driven development
+- `integration` - Multi-step workflows
+
+### Test Utilities
+
+**Built-in Go testing:**
+- `t.TempDir()` - Creates isolated test directory
+- `exec.Command()` - Executes chu commands
+- `os.ReadFile()` - Validates file contents
+- `os.ReadDir()` - Validates directory structure
+
+**Environment variables:**
+- Tests automatically skip when `E2E_BACKEND` not set
+- Use `skipIfNoE2E(t)` helper in your tests
+- chu test e2e sets E2E_BACKEND, E2E_PROFILE, E2E_TIMEOUT
+
+**Timeout handling:**
+- Use Go channels for async execution with timeout
+- Example: 5-minute timeout for slow Ollama operations
+
+### Test Output Example
+
 ```bash
-./tests/e2e/scenarios/your_test.sh
+$ chu test e2e run
+
+🧪 Chuchu E2E Tests
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Backend:  ollama
+Profile:  local
+Category: run
+Timeout:  600s per test
+Notify:   enabled
+
+Agent Models:
+  Router:   llama3.1:8b
+  Query:    gpt-oss:latest
+  Editor:   qwen3-coder:latest
+  Research: gpt-oss:latest
+
+Running Run tests from tests/e2e/run...
+
+=== RUN   TestChuDoCreateFile
+    chu_do_test.go:28: Running chu do in /tmp/TestChuDoCreateFile123
+    chu_do_test.go:29: This may take 2-5 minutes with local Ollama...
+    chu_do_test.go:60: ✓ chu do successfully created hello.txt
+--- PASS: TestChuDoCreateFile (143.21s)
+
+⏱️  2m23s | ✅ 1 passed | ❌ 0 failed | ⏳ 7m37s remaining | 🔄 TestChuDoModifyFile
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ All tests passed! (4/4)
+⏱️  Total time: 8m45s
+
+[macOS notification: "✅ All tests passed (4/4)"]
 ```
-
-4. Update `tests/E2E_ROADMAP.md` with description
-
-### Helper Functions
-
-**Setup/Teardown:**
-- `setup_e2e_backend` - Configure Ollama backend
-- `setup_test_dir "name"` - Create isolated test directory
-- `cleanup_test_dir` - Remove test directory
-
-**Execution:**
-- `run_chu_command "cmd" "arg1" "arg2"` - Run chu command
-- `run_chu_command_with_timeout "cmd" "arg"` - With 90s timeout
-- `run_chu_with_input "cmd" "input"` - With stdin
-
-**Assertions:**
-- `assert_exit_code 0` - Check exit code
-- `assert_contains "$OUTPUT" "text"` - Check output contains
-- `assert_not_contains "$OUTPUT" "text"` - Check output doesn't contain
-- `assert_file_exists "path"` - Check file exists
-- `assert_dir_exists "path"` - Check directory exists
-
-**Test Utilities:**
-- `create_test_file "name" "content"` - Create file
-- `create_go_project "name"` - Create Go project structure
-
-### Documentation
-
-For detailed test strategy and roadmap:
-- `tests/E2E_STATUS.md` - Current state and results
-- `tests/E2E_ROADMAP.md` - Long-term vision
-- `tests/E2E_COVERAGE_PLAN.md` - Detailed implementation plan
 ### Running Locally
 
 ```bash
