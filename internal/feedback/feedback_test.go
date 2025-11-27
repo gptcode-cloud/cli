@@ -172,3 +172,98 @@ func TestEmptyFeedback(t *testing.T) {
 		t.Errorf("Analyze(empty) TotalEvents = %d, want 0", stats.TotalEvents)
 	}
 }
+
+func TestRecordWithExtendedFields(t *testing.T) {
+	tempDir := t.TempDir()
+	origHome := os.Getenv("HOME")
+	os.Setenv("HOME", tempDir)
+	defer os.Setenv("HOME", origHome)
+
+	event := Event{
+		Sentiment:       SentimentBad,
+		Backend:         "groq",
+		Model:           "llama-3.3-70b",
+		Agent:           "editor",
+		Task:            "list files",
+		WrongResponse:   "ls -la",
+		CorrectResponse: "ls -lah",
+		Source:          "shell",
+		Kind:            "command",
+		Files:           []string{"main.go", "config.yaml"},
+		DiffPath:        "/tmp/test.patch",
+	}
+
+	err := Record(event)
+	if err != nil {
+		t.Fatalf("Record() error = %v", err)
+	}
+
+	events, err := LoadAll()
+	if err != nil {
+		t.Fatalf("LoadAll() error = %v", err)
+	}
+
+	if len(events) != 1 {
+		t.Fatalf("LoadAll() got %d events, want 1", len(events))
+	}
+
+	loaded := events[0]
+	if loaded.WrongResponse != "ls -la" {
+		t.Errorf("WrongResponse = %s, want 'ls -la'", loaded.WrongResponse)
+	}
+	if loaded.CorrectResponse != "ls -lah" {
+		t.Errorf("CorrectResponse = %s, want 'ls -lah'", loaded.CorrectResponse)
+	}
+	if loaded.Source != "shell" {
+		t.Errorf("Source = %s, want 'shell'", loaded.Source)
+	}
+	if string(loaded.Kind) != "command" {
+		t.Errorf("Kind = %s, want 'command'", loaded.Kind)
+	}
+	if len(loaded.Files) != 2 {
+		t.Errorf("Files length = %d, want 2", len(loaded.Files))
+	}
+	if loaded.DiffPath != "/tmp/test.patch" {
+		t.Errorf("DiffPath = %s, want '/tmp/test.patch'", loaded.DiffPath)
+	}
+}
+
+func TestRecordWithPartialFields(t *testing.T) {
+	tempDir := t.TempDir()
+	origHome := os.Getenv("HOME")
+	os.Setenv("HOME", tempDir)
+	defer os.Setenv("HOME", origHome)
+
+	event := Event{
+		Sentiment:       SentimentGood,
+		Backend:         "ollama",
+		Model:           "qwen-3",
+		Agent:           "query",
+		CorrectResponse: "helpful response",
+	}
+
+	err := Record(event)
+	if err != nil {
+		t.Fatalf("Record() error = %v", err)
+	}
+
+	events, err := LoadAll()
+	if err != nil {
+		t.Fatalf("LoadAll() error = %v", err)
+	}
+
+	if len(events) != 1 {
+		t.Fatalf("LoadAll() got %d events, want 1", len(events))
+	}
+
+	loaded := events[0]
+	if loaded.WrongResponse != "" {
+		t.Errorf("WrongResponse should be empty, got %s", loaded.WrongResponse)
+	}
+	if loaded.CorrectResponse != "helpful response" {
+		t.Errorf("CorrectResponse = %s, want 'helpful response'", loaded.CorrectResponse)
+	}
+	if len(loaded.Files) != 0 {
+		t.Errorf("Files should be empty, got %v", loaded.Files)
+	}
+}

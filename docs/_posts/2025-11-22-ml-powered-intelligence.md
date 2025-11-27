@@ -367,6 +367,8 @@ But the foundation is here today: fast, cheap, accurate routing powered by embed
 
 ## See Also
 
+- [Getting Started](../guides/getting-started) - installation and quick start
+- [Universal Feedback Capture](../guides/feedback) - learn from corrections in any CLI
 - [Full ML Features Documentation](../ml-features) - Technical deep dive
 - [Groq Optimal Configurations](2025-11-15-groq-optimal-configs) - Combine ML routing with cheap Groq models
 - [Cost Optimization](../commands#configuration) - Additional cost-saving strategies

@@ -32,6 +32,10 @@ Currently, all documentation lives in `_posts/`. This works but mixes temporal b
 
 Future guides will be extracted to `guides/` as the project matures.
 
+### Available guides
+- [Getting Started](./getting-started.md) - install, setup, quick start
+- [Universal Feedback Capture](./feedback.md) - two‑keystroke feedback from any CLI
+
 ## Contributing
 
 When documenting a feature:

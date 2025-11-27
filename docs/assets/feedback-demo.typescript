@@ -1,0 +1,60 @@
+Record and analyze feedback for model performance
+
+Usage:
+  chu feedback [command]
+
+Available Commands:
+  bad         Record negative feedback
+  good        Record positive feedback
+  hook        Install shell hooks for automatic feedback capture
+  stats       View feedback statistics
+  submit      Submit feedback event via flags or JSON
+
+Flags:
+  -h, --help   help for feedback
+
+Use "chu feedback [command] --help" for more information about a command.
+
+Simulando evento
+✓ Feedback submitted
+
+{
+  "total_events": 26,
+  "good_count": 22,
+  "bad_count": 4,
+  "by_backend": {
+    "groq": {
+      "good": 6,
+      "bad": 3,
+      "total": 9,
+      "ratio": 0.6666666666666666
+    },
+    "test": {
+      "good": 8,
+      "bad": 0,
+      "total": 8,
+      "ratio": 1
+    }
+  },
+  "by_model": {
+    "llama-3.1-8b-instant": {
+      "good": 0,
+      "bad": 1,
+      "total": 1,
+      "ratio": 0,
+      "backend": "groq"
+    },
+    "llama-3.3-70b-versatile": {
+      "good": 6,
+      "bad": 2,
+      "total": 8,
+      "ratio": 0.75,
+      "backend": "groq"
+    },
+    "test-model": {
+      "good": 8,
+      "bad": 0,
+      "total": 8,
+      "ratio": 1,
+      "backend": "test"
+    }

@@ -2,6 +2,7 @@ package main
 
 import (
 	"os"
+	"strings"
 
 	"testing"
 )
@@ -42,6 +43,149 @@ func TestDetectLanguage(t *testing.T) {
 
 		if tt.filename != "unknown.txt" {
 			os.Remove(tt.filename)
+		}
+	}
+}
+
+func TestFeedbackCommandsRegistered(t *testing.T) {
+	tests := []struct {
+		name     string
+		cmdPath  []string
+		wantHelp string
+	}{
+		{
+			name:     "feedback command exists",
+			cmdPath:  []string{"feedback"},
+			wantHelp: "Record and analyze feedback",
+		},
+		{
+			name:     "feedback submit exists",
+			cmdPath:  []string{"feedback", "submit"},
+			wantHelp: "Submit feedback event",
+		},
+		{
+			name:     "feedback stats exists",
+			cmdPath:  []string{"feedback", "stats"},
+			wantHelp: "View feedback statistics",
+		},
+		{
+			name:     "feedback hook exists",
+			cmdPath:  []string{"feedback", "hook"},
+			wantHelp: "Install shell hooks",
+		},
+		{
+			name:     "feedback hook install exists",
+			cmdPath:  []string{"feedback", "hook", "install"},
+			wantHelp: "Install shell hook",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := rootCmd
+			for _, part := range tt.cmdPath {
+				var found bool
+				for _, subcmd := range cmd.Commands() {
+					if subcmd.Name() == part {
+						cmd = subcmd
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Fatalf("Command %v not found", tt.cmdPath)
+				}
+			}
+			if !strings.Contains(cmd.Short, tt.wantHelp) {
+				t.Errorf("Command help = %q, want to contain %q", cmd.Short, tt.wantHelp)
+			}
+		})
+	}
+}
+
+func TestDemoCommandsRegistered(t *testing.T) {
+	tests := []struct {
+		name     string
+		cmdPath  []string
+		wantHelp string
+	}{
+		{
+			name:     "demo command exists",
+			cmdPath:  []string{"demo"},
+			wantHelp: "Demos and recordings",
+		},
+		{
+			name:     "demo feedback exists",
+			cmdPath:  []string{"demo", "feedback"},
+			wantHelp: "Feedback capture demos",
+		},
+		{
+			name:     "demo feedback create exists",
+			cmdPath:  []string{"demo", "feedback", "create"},
+			wantHelp: "Generate feedback demos",
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			cmd := rootCmd
+			for _, part := range tt.cmdPath {
+				var found bool
+				for _, subcmd := range cmd.Commands() {
+					if subcmd.Name() == part {
+						cmd = subcmd
+						found = true
+						break
+					}
+				}
+				if !found {
+					t.Fatalf("Command %v not found", tt.cmdPath)
+				}
+			}
+			if !strings.Contains(cmd.Short, tt.wantHelp) {
+				t.Errorf("Command help = %q, want to contain %q", cmd.Short, tt.wantHelp)
+			}
+		})
+	}
+}
+
+func TestDemoFeedbackCreateFlags(t *testing.T) {
+	cmd := rootCmd
+	for _, part := range []string{"demo", "feedback", "create"} {
+		for _, subcmd := range cmd.Commands() {
+			if subcmd.Name() == part {
+				cmd = subcmd
+				break
+			}
+		}
+	}
+
+	if cmd.Name() != "create" {
+		t.Fatal("demo feedback create command not found")
+	}
+
+	repoFlag := cmd.Flags().Lookup("repo")
+	if repoFlag == nil {
+		t.Error("--repo flag not found")
+	} else if repoFlag.DefValue != "." {
+		t.Errorf("--repo default value = %q, want .", repoFlag.DefValue)
+	}
+
+	triesFlag := cmd.Flags().Lookup("tries")
+	if triesFlag == nil {
+		t.Error("--tries flag not found")
+	} else if triesFlag.DefValue != "3" {
+		t.Errorf("--tries default value = %q, want 3", triesFlag.DefValue)
+	}
+
+	aliases := cmd.Aliases
+	if len(aliases) != 2 {
+		t.Errorf("Expected 2 aliases, got %d", len(aliases))
+	}
+	expectedAliases := map[string]bool{"feedback:create": true, "feedback.create": true}
+	for _, alias := range aliases {
+		if !expectedAliases[alias] {
+			t.Errorf("Unexpected alias: %s", alias)
 		}
 	}
 }

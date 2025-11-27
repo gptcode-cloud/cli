@@ -1,10 +1,12 @@
 package feedback
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -15,15 +17,23 @@ const (
 	SentimentBad  Sentiment = "bad"
 )
 
+type EventKind string
+
 type Event struct {
-	Timestamp time.Time         `json:"timestamp"`
-	Sentiment Sentiment         `json:"sentiment"`
-	Backend   string            `json:"backend"`
-	Model     string            `json:"model"`
-	Agent     string            `json:"agent"`
-	Task      string            `json:"task,omitempty"`
-	Context   string            `json:"context,omitempty"`
-	Metadata  map[string]string `json:"metadata,omitempty"`
+	Timestamp       time.Time         `json:"timestamp"`
+	Sentiment       Sentiment         `json:"sentiment"`
+	Backend         string            `json:"backend"`
+	Model           string            `json:"model"`
+	Agent           string            `json:"agent"`
+	Task            string            `json:"task,omitempty"`
+	Context         string            `json:"context,omitempty"`
+	WrongResponse   string            `json:"wrong_response,omitempty"`
+	CorrectResponse string            `json:"correct_response,omitempty"`
+	Source          string            `json:"source,omitempty"`
+	Kind            EventKind         `json:"kind,omitempty"`
+	Files           []string          `json:"files,omitempty"`
+	DiffPath        string            `json:"diff_path,omitempty"`
+	Metadata        map[string]string `json:"metadata,omitempty"`
 }
 
 func GetFeedbackDir() string {
@@ -205,6 +215,43 @@ func Analyze(events []Event) Stats {
 	}
 
 	return stats
+}
+
+// PromptForFeedback prompts user for feedback after task completion
+// Returns: sentiment, correctResponse (if provided), shouldRecord
+func PromptForFeedback() (Sentiment, string, bool) {
+	fmt.Fprintf(os.Stderr, "\n\nWas this response helpful? [Y/n/e] ")
+	fmt.Fprintf(os.Stderr, "\n  Y - Yes, good response\n")
+	fmt.Fprintf(os.Stderr, "  n - No, bad response\n")
+	fmt.Fprintf(os.Stderr, "  e - Edit correct response\n")
+	fmt.Fprintf(os.Stderr, "  <enter> - Skip\n")
+	fmt.Fprintf(os.Stderr, "> ")
+
+	var input string
+	fmt.Scanln(&input)
+
+	input = strings.ToLower(strings.TrimSpace(input))
+
+	switch input {
+	case "y", "yes":
+		return SentimentGood, "", true
+	case "n", "no":
+		return SentimentBad, "", true
+	case "e", "edit":
+		fmt.Fprintf(os.Stderr, "\nProvide the correct response:\n> ")
+		var correctResponse string
+		scanner := bufio.NewScanner(os.Stdin)
+		if scanner.Scan() {
+			correctResponse = scanner.Text()
+		}
+		if correctResponse != "" {
+			fmt.Fprintf(os.Stderr, "\nThank you! This will improve future responses.\n")
+			return SentimentBad, correctResponse, true
+		}
+		return SentimentBad, "", false
+	default:
+		return "", "", false
+	}
 }
 
 func GetBestModels(agent string, minSamples int) []string {
