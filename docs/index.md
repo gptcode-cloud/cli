@@ -5,22 +5,15 @@ description: AI coding assistant with specialized agents and validation
 ---
 
 <div class="hero">
-  <h1>AI Coding Assistant<br/>with Specialized Agents</h1>
-  <p>Autonomous execution with validation. <strong>Analyzer → Planner → Editor → Validator</strong>. File validation prevents mistakes. Success criteria with auto-retry. $0-5/month vs $20-30/month subscriptions.</p>
+  <h1>The Open Source<br/>AI Coding Assistant</h1>
+  <p>Transparent, Autonomous, and Local. <strong>Bring Your Own Keys</strong>. Run with Groq, OpenAI, or locally with Ollama. No subscriptions, full control.</p>
   <div class="hero-cta">
     <a href="#quick-start" class="btn btn-primary">Get Started</a>
     <a href="https://github.com/jadercorrea/chuchu" class="btn btn-secondary">View on GitHub</a>
   </div>
 </div>
 
-<div class="section" style="text-align: center; background: #f8f9fa; padding: 4rem 2rem; border-radius: 12px; margin: 2rem 0;">
-  <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">Watch AI Orchestration in Real-Time</h2>
-  <p style="font-size: 1.25rem; color: #64748b; max-width: 700px; margin: 0 auto 2rem;">
-    While other assistants are black boxes, Chuchu shows you exactly what's happening.
-    See specialized agents collaborate, smart model selection, and transparent cost tracking.
-  </p>
-  <a href="/observatory" class="btn btn-primary" style="font-size: 1.1rem; padding: 1rem 2rem;">Try Interactive Demo</a>
-</div>
+{% include explainer.html %}
 
 <div class="features">
   <a href="/features#agent-based-architecture" class="feature-card">

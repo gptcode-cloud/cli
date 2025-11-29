@@ -562,7 +562,7 @@ const scenarios = [
   },
   {
     id: "bug-fix",
-    title: "🐛 Fix Payment Bug",
+    title: "Fix Payment Bug",
     command: "chu do 'fix nil pointer in payment'",
     stats: "6 steps • $0.007 • 9.2s",
     steps: [
@@ -581,7 +581,7 @@ const scenarios = [
   },
   {
     id: "feature",
-    title: "🎨 Add Dark Mode",
+    title: "Add Dark Mode",
     stats: "3 steps • $0.003 • 4.5s"
   }
 ];
