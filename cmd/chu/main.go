@@ -451,6 +451,145 @@ var profilesCmd = &cobra.Command{
 	Short: "Manage backend profiles",
 }
 
+var profileCmd = &cobra.Command{
+	Use:   "profile",
+	Short: "Show and manage current profile",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		setup, err := config.LoadSetup()
+		if err != nil {
+			return fmt.Errorf("failed to load setup: %w", err)
+		}
+
+		backend := setup.Defaults.Backend
+		profileName := setup.Defaults.Profile
+		if profileName == "" {
+			profileName = "default"
+		}
+
+		profile, err := config.GetBackendProfile(backend, profileName)
+		if err != nil {
+			return fmt.Errorf("failed to get profile: %w", err)
+		}
+
+		fmt.Printf("Current: %s/%s\n", backend, profileName)
+		if len(profile.AgentModels) > 0 {
+			for agent, model := range profile.AgentModels {
+				fmt.Printf("  %s: %s\n", agent, model)
+			}
+		}
+		return nil
+	},
+}
+
+var profileListCmd = &cobra.Command{
+	Use:   "list [backend]",
+	Short: "List all profiles (or for specific backend)",
+	Args:  cobra.MaximumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		setup, err := config.LoadSetup()
+		if err != nil {
+			return fmt.Errorf("failed to load setup: %w", err)
+		}
+
+		var backendFilter string
+		if len(args) > 0 {
+			backendFilter = args[0]
+		}
+
+		for backendName := range setup.Backend {
+			if backendFilter != "" && backendName != backendFilter {
+				continue
+			}
+
+			profiles, err := config.ListBackendProfiles(backendName)
+			if err != nil {
+				continue
+			}
+
+			for _, p := range profiles {
+				if backendName == setup.Defaults.Backend && p == setup.Defaults.Profile {
+					fmt.Printf("%s.%s (current)\n", backendName, p)
+				} else {
+					fmt.Printf("%s.%s\n", backendName, p)
+				}
+			}
+		}
+		return nil
+	},
+}
+
+var profileShowCmd = &cobra.Command{
+	Use:   "show [backend.profile]",
+	Short: "Show profile configuration (current if not specified)",
+	Args:  cobra.MaximumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		setup, err := config.LoadSetup()
+		if err != nil {
+			return fmt.Errorf("failed to load setup: %w", err)
+		}
+
+		backend := setup.Defaults.Backend
+		profileName := setup.Defaults.Profile
+		if profileName == "" {
+			profileName = "default"
+		}
+
+		if len(args) > 0 {
+			parts := strings.Split(args[0], ".")
+			if len(parts) != 2 {
+				return fmt.Errorf("format must be <backend>.<profile> (e.g., openrouter.free)")
+			}
+			backend = parts[0]
+			profileName = parts[1]
+		}
+
+		profile, err := config.GetBackendProfile(backend, profileName)
+		if err != nil {
+			return fmt.Errorf("failed to get profile: %w", err)
+		}
+
+		fmt.Printf("%s/%s\n", backend, profileName)
+		if len(profile.AgentModels) > 0 {
+			for agent, model := range profile.AgentModels {
+				fmt.Printf("  %s: %s\n", agent, model)
+			}
+		}
+		return nil
+	},
+}
+
+var profileUseCmd = &cobra.Command{
+	Use:   "use <backend>.<profile>",
+	Short: "Switch to a backend and profile",
+	Long: `Switch to a specific backend and profile in one command.
+
+Examples:
+  chu profile use openrouter.free
+  chu profile use groq.speed
+  chu profile use ollama.local`,
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		parts := strings.Split(args[0], ".")
+		if len(parts) != 2 {
+			return fmt.Errorf("format must be <backend>.<profile> (e.g., openrouter.free)")
+		}
+
+		backend := parts[0]
+		profile := parts[1]
+
+		if err := config.SetConfig("defaults.backend", backend); err != nil {
+			return fmt.Errorf("failed to set backend: %w", err)
+		}
+
+		if err := config.SetConfig("defaults.profile", profile); err != nil {
+			return fmt.Errorf("failed to set profile: %w", err)
+		}
+
+		fmt.Printf("✓ Switched to %s/%s\n", backend, profile)
+		return nil
+	},
+}
+
 var profilesListCmd = &cobra.Command{
 	Use:   "list <backend>",
 	Short: "List profiles for a backend",
@@ -555,6 +694,38 @@ var profilesDeleteCmd = &cobra.Command{
 		}
 
 		fmt.Printf("✓ Deleted profile: %s/%s\n", backend, profile)
+		return nil
+	},
+}
+
+var profilesUseCmd = &cobra.Command{
+	Use:   "use <backend>.<profile>",
+	Short: "Switch to a backend and profile",
+	Long: `Switch to a specific backend and profile in one command.
+
+Examples:
+  chu profiles use openrouter.free
+  chu profiles use groq.speed
+  chu profiles use ollama.local`,
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		parts := strings.Split(args[0], ".")
+		if len(parts) != 2 {
+			return fmt.Errorf("format must be <backend>.<profile> (e.g., openrouter.free)")
+		}
+
+		backend := parts[0]
+		profile := parts[1]
+
+		if err := config.SetConfig("defaults.backend", backend); err != nil {
+			return fmt.Errorf("failed to set backend: %w", err)
+		}
+
+		if err := config.SetConfig("defaults.profile", profile); err != nil {
+			return fmt.Errorf("failed to set profile: %w", err)
+		}
+
+		fmt.Printf("✓ Switched to %s/%s\n", backend, profile)
 		return nil
 	},
 }
@@ -795,6 +966,12 @@ func init() {
 	profilesCmd.AddCommand(profilesCreateCmd)
 	profilesCmd.AddCommand(profilesSetAgentCmd)
 	profilesCmd.AddCommand(profilesDeleteCmd)
+	profilesCmd.AddCommand(profilesUseCmd)
+
+	rootCmd.AddCommand(profileCmd)
+	profileCmd.AddCommand(profileListCmd)
+	profileCmd.AddCommand(profileShowCmd)
+	profileCmd.AddCommand(profileUseCmd)
 
 	rootCmd.AddCommand(feedbackCmd)
 	feedbackCmd.AddCommand(feedbackGoodCmd)
@@ -1079,17 +1256,16 @@ func init() {
 
 var chatCmd = &cobra.Command{
 	Use:   "chat [message]",
-	Short: "Chat mode (code-focused conversation)",
-	Long: `Chat mode with code-focused conversation. Two modes available:
+	Short: "Interactive chat with optional initial message",
+	Long: `Interactive chat mode - always stays open for follow-up questions.
 
-1. Single-shot mode (previous behavior):
-   chu chat "quick question"
-   echo "question" | chu chat
-
-2. REPL mode (new):
+With initial message:
+   chu chat "investigate 700GB system data"
+   # Processes message and stays open for follow-up
+   
+Without message:
    chu chat
-   chu chat --help  # Show REPL commands
-   chu chat --once     # Force single-shot mode
+   # Starts interactive session
 
 REPL Commands:
   /exit, /quit   - Exit chat
@@ -1101,53 +1277,23 @@ REPL Commands:
   /history       - Show history
   /help          - Show help`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		once, _ := cmd.Flags().GetBool("once")
-
-		// Check if we have a message argument or stdin input, or if we're in an interactive TTY
-		var input string
+		// Check if we have a message argument or stdin input
+		var initialMessage string
 		if len(args) > 0 && args[0] != "" {
-			input = args[0]
-			args = args[1:]
+			initialMessage = args[0]
 		} else if !isInteractiveTTY() {
 			// Check for piped input
 			stdinBytes, _ := io.ReadAll(os.Stdin)
-			input = string(stdinBytes)
-		}
-		// If we have input or --once flag, use single-shot mode
-		if input != "" || once {
-			err := repl.RunSingleShot(input, args)
-
-			// Prompt for feedback after execution
-			if err == nil && isInteractiveTTY() {
-				sentiment, correctResp, shouldRecord := feedback.PromptForFeedback()
-				if shouldRecord {
-					setup, _ := config.LoadSetup()
-					event := feedback.Event{
-						Sentiment:       sentiment,
-						Task:            input,
-						Backend:         setup.Defaults.Backend,
-						Model:           setup.Defaults.Model,
-						Agent:           "query",
-						CorrectResponse: correctResp,
-					}
-					_ = feedback.Record(event)
-				}
-			}
-
-			return err
+			initialMessage = string(stdinBytes)
 		}
 
-		// Otherwise, start REPL mode
-		repl, err := repl.NewChatREPL(8000, 50) // 8k tokens, 50 messages
+		// Always start REPL, with optional initial message
+		replInstance, err := repl.NewChatREPL(8000, 50) // 8k tokens, 50 messages
 		if err != nil {
 			return fmt.Errorf("failed to initialize chat REPL: %w", err)
 		}
-		return repl.Run()
+		return replInstance.RunWithInitialMessage(initialMessage)
 	},
-}
-
-func init() {
-	chatCmd.Flags().Bool("once", false, "Run single-shot mode (disable REPL)")
 }
 
 // isInteractiveTTY returns true if we're running in an interactive terminal

@@ -311,6 +311,14 @@ func runCommand(call ToolCall, workdir string) ToolResult {
 		return ToolResult{Tool: "run_command", Error: "command parameter required"}
 	}
 
+	// Block sudo commands to prevent password prompts
+	if strings.Contains(command, "sudo ") || strings.HasPrefix(command, "sudo") {
+		return ToolResult{
+			Tool: "run_command",
+			Error: "sudo commands not allowed in autonomous mode. Present sudo commands to user for manual execution.",
+		}
+	}
+
 	cmd := exec.Command("sh", "-c", command)
 	cmd.Dir = workdir
 	output, err := cmd.CombinedOutput()
