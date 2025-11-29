@@ -48,7 +48,13 @@ backend:
           research: groq/compound
 ```
 
-**Estimated cost**: $2-5/month (typical usage)
+**Estimated cost**: $0.85/month for 3M tokens (~150k/day)
+
+| Usage Level | Tokens/Month | Cost/Month |
+|-------------|--------------|------------|
+| Light | 1M (~50k/day) | $0.28 |
+| **Moderate** | **3M (~150k/day)** | **$0.85** |
+| Heavy | 5M (~250k/day) | $1.42 |
 
 ### Technical Rationale
 
@@ -92,7 +98,13 @@ backend:
           research: groq/compound
 ```
 
-**Estimated cost**: $10-20/month (typical usage)
+**Estimated cost**: $2.41/month for 3M tokens (~150k/day)
+
+| Usage Level | Tokens/Month | Cost/Month |
+|-------------|--------------|------------|
+| Light | 1M (~50k/day) | $0.80 |
+| **Moderate** | **3M (~150k/day)** | **$2.41** |
+| Heavy | 5M (~250k/day) | $4.01 |
 
 ### Technical Rationale
 
@@ -335,6 +347,39 @@ chu profile show groq budget   # Show specific profile details
 ### ❌ Generic 70B Over Specialized 32B
 **Problem**: Higher cost, not coding-focused
 **Fix**: qwen/qwen3-32b beats llama-3.3-70b for budget editing
+
+## Cost Comparison
+
+### Groq vs Claude Pro Max
+
+**Claude Pro Max**: $200/month for ~4.8M tokens (~800 prompts/session)
+
+**Groq** (5M tokens/month, ~250k/day):
+- **Budget**: $1.42/month (~**99% cheaper**)
+- **Performance**: $4.01/month (~**98% cheaper**)
+
+### Why So Cheap?
+
+1. **Groq LPU efficiency**: Hardware-level optimization
+2. **Open-source models**: No model training costs passed to users
+3. **Competitive pricing**: Groq subsidizing to gain market share
+4. **Smart agent routing**: 40% of calls use cheapest model (router)
+
+### Usage Breakdown (3M tokens/month typical)
+
+**Budget Profile** ($0.85/month):
+- Router (40%): $0.06 - llama-3.1-8b-instant
+- Query (30%): $0.34 - openai/gpt-oss-120b
+- Editor (25%): $0.40 - qwen/qwen3-32b
+- Research (5%): $0.06 - groq/compound
+
+**Performance Profile** ($2.41/month):
+- Router (40%): $0.06 - llama-3.1-8b-instant (same)
+- Query (30%): $0.34 - openai/gpt-oss-120b (same)
+- Editor (25%): $1.95 - moonshotai/kimi-k2-instruct (5x more)
+- Research (5%): $0.06 - groq/compound (same)
+
+**Key insight**: Editor accounts for 46% of budget cost but 81% of performance cost.
 
 ---
 
