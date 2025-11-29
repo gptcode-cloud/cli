@@ -6,7 +6,9 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -449,6 +451,145 @@ var profilesCmd = &cobra.Command{
 	Short: "Manage backend profiles",
 }
 
+var profileCmd = &cobra.Command{
+	Use:   "profile",
+	Short: "Show and manage current profile",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		setup, err := config.LoadSetup()
+		if err != nil {
+			return fmt.Errorf("failed to load setup: %w", err)
+		}
+
+		backend := setup.Defaults.Backend
+		profileName := setup.Defaults.Profile
+		if profileName == "" {
+			profileName = "default"
+		}
+
+		profile, err := config.GetBackendProfile(backend, profileName)
+		if err != nil {
+			return fmt.Errorf("failed to get profile: %w", err)
+		}
+
+		fmt.Printf("Current: %s/%s\n", backend, profileName)
+		if len(profile.AgentModels) > 0 {
+			for agent, model := range profile.AgentModels {
+				fmt.Printf("  %s: %s\n", agent, model)
+			}
+		}
+		return nil
+	},
+}
+
+var profileListCmd = &cobra.Command{
+	Use:   "list [backend]",
+	Short: "List all profiles (or for specific backend)",
+	Args:  cobra.MaximumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		setup, err := config.LoadSetup()
+		if err != nil {
+			return fmt.Errorf("failed to load setup: %w", err)
+		}
+
+		var backendFilter string
+		if len(args) > 0 {
+			backendFilter = args[0]
+		}
+
+		for backendName := range setup.Backend {
+			if backendFilter != "" && backendName != backendFilter {
+				continue
+			}
+
+			profiles, err := config.ListBackendProfiles(backendName)
+			if err != nil {
+				continue
+			}
+
+			for _, p := range profiles {
+				if backendName == setup.Defaults.Backend && p == setup.Defaults.Profile {
+					fmt.Printf("%s.%s (current)\n", backendName, p)
+				} else {
+					fmt.Printf("%s.%s\n", backendName, p)
+				}
+			}
+		}
+		return nil
+	},
+}
+
+var profileShowCmd = &cobra.Command{
+	Use:   "show [backend.profile]",
+	Short: "Show profile configuration (current if not specified)",
+	Args:  cobra.MaximumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		setup, err := config.LoadSetup()
+		if err != nil {
+			return fmt.Errorf("failed to load setup: %w", err)
+		}
+
+		backend := setup.Defaults.Backend
+		profileName := setup.Defaults.Profile
+		if profileName == "" {
+			profileName = "default"
+		}
+
+		if len(args) > 0 {
+			parts := strings.Split(args[0], ".")
+			if len(parts) != 2 {
+				return fmt.Errorf("format must be <backend>.<profile> (e.g., openrouter.free)")
+			}
+			backend = parts[0]
+			profileName = parts[1]
+		}
+
+		profile, err := config.GetBackendProfile(backend, profileName)
+		if err != nil {
+			return fmt.Errorf("failed to get profile: %w", err)
+		}
+
+		fmt.Printf("%s/%s\n", backend, profileName)
+		if len(profile.AgentModels) > 0 {
+			for agent, model := range profile.AgentModels {
+				fmt.Printf("  %s: %s\n", agent, model)
+			}
+		}
+		return nil
+	},
+}
+
+var profileUseCmd = &cobra.Command{
+	Use:   "use <backend>.<profile>",
+	Short: "Switch to a backend and profile",
+	Long: `Switch to a specific backend and profile in one command.
+
+Examples:
+  chu profile use openrouter.free
+  chu profile use groq.speed
+  chu profile use ollama.local`,
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		parts := strings.Split(args[0], ".")
+		if len(parts) != 2 {
+			return fmt.Errorf("format must be <backend>.<profile> (e.g., openrouter.free)")
+		}
+
+		backend := parts[0]
+		profile := parts[1]
+
+		if err := config.SetConfig("defaults.backend", backend); err != nil {
+			return fmt.Errorf("failed to set backend: %w", err)
+		}
+
+		if err := config.SetConfig("defaults.profile", profile); err != nil {
+			return fmt.Errorf("failed to set profile: %w", err)
+		}
+
+		fmt.Printf("✓ Switched to %s/%s\n", backend, profile)
+		return nil
+	},
+}
+
 var profilesListCmd = &cobra.Command{
 	Use:   "list <backend>",
 	Short: "List profiles for a backend",
@@ -557,6 +698,38 @@ var profilesDeleteCmd = &cobra.Command{
 	},
 }
 
+var profilesUseCmd = &cobra.Command{
+	Use:   "use <backend>.<profile>",
+	Short: "Switch to a backend and profile",
+	Long: `Switch to a specific backend and profile in one command.
+
+Examples:
+  chu profiles use openrouter.free
+  chu profiles use groq.speed
+  chu profiles use ollama.local`,
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		parts := strings.Split(args[0], ".")
+		if len(parts) != 2 {
+			return fmt.Errorf("format must be <backend>.<profile> (e.g., openrouter.free)")
+		}
+
+		backend := parts[0]
+		profile := parts[1]
+
+		if err := config.SetConfig("defaults.backend", backend); err != nil {
+			return fmt.Errorf("failed to set backend: %w", err)
+		}
+
+		if err := config.SetConfig("defaults.profile", profile); err != nil {
+			return fmt.Errorf("failed to set profile: %w", err)
+		}
+
+		fmt.Printf("✓ Switched to %s/%s\n", backend, profile)
+		return nil
+	},
+}
+
 var feedbackCmd = &cobra.Command{
 	Use:   "feedback",
 	Short: "Record and analyze feedback for model performance",
@@ -570,13 +743,25 @@ var feedbackGoodCmd = &cobra.Command{
 		model, _ := cmd.Flags().GetString("model")
 		agent, _ := cmd.Flags().GetString("agent")
 		context, _ := cmd.Flags().GetString("context")
+		task, _ := cmd.Flags().GetString("task")
+		wrong, _ := cmd.Flags().GetString("wrong")
+		correct, _ := cmd.Flags().GetString("correct")
+		source, _ := cmd.Flags().GetString("source")
+		kind, _ := cmd.Flags().GetString("kind")
+		files, _ := cmd.Flags().GetStringSlice("files")
 
 		event := feedback.Event{
-			Sentiment: feedback.SentimentGood,
-			Backend:   backend,
-			Model:     model,
-			Agent:     agent,
-			Context:   context,
+			Sentiment:       feedback.SentimentGood,
+			Backend:         backend,
+			Model:           model,
+			Agent:           agent,
+			Context:         context,
+			Task:            task,
+			WrongResponse:   wrong,
+			CorrectResponse: correct,
+			Source:          source,
+			Kind:            feedback.EventKind(kind),
+			Files:           files,
 		}
 
 		if err := feedback.Record(event); err != nil {
@@ -596,13 +781,25 @@ var feedbackBadCmd = &cobra.Command{
 		model, _ := cmd.Flags().GetString("model")
 		agent, _ := cmd.Flags().GetString("agent")
 		context, _ := cmd.Flags().GetString("context")
+		task, _ := cmd.Flags().GetString("task")
+		wrong, _ := cmd.Flags().GetString("wrong")
+		correct, _ := cmd.Flags().GetString("correct")
+		source, _ := cmd.Flags().GetString("source")
+		kind, _ := cmd.Flags().GetString("kind")
+		files, _ := cmd.Flags().GetStringSlice("files")
 
 		event := feedback.Event{
-			Sentiment: feedback.SentimentBad,
-			Backend:   backend,
-			Model:     model,
-			Agent:     agent,
-			Context:   context,
+			Sentiment:       feedback.SentimentBad,
+			Backend:         backend,
+			Model:           model,
+			Agent:           agent,
+			Context:         context,
+			Task:            task,
+			WrongResponse:   wrong,
+			CorrectResponse: correct,
+			Source:          source,
+			Kind:            feedback.EventKind(kind),
+			Files:           files,
 		}
 
 		if err := feedback.Record(event); err != nil {
@@ -640,6 +837,121 @@ var feedbackStatsCmd = &cobra.Command{
 	},
 }
 
+var feedbackSubmitCmd = &cobra.Command{
+	Use:   "submit",
+	Short: "Submit feedback event via flags or JSON",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		jsonStr, _ := cmd.Flags().GetString("json")
+		if jsonStr != "" {
+			var e feedback.Event
+			if jsonStr == "-" {
+				data, err := io.ReadAll(os.Stdin)
+				if err != nil {
+					return fmt.Errorf("failed to read stdin: %w", err)
+				}
+				jsonStr = string(data)
+			}
+			if err := json.Unmarshal([]byte(jsonStr), &e); err != nil {
+				return fmt.Errorf("invalid JSON: %w", err)
+			}
+			if err := feedback.Record(e); err != nil {
+				return fmt.Errorf("failed to record feedback: %w", err)
+			}
+			fmt.Println("✓ Feedback submitted")
+			return nil
+		}
+
+		backend, _ := cmd.Flags().GetString("backend")
+		model, _ := cmd.Flags().GetString("model")
+		agent, _ := cmd.Flags().GetString("agent")
+		context, _ := cmd.Flags().GetString("context")
+		task, _ := cmd.Flags().GetString("task")
+		wrong, _ := cmd.Flags().GetString("wrong")
+		correct, _ := cmd.Flags().GetString("correct")
+		source, _ := cmd.Flags().GetString("source")
+		kind, _ := cmd.Flags().GetString("kind")
+		files, _ := cmd.Flags().GetStringSlice("files")
+		captureDiff, _ := cmd.Flags().GetBool("capture-diff")
+		sent, _ := cmd.Flags().GetString("sentiment")
+
+		e := feedback.Event{
+			Backend:         backend,
+			Model:           model,
+			Agent:           agent,
+			Context:         context,
+			Task:            task,
+			WrongResponse:   wrong,
+			CorrectResponse: correct,
+			Source:          source,
+			Kind:            feedback.EventKind(kind),
+			Files:           files,
+		}
+		if sent != "" {
+			e.Sentiment = feedback.Sentiment(sent)
+		}
+		if captureDiff {
+			if _, err := exec.LookPath("git"); err == nil {
+				cmd := exec.Command("git", "rev-parse", "--is-inside-work-tree")
+				if err := cmd.Run(); err == nil {
+					diffCmd := exec.Command("git", "diff")
+					diffBytes, _ := diffCmd.Output()
+					if len(diffBytes) > 0 {
+						dir := filepath.Join(os.Getenv("HOME"), ".chuchu", "diffs")
+						_ = os.MkdirAll(dir, 0755)
+						name := time.Now().Format("20060102-150405") + ".patch"
+						path := filepath.Join(dir, name)
+						_ = os.WriteFile(path, diffBytes, 0644)
+						e.DiffPath = path
+					}
+				}
+			}
+		}
+		if err := feedback.Record(e); err != nil {
+			return fmt.Errorf("failed to record feedback: %w", err)
+		}
+		fmt.Println("✓ Feedback submitted")
+		return nil
+	},
+}
+
+var demoCmd = &cobra.Command{
+	Use:   "demo",
+	Short: "Demos and recordings",
+}
+
+var demoFeedbackCmd = &cobra.Command{
+	Use:   "feedback",
+	Short: "Feedback capture demos",
+}
+
+var demoFeedbackCreateCmd = &cobra.Command{
+	Use:     "create",
+	Aliases: []string{"feedback:create", "feedback.create"},
+	Short:   "Generate feedback demos (casts + GIFs)",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		repo, _ := cmd.Flags().GetString("repo")
+		tries, _ := cmd.Flags().GetInt("tries")
+		if repo == "" {
+			repo = "."
+		}
+		sh := exec.Command("bash", "docs/scripts/build_demos.sh")
+		sh.Dir = repo
+		sh.Env = append(os.Environ(), fmt.Sprintf("TRIES=%d", tries))
+		sh.Stdout = os.Stdout
+		sh.Stderr = os.Stderr
+		if err := sh.Run(); err != nil {
+			return fmt.Errorf("failed to build demos: %w", err)
+		}
+		fmt.Println("✓ Demos built in docs/assets")
+		return nil
+	},
+}
+
+var feedbackHookCmd = &cobra.Command{
+	Use:   "hook",
+	Short: "Install shell hooks for automatic feedback capture",
+}
+
 func init() {
 	backendCmd.AddCommand(backendListCmd)
 	backendCmd.AddCommand(backendCreateCmd)
@@ -654,21 +966,61 @@ func init() {
 	profilesCmd.AddCommand(profilesCreateCmd)
 	profilesCmd.AddCommand(profilesSetAgentCmd)
 	profilesCmd.AddCommand(profilesDeleteCmd)
+	profilesCmd.AddCommand(profilesUseCmd)
+
+	rootCmd.AddCommand(profileCmd)
+	profileCmd.AddCommand(profileListCmd)
+	profileCmd.AddCommand(profileShowCmd)
+	profileCmd.AddCommand(profileUseCmd)
 
 	rootCmd.AddCommand(feedbackCmd)
 	feedbackCmd.AddCommand(feedbackGoodCmd)
 	feedbackCmd.AddCommand(feedbackBadCmd)
 	feedbackCmd.AddCommand(feedbackStatsCmd)
+	feedbackCmd.AddCommand(feedbackSubmitCmd)
+	feedbackCmd.AddCommand(feedbackHookCmd)
+
+	rootCmd.AddCommand(demoCmd)
+	demoCmd.AddCommand(demoFeedbackCmd)
+	demoFeedbackCmd.AddCommand(demoFeedbackCreateCmd)
+	demoFeedbackCreateCmd.Flags().String("repo", ".", "Repository root containing docs/scripts/build_demos.sh")
+	demoFeedbackCreateCmd.Flags().Int("tries", 3, "Max attempts to capture good demos")
 
 	feedbackGoodCmd.Flags().String("backend", "", "Backend used")
 	feedbackGoodCmd.Flags().String("model", "", "Model used")
 	feedbackGoodCmd.Flags().String("agent", "", "Agent type (router, query, editor, research)")
 	feedbackGoodCmd.Flags().String("context", "", "Additional context")
+	feedbackGoodCmd.Flags().String("task", "", "Task/query from user")
+	feedbackGoodCmd.Flags().String("wrong", "", "Wrong response to task")
+	feedbackGoodCmd.Flags().String("correct", "", "Correct response for task")
+	feedbackGoodCmd.Flags().String("source", "", "Source of feedback (cli/tool)")
+	feedbackGoodCmd.Flags().String("kind", "", "Event kind (command,text,file_edit,review_note)")
+	feedbackGoodCmd.Flags().StringSlice("files", nil, "Related files")
 
 	feedbackBadCmd.Flags().String("backend", "", "Backend used")
 	feedbackBadCmd.Flags().String("model", "", "Model used")
 	feedbackBadCmd.Flags().String("agent", "", "Agent type (router, query, editor, research)")
 	feedbackBadCmd.Flags().String("context", "", "Additional context")
+	feedbackBadCmd.Flags().String("task", "", "Task/query from user")
+	feedbackBadCmd.Flags().String("wrong", "", "Wrong response to task")
+	feedbackBadCmd.Flags().String("correct", "", "Correct response for task")
+	feedbackBadCmd.Flags().String("source", "", "Source of feedback (cli/tool)")
+	feedbackBadCmd.Flags().String("kind", "", "Event kind (command,text,file_edit,review_note)")
+	feedbackBadCmd.Flags().StringSlice("files", nil, "Related files")
+
+	feedbackSubmitCmd.Flags().String("json", "", "JSON payload or '-' to read from stdin")
+	feedbackSubmitCmd.Flags().String("backend", "", "Backend used")
+	feedbackSubmitCmd.Flags().String("model", "", "Model used")
+	feedbackSubmitCmd.Flags().String("agent", "", "Agent type (router, query, editor, research)")
+	feedbackSubmitCmd.Flags().String("context", "", "Additional context")
+	feedbackSubmitCmd.Flags().String("task", "", "Task/query from user")
+	feedbackSubmitCmd.Flags().String("wrong", "", "Wrong response to task")
+	feedbackSubmitCmd.Flags().String("correct", "", "Correct response for task")
+	feedbackSubmitCmd.Flags().String("source", "", "Source of feedback (cli/tool)")
+	feedbackSubmitCmd.Flags().String("kind", "", "Event kind (command,text,file_edit,review_note)")
+	feedbackSubmitCmd.Flags().StringSlice("files", nil, "Related files")
+	feedbackSubmitCmd.Flags().Bool("capture-diff", false, "Also capture git diff to file and link it")
+	feedbackSubmitCmd.Flags().String("sentiment", "", "good|bad")
 
 	modelsCmd.AddCommand(modelsUpdateCmd)
 	modelsCmd.AddCommand(modelsSearchCmd)
@@ -678,19 +1030,242 @@ func init() {
 	modelsSearchCmd.Flags().StringP("agent", "a", "", "Agent type (router, query, editor, research)")
 }
 
+var feedbackHookInstallCmd = &cobra.Command{
+	Use:   "install",
+	Short: "Install shell hook",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		shell, _ := cmd.Flags().GetString("shell")
+		withDiff, _ := cmd.Flags().GetBool("with-diff")
+		andSource, _ := cmd.Flags().GetBool("and-source")
+		home, err := os.UserHomeDir()
+		if err != nil {
+			return err
+		}
+		hookDir := filepath.Join(home, ".chuchu")
+		if err := os.MkdirAll(hookDir, 0755); err != nil {
+			return err
+		}
+		switch shell {
+		case "zsh":
+			hookPath := filepath.Join(hookDir, "feedback_hook.zsh")
+			hook := `chu_mark_suggestion_widget() {
+	local f="$HOME/.chuchu/last_suggestion_cmd"
+	print -r -- "$BUFFER" > "$f"
+zle -M "Suggestion captured"
+}
+
+zle -N chu_mark_suggestion_widget
+bindkey -M emacs "^G" chu_mark_suggestion_widget
+bindkey -M viins "^G" chu_mark_suggestion_widget
+
+preexec_chu_feedback() {
+	local cmd="$1"
+	local sfile="$HOME/.chuchu/last_suggestion_cmd"
+	if [[ -f "$sfile" ]]; then
+		print -r -- "$(<"$sfile")" > "$HOME/.chuchu/.pending_wrong"
+		print -r -- "$cmd" > "$HOME/.chuchu/.pending_correct"
+	fi
+}
+
+precmd_chu_feedback() {
+	local wrongf="$HOME/.chuchu/.pending_wrong"
+	local correctf="$HOME/.chuchu/.pending_correct"
+	if [[ -f "$wrongf" && -f "$correctf" ]]; then
+		local wrong="$(<"$wrongf")"
+		local correct="$(<"$correctf")"
+		local files=""
+		if command -v git >/dev/null 2>&1; then
+			if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+				files=$(git diff --name-only)
+			fi
+		fi
+		local -a args
+		args=(feedback submit --sentiment=bad --kind=command --source=shell --agent=editor --wrong="$wrong" --correct="$correct")
+		
+		if [[ -n "$files" ]]; then
+			local f
+			for f in ${(f)files}; do
+				args+=(--files "$f")
+			done
+		fi
+		if [[ %WITH_DIFF% == 1 ]]; then args+=(--capture-diff); fi
+		chu $args >/dev/null 2>&1
+		rm -f "$wrongf" "$correctf" "$HOME/.chuchu/last_suggestion_cmd"
+	fi
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook preexec preexec_chu_feedback
+add-zsh-hook precmd precmd_chu_feedback
+`
+			if withDiff {
+				hook = strings.ReplaceAll(hook, "%WITH_DIFF%", "1")
+				hook = strings.ReplaceAll(hook, "%FISH_DIFF%", "set args $args --capture-diff")
+			} else {
+				hook = strings.ReplaceAll(hook, "%WITH_DIFF%", "0")
+				hook = strings.ReplaceAll(hook, "%FISH_DIFF%", "")
+			}
+			if err := os.WriteFile(hookPath, []byte(hook), 0644); err != nil {
+				return err
+			}
+			rcPath := filepath.Join(home, ".zshrc")
+			var rc string
+			if data, err := os.ReadFile(rcPath); err == nil {
+				rc = string(data)
+			}
+			line := "source $HOME/.chuchu/feedback_hook.zsh"
+			if !strings.Contains(rc, line) {
+				rc += "\n" + line + "\n"
+				if err := os.WriteFile(rcPath, []byte(rc), 0644); err != nil {
+					return err
+				}
+			}
+			fmt.Println("✓ Installed zsh hook. Restart your shell or run: source ~/.zshrc")
+			if andSource {
+				_ = exec.Command("zsh", "-ic", "source ~/.zshrc").Run()
+			}
+			return nil
+		case "bash":
+			hookPath := filepath.Join(hookDir, "feedback_hook.bash")
+			hook := `chu_mark_suggestion_bash() {
+	local f="$HOME/.chuchu/last_suggestion_cmd"
+	printf "%s" "$READLINE_LINE" > "$f"
+}
+
+bind -x '"\C-g":"chu_mark_suggestion_bash"'
+
+chu_preexec() {
+	local cmd="$1"
+	local sfile="$HOME/.chuchu/last_suggestion_cmd"
+	if [[ -f "$sfile" ]]; then
+		cat "$sfile" > "$HOME/.chuchu/.pending_wrong"
+		printf "%s" "$cmd" > "$HOME/.chuchu/.pending_correct"
+	fi
+}
+trap 'chu_preexec "$BASH_COMMAND"' DEBUG
+
+chu_precmd() {
+	local wrongf="$HOME/.chuchu/.pending_wrong"
+	local correctf="$HOME/.chuchu/.pending_correct"
+	if [[ -f "$wrongf" && -f "$correctf" ]]; then
+		local wrong
+		wrong="$(cat "$wrongf")"
+		local correct
+		correct="$(cat "$correctf")"
+		local files=""
+		if command -v git >/dev/null 2>&1; then
+			if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+				files="$(git diff --name-only)"
+			fi
+		fi
+		local -a args=(feedback submit --sentiment=bad --kind=command --source=shell --agent=editor --wrong="$wrong" --correct="$correct")
+		if [[ %WITH_DIFF% == 1 ]]; then args+=(--capture-diff); fi
+		if [[ -n "$files" ]]; then
+			while IFS= read -r f; do args+=(--files "$f"); done <<< "$files"
+		fi
+		chu "${args[@]}" >/dev/null 2>&1
+		rm -f "$wrongf" "$correctf" "$HOME/.chuchu/last_suggestion_cmd"
+	fi
+}
+
+PROMPT_COMMAND="chu_precmd; $PROMPT_COMMAND"
+`
+			if err := os.WriteFile(hookPath, []byte(hook), 0644); err != nil {
+				return err
+			}
+			rcPath := filepath.Join(home, ".bashrc")
+			var rc string
+			if data, err := os.ReadFile(rcPath); err == nil {
+				rc = string(data)
+			}
+			line := ". \"$HOME/.chuchu/feedback_hook.bash\""
+			if !strings.Contains(rc, line) {
+				rc += "\n" + line + "\n"
+				if err := os.WriteFile(rcPath, []byte(rc), 0644); err != nil {
+					return err
+				}
+			}
+			fmt.Println("✓ Installed bash hook. Restart your shell or run: source ~/.bashrc")
+			if andSource {
+				_ = exec.Command("bash", "-ic", "source ~/.bashrc").Run()
+			}
+			return nil
+		case "fish":
+			confDir := filepath.Join(home, ".config", "fish", "conf.d")
+			if err := os.MkdirAll(confDir, 0755); err != nil {
+				return err
+			}
+			hookPath := filepath.Join(confDir, "chu_feedback.fish")
+			hook := `function chufb_mark_suggestion
+	set -l f "$HOME/.chuchu/last_suggestion_cmd"
+	commandline -b > $f
+end
+bind \cg chufb_mark_suggestion
+
+function chufb_preexec --on-event fish_preexec
+	set -l cmd $argv
+	set -l sfile "$HOME/.chuchu/last_suggestion_cmd"
+	if test -f $sfile
+		cat $sfile > "$HOME/.chuchu/.pending_wrong"
+		printf "%s" "$cmd" > "$HOME/.chuchu/.pending_correct"
+	end
+end
+
+function chufb_postexec --on-event fish_postexec
+	set -l wrongf "$HOME/.chuchu/.pending_wrong"
+	set -l correctf "$HOME/.chuchu/.pending_correct"
+	if test -f $wrongf; and test -f $correctf
+		set -l wrong (cat $wrongf)
+		set -l correct (cat $correctf)
+		set -l files
+		if type -q git
+			if git rev-parse --is-inside-work-tree >/dev/null 2>&1
+				set files (git diff --name-only)
+			end
+		end
+		set -l args feedback submit --sentiment=bad --kind=command --source=shell --agent=editor --wrong="$wrong" --correct="$correct"
+		%FISH_DIFF%
+		for f in $files
+			set args $args --files $f
+		end
+		chu $args >/dev/null 2>&1
+		rm -f $wrongf $correctf "$HOME/.chuchu/last_suggestion_cmd"
+	end
+end
+`
+			if err := os.WriteFile(hookPath, []byte(hook), 0644); err != nil {
+				return err
+			}
+			fmt.Println("✓ Installed fish hook. Restart fish or open a new session")
+			if andSource {
+				_ = exec.Command("fish", "-ic", "source ~/.config/fish/conf.d/chu_feedback.fish").Run()
+			}
+			return nil
+		default:
+			return fmt.Errorf("unsupported shell: %s", shell)
+		}
+	},
+}
+
+func init() {
+	feedbackHookInstallCmd.Flags().String("shell", "zsh", "Shell to install hook for")
+	feedbackHookInstallCmd.Flags().Bool("with-diff", false, "Also capture git diff patch to file")
+	feedbackHookInstallCmd.Flags().Bool("and-source", false, "Attempt to source shell rc after install")
+	feedbackHookCmd.AddCommand(feedbackHookInstallCmd)
+}
+
 var chatCmd = &cobra.Command{
 	Use:   "chat [message]",
-	Short: "Chat mode (code-focused conversation)",
-	Long: `Chat mode with code-focused conversation. Two modes available:
+	Short: "Interactive chat with optional initial message",
+	Long: `Interactive chat mode - always stays open for follow-up questions.
 
-1. Single-shot mode (previous behavior):
-   chu chat "quick question"
-   echo "question" | chu chat
-
-2. REPL mode (new):
+With initial message:
+   chu chat "investigate 700GB system data"
+   # Processes message and stays open for follow-up
+   
+Without message:
    chu chat
-   chu chat --help  # Show REPL commands
-   chu chat --once     # Force single-shot mode
+   # Starts interactive session
 
 REPL Commands:
   /exit, /quit   - Exit chat
@@ -702,34 +1277,23 @@ REPL Commands:
   /history       - Show history
   /help          - Show help`,
 	RunE: func(cmd *cobra.Command, args []string) error {
-		once, _ := cmd.Flags().GetBool("once")
-
-		// Check if we have a message argument or stdin input, or if we're in an interactive TTY
-		var input string
+		// Check if we have a message argument or stdin input
+		var initialMessage string
 		if len(args) > 0 && args[0] != "" {
-			input = args[0]
-			args = args[1:]
+			initialMessage = args[0]
 		} else if !isInteractiveTTY() {
 			// Check for piped input
 			stdinBytes, _ := io.ReadAll(os.Stdin)
-			input = string(stdinBytes)
-		}
-		// If we have input or --once flag, use single-shot mode
-		if input != "" || once {
-			return repl.RunSingleShot(input, args)
+			initialMessage = string(stdinBytes)
 		}
 
-		// Otherwise, start REPL mode
-		repl, err := repl.NewChatREPL(8000, 50) // 8k tokens, 50 messages
+		// Always start REPL, with optional initial message
+		replInstance, err := repl.NewChatREPL(8000, 50) // 8k tokens, 50 messages
 		if err != nil {
 			return fmt.Errorf("failed to initialize chat REPL: %w", err)
 		}
-		return repl.Run()
+		return replInstance.RunWithInitialMessage(initialMessage)
 	},
-}
-
-func init() {
-	chatCmd.Flags().Bool("once", false, "Run single-shot mode (disable REPL)")
 }
 
 // isInteractiveTTY returns true if we're running in an interactive terminal

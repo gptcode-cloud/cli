@@ -24,6 +24,37 @@ type ChatHistory struct {
 	Messages []llm.ChatMessage `json:"messages"`
 }
 
+func isOpsQuery(s string) bool {
+	q := strings.ToLower(s)
+	keys := []string{
+		"system data",
+		"disk usage",
+		"storage",
+		"disk space",
+		"out of space",
+		"investigate",
+		"troubleshoot",
+		"diagnose",
+		"macos",
+		"apfs",
+		"snapshot",
+		"time machine",
+		"cache",
+		"xcode",
+		"docker",
+		"high usage",
+		"dados do sistema",
+		"armazenamento",
+		"disco",
+	}
+	for _, k := range keys {
+		if strings.Contains(q, k) {
+			return true
+		}
+	}
+	return false
+}
+
 func Chat(input string, args []string) {
 	os.Stdout.Sync()
 
@@ -80,6 +111,22 @@ func Chat(input string, args []string) {
 	}
 
 	lastUserMessage := history.Messages[len(history.Messages)-1].Content
+
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[CHAT] Checking isOpsQuery for: %s\n", lastUserMessage)
+		fmt.Fprintf(os.Stderr, "[CHAT] isOpsQuery result: %v\n", isOpsQuery(lastUserMessage))
+	}
+
+	// Check if this is an ops/troubleshooting query - route to run mode
+	if isOpsQuery(lastUserMessage) {
+		if os.Getenv("CHUCHU_DEBUG") == "1" {
+			fmt.Fprintln(os.Stderr, "[CHAT] Ops query detected, routing to run mode")
+		}
+		builder := prompt.NewDefaultBuilder(nil)
+		queryModel := backendCfg.GetModelForAgent("query")
+		RunExecute(builder, provider, queryModel, []string{lastUserMessage})
+		return
+	}
 
 	if strings.ToLower(strings.TrimSpace(lastUserMessage)) == "implement" {
 		fmt.Fprintln(os.Stderr, "[CHAT] Implement command detected")

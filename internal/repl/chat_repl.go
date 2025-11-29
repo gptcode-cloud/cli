@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/exec"
 	"strings"
 
 	"chuchu/internal/config"
+	"chuchu/internal/llm"
 	"chuchu/internal/modes"
 	"chuchu/internal/prompt"
 	"github.com/chzyer/readline"
@@ -87,8 +89,29 @@ func filterInput(r rune) (rune, bool) {
 	return r, true
 }
 
+// RunWithInitialMessage starts REPL with an optional initial message to process first
+func (r *ChatREPL) RunWithInitialMessage(initialMessage string) error {
+	if initialMessage != "" {
+		// Process initial message first
+		if err := r.processMessage(initialMessage); err != nil {
+			fmt.Printf("Error: %v\n", err)
+		}
+		fmt.Println("")
+
+		// If non-interactive (piped input), exit after processing
+		if !isInteractiveTTY() {
+			return nil
+		}
+	}
+	return r.Run()
+}
+
 // Run starts the REPL loop
 func (r *ChatREPL) Run() error {
+	if !isInteractiveTTY() {
+		// Non-interactive, don't show prompts
+		return nil
+	}
 	fmt.Println("Chuchu Chat REPL - Type /help for commands")
 	fmt.Println("")
 
@@ -264,7 +287,6 @@ func (r *ChatREPL) showHistory() {
 		case "assistant":
 			role = "Assistant"
 		default:
-			// Capitalize first letter for other roles
 			if len(role) > 0 {
 				role = strings.ToUpper(role[:1]) + role[1:]
 			}
@@ -276,15 +298,71 @@ func (r *ChatREPL) showHistory() {
 	}
 }
 
-// estimateTokens provides a simple token estimation
 func estimateTokens(text string) int {
-	// Simple heuristic: ~4 characters per token
 	return len(text) / 4
 }
 
-// RunSingleShot executes a single chat message without REPL mode
+func isInteractiveTTY() bool {
+	cmd := exec.Command("tty", "-s")
+	return cmd.Run() == nil
+}
+
+func isOpsQuery(s string) bool {
+	q := strings.ToLower(s)
+	keys := []string{
+		"system data",
+		"disk usage",
+		"storage",
+		"disk space",
+		"out of space",
+		"investigate",
+		"troubleshoot",
+		"diagnose",
+		"macos",
+		"apfs",
+		"snapshot",
+		"time machine",
+		"cache",
+		"xcode",
+		"docker",
+		"high usage",
+		"dados do sistema",
+		"armazenamento",
+		"disco",
+	}
+	for _, k := range keys {
+		if strings.Contains(q, k) {
+			return true
+		}
+	}
+	return false
+}
+
 func RunSingleShot(input string, args []string) error {
-	// Just delegate to existing modes.Chat
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[RunSingleShot] Input: %s\n", input)
+		fmt.Fprintf(os.Stderr, "[RunSingleShot] isOpsQuery: %v\n", isOpsQuery(input))
+	}
+	if isOpsQuery(input) {
+		if os.Getenv("CHUCHU_DEBUG") == "1" {
+			fmt.Fprintf(os.Stderr, "[RunSingleShot] Routing to run mode\n")
+		}
+		setup, _ := config.LoadSetup()
+		backendName := setup.Defaults.Backend
+		backendCfg := setup.Backend[backendName]
+
+		// Use query agent model from profile
+		queryModel := backendCfg.GetModelForAgent("query")
+
+		var provider llm.Provider
+		if backendCfg.Type == "ollama" {
+			provider = llm.NewOllama(backendCfg.BaseURL)
+		} else {
+			provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
+		}
+		builder := prompt.NewDefaultBuilder(nil)
+		return modes.RunExecute(builder, provider, queryModel, []string{input})
+	}
 	modes.Chat(input, args)
 	return nil
 }

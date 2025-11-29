@@ -1,0 +1,2247 @@
+<style>
+  :root {
+    --page-bg: #f3f4f6;
+    --white: #ffffff;
+    --panel: #f9fafb;
+    --border-soft: #e5e7eb;
+    --border-light: #f1f5f9;
+    --text-main: #111827;
+    --text-muted: #6b7280;
+    --text-soft: #9ca3af;
+    --q-color: #2563eb;
+    --k-color: #ef4444;
+    --v-color: #22c55e;
+    --curve-color: rgba(56, 189, 248, 0.9);
+    --curve-color-dim: rgba(148, 163, 184, 0.35);
+    --prob-purple: #7c3aed;
+    --prob-purple-soft: #ede9fe;
+    --radius-lg: 12px;
+    --radius-xl: 18px;
+    --font-sans: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      "Liberation Mono", "Courier New", monospace;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: var(--font-sans);
+    background: var(--page-bg);
+    color: var(--text-main);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .te-page {
+    max-width: 1200px;
+    margin: 32px auto 64px;
+    padding: 0 16px;
+  }
+
+  .te-shell {
+    background: var(--white);
+    border-radius: 24px;
+    border: 1px solid var(--border-soft);
+    box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+    padding: 24px 24px 28px;
+    overflow: hidden;
+  }
+
+  @media (min-width: 1024px) {
+    .te-shell {
+      padding: 24px 32px 32px;
+    }
+  }
+
+  /* Header */
+
+  .te-kicker {
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-soft);
+    margin-bottom: 4px;
+  }
+
+  .te-title {
+    font-size: 22px;
+    font-weight: 600;
+    margin-bottom: 4px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  .te-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    max-width: 720px;
+    margin-bottom: 18px;
+  }
+
+  /* Diagram layout */
+
+  .te-diagram-wrapper {
+    position: relative;
+    margin-top: 8px;
+  }
+
+  .te-diagram-grid {
+    position: relative;
+    display: grid;
+    grid-template-columns: 160px minmax(0, 430px) 160px 220px;
+    column-gap: 40px;
+    align-items: stretch;
+  }
+
+  @media (max-width: 1024px) {
+    .te-diagram-grid {
+      grid-template-columns: 150px minmax(0, 1fr);
+      grid-template-rows: auto auto auto;
+      grid-template-areas:
+        "embed block"
+        "mlp   block"
+        "prob  prob";
+      row-gap: 24px;
+    }
+
+    .te-col--embed {
+      grid-area: embed;
+    }
+
+    .te-col--block {
+      grid-area: block;
+    }
+
+    .te-col--mlp {
+      grid-area: mlp;
+    }
+
+    .te-col--prob {
+      grid-area: prob;
+    }
+  }
+
+  .te-top-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-bottom: 10px;
+  }
+
+  .te-top-left {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+
+  .te-top-right {
+    display: flex;
+    gap: 48px;
+    align-items: baseline;
+    flex-wrap: wrap;
+  }
+
+  .te-label-strong {
+    color: var(--text-main);
+    font-weight: 600;
+  }
+
+  /* Columns / cards */
+
+  .te-col {
+    position: relative;
+  }
+
+  .te-stage-caption {
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+  }
+
+  .te-card {
+    position: relative;
+    border-radius: var(--radius-xl);
+    background: var(--panel);
+    border: 1px solid var(--border-soft);
+    padding: 10px 10px 12px;
+    overflow: hidden;
+  }
+
+  /* Embedding column */
+
+  .te-embed-card {
+    padding: 8px 8px 10px 0;
+  }
+
+  .te-embed-tube {
+    position: absolute;
+    top: -10px;
+    right: -12px;
+    bottom: -40px;
+    width: 82px;
+    background: linear-gradient(to right,
+        rgba(191, 219, 254, 0.9),
+        rgba(224, 231, 255, 0.2));
+    border-radius: 999px 999px 60% 60%;
+    opacity: 0.8;
+    z-index: -1;
+  }
+
+  .te-token-row {
+    display: grid;
+    grid-template-columns: 1fr 38px;
+    align-items: center;
+    padding: 2px 0;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .te-token-row:hover {
+    background: rgba(219, 234, 254, 0.35);
+  }
+
+  .te-token-label {
+    text-align: right;
+    padding-right: 6px;
+    font-size: 13px;
+    font-family: var(--font-mono);
+    white-space: nowrap;
+  }
+
+  .te-token-vec-wrap {
+    display: flex;
+    align-items: center;
+  }
+
+  .te-token-vec {
+    width: 30px;
+    height: 11px;
+    border-radius: 999px;
+    background: linear-gradient(to right, #e5e7eb, #d1d5db);
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .te-token-row.is-active .te-token-label {
+    color: #1d4ed8;
+    font-weight: 600;
+  }
+
+  .te-token-row.is-active .te-token-vec {
+    background: linear-gradient(to right, #60a5fa, #38bdf8);
+    transform: scaleX(1.15);
+  }
+
+  /* Block (Q/K/V + Attention) */
+
+  .te-block-header {
+    text-align: center;
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+  }
+
+  .te-block-header strong {
+    color: var(--text-main);
+  }
+
+  .te-block-card {
+    padding: 10px 16px 14px;
+  }
+
+  .te-block-tube {
+    position: absolute;
+    top: -40px;
+    left: 22%;
+    right: 18%;
+    bottom: -60px;
+    background: linear-gradient(to right,
+        rgba(191, 219, 254, 0.9),
+        rgba(224, 231, 255, 0.3));
+    border-radius: 999px;
+    opacity: 0.85;
+    z-index: -2;
+  }
+
+  .te-block-inner {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    column-gap: 18px;
+    z-index: 1;
+  }
+
+  .te-kqv-block {
+    font-size: 11px;
+  }
+
+  .te-kqv-label {
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .te-kqv-label--k {
+    color: var(--k-color);
+  }
+
+  .te-kqv-label--q {
+    color: var(--q-color);
+  }
+
+  .te-kqv-label--v {
+    color: var(--v-color);
+  }
+
+  .te-kqv-lines div {
+    color: var(--text-muted);
+    margin-bottom: 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .te-attention-block {
+    text-align: center;
+    font-size: 11px;
+    color: var(--text-soft);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+
+  .te-attention-dots {
+    display: grid;
+    grid-template-columns: repeat(6, 10px);
+    grid-auto-rows: 10px;
+    gap: 3px;
+    padding: 6px;
+    border-radius: 12px;
+    background: #eef2ff;
+    border: 1px solid #e0e7ff;
+  }
+
+  .te-attn-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  .te-attn-dot.is-active {
+    background: #6366f1;
+    transform: scale(1.2);
+  }
+
+  .te-attn-head-caption {
+    color: var(--text-soft);
+  }
+
+  /* MLP */
+
+  .te-mlp-card {
+    padding: 10px 6px 10px;
+  }
+
+  .te-mlp-tube {
+    position: absolute;
+    top: -14px;
+    left: 18px;
+    right: 18px;
+    bottom: -60px;
+    background:
+      radial-gradient(circle at 50% 0, rgba(191, 219, 254, 0.8), transparent 60%),
+      linear-gradient(to bottom, rgba(219, 234, 254, 0.9), rgba(239, 246, 255, 0.3));
+    border-radius: 999px;
+    opacity: 0.9;
+    z-index: -1;
+  }
+
+  .te-mlp-rows {
+    display: grid;
+    grid-template-columns: 1fr 26px;
+    grid-auto-rows: 20px;
+    row-gap: 4px;
+  }
+
+  .te-mlp-token {
+    font-size: 13px;
+  }
+
+  .te-mlp-bar {
+    width: 24px;
+    height: 10px;
+    border-radius: 999px;
+    background: linear-gradient(to right, #e5e7eb, #d1d5db);
+  }
+
+  /* Probabilities */
+
+  .te-prob-title {
+    font-size: 13px;
+    color: var(--text-soft);
+    margin-bottom: 6px;
+  }
+
+  .te-prob-card {
+    padding: 8px 10px 10px;
+  }
+
+  .te-prob-row {
+    display: grid;
+    grid-template-columns: 1fr 62px;
+    column-gap: 6px;
+    align-items: center;
+    font-size: 11px;
+    margin-bottom: 4px;
+    cursor: default;
+    transition: background 0.15s ease, transform 0.15s ease;
+  }
+
+  .te-prob-label {
+    color: var(--text-soft);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .te-prob-bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .te-prob-bar {
+    flex: 1;
+    height: 6px;
+    border-radius: 999px;
+    background: #e5e7eb;
+    overflow: hidden;
+  }
+
+  .te-prob-bar-inner {
+    height: 100%;
+    width: 0%;
+    background: #d1d5db;
+    transition: width 0.2s ease, background 0.2s ease;
+  }
+
+  .te-prob-percent {
+    color: var(--text-soft);
+    transition: color 0.2s ease;
+  }
+
+  .te-prob-row--main .te-prob-label {
+    color: var(--prob-purple);
+    font-weight: 600;
+  }
+
+  .te-prob-row--main .te-prob-bar-inner {
+    width: 60%;
+    background: var(--prob-purple);
+  }
+
+  .te-prob-row--main .te-prob-percent {
+    color: var(--prob-purple);
+  }
+
+  .te-prob-row--mid .te-prob-bar-inner {
+    width: 18%;
+  }
+
+  .te-prob-row--low .te-prob-bar-inner {
+    width: 8%;
+  }
+
+  .te-prob-row--zero .te-prob-bar-inner {
+    width: 0%;
+  }
+
+  .te-prob-row.is-active {
+    background: var(--prob-purple-soft);
+    transform: translateX(-2px);
+  }
+
+  .te-prob-row.is-active .te-prob-label {
+    color: var(--prob-purple);
+    font-weight: 600;
+  }
+
+  .te-prob-row.is-active .te-prob-bar-inner {
+    background: var(--prob-purple);
+  }
+
+  .te-prob-row.is-active .te-prob-percent {
+    color: var(--prob-purple);
+  }
+
+  /* Connection curves (SVG) */
+
+  .te-curve-layer {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  .te-curve-path {
+    fill: none;
+    stroke: var(--curve-color-dim);
+    stroke-width: 6;
+    stroke-linecap: round;
+    transition:
+      stroke 0.2s ease,
+      stroke-width 0.2s ease,
+      opacity 0.2s ease;
+    opacity: 0.8;
+  }
+
+  .te-curve-path.is-active {
+    stroke: var(--curve-color);
+    stroke-width: 8;
+    opacity: 1;
+  }
+
+  .te-curve-path.is-muted {
+    opacity: 0.25;
+  }
+
+  .te-diagram-wrapper.is-hovering-token .te-curve-path {
+    opacity: 0.25;
+  }
+
+  /* === OBSERVATORY-STYLE LAYOUT === */
+  :root {
+    --obs-bg: #ffffff;
+    --obs-panel-bg: #f8f9fa;
+    --obs-border: #e2e8f0;
+    --obs-text: #1e293b;
+    --obs-text-muted: #64748b;
+    --obs-success: #10b981;
+    --obs-terminal-bg: #1e1e1e;
+  }
+
+  .explainer-container {
+    max-width: 1200px;
+    /* Increased to 1200px */
+    margin: 32px auto;
+    padding: 0 16px;
+    font-family: var(--font-sans);
+  }
+
+  /* Main Interface Window */
+  .demo-interface {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    /* Reduced terminal width */
+    height: 580px;
+    /* Reduced from 680px */
+    background: var(--white);
+    border: 1px solid var(--obs-border);
+    border-radius: 12px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    margin-bottom: 0;
+    /* Attached to stats below if we want, or small gap */
+  }
+
+  /* Left Panel: Terminal */
+  .terminal-panel {
+    background: var(--obs-terminal-bg);
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #333;
+  }
+
+  .terminal-header {
+    padding: 12px 16px;
+    background: #2d2d2d;
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid #333;
+  }
+
+  .terminal-controls {
+    display: flex;
+    gap: 6px;
+  }
+
+  .control {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+  }
+
+  .control.close {
+    background: #ff5f56;
+  }
+
+  .control.minimize {
+    background: #ffbd2e;
+  }
+
+  .control.maximize {
+    background: #27c93f;
+  }
+
+  .terminal-title {
+    flex: 1;
+    text-align: center;
+    color: #888;
+    font-family: var(--font-sans);
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .terminal-body {
+    flex: 1;
+    padding: 16px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.5;
+    color: #d4d4d4;
+    overflow-y: auto;
+  }
+
+  /* Right Panel: Pages */
+  .pages-panel {
+    background: var(--obs-panel-bg);
+    position: relative;
+    overflow: hidden;
+    /* Contain the pages */
+    display: flex;
+    flex-direction: column;
+  }
+
+  .page {
+    display: none;
+    height: 100%;
+    overflow-y: auto;
+    padding: 24px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .page.active {
+    display: block;
+  }
+
+  /* Remove the old shell styling since we are inside the panel now */
+  .te-shell {
+    background: transparent;
+    border: none;
+    box-shadow: none;
+    padding: 0;
+  }
+
+  /* Make Page 1 elements more uniform */
+  .te-diagram-grid {
+    align-items: stretch;
+    /* Stretch cards to match height */
+  }
+
+  .te-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .te-card {
+    flex: 1;
+    /* Make cards fill the column height */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    /* Center content vertically if card is taller */
+  }
+
+  /* Exception for embedding/MLP which might look weird if stretched too much, 
+       but let's try to keep them consistent */
+
+  /* Stats Bar */
+  .viz-stats {
+    margin-top: -1px;
+    /* Attach to bottom of interface */
+    padding: 16px 24px;
+    background: #fff;
+    border: 1px solid var(--obs-border);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+  }
+
+  .stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .stat-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--obs-text-muted);
+    font-weight: 600;
+  }
+
+  .stat-value {
+    font-family: var(--font-mono);
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--obs-text);
+  }
+
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    background: var(--obs-border);
+    color: var(--obs-text-muted);
+  }
+
+  .status-badge.running {
+    background: #dbeafe;
+    color: #1e40af;
+  }
+
+  .status-badge.success {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  /* Navigation Dots - moved inside pages panel or overlay */
+  .page-nav {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+    z-index: 10;
+  }
+
+  /* Highlight classes for other pages */
+  .te-prob-row.is-highlighted {
+    background: var(--prob-purple-soft);
+    transform: translateX(-2px);
+  }
+
+  .te-prob-row.is-highlighted .te-prob-label {
+    color: var(--prob-purple);
+    font-weight: 600;
+  }
+
+  .te-card.is-highlighted {
+    border-color: var(--prob-purple);
+    box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+    transform: scale(1.02);
+  }
+
+  /* New Visual Elements */
+  .agent-detail {
+    margin-top: 12px;
+    background: #f1f5f9;
+    border-radius: 8px;
+    padding: 8px;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+    border: 1px solid var(--border-soft);
+    display: none;
+    /* Hidden by default */
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .agent-detail.visible {
+    display: block;
+    opacity: 1;
+  }
+
+  .detail-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    opacity: 0;
+    transform: translateX(-5px);
+    transition: all 0.3s ease;
+  }
+
+  .detail-item.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .detail-icon {
+    width: 12px;
+    height: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 8px;
+  }
+
+  .detail-item.success .detail-icon {
+    background: #dcfce7;
+    color: #166534;
+  }
+
+  .code-diff {
+    background: #1e293b;
+    color: #e2e8f0;
+    padding: 8px;
+    border-radius: 6px;
+    margin-top: 6px;
+    font-size: 10px;
+    line-height: 1.4;
+    overflow: hidden;
+  }
+
+  .diff-line {
+    display: block;
+    white-space: pre;
+  }
+
+  .diff-add {
+    color: #4ade80;
+  }
+
+  .diff-del {
+    color: #f87171;
+  }
+
+  .diff-ctx {
+    color: #94a3b8;
+  }
+
+  .routing-extra {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .routing-extra.visible {
+    display: block;
+    opacity: 1;
+  }
+
+  .model-card {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .model-icon {
+    width: 32px;
+    height: 32px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+  }
+
+  .complexity-meter {
+    height: 4px;
+    background: #e2e8f0;
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+
+  .complexity-fill {
+    height: 100%;
+    width: 0%;
+    background: var(--prob-purple);
+    transition: width 1s ease;
+  }
+
+  /* Ensemble Visualization */
+  .ensemble-viz {
+    margin-top: 16px;
+    padding: 12px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .ensemble-viz.visible {
+    display: block;
+    opacity: 1;
+  }
+
+  .ensemble-models {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+
+  .ensemble-model {
+    flex: 1;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 6px;
+    text-align: center;
+    font-size: 10px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ensemble-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 0%;
+    opacity: 0.2;
+    transition: height 0.5s ease;
+  }
+
+  .ensemble-model.xgboost .ensemble-bar {
+    background: #f59e0b;
+  }
+
+  /* Amber */
+  .ensemble-model.kan .ensemble-bar {
+    background: #3b82f6;
+  }
+
+  /* Blue */
+
+  .ensemble-mixing {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-top: 4px;
+  }
+
+  .mixing-line {
+    height: 1px;
+    background: #cbd5e1;
+    flex: 1;
+  }
+</style>
+<div class="explainer-container">
+  <!-- Main Interface Window -->
+  <div class="demo-interface">
+    <!-- Left Panel: Terminal -->
+    <div class="terminal-panel">
+      <div class="terminal-header">
+        <div class="terminal-controls">
+          <span class="control close"></span>
+          <span class="control minimize"></span>
+          <span class="control maximize"></span>
+        </div>
+        <div class="terminal-title">chu-cli — 80x24</div>
+      </div>
+      <div class="terminal-body" id="terminal">
+        <!-- Terminal output -->
+      </div>
+    </div>
+
+    <!-- Right Panel: Pages -->
+    <div class="pages-panel">
+      <!-- Page 1: Transformer Input Analysis -->
+      <div class="page active" id="page-1">
+        <main class="te-page" style="margin: 0; padding: 0;">
+          <section class="te-shell">
+            <header>
+              <div class="te-kicker">AI AGENT EXECUTION FLOW VISUALLY EXPLAINED</div>
+              <h1 class="te-title">Input Analysis · Transformers</h1>
+              <p class="te-subtitle">
+                Watch how the transformer processes your command through self-attention to generate intent
+                predictions.
+              </p>
+            </header>
+
+            <div class="te-diagram-wrapper" id="diagram-root">
+              <!-- SVG layer for curves -->
+              <svg class="te-curve-layer" id="curve-layer"></svg>
+
+              <!-- Top labels -->
+              <div class="te-top-labels">
+                <div class="te-top-left">
+                  <span class="te-label-strong">Embedding</span>
+                  <div>
+                    <span class="te-label-strong">Transformer Block</span>
+                    <span> · <strong>Multi-head Self Attention</strong></span>
+                  </div>
+                </div>
+                <div class="te-top-right">
+                  <span class="te-label-strong">MLP</span>
+                  <span class="te-label-strong">Intent Probabilities</span>
+                </div>
+              </div>
+
+              <!-- Main grid -->
+              <div class="te-diagram-grid">
+                <!-- Embedding / Tokens -->
+                <section class="te-col te-col--embed">
+                  <div class="te-stage-caption">Embedding</div>
+                  <div class="te-card te-embed-card">
+                    <div class="te-embed-tube"></div>
+
+                    <div class="te-token-row" data-token-index="0">
+                      <div class="te-token-label">chu</div>
+                      <div class="te-token-vec-wrap">
+                        <div class="te-token-vec"></div>
+                      </div>
+                    </div>
+                    <div class="te-token-row" data-token-index="1">
+                      <div class="te-token-label">do</div>
+                      <div class="te-token-vec-wrap">
+                        <div class="te-token-vec"></div>
+                      </div>
+                    </div>
+                    <div class="te-token-row" data-token-index="2">
+                      <div class="te-token-label">"add</div>
+                      <div class="te-token-vec-wrap">
+                        <div class="te-token-vec"></div>
+                      </div>
+                    </div>
+                    <div class="te-token-row" data-token-index="3">
+                      <div class="te-token-label">user</div>
+                      <div class="te-token-vec-wrap">
+                        <div class="te-token-vec"></div>
+                      </div>
+                    </div>
+                    <div class="te-token-row" data-token-index="4">
+                      <div class="te-token-label">auth"</div>
+                      <div class="te-token-vec-wrap">
+                        <div class="te-token-vec"></div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Transformer Block (Q/K/V + Attention) -->
+                <section class="te-col te-col--block">
+                  <div class="te-stage-caption">Transformer Block</div>
+                  <div class="te-card te-block-card">
+                    <div class="te-block-tube"></div>
+                    <div class="te-block-inner">
+                      <div class="te-kqv-block">
+                        <div class="te-kqv-label te-kqv-label--k">Key (K)</div>
+                        <div class="te-kqv-lines">
+                          <div>command structure</div>
+                          <div>operation type</div>
+                          <div>target entity</div>
+                        </div>
+
+                        <div style="height:6px"></div>
+
+                        <div class="te-kqv-label te-kqv-label--q">Query (Q)</div>
+                        <div class="te-kqv-lines">
+                          <div>add user auth</div>
+                          <div>security feature</div>
+                        </div>
+
+                        <div style="height:6px"></div>
+
+                        <div class="te-kqv-label te-kqv-label--v">Value (V)</div>
+                        <div class="te-kqv-lines">
+                          <div>authentication context</div>
+                          <div>user management</div>
+                        </div>
+                      </div>
+
+                      <div class="te-attention-block">
+                        <div class="te-attention-dots">
+                          <!-- 5 rows × 6 cols (simplified from 6x6) -->
+                          <div class="te-attn-dot" data-attn-row="0"></div>
+                          <div class="te-attn-dot" data-attn-row="0"></div>
+                          <div class="te-attn-dot" data-attn-row="0"></div>
+                          <div class="te-attn-dot" data-attn-row="0"></div>
+                          <div class="te-attn-dot" data-attn-row="0"></div>
+                          <div class="te-attn-dot" data-attn-row="0"></div>
+
+                          <div class="te-attn-dot" data-attn-row="1"></div>
+                          <div class="te-attn-dot" data-attn-row="1"></div>
+                          <div class="te-attn-dot" data-attn-row="1"></div>
+                          <div class="te-attn-dot" data-attn-row="1"></div>
+                          <div class="te-attn-dot" data-attn-row="1"></div>
+                          <div class="te-attn-dot" data-attn-row="1"></div>
+
+                          <div class="te-attn-dot" data-attn-row="2"></div>
+                          <div class="te-attn-dot" data-attn-row="2"></div>
+                          <div class="te-attn-dot" data-attn-row="2"></div>
+                          <div class="te-attn-dot" data-attn-row="2"></div>
+                          <div class="te-attn-dot" data-attn-row="2"></div>
+                          <div class="te-attn-dot" data-attn-row="2"></div>
+
+                          <div class="te-attn-dot" data-attn-row="3"></div>
+                          <div class="te-attn-dot" data-attn-row="3"></div>
+                          <div class="te-attn-dot" data-attn-row="3"></div>
+                          <div class="te-attn-dot" data-attn-row="3"></div>
+                          <div class="te-attn-dot" data-attn-row="3"></div>
+                          <div class="te-attn-dot" data-attn-row="3"></div>
+
+                          <div class="te-attn-dot" data-attn-row="4"></div>
+                          <div class="te-attn-dot" data-attn-row="4"></div>
+                          <div class="te-attn-dot" data-attn-row="4"></div>
+                          <div class="te-attn-dot" data-attn-row="4"></div>
+                          <div class="te-attn-dot" data-attn-row="4"></div>
+                          <div class="te-attn-dot" data-attn-row="4"></div>
+                        </div>
+                        <div class="te-attn-head-caption">Attention</div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- MLP -->
+                <section class="te-col te-col--mlp">
+                  <div class="te-stage-caption">MLP</div>
+                  <div class="te-card te-mlp-card">
+                    <div class="te-mlp-tube"></div>
+                    <div class="te-mlp-rows">
+                      <div class="te-mlp-token">chu</div>
+                      <div class="te-mlp-bar"></div>
+                      <div class="te-mlp-token">do</div>
+                      <div class="te-mlp-bar"></div>
+                      <div class="te-mlp-token">"add</div>
+                      <div class="te-mlp-bar"></div>
+                      <div class="te-mlp-token">user</div>
+                      <div class="te-mlp-bar"></div>
+                      <div class="te-mlp-token">auth"</div>
+                      <div class="te-mlp-bar"></div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Probabilities -->
+                <section class="te-col te-col--prob">
+                  <div class="te-prob-title">Intent Classification</div>
+                  <div class="te-card te-prob-card">
+                    <div class="te-prob-row te-prob-row--main">
+                      <div class="te-prob-label">authentication_add</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner"></div>
+                        </div>
+                        <div class="te-prob-percent">60%</div>
+                      </div>
+                    </div>
+                    <div class="te-prob-row te-prob-row--mid">
+                      <div class="te-prob-label">user_create</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner"></div>
+                        </div>
+                        <div class="te-prob-percent">18%</div>
+                      </div>
+                    </div>
+                    <div class="te-prob-row te-prob-row--low">
+                      <div class="te-prob-label">security_config</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner"></div>
+                        </div>
+                        <div class="te-prob-percent">8%</div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </section>
+        </main>
+
+        <script>
+          (function () {
+            const root = document.getElementById('diagram-root');
+            const svg = document.getElementById('curve-layer');
+            if (!root || !svg) return;
+
+            const tokenRows = Array.from(root.querySelectorAll('.te-token-row'));
+            const attnDots = Array.from(root.querySelectorAll('.te-attn-dot'));
+            const probRows = Array.from(root.querySelectorAll('.te-prob-row'));
+            const connections = [];
+
+            function createPathElement(svgLayer) {
+              const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+              path.classList.add('te-curve-path');
+              svgLayer.appendChild(path);
+              return path;
+            }
+
+            function rebuildConnections() {
+              svg.innerHTML = '';
+              const rootRect = root.getBoundingClientRect();
+              svg.setAttribute('width', rootRect.width);
+              svg.setAttribute('height', rootRect.height);
+              svg.setAttribute('viewBox', `0 0 ${rootRect.width} ${rootRect.height}`);
+
+              connections.length = 0;
+
+              tokenRows.forEach((tokenEl, idx) => {
+                const dotsForRow = attnDots.filter(d => d.getAttribute('data-attn-row') === String(idx));
+                if (!dotsForRow.length) return;
+
+                const tokenRect = tokenEl.getBoundingClientRect();
+                const midTokenX = tokenRect.right - rootRect.left;
+                const midTokenY = tokenRect.top + tokenRect.height / 2 - rootRect.top;
+
+                const targetDot = dotsForRow[Math.floor(dotsForRow.length / 2)];
+                const dotRect = targetDot.getBoundingClientRect();
+                const midDotX = dotRect.left + dotRect.width / 2 - rootRect.left;
+                const midDotY = dotRect.top + dotRect.height / 2 - rootRect.top;
+
+                const dx = Math.abs(midDotX - midTokenX);
+                const cpOffset = Math.max(80, dx * 0.6);
+
+                const c1x = midTokenX + cpOffset;
+                const c1y = midTokenY;
+                const c2x = midDotX - cpOffset * 0.4;
+                const c2y = midDotY;
+
+                const d = ['M', midTokenX, midTokenY, 'C', c1x, c1y, c2x, c2y, midDotX, midDotY].join(' ');
+
+                const path = createPathElement(svg);
+                path.setAttribute('d', d);
+                path.dataset.tokenIndex = String(idx);
+
+                connections.push({ tokenIndex: idx, path });
+              });
+            }
+
+            function clearHighlights() {
+              root.classList.remove('is-hovering-token');
+              tokenRows.forEach(row => row.classList.remove('is-active'));
+              attnDots.forEach(dot => dot.classList.remove('is-active'));
+              connections.forEach(conn => conn.path.classList.remove('is-active'));
+              probRows.forEach(row => row.classList.remove('is-active'));
+            }
+
+            function highlightToken(index) {
+              root.classList.add('is-hovering-token');
+
+              tokenRows.forEach((row, i) => {
+                row.classList.toggle('is-active', i === index);
+              });
+
+              attnDots.forEach((dot) => {
+                const row = dot.getAttribute('data-attn-row');
+                dot.classList.toggle('is-active', String(index) === row);
+              });
+
+              connections.forEach(conn => {
+                conn.path.classList.toggle('is-active', conn.tokenIndex === index);
+              });
+
+              // Highlight the corresponding probability row
+              // For simplicity: tokens 0-1 map to prob 0, 2-3 to 1, 4 to 2
+              const probIndex = index <= 1 ? 0 : (index <= 3 ? 1 : 2);
+              probRows.forEach((row, i) => {
+                row.classList.toggle('is-active', i === probIndex);
+              });
+            }
+
+            tokenRows.forEach((row, i) => {
+              row.addEventListener('mouseenter', () => highlightToken(i));
+              row.addEventListener('mouseleave', () => clearHighlights());
+            });
+
+            // Expose for Director
+            window.clearHighlights = clearHighlights;
+            window.highlightToken = highlightToken;
+
+            // Initial build
+            window.addEventListener('load', rebuildConnections);
+            setTimeout(rebuildConnections, 100);
+          })();
+        </script>
+      </div>
+
+      <div class="page" id="page-2">
+        <main class="te-page" style="margin:0;padding:0">
+          <section class="te-shell">
+            <header>
+              <div class="te-kicker">AI AGENT EXECUTION FLOW VISUALLY EXPLAINED</div>
+              <h1 class="te-title">Intelligence Routing</h1>
+              <p class="te-subtitle">
+                Based on the intent classification, the system routes to the appropriate execution mode.
+              </p>
+            </header>
+
+            <div class="te-diagram-wrapper" id="routing-root">
+              <!-- SVG layer for curves -->
+              <svg class="te-curve-layer" id="routing-curves"></svg>
+
+              <div class="te-diagram-grid" style="grid-template-columns: 200px 1fr 200px;">
+                <!-- Features Column -->
+                <div class="te-col">
+                  <div class="te-stage-caption">Request Features</div>
+                  <div class="te-card te-prob-card">
+                    <div class="te-prob-row" id="feat-0">
+                      <div class="te-prob-label">Intent: Modify Code</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner" style="width: 90%"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="te-prob-row" id="feat-1">
+                      <div class="te-prob-label">Complexity: High</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner" style="width: 75%"></div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="te-prob-row" id="feat-2">
+                      <div class="te-prob-label">Context: 14 Files</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner" style="width: 40%"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- New Routing Extra: Complexity Meter -->
+                  <div class="routing-extra" id="routing-extra">
+                    <div class="te-stage-caption">Decision Factors</div>
+                    <div class="model-card">
+                      <div class="model-icon">🧠</div>
+                      <div>
+                        <div style="font-weight: 600; font-size: 12px;">Model Recommender</div>
+                        <div style="font-size: 11px; color: var(--text-muted);">Profile: Balanced</div>
+                      </div>
+                    </div>
+                    <div style="font-size: 11px; margin-bottom: 2px;">Estimated Complexity</div>
+                    <div class="complexity-meter">
+                      <div class="complexity-fill" id="complexity-fill"></div>
+                    </div>
+
+                  </div>
+                </div>
+
+                <!-- Agents Column -->
+                <div class="te-col">
+                  <div class="te-stage-caption">Autonomous Agents</div>
+                  <div style="display: flex; flex-direction: column; gap: 12px;">
+                    <div class="te-card" style="padding: 12px; border-left: 3px solid #06b6d4;">
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <div style="font-weight: 600; font-size: 13px;">Analyzer (Research)</div>
+                        <div style="font-size: 10px; color: #06b6d4; font-weight: 600;">🔍 Active</div>
+                      </div>
+                      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Scans codebase &
+                        builds graph</div>
+                      <div class="agent-detail" id="analyzer-details">
+                        <div class="detail-item"><span class="detail-icon">📄</span> src/auth/index.ts</div>
+                        <div class="detail-item"><span class="detail-icon">📄</span> src/middleware/jwt.ts</div>
+                        <div class="detail-item"><span class="detail-icon">📄</span> src/tests/auth.test.ts</div>
+                      </div>
+                      <div style="margin-top: 6px; background: #f0f9ff; border-radius: 4px; padding: 4px 6px;">
+                        <div style="font-size: 9px; color: #0369a1; margin-bottom: 2px;">Graph Analysis</div>
+                        <div class="complexity-meter" style="background: #bae6fd;">
+                          <div class="complexity-fill" style="width: 100%; background: #0ea5e9;"></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="te-card" style="padding: 12px; border-left: 3px solid #8b5cf6;">
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <div style="font-weight: 600; font-size: 13px;">Planner (Query)</div>
+                        <div style="font-size: 10px; color: #8b5cf6; font-weight: 600;">📝 Planning</div>
+                      </div>
+                      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Creates implementation
+                        plan</div>
+                      <div class="agent-detail" id="planner-details">
+                        <div class="detail-item"><span class="detail-icon">1</span> Define JWT schema</div>
+                        <div class="detail-item"><span class="detail-icon">2</span> Update auth middleware</div>
+                        <div class="detail-item"><span class="detail-icon">3</span> Verify with tests</div>
+                        <div class="detail-item" style="color: var(--prob-purple); margin-top: 4px; font-size: 10px;">
+                          ⚡ Optimized for Intelligence (KAN)
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="te-card" style="padding: 12px; border-left: 3px solid #f59e0b;">
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <div style="font-weight: 600; font-size: 13px;">Editor</div>
+                        <div style="font-size: 10px; color: #f59e0b; font-weight: 600;">✏️ Editing</div>
+                      </div>
+                      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Applies code changes
+                      </div>
+
+                      <!-- Auto Recovery Simulation -->
+                      <div class="agent-detail" id="recovery-block"
+                        style="background: #fff1f2; border-color: #fecdd3; color: #881337; margin-top: 8px;">
+                        <div style="font-weight: 600; font-size: 10px; margin-bottom: 3px;">⚠️ Attempt 1 Failed</div>
+                        <div style="font-size: 9px;">Tool 'read_file' not available</div>
+                      </div>
+
+                      <div class="agent-detail" id="recovery-fix"
+                        style="background: #ecfdf5; border-color: #6ee7b7; color: #065f46; margin-top: 4px;">
+                        <div style="font-weight: 600; font-size: 10px; margin-bottom: 3px;">🔄 Auto-Recovery</div>
+                        <div style="font-size: 9px;">openrouter/kimi:free (Score: 0.88)</div>
+                      </div>
+
+                      <div class="agent-detail" id="editor-details">
+                        <div class="code-diff">
+                          <span class="diff-line diff-ctx"> import { verify } from 'jsonwebtoken';</span>
+                          <span class="diff-line diff-add">+ export const authMiddleware = (req, res, next) => {</span>
+                          <span class="diff-line diff-add">+ const token = req.headers.authorization;</span>
+                          <span class="diff-line diff-ctx"> // ... implementation</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="te-card" style="padding: 12px; border-left: 3px solid #10b981;">
+                      <div
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+                        <div style="font-weight: 600; font-size: 13px;">Validator</div>
+                        <div style="font-size: 10px; color: #10b981; font-weight: 600;">✅ Testing</div>
+                      </div>
+                      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Runs tests & linters
+                      </div>
+                      <div class="agent-detail" id="validator-details">
+                        <div class="detail-item success"><span class="detail-icon">✓</span> Build Successful</div>
+                        <div class="detail-item success"><span class="detail-icon">✓</span> Tests Passed (4/4)</div>
+                        <div class="detail-item success"><span class="detail-icon">✓</span> Lints Passed</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Routes -->
+                <section class="te-col">
+                  <div class="te-stage-caption">Execution Mode</div>
+                  <div class="te-card te-prob-card" style="padding: 8px 10px;">
+                    <div class="te-prob-row te-prob-row--main" data-route="0">
+                      <div class="te-prob-label">Orchestrated</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner"></div>
+                        </div>
+                        <div class="te-prob-percent">92%</div>
+                      </div>
+                    </div>
+                    <div class="te-prob-row te-prob-row--mid" data-route="1">
+                      <div class="te-prob-label">Single Agent</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner"></div>
+                        </div>
+                        <div class="te-prob-percent">6%</div>
+                      </div>
+                    </div>
+                    <div class="te-prob-row te-prob-row--low" data-route="2">
+                      <div class="te-prob-label">Direct LLM</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner"></div>
+                        </div>
+                        <div class="te-prob-percent">2%</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Ensemble below Execution Mode -->
+                  <div class="te-card te-block-card" style="padding:12px; margin-top:12px;">
+                    <div style="font-size:12px; font-weight:600; margin-bottom:6px; text-align:center;">Ensemble
+                      Optimization</div>
+
+                    <div class="ensemble-viz visible" id="ensemble-viz"
+                      style="margin-top:4px; background:transparent; border:none; padding:0;">
+                      <div class="ensemble-models">
+                        <div class="ensemble-model xgboost">
+                          <div class="ensemble-bar" id="bar-xgb"></div>
+                          <div style="position: relative; z-index: 1; font-size: 10px;">XGBoost<br />(Speed)</div>
+                        </div>
+                        <div class="ensemble-model kan">
+                          <div class="ensemble-bar" id="bar-kan"></div>
+                          <div style="position: relative; z-index: 1; font-size: 10px;">KAN<br />(Logic)</div>
+                        </div>
+                      </div>
+                      <div class="ensemble-mixing">
+                        <div class="mixing-line"></div>
+                        <span style="font-size: 9px;">Unbiased Sampling</span>
+                        <div class="mixing-line"></div>
+                      </div>
+                      <div
+                        style="text-align: center; font-size: 10px; margin-top: 4px; color: var(--prob-purple); font-weight: 600;"
+                        id="ensemble-result">
+                        Calculating...
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+
+            <script>
+              (function () {
+                const root = document.getElementById('routing-root');
+                const svg = document.getElementById('routing-curves');
+                if (!root || !svg) return;
+
+                function drawRoutingCurves() {
+                  svg.innerHTML = '';
+                  const rootRect = root.getBoundingClientRect();
+                  svg.setAttribute('width', rootRect.width);
+                  svg.setAttribute('height', rootRect.height);
+                  svg.setAttribute('viewBox', `0 0 ${rootRect.width} ${rootRect.height}`);
+
+                  const features = Array.from(root.querySelectorAll('[data-feature]'));
+                  const routes = Array.from(root.querySelectorAll('[data-route]'));
+                  const routerCard = root.querySelector('.te-block-card');
+
+                  if (!routerCard) return;
+
+                  const routerRect = routerCard.getBoundingClientRect();
+                  const routerX = routerRect.left + routerRect.width / 2 - rootRect.left;
+                  const routerY = routerRect.top + routerRect.height / 2 - rootRect.top;
+
+                  // Features -> Router
+                  features.forEach(f => {
+                    const fRect = f.getBoundingClientRect();
+                    const fX = fRect.right - rootRect.left;
+                    const fY = fRect.top + fRect.height / 2 - rootRect.top;
+
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.classList.add('te-curve-path');
+                    const d = `M ${fX} ${fY} C ${fX + 40} ${fY}, ${routerX - 40} ${routerY}, ${routerX} ${routerY}`;
+                    path.setAttribute('d', d);
+                    f.dataset.curveId = 'f-' + f.dataset.feature; // Store ID for animation
+                    path.id = 'curve-f-' + f.dataset.feature;
+                    svg.appendChild(path);
+                  });
+
+                  // Router -> Routes
+                  routes.forEach(r => {
+                    const rRect = r.getBoundingClientRect();
+                    const rX = rRect.left - rootRect.left;
+                    const rY = rRect.top + rRect.height / 2 - rootRect.top;
+
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.classList.add('te-curve-path');
+                    const d = `M ${routerX} ${routerY} C ${routerX + 40} ${routerY}, ${rX - 40} ${rY}, ${rX} ${rY}`;
+                    path.setAttribute('d', d);
+
+                    if (r.dataset.route === '0') {
+                      path.style.stroke = 'var(--curve-color)';
+                      path.style.strokeWidth = '8';
+                      path.style.opacity = '1';
+                    }
+                    path.id = 'curve-r-' + r.dataset.route;
+                    svg.appendChild(path);
+                  });
+                }
+
+                window.addEventListener('load', drawRoutingCurves);
+                setTimeout(drawRoutingCurves, 100);
+              })();
+            </script>
+          </section>
+        </main>
+      </div>
+
+      <div class="page" id="page-3">
+        <main class="te-page" style="margin:0;padding:0">
+          <section class="te-shell">
+            <header>
+              <div class="te-kicker">AI AGENT EXECUTION FLOW VISUALLY EXPLAINED</div>
+              <h1 class="te-title">Agent Execution · Orchestrated</h1>
+              <p class="te-subtitle">
+                Multiple agents collaborate sequentially to analyze, plan, edit, and validate changes.
+              </p>
+            </header>
+
+            <div class="te-diagram-wrapper" id="exec-root">
+              <svg class="te-curve-layer" id="exec-curves"></svg>
+
+              <div style="display:grid; grid-template-columns: repeat(4, 1fr); gap:20px; margin-top:16px">
+                <!-- Analyzer -->
+                <div class="te-card te-embed-card" data-agent="0">
+                  <div class="te-embed-tube"></div>
+                  <div style="position:relative; z-index:1">
+                    <div style="font-size:14px; font-weight:600; margin-bottom:6px; color:var(--k-color)">Analyzer
+                    </div>
+                    <div style="font-size:10px; color:var(--text-muted); margin-bottom:8px">
+                      <div>• Scan codebase</div>
+                      <div>• Identify patterns</div>
+                      <div>• Extract context</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Planner -->
+                <div class="te-card te-embed-card" data-agent="1">
+                  <div class="te-embed-tube"
+                    style="background:linear-gradient(to right, rgba(239,68,68,0.2), rgba(254,202,202,0.1))"></div>
+                  <div style="position:relative; z-index:1">
+                    <div style="font-size:14px; font-weight:600; margin-bottom:6px; color:var(--q-color)">Planner
+                    </div>
+                    <div style="font-size:10px; color:var(--text-muted); margin-bottom:8px">
+                      <div>• Design approach</div>
+                      <div>• Define steps</div>
+                      <div>• Set constraints</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Editor -->
+                <div class="te-card te-embed-card" data-agent="2">
+                  <div class="te-embed-tube"
+                    style="background:linear-gradient(to right, rgba(34,197,94,0.2), rgba(187,247,208,0.1))"></div>
+                  <div style="position:relative; z-index:1">
+                    <div style="font-size:14px; font-weight:600; margin-bottom:6px; color:var(--v-color)">Editor</div>
+                    <div style="font-size:10px; color:var(--text-muted); margin-bottom:8px">
+                      <div>• Apply changes</div>
+                      <div>• Generate code</div>
+                      <div>• Refactor files</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Validator -->
+                <div class="te-card te-embed-card" data-agent="3">
+                  <div class="te-embed-tube"
+                    style="background:linear-gradient(to right, rgba(124,58,237,0.2), rgba(221,214,254,0.1))"></div>
+                  <div style="position:relative; z-index:1">
+                    <div style="font-size:14px; font-weight:600; margin-bottom:6px; color:var(--prob-purple)">
+                      Validator</div>
+                    <div style="font-size:10px; color:var(--text-muted); margin-bottom:8px">
+                      <div>• Run tests</div>
+                      <div>• Check lints</div>
+                      <div>• Verify syntax</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <script>
+              (function () {
+                const root = document.getElementById('exec-root');
+                const svg = document.getElementById('exec-curves');
+                if (!root || !svg) return;
+
+                function drawExecCurves() {
+                  svg.innerHTML = '';
+                  const rootRect = root.getBoundingClientRect();
+                  svg.setAttribute('width', rootRect.width);
+                  svg.setAttribute('height', rootRect.height);
+                  svg.setAttribute('viewBox', `0 0 ${rootRect.width} ${rootRect.height}`);
+
+                  const agents = Array.from(root.querySelectorAll('[data-agent]'));
+
+                  for (let i = 0; i < agents.length - 1; i++) {
+                    const a1 = agents[i].getBoundingClientRect();
+                    const a2 = agents[i + 1].getBoundingClientRect();
+
+                    const x1 = a1.right - rootRect.left;
+                    const y1 = a1.top + a1.height / 2 - rootRect.top;
+                    const x2 = a2.left - rootRect.left;
+                    const y2 = a2.top + a2.height / 2 - rootRect.top;
+
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.classList.add('te-curve-path');
+                    const d = `M ${x1} ${y1} C ${x1 + 30} ${y1}, ${x2 - 30} ${y2}, ${x2} ${y2}`;
+                    path.setAttribute('d', d);
+                    path.id = 'exec-curve-' + i;
+                    svg.appendChild(path);
+                  }
+                }
+
+                window.addEventListener('load', drawExecCurves);
+                setTimeout(drawExecCurves, 100);
+              })();
+            </script>
+          </section>
+        </main>
+      </div>
+
+      <div class="page" id="page-4">
+        <main class="te-page" style="margin:0;padding:0">
+          <section class="te-shell">
+            <header>
+              <div class="te-kicker">AI AGENT EXECUTION FLOW VISUALLY EXPLAINED</div>
+              <h1 class="te-title">Response Generation · Transformers</h1>
+              <p class="te-subtitle">
+                The final response is decoded from execution context using the transformer.
+              </p>
+            </header>
+
+            <div class="te-diagram-wrapper" id="response-root">
+              <svg class="te-curve-layer" id="response-curves"></svg>
+
+              <div class="te-top-labels">
+                <div class="te-top-left">
+                  <span class="te-label-strong">Context</span>
+                </div>
+                <div class="te-top-right">
+                  <span class="te-label-strong">Transformer Decoder</span>
+                  <span class="te-label-strong">Generated Response</span>
+                </div>
+              </div>
+
+              <div class="te-diagram-grid" style="grid-template-columns: 180px minmax(0, 400px) 240px;">
+                <!-- Context -->
+                <section class="te-col">
+                  <div class="te-card te-embed-card">
+                    <div class="te-embed-tube"></div>
+
+                    <!-- Context Retrieval Details -->
+                    <div style="padding: 8px; margin-bottom: 6px;">
+                      <div style="font-weight: 600; font-size: 11px; margin-bottom: 4px;">Retrieved Context</div>
+                      <div class="agent-detail visible" id="context-items">
+                        <div class="detail-item"><span class="detail-icon">📄</span> auth/index.ts</div>
+                        <div class="detail-item"><span class="detail-icon">📄</span> middleware/jwt.ts</div>
+                        <div class="detail-item"><span class="detail-icon">🧠</span> Implementation Plan</div>
+                      </div>
+                      <div style="margin-top: 6px; font-size: 9px; color: var(--text-muted);">Tokens: 4,102 / 128,000
+                      </div>
+                    </div>
+
+                    <div class="te-token-row" data-ctx="0">
+                      <div class="te-token-label">files_modified</div>
+                      <div class="te-token-vec-wrap">
+                        <div class="te-token-vec"></div>
+                      </div>
+                    </div>
+                    <div class="te-token-row" data-ctx="1">
+                      <div class="te-token-label">tests_passed</div>
+                      <div class="te-token-vec-wrap">
+                        <div class="te-token-vec"></div>
+                      </div>
+                    </div>
+                    <div class="te-token-row" data-ctx="2">
+                      <div class="te-token-label">validation_ok</div>
+                      <div class="te-token-vec-wrap">
+                        <div class="te-token-vec"></div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Decoder -->
+                <section class="te-col">
+                  <div class="te-card te-block-card">
+                    <div class="te-block-tube"></div>
+                    <div class="te-block-inner" style="grid-template-columns:1fr">
+                      <div style="text-align:center; position:relative; z-index:1">
+                        <div style="font-size:11px; color:var(--text-soft); margin-bottom:8px">DECODING ATTENTION
+                        </div>
+                        <div class="te-attention-dots"
+                          style="display:inline-grid; grid-template-columns:repeat(4,10px)">
+                          <div class="te-attn-dot"></div>
+                          <div class="te-attn-dot"></div>
+                          <div class="te-attn-dot"></div>
+                          <div class="te-attn-dot"></div>
+                          <div class="te-attn-dot"></div>
+                          <div class="te-attn-dot"></div>
+                          <div class="te-attn-dot"></div>
+                          <div class="te-attn-dot"></div>
+                          <div class="te-attn-dot"></div>
+                          <div class="te-attn-dot"></div>
+                          <div class="te-attn-dot"></div>
+                          <div class="te-attn-dot"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+
+                <!-- Output -->
+                <section class="te-col">
+                  <div class="te-card te-prob-card">
+                    <div class="te-prob-row te-prob-row--main" data-out="0">
+                      <div class="te-prob-label">Done!</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner"></div>
+                        </div>
+                        <div class="te-prob-percent">95%</div>
+                      </div>
+                    </div>
+                    <div class="te-prob-row te-prob-row--main" data-out="1">
+                      <div class="te-prob-label">I've</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner"></div>
+                        </div>
+                        <div class="te-prob-percent">92%</div>
+                      </div>
+                    </div>
+                    <div class="te-prob-row te-prob-row--main" data-out="2">
+                      <div class="te-prob-label">added</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner"></div>
+                        </div>
+                        <div class="te-prob-percent">88%</div>
+                      </div>
+                    </div>
+                    <div class="te-prob-row te-prob-row--main" data-out="3">
+                      <div class="te-prob-label">authentication</div>
+                      <div class="te-prob-bar-wrap">
+                        <div class="te-prob-bar">
+                          <div class="te-prob-bar-inner"></div>
+                        </div>
+                        <div class="te-prob-percent">97%</div>
+                      </div>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+
+            <script>
+              (function () {
+                const root = document.getElementById('response-root');
+                const svg = document.getElementById('response-curves');
+                if (!root || !svg) return;
+
+                function drawResponseCurves() {
+                  svg.innerHTML = '';
+                  const rootRect = root.getBoundingClientRect();
+                  svg.setAttribute('width', rootRect.width);
+                  svg.setAttribute('height', rootRect.height);
+                  svg.setAttribute('viewBox', `0 0 ${rootRect.width} ${rootRect.height}`);
+
+                  const ctxRows = Array.from(root.querySelectorAll('[data-ctx]'));
+                  const decoder = root.querySelector('.te-block-card');
+
+                  if (!decoder) return;
+
+                  const decRect = decoder.getBoundingClientRect();
+                  const decX = decRect.left + decRect.width / 2 - rootRect.left;
+                  const decY = decRect.top + decRect.height / 2 - rootRect.top;
+
+                  ctxRows.forEach(ctx => {
+                    const cRect = ctx.getBoundingClientRect();
+                    const cX = cRect.right - rootRect.left;
+                    const cY = cRect.top + cRect.height / 2 - rootRect.top;
+
+                    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                    path.classList.add('te-curve-path');
+                    const d = `M ${cX} ${cY} C ${cX + 50} ${cY}, ${decX - 50} ${decY}, ${decX} ${decY}`;
+                    path.setAttribute('d', d);
+                    path.id = 'resp-curve-' + ctx.dataset.ctx;
+                    svg.appendChild(path);
+                  });
+                }
+
+                window.addEventListener('load', drawResponseCurves);
+                setTimeout(drawResponseCurves, 100);
+              })();
+            </script>
+          </section>
+        </main>
+      </div>
+
+      <!-- Navigation Dots (Overlay) -->
+      <div class="page-nav" id="page-nav">
+        <div class="nav-dot active" onclick="goToPage(1)"></div>
+        <div class="nav-dot" onclick="goToPage(2)"></div>
+        <div class="nav-dot" onclick="goToPage(3)"></div>
+        <div class="nav-dot" onclick="goToPage(4)"></div>
+      </div>
+    </div> <!-- End pages-panel -->
+  </div> <!-- End demo-interface -->
+
+  <!-- Status Bar -->
+  <div class="viz-stats">
+    <div class="stat-item">
+      <span class="stat-label">Model</span>
+      <span class="stat-value" id="stat-model">claude-3-5-sonnet</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Cost</span>
+      <span class="stat-value" id="stat-cost">$0.0000</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Time</span>
+      <span class="stat-value" id="stat-time">0.0s</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-label">Status</span>
+      <span class="status-badge" id="stat-status">IDLE</span>
+    </div>
+  </div>
+</div> <!-- End explainer-container -->
+
+<script>
+  class Director {
+    constructor() {
+      this.terminal = document.getElementById('terminal');
+      this.stats = {
+        model: document.getElementById('stat-model'),
+        cost: document.getElementById('stat-cost'),
+        time: document.getElementById('stat-time'),
+        status: document.getElementById('stat-status')
+      };
+      this.startTime = 0;
+      this.cost = 0;
+    }
+
+    async start() {
+      this.updateStatus('RUNNING', 'running');
+      this.startTime = Date.now();
+      this.startTimer();
+
+      await this.stepInput();
+      await this.wait(800);
+
+      await this.stepTransformer();
+      await this.wait(800);
+
+      await this.stepRouting();
+      await this.wait(800);
+
+      await this.stepExecution();
+      await this.wait(800);
+
+      await this.stepResponse();
+
+      this.updateStatus('COMPLETED', 'success');
+    }
+
+    startTimer() {
+      setInterval(() => {
+        if (this.stats.status.textContent === 'RUNNING') {
+          const elapsed = (Date.now() - this.startTime) / 1000;
+          this.stats.time.textContent = elapsed.toFixed(1) + 's';
+        }
+      }, 100);
+    }
+
+    updateCost(amount) {
+      this.cost += amount;
+      this.stats.cost.textContent = '$' + this.cost.toFixed(4);
+    }
+
+    updateStatus(text, className) {
+      this.stats.status.textContent = text;
+      this.stats.status.className = 'status-badge ' + className;
+    }
+
+    setModel(name) {
+      this.stats.model.textContent = name;
+    }
+
+    async stepInput() {
+      this.setModel('system/cli');
+      await this.type('> chu do "add user authentication"', 'term-prompt term-cmd');
+      await this.wait(500);
+    }
+
+    async stepTransformer() {
+      this.goToPage(1);
+      this.setModel('groq/llama-3.1-8b-instant');
+      await this.type('ℹ [LLM] Tokenizing input prompt...', 'term-log');
+
+      if (window.highlightToken) {
+        for (let i = 0; i < 5; i++) {
+          window.highlightToken(i);
+          await this.wait(400);
+        }
+        window.clearHighlights();
+      }
+      await this.wait(500);
+    }
+
+    async stepRouting() {
+      this.goToPage(2);
+      this.setModel('groq/llama-3.1-8b-instant');
+      await this.type('ℹ [Router] Analyzing request complexity...', 'term-log');
+
+      // Granular animation: Cycle features
+      const features = document.querySelectorAll('#routing-root .te-prob-row');
+      for (let i = 0; i < features.length; i++) {
+        features[i].classList.add('is-highlighted');
+        const curve = document.getElementById('curve-f-' + i);
+        if (curve) { curve.style.stroke = 'var(--prob-purple)'; curve.style.opacity = '1'; }
+        await this.wait(300);
+        features[i].classList.remove('is-highlighted');
+        if (curve) { curve.style.stroke = ''; curve.style.opacity = ''; }
+      }
+
+      await this.wait(200);
+
+      // Show Routing Extra (Model Card + Complexity + Ensemble)
+      const extra = document.getElementById('routing-extra');
+      if (extra) extra.classList.add('visible');
+
+      await this.type('ℹ [ModelRecommender] Selecting optimal profile...', 'term-log');
+
+      // Animate Complexity Meter
+      const meter = document.getElementById('complexity-fill');
+      if (meter) meter.style.width = '75%';
+
+      await this.wait(400);
+
+      // Animate Ensemble
+      const ensViz = document.getElementById('ensemble-viz');
+      if (ensViz) {
+        ensViz.classList.add('visible');
+        await this.wait(200);
+
+        // Fill bars
+        document.getElementById('bar-xgb').style.height = '40%'; // Speed
+        await this.wait(200);
+        document.getElementById('bar-kan').style.height = '90%'; // Logic
+
+        await this.wait(400);
+        document.getElementById('ensemble-result').textContent = '✓ Weight: 0.8 KAN / 0.2 XGB';
+      }
+
+      this.updateCost(0.000056); // Router cost
+
+      await this.wait(600);
+      await this.type('✓ [Router] Mode: OrchestratedMode (Confidence: 0.92)', 'term-log success');
+
+      // Highlight selected route
+      const route = document.querySelector('#routing-root [data-route="0"]');
+      if (route) route.classList.add('is-highlighted');
+      const rCurve = document.getElementById('curve-r-0');
+      if (rCurve) { rCurve.style.stroke = 'var(--prob-purple)'; rCurve.style.opacity = '1'; }
+
+      await this.wait(1000);
+    }
+
+    async stepExecution() {
+      this.goToPage(3);
+      await this.type('ℹ [Orchestrator] Initializing agent workflow...', 'term-log');
+      await this.type('  → Strategy: Optimized for Intelligence (KAN)', 'term-log');
+
+      const agents = document.querySelectorAll('#exec-root .te-card');
+
+      // Analyzer (Research)
+      this.setModel('groq/compound');
+      await this.type('ℹ [Analyzer] Scanning src/ directory...', 'term-log');
+      this.highlightAgent(agents[0], true);
+
+      // Show Analyzer Details
+      const anDetails = document.getElementById('analyzer-details');
+      if (anDetails) {
+        anDetails.classList.add('visible');
+        const items = anDetails.querySelectorAll('.detail-item');
+        for (const item of items) {
+          item.classList.add('visible');
+          await this.wait(150);
+        }
+      }
+
+      await this.wait(400);
+      await this.type('  → Building dependency graph...', 'term-log');
+      await this.wait(300);
+      await this.type('  → Computing PageRank...', 'term-log');
+      await this.wait(300);
+      this.updateCost(0.000651); // Research cost
+      await this.type('  - Found 14 relevant files', 'term-log');
+      this.highlightAgent(agents[0], false);
+      this.highlightCurve(0, true);
+
+      // Planner (Query)
+      this.setModel('openai/gpt-oss-120b');
+      await this.type('ℹ [Planner] Creating implementation plan...', 'term-log');
+      this.highlightAgent(agents[1], true);
+
+      // Show Planner Details
+      const plDetails = document.getElementById('planner-details');
+      if (plDetails) {
+        plDetails.classList.add('visible');
+        const items = plDetails.querySelectorAll('.detail-item');
+        for (const item of items) {
+          item.classList.add('visible');
+          await this.wait(200);
+        }
+      }
+
+      await this.wait(400);
+      await this.type('  → Drafting steps...', 'term-log');
+      await this.wait(300);
+      await this.type('  → Defining success criteria...', 'term-log');
+      await this.wait(300);
+      this.updateCost(0.002096); // Query cost
+      this.highlightAgent(agents[1], false);
+      this.highlightCurve(1, true);
+
+      // Editor (With Auto Recovery Simulation)
+      this.setModel('moonshotai/kimi-k2-instruct');
+      await this.type('ℹ [Editor] Applying edits...', 'term-log');
+      this.highlightAgent(agents[2], true);
+
+      // Simulate Failure
+      await this.wait(500);
+      await this.type('❌ [Editor] Error: tool "read_file" not available', 'term-log error');
+
+      // Show Recovery Block
+      const recBlock = document.getElementById('recovery-block');
+      if (recBlock) {
+        recBlock.classList.add('visible');
+        await this.wait(800);
+      }
+
+      await this.type('🤔 [Intelligence] Evaluating recovery options...', 'term-log');
+      await this.wait(600);
+      await this.type('💡 [Intelligence] Switching to openrouter/kimi:free (Score: 0.88)', 'term-log success');
+
+      // Show Recovery Fix
+      const recFix = document.getElementById('recovery-fix');
+      if (recFix) {
+        recFix.classList.add('visible');
+        await this.wait(400);
+      }
+
+      // Retry with new model
+      this.setModel('openrouter/kimi:free');
+      await this.type('🔄 [Editor] Retrying with new strategy...', 'term-log');
+
+      // Show Editor Details (Success)
+      const edDetails = document.getElementById('editor-details');
+      if (edDetails) edDetails.classList.add('visible');
+
+      await this.wait(400);
+      await this.type('  → Validating file permissions...', 'term-log');
+      await this.wait(300);
+      await this.type('  → Applying patch to src/middleware/jwt.ts...', 'term-log');
+      await this.wait(300);
+      this.updateCost(0.043359); // Editor cost
+      this.highlightAgent(agents[2], false);
+      this.highlightCurve(2, true);
+
+      // Validator
+      this.setModel('system/test-runner');
+      await this.type('ℹ [Validator] Verifying changes...', 'term-log');
+      this.highlightAgent(agents[3], true);
+
+      // Show Validator Details
+      const valDetails = document.getElementById('validator-details');
+      if (valDetails) {
+        valDetails.classList.add('visible');
+        const items = valDetails.querySelectorAll('.detail-item');
+        for (const item of items) {
+          item.classList.add('visible');
+          await this.wait(200);
+        }
+      }
+
+      await this.wait(400);
+      await this.type('  → Running unit tests...', 'term-log');
+      await this.wait(300);
+      await this.type('  → Checking lints...', 'term-log');
+      await this.wait(300);
+      await this.type('  PASS src/tests/auth.test.ts (142ms)', 'term-log success');
+      this.highlightAgent(agents[3], false);
+      await this.wait(500);
+    }
+
+    highlightAgent(el, active) {
+      if (!el) return;
+      if (active) el.classList.add('is-highlighted');
+      else el.classList.remove('is-highlighted');
+    }
+
+    highlightCurve(idx, active) {
+      const c = document.getElementById('exec-curve-' + idx);
+      if (c) {
+        c.style.stroke = active ? 'var(--prob-purple)' : '';
+        c.style.opacity = active ? '1' : '';
+      }
+    }
+
+    async stepResponse() {
+      this.goToPage(4);
+      this.setModel('groq/llama-3.1-8b-instant');
+      await this.type('ℹ [LLM] Decoding final response...', 'term-log');
+
+      // Animate context curves one by one
+      const ctxRows = document.querySelectorAll('#response-root [data-ctx]');
+      for (let i = 0; i < ctxRows.length; i++) {
+        ctxRows[i].classList.add('is-highlighted');
+        const c = document.getElementById('resp-curve-' + i);
+        if (c) { c.style.stroke = 'var(--prob-purple)'; c.style.opacity = '1'; }
+        await this.wait(300);
+        ctxRows[i].classList.remove('is-highlighted');
+        if (c) { c.style.stroke = ''; c.style.opacity = ''; }
+      }
+
+      // Animate decoder attention
+      const dots = document.querySelectorAll('#response-root .te-attn-dot');
+      for (let i = 0; i < 10; i++) {
+        const d = dots[Math.floor(Math.random() * dots.length)];
+        d.classList.add('is-active');
+        setTimeout(() => d.classList.remove('is-active'), 200);
+        await this.wait(50);
+      }
+
+      await this.type('✓ [System] Done! Added user authentication.', 'term-log success');
+
+      // Animate output tokens
+      const tokens = document.querySelectorAll('#response-root .te-prob-row');
+      for (const t of tokens) {
+        t.classList.add('is-highlighted');
+        await this.wait(200);
+      }
+
+      await this.wait(300);
+      await this.type('  - Modified: src/auth/index.ts', 'term-log');
+      await this.type('  - Created:  src/middleware/jwt.ts', 'term-log');
+    }
+
+    goToPage(n) {
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.nav-dot').forEach((d, i) => {
+        d.classList.toggle('active', i + 1 === n);
+      });
+      document.getElementById('page-' + n).classList.add('active');
+    }
+
+    async type(txt, cls = '') {
+      const l = document.createElement('div');
+      l.className = 'term-line ' + cls;
+      this.terminal.appendChild(l);
+      for (const c of txt) { l.textContent += c; await new Promise(r => setTimeout(r, 5)); }
+      this.terminal.scrollTop = this.terminal.scrollHeight;
+    }
+
+    wait(ms) { return new Promise(r => setTimeout(r, ms)); }
+  }
+
+  function goToPage(n) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-dot').forEach((d, i) => d.classList.toggle('active', i + 1 === n));
+    document.getElementById('page-' + n).classList.add('active');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    new Director().start();
+  });
+</script>

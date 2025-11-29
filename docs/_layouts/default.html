@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{{ page.title }} - Chuchu</title>
-  <meta name="description" content="{{ page.description | default: site.description }}"/>
-  
-  <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}"/>
+  <meta name="description" content="{{ page.description | default: site.description }}" />
+
+  <link rel="stylesheet" href="{{ '/assets/style.css' | relative_url }}" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
   <nav class="main-nav">
     <div class="nav-container">
       <a href="{{ '/' | relative_url }}" class="nav-brand">
-        <img src="{{ '/assets/chuchu.png' | relative_url }}" alt="Chuchu" class="nav-logo"/>
+        <img src="{{ '/assets/chuchu.png' | relative_url }}" alt="Chuchu" class="nav-logo" />
         <span>Chuchu</span>
       </a>
       <div class="nav-links">
@@ -24,6 +27,7 @@
         <a href="{{ '/commands' | relative_url }}">Commands</a>
         <a href="{{ '/prompts' | relative_url }}">Prompts</a>
         <a href="{{ '/compare' | relative_url }}">Compare</a>
+        <a href="{{ '/observatory' | relative_url }}">Observatory</a>
         <a href="{{ '/blog' | relative_url }}">Blog</a>
         <a href="https://github.com/jadercorrea/chuchu" class="nav-github" target="_blank">GitHub</a>
       </div>
@@ -40,4 +44,5 @@
     </div>
   </footer>
 </body>
+
 </html>

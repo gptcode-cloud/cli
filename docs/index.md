@@ -5,13 +5,15 @@ description: AI coding assistant with specialized agents and validation
 ---
 
 <div class="hero">
-  <h1>AI Coding Assistant<br/>with Specialized Agents</h1>
-  <p>Autonomous execution with validation. <strong>Analyzer → Planner → Editor → Validator</strong>. File validation prevents mistakes. Success criteria with auto-retry. $0-5/month vs $20-30/month subscriptions.</p>
+  <h1>The Open Source<br/>AI Coding Assistant</h1>
+  <p>Transparent, Autonomous, and Local. <strong>Bring Your Own Keys</strong>. Run with Groq, OpenAI, or locally with Ollama. No subscriptions, full control.</p>
   <div class="hero-cta">
     <a href="#quick-start" class="btn btn-primary">Get Started</a>
     <a href="https://github.com/jadercorrea/chuchu" class="btn btn-secondary">View on GitHub</a>
   </div>
 </div>
+
+{% include explainer.html %}
 
 <div class="features">
   <a href="/features#agent-based-architecture" class="feature-card">

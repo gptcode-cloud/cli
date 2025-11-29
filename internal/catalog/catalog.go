@@ -13,7 +13,7 @@ import (
 
 func GetCatalogPath() string {
 	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".chuchu", "models.json")
+	return filepath.Join(home, ".chuchu", "models_catalog.json")
 }
 
 func Load() (*OutputJSON, error) {

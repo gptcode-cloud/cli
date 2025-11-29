@@ -12,6 +12,7 @@ import numpy as np
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
 DATA_PATH = PROJECT_ROOT / "data" / "training_data_merged.csv"
+FEEDBACK_PATH = PROJECT_ROOT / "data" / "training_data_feedback.csv"
 MODEL_OUTPUT = PROJECT_ROOT / "models" / "intent_model.json"
 
 # Labels
@@ -30,6 +31,18 @@ def load_data():
     print(f"📂 Loading data from {DATA_PATH}")
     df = pd.read_csv(DATA_PATH)
     
+    # Auto-detect and merge feedback data if exists
+    feedback_count = 0
+    if FEEDBACK_PATH.exists():
+        print(f"📂 Detected feedback data at {FEEDBACK_PATH}")
+        df_feedback = pd.read_csv(FEEDBACK_PATH)
+        feedback_count = len(df_feedback)
+        
+        # Duplicate feedback examples for higher weight (2x)
+        df_feedback_weighted = pd.concat([df_feedback, df_feedback], ignore_index=True)
+        df = pd.concat([df, df_feedback_weighted], ignore_index=True)
+        print(f"   Added {feedback_count} feedback examples (2x weight = {len(df_feedback_weighted)} total)")
+    
     required_cols = ['message', 'label']
     if not all(col in df.columns for col in required_cols):
         raise ValueError(f"CSV must contain columns: {required_cols}")
@@ -43,7 +56,8 @@ def load_data():
             raise ValueError(f"Invalid labels found: {invalid}. Allowed: {list(LABELS.values())}")
         df['label'] = df['label_id']
     
-    print(f"   Loaded {len(df)} examples")
+    base_count = len(df) - (feedback_count * 2) if feedback_count > 0 else len(df)
+    print(f"   Loaded {len(df)} total examples ({base_count} base + {feedback_count * 2} feedback weighted)")
     print(f"   Class distribution:\n{df['label'].map(LABELS).value_counts()}")
     return df
 
