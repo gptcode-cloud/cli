@@ -334,6 +334,134 @@ func RunChat(builder *prompt.Builder, provider llm.Provider, model string, cliAr
 	return nil
 }
 
+// ChatWithResponse executes chat and returns the response instead of printing it
+// This is used by the REPL to capture responses for conversation history
+func ChatWithResponse(input string, args []string) (string, error) {
+	os.Stdout.Sync()
+
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[CHAT] ChatWithResponse: input len=%d\n", len(input))
+	}
+
+	setup, _ := config.LoadSetup()
+
+	var history ChatHistory
+	if input != "" {
+		if err := json.Unmarshal([]byte(input), &history); err != nil {
+			if len(input) > 0 && input[0] == '{' {
+				return "", fmt.Errorf("error parsing chat history: %w", err)
+			}
+			history.Messages = []llm.ChatMessage{{Role: "user", Content: input}}
+		}
+	}
+
+	history.Messages = truncateHistory(history.Messages, 20)
+
+	backendName := setup.Defaults.Backend
+	if len(args) >= 2 && args[1] != "" {
+		backendName = args[1]
+	}
+
+	backendCfg := setup.Backend[backendName]
+	cwd, _ := os.Getwd()
+
+	var provider llm.Provider
+	if backendCfg.Type == "ollama" {
+		provider = llm.NewOllama(backendCfg.BaseURL)
+	} else {
+		provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
+	}
+
+	researchModel := backendCfg.GetModelForAgent("research")
+	orchestrator := llm.NewOrchestrator(backendCfg.BaseURL, backendName, provider, researchModel)
+
+	if len(history.Messages) == 0 || history.Messages[len(history.Messages)-1].Role != "user" {
+		return "", fmt.Errorf("invalid message history - must have at least one user message")
+	}
+
+	lastUserMessage := history.Messages[len(history.Messages)-1].Content
+
+	// Check if this is an ops/troubleshooting query - route to run mode
+	if isOpsQuery(lastUserMessage) {
+		if os.Getenv("CHUCHU_DEBUG") == "1" {
+			fmt.Fprintln(os.Stderr, "[CHAT] Ops query detected, routing to run mode")
+		}
+		builder := prompt.NewDefaultBuilder(nil)
+		queryModel := backendCfg.GetModelForAgent("query")
+		// For REPL, we can't use RunExecute as it prints directly
+		// This is a limitation - ops queries in REPL will print instead of returning
+		// TODO: Refactor RunExecute to support response capture
+		RunExecute(builder, provider, queryModel, []string{lastUserMessage})
+		return "[Executed operational command]", nil
+	}
+
+	if IsComplexTask(lastUserMessage) {
+		if os.Getenv("CHUCHU_DEBUG") == "1" {
+			fmt.Fprintln(os.Stderr, "[CHAT] Complexity detected, using guided mode")
+		}
+		queryModel := backendCfg.GetModelForAgent("query")
+		guided := NewGuidedMode(orchestrator, cwd, queryModel)
+		if err := guided.Execute(context.Background(), lastUserMessage); err != nil {
+			return "", fmt.Errorf("guided mode error: %w", err)
+		}
+		return "[Executed complex task in guided mode]", nil
+	}
+
+	routerModel := backendCfg.GetModelForAgent("router")
+	editorModel := backendCfg.GetModelForAgent("editor")
+	queryModel := backendCfg.GetModelForAgent("query")
+
+	// Build dependency graph context if enabled
+	if os.Getenv("CHUCHU_GRAPH") != "false" {
+		builder := graph.NewBuilder(cwd)
+		if g, err := builder.Build(); err == nil {
+			g.PageRank(0.85, 20)
+			optimizer := graph.NewOptimizer(g)
+			maxFiles := setup.Defaults.GraphMaxFiles
+			if maxFiles == 0 {
+				maxFiles = 5
+			}
+			relevantFiles := optimizer.OptimizeContext(lastUserMessage, maxFiles)
+
+			if len(relevantFiles) > 0 {
+				var contextBuilder strings.Builder
+				contextBuilder.WriteString("\n\n[Context from Dependency Graph]\n")
+
+				for _, file := range relevantFiles {
+					content, err := os.ReadFile(filepath.Join(cwd, file))
+					if err == nil {
+						text := string(content)
+						if len(text) > 3000 {
+							lines := strings.Split(text, "\n")
+							head := strings.Join(lines[:min(30, len(lines))], "\n")
+							tailStart := max(30, len(lines)-20)
+							tail := strings.Join(lines[tailStart:], "\n")
+							text = fmt.Sprintf("%s\n\n... (%d lines omitted) ...\n\n%s", head, len(lines)-50, tail)
+						}
+						contextBuilder.WriteString(fmt.Sprintf("File: %s\n```\n%s\n```\n", file, text))
+					}
+				}
+				history.Messages[len(history.Messages)-1].Content += contextBuilder.String()
+			}
+		}
+	}
+
+	coordinator := agents.NewCoordinator(provider, orchestrator, cwd, routerModel, editorModel, queryModel, researchModel)
+
+	statusCallback := func(status string) {
+		if os.Getenv("CHUCHU_DEBUG") == "1" {
+			fmt.Fprintf(os.Stderr, "[STATUS] %s\n", status)
+		}
+	}
+
+	result, err := coordinator.Execute(context.Background(), history.Messages, statusCallback)
+	if err != nil {
+		return "", fmt.Errorf("chat error: %w", err)
+	}
+
+	return result, nil
+}
+
 func truncateHistory(messages []llm.ChatMessage, maxMessages int) []llm.ChatMessage {
 	if len(messages) <= maxMessages {
 		return messages

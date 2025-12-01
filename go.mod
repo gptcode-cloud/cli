@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/Netflix/go-expect v0.0.0-20220104043353-73e0943537d2 // indirect
 	github.com/alecthomas/chroma/v2 v2.14.0 // indirect
 	github.com/antchfx/htmlquery v1.3.5 // indirect
 	github.com/antchfx/xpath v1.3.5 // indirect
@@ -27,6 +28,7 @@ require (
 	github.com/chromedp/chromedp v0.14.2 // indirect
 	github.com/chromedp/sysutil v1.1.0 // indirect
 	github.com/chzyer/readline v1.5.1 // indirect
+	github.com/creack/pty v1.1.17 // indirect
 	github.com/dlclark/regexp2 v1.11.0 // indirect
 	github.com/eiannone/keyboard v0.0.0-20220611211555-0d226195f203 // indirect
 	github.com/go-json-experiment/json v0.0.0-20250725192818-e39067aee2d2 // indirect

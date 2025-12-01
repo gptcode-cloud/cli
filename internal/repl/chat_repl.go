@@ -242,20 +242,31 @@ func (r *ChatREPL) processMessage(input string) error {
 	fileContext := r.ctxMgr.GetFileContext()
 
 	// Prepare prompt with context
-	fullPrompt := ""
+	fullPrompt := input
 	if fileContext != "" {
-		fullPrompt += "Relevant files:\n" + fileContext + "\n"
+		fullPrompt = "Relevant files:\n" + fileContext + "\n\nUser: " + input
 	}
 	if conversationContext != "" {
-		fullPrompt += "Previous conversation:\n" + conversationContext + "\n"
+		if fileContext != "" {
+			fullPrompt = "Previous conversation:\n" + conversationContext + "\n\n" + fullPrompt
+		} else {
+			fullPrompt = "Previous conversation:\n" + conversationContext + "\n\nUser: " + input
+		}
 	}
 
-	// Process the message using existing chat mode functionality
-	// Note: We need to extract the model and builder config from the setup
-	fmt.Printf("Processing: %s\n", input)
+	// Call ChatWithResponse to capture the response
+	response, err := modes.ChatWithResponse(fullPrompt, []string{})
+	if err != nil {
+		return fmt.Errorf("chat error: %w", err)
+	}
 
-	// For now, use the existing modes.Chat with the combined prompt
-	modes.Chat(fullPrompt+"\nUser: "+input, []string{})
+	// Print the response to user
+	fmt.Println(response)
+	fmt.Println()
+
+	// Add assistant response to context
+	responseTokens := estimateTokens(response)
+	r.ctxMgr.AddMessage("assistant", response, responseTokens)
 
 	return nil
 }

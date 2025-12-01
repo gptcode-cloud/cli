@@ -55,32 +55,47 @@ e2e:
 
 ---
 
-## 🚧 Phase 2 – Chat & Interactive Commands (PLANNED)
+## ✅ Phase 2 – Chat & Interactive Commands (COMPLETE)
 
 ### Goals
-- Test `chu chat` single-shot and (future) REPL mode
-- Test `chu run` with follow-up capability
-- Validate conversation context management
+- ✅ Test `chu chat` single-shot and REPL mode
+- ✅ Test conversation context management
+- ✅ Validate response capture and history
 
-### Planned Tests (tests/e2e/chat/)
-- [ ] `TestChuChatSingleShot` - Single Q&A
-- [ ] `TestChuChatCodeExplanation` - Code understanding
-- [ ] `TestChuChatMultiTurn` - Conversation context (when REPL implemented)
+### Implemented Tests (tests/e2e/chat/)
+- ✅ `TestChatBasicInteraction` - Single Q&A
+- ✅ `TestChatCodeExplanation` - Code understanding
+- ✅ `TestChatFollowUp` - Conversation context validation
+- ✅ `TestChatSaveLoadSession` - Session persistence
+- ✅ `TestChatConversationContext` - Multi-turn context
+
+### Unit Tests (internal/repl/)
+- ✅ `TestContextManagerAddMessage` - Message addition
+- ✅ `TestContextManagerGetContext` - Context retrieval
+- ✅ `TestContextManagerClear` - History clearing
+- ✅ `TestContextManagerTokenLimit` - Token limits
+- ✅ `TestContextManagerMessageLimit` - Message limits
+- ✅ `TestContextManagerGetRecentMessages` - Recent messages
 
 ---
 
-## 🚧 Phase 3 – Research & Planning (PLANNED)
+## 🚧 Phase 3 – Research & Planning (PARTIAL)
 
 ### Goals
-- Test `chu research` with web search
-- Test `chu plan` generation
-- Validate research → plan workflow
+- ✅ Validate commands exist and show help
+- ⏭️ Test `chu research` functionality (placeholder)
+- ⏭️ Test `chu plan` generation (placeholder)
+- ⏭️ Validate research → plan workflow (placeholder)
 
-### Planned Tests (tests/e2e/tdd/)
-- [ ] `TestChuResearch` - Research output quality
-- [ ] `TestChuPlan` - Plan generation
-- [ ] `TestResearchToPlan` - Full workflow
-- [ ] `TestTDDFeature` - TDD workflow validation
+### Implemented Tests (tests/e2e/planning/)
+- ✅ `TestResearchHelp` - Command exists
+- ✅ `TestPlanHelp` - Command exists
+- ✅ `TestTDDHelp` - Command exists  
+- ✅ `TestDoHelp` - Command exists
+- ✅ `TestCommandsExist` - All commands registered
+- ⏭️ `TestResearchBasic` - Research output quality (skipped)
+- ⏭️ `TestPlanGeneration` - Plan generation (skipped)
+- ⏭️ `TestTDDWorkflow` - TDD workflow (skipped)
 
 ---
 
