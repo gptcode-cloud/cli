@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Learn from Any CLI: Two‑Keystroke Feedback (Ctrl+g)"
-date: 2025-11-27
+date: 2025-11-28
 author: Jader Correa
 description: "Shell hooks and a universal sink capture corrections from any CLI with two keystrokes. Your machine learns from you."
 tags: [dx, feedback, learning]

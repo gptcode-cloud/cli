@@ -17,13 +17,11 @@ import (
 
 var doCmd = &cobra.Command{
 	Use:   "do [task]",
-	Short: "Autonomously execute vague or multi-step tasks with auto-recovery",
-	Long: `Execute tasks autonomously with intelligent model selection and auto-recovery.
-
-The 'do' command learns from past executions and automatically retries with better models when failures occur.
+	Short: "Execute a task autonomously",
+	Long: `Execute a task autonomously using the agent system.
 
 Examples:
-  chu do "create a hello.txt file with Hello World"
+  chu do "add error handling to main.go"
   chu do "read docs/README.md and create a getting-started guide"
   chu do "unify all feature files in /guides"`,
 	Args: cobra.MinimumNArgs(1),
@@ -242,6 +240,15 @@ func runDoExecution(task string, verbose bool, supervised bool, setup *config.Se
 		fmt.Fprintf(os.Stderr, "Backend: %s\n", backendName)
 		fmt.Fprintf(os.Stderr, "Editor Model: %s\n", editorModel)
 		fmt.Fprintf(os.Stderr, "Query Model: %s\n\n", queryModel)
+	}
+
+	// CHECK FOR AUTONOMOUS EXECUTION
+	if !supervised && modes.ShouldUseAutonomous(context.Background(), task) {
+		if verbose {
+			fmt.Fprintf(os.Stderr, "🚀 Detected complex task. Using Autonomous Symphony Mode...\n")
+		}
+		executor := modes.NewAutonomousExecutor(orchestrator, provider, cwd, queryModel, editorModel)
+		return executor.Execute(context.Background(), task)
 	}
 
 	if supervised {
