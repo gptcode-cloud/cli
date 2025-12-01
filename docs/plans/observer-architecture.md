@@ -1,8 +1,17 @@
 # Chuchu Observer: Architecture & Vision
 
+**Status:** 🌐 Marketing Site Complete | ❌ CLI Not Implemented  
+**Last Updated:** 2025-12-01
+
 ## Executive Summary
 
-Transform the Chuchu CLI from a black box into a **didactic observatory** through architectural decoupling and explainability.
+**Current State:**
+- ✅ **Marketing visualization** - Interactive demo on Jekyll homepage (100% complete)
+- ❌ **CLI telemetry** - Not implemented (this doc describes future work)
+- ❌ **Real-time WebSocket server** - Not implemented
+- ❌ **Live dashboard** - Not implemented
+
+**Vision:** Transform the Chuchu CLI from a black box into a **didactic observatory** through architectural decoupling and explainability.
 
 ## Core Principles
 

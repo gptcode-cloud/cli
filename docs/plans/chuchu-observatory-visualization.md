@@ -1,5 +1,17 @@
 # Chuchu Observer: Real-Time Visualization Dashboard
 
+**Status:** 🌐 Marketing Demo Complete | ❌ CLI Implementation Pending  
+**Last Updated:** 2025-12-01
+
+**What Exists:**
+- ✅ Static visualization on Jekyll homepage - Shows agent flow conceptually
+- ✅ Marketing materials demonstrating vision
+
+**What This Doc Describes (Future):**
+- ❌ Real-time CLI telemetry
+- ❌ WebSocket server for live updates
+- ❌ Interactive dashboard showing actual executions
+
 ## Contexto e Motivação
 
 ### Por que visualização em tempo real?
