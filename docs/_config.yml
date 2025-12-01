@@ -22,6 +22,9 @@ plugins:
   - jekyll-feed
   - jekyll-seo-tag
 
+# Server configuration
+port: 4040
+
 defaults:
   - scope:
       path: ""

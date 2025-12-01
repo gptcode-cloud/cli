@@ -1,4 +1,4 @@
-# Chuchu Observatory: Real-Time Visualization Dashboard
+# Chuchu Observer: Real-Time Visualization Dashboard
 
 ## Contexto e Motivação
 
@@ -23,7 +23,7 @@
 ❌ **Token-level é muito granular** - Pouco valor prático
 ❌ **Attention weights** - Interessante academicamente, mas não útil para usuários
 
-## Proposta: "Chuchu Observatory"
+## Proposta: "Chuchu Observer"
 
 ### Conceito Central
 Dashboard web que mostra **execução em tempo real** dos sistemas do Chuchu com foco em:
@@ -189,7 +189,7 @@ Model: claude-4.5-sonnet
 
 ### Backend (Go)
 ```
-internal/observatory/
+internal/observer/
   server.go        - WebSocket server
   events.go        - Event types & serialization
   broadcaster.go   - Fan-out para múltiplos clientes
@@ -197,12 +197,12 @@ internal/observatory/
 
 **Mudanças necessárias:**
 - Extend `internal/events/emitter.go` para enviar via WebSocket
-- Adicionar flag `--observatory` para habilitar
+- Adicionar flag `--observer` para habilitar
 - Zero overhead quando desabilitado
 
 **Event types:**
 ```go
-type ObservatoryEvent struct {
+type ObserverEvent struct {
     Type      string                 `json:"type"`
     Timestamp time.Time              `json:"timestamp"`
     Data      map[string]interface{} `json:"data"`
@@ -229,7 +229,7 @@ type ObservatoryEvent struct {
 
 **Estrutura:**
 ```
-observatory-web/
+observer-web/
   src/
     components/
       MaestroFlow.tsx
@@ -238,7 +238,7 @@ observatory-web/
       AgentRouter.tsx
     hooks/
       useWebSocket.ts
-      useObservatoryEvents.ts
+      useObserverEvents.ts
     types/
       events.ts
 ```
@@ -246,7 +246,7 @@ observatory-web/
 ### Deploy
 - Frontend: GitHub Pages ou Vercel
 - Backend WebSocket: Embeded no `chu` binary
-- Acesso: `http://localhost:8080` quando rodando com `--observatory`
+- Acesso: `http://localhost:5150` quando rodando com `--observer`
 
 ## Implementação por Fases
 
@@ -262,16 +262,16 @@ observatory-web/
 
 **Arquivos a criar/modificar:**
 ```
-internal/observatory/server.go         - NEW
-internal/observatory/events.go         - NEW
-internal/events/emitter.go             - MODIFY (add WebSocket)
-internal/maestro/orchestrator.go       - MODIFY (emit events)
-cmd/chu/main.go                        - MODIFY (add --observatory flag)
-observatory-web/                       - NEW (React app)
+internal/observer/server.go         - NEW
+internal/observer/events.go         - NEW
+internal/events/emitter.go          - MODIFY (add WebSocket)
+internal/maestro/orchestrator.go    - MODIFY (emit events)
+cmd/chu/main.go                     - MODIFY (add --observer flag)
+observer-web/                       - NEW (React app)
 ```
 
 **Success criteria:**
-- `chu do --observatory` abre dashboard em browser
+- `chu do --observer` abre dashboard em browser
 - Maestro flow aparece em tempo real
 - Steps animam quando executam
 - Zero overhead quando flag não está ativa
@@ -289,7 +289,7 @@ observatory-web/                       - NEW (React app)
 ```
 internal/intelligence/recommender.go   - MODIFY (emit events)
 internal/agents/coordinator.go         - MODIFY (emit routing events)
-observatory-web/src/components/        - ADD new components
+observer-web/src/components/           - ADD new components
 ```
 
 **Success criteria:**
@@ -308,8 +308,8 @@ observatory-web/src/components/        - ADD new components
 
 **Arquivos a modificar:**
 ```
-internal/telemetry/telemetry.go        - MODIFY (emit cost events)
-observatory-web/src/components/        - ADD CostDashboard
+internal/telemetry/telemetry.go     - MODIFY (emit cost events)
+observer-web/src/components/        - ADD CostDashboard
 ```
 
 **Success criteria:**
@@ -360,7 +360,7 @@ observatory-web/src/components/        - ADD CostDashboard
 ### Para Marketing
 
 **1. Demo interativo**
-- Página `/observatory` no site
+- Página `/observer` no site
 - Demo com dados fake rodando
 - "Try it live" button
 
@@ -386,7 +386,7 @@ observatory-web/src/components/        - ADD CostDashboard
 **Problema:** WebSocket e events podem deixar execução lenta
 
 **Mitigação:**
-- Flag `--observatory` opcional
+- Flag `--observer` opcional
 - Zero overhead quando desabilitado
 - Events são async (não bloqueiam)
 - Buffering de eventos se cliente lento
@@ -430,7 +430,7 @@ observatory-web/src/components/        - ADD CostDashboard
 - Reconnect time: < 1s
 
 ### Produto
-- 100+ usuários usando `--observatory` no primeiro mês
+- 100+ usuários usando `--observer` no primeiro mês
 - 50%+ retention (usam mais de uma vez)
 - 5+ issues/PRs de feedback da comunidade
 - 10+ shares no Twitter/LinkedIn
@@ -507,7 +507,7 @@ observatory-web/src/components/        - ADD CostDashboard
 ### Arquitetura do Demo
 
 ```
-GitHub Pages (jader-correa.com/chuchu/observatory)
+GitHub Pages (jader-correa.com/chuchu/observer)
 ├── index.html                    - Landing + demo
 ├── assets/
 │   ├── js/
@@ -516,7 +516,7 @@ GitHub Pages (jader-correa.com/chuchu/observatory)
 │   │   ├── animations.js        - Smooth transitions
 │   │   └── scenarios.js         - Cenários pré-programados
 │   ├── css/
-│   │   └── observatory.css      - Design moderno
+│   │   └── observer.css      - Design moderno
 │   └── data/
 │       └── scenarios.json       - Dados dos cenários
 ```
@@ -642,7 +642,7 @@ Choose a scenario below or try your own:
 │  Ready to see it on your own code?                    │
 │                                                        │
 │  $ go install github.com/jadercorrea/chuchu@latest    │
-│  $ chu do --observatory "your task"                   │
+│  $ chu do --observer "your task"                   │
 │                                                        │
 │  [Download] [Documentation] [GitHub]                  │
 └────────────────────────────────────────────────────────┘
@@ -663,7 +663,7 @@ Choose a scenario below or try your own:
 
 **3. Stats animados:**
 ```
-Users who saw Observatory: 
+Users who saw observer: 
 ┌─────────────────────────────┐
 │ 87% understood how it works │
 │ 64% tried installation      │
@@ -691,7 +691,7 @@ Users who saw Observatory:
 - Dark theme by default
 
 **Deploy:**
-- Tudo em `docs/observatory/`
+- Tudo em `docs/observer/`
 - Servido por Jekyll (GitHub Pages)
 - Zero build step
 - Zero dependências de runtime
@@ -711,13 +711,13 @@ Users who saw Observatory:
 
 **Arquivos:**
 ```
-docs/observatory/
+docs/observer/
   index.html           - Landing + demo
   terminal.js          - Terminal fake
   orchestration.js     - Mock logic
   animations.js        - Smooth effects
   scenarios.json       - Pré-programados
-  observatory.css      - Design moderno
+  observer.css      - Design moderno
 ```
 
 **Success criteria:**
@@ -734,12 +734,12 @@ docs/observatory/
 **Entregas:**
 1. WebSocket server no `chu` binary
 2. Frontend conecta em localhost
-3. Flag `--observatory`
+3. Flag `--observer`
 4. Eventos reais do Maestro
 
 **Arquivos:**
 ```
-internal/observatory/server.go  - WebSocket
+internal/observer/server.go  - WebSocket
 cmd/chu/main.go                - Flag
 internal/maestro/*.go          - Emit events
 ```
@@ -760,7 +760,7 @@ internal/maestro/*.go          - Emit events
 
 **Conversão:**
 - 5%+ de visitantes do demo instalam
-- 50%+ dos que instalam usam `--observatory`
+- 50%+ dos que instalam usam `--observer`
 - 20%+ se tornam usuários ativos
 
 ### Por que Demo Primeiro?
@@ -785,7 +785,7 @@ internal/maestro/*.go          - Emit events
 
 ## Conclusão
 
-O Chuchu Observatory é uma **oportunidade única** de diferenciação no mercado de AI coding assistants. Nenhum competidor mostra o que acontece internamente em tempo real.
+O Chuchu Observer é uma **oportunidade única** de diferenciação no mercado de AI coding assistants. Nenhum competidor mostra o que acontece internamente em tempo real.
 
 **Por que fazer:**
 1. Diferencial competitivo claro

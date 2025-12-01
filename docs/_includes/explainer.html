@@ -608,6 +608,8 @@
     line-height: 1.5;
     color: #d4d4d4;
     overflow-y: auto;
+    max-height: 100%;
+    scroll-behavior: smooth;
   }
 
   /* Right Panel: Pages */
@@ -752,34 +754,46 @@
     background: #f1f5f9;
     border-radius: 8px;
     padding: 8px;
-    font-size: 11px;
-    font-family: var(--font-mono);
-    color: var(--text-muted);
-    border: 1px solid var(--border-soft);
-    display: none;
-    /* Hidden by default */
     opacity: 0;
-    transition: opacity 0.3s ease;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.4s ease, max-height 0.4s ease, transform 0.3s ease;
+    margin-top: 8px;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 0;
+    transform: translateY(-10px);
   }
 
   .agent-detail.visible {
-    display: block;
     opacity: 1;
+    max-height: 500px;
+    padding: 8px;
+    transform: translateY(0);
   }
 
   .detail-item {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 4px 0;
+    font-size: 11px;
     display: flex;
     align-items: center;
     gap: 6px;
-    margin-bottom: 4px;
-    opacity: 0;
-    transform: translateX(-5px);
-    transition: all 0.3s ease;
   }
 
   .detail-item.visible {
     opacity: 1;
     transform: translateX(0);
+  }
+
+  .detail-item:hover {
+    background: #f1f5f9;
+    margin: 0 -4px;
+    padding: 4px 4px;
+    border-radius: 4px;
   }
 
   .detail-icon {
@@ -1347,91 +1361,66 @@
 
                 <!-- Agents Column -->
                 <div class="te-col">
-                  <div class="te-stage-caption">Autonomous Agents</div>
-                  <div style="display: flex; flex-direction: column; gap: 12px;">
-                    <div class="te-card" style="padding: 12px; border-left: 3px solid #06b6d4;">
+                  <div class="te-stage-caption" style="font-size: 11px; margin-bottom: 5px;">Autonomous Agents</div>
+                  <div style="display: flex; flex-direction: column; gap: 8px;">
+                    <div class="te-card" style="padding: 8px; border-left: 3px solid #06b6d4;">
                       <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <div style="font-weight: 600; font-size: 13px;">Analyzer (Research)</div>
-                        <div style="font-size: 10px; color: #06b6d4; font-weight: 600;">🔍 Active</div>
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                        <div style="font-weight: 600; font-size: 11px;">Analyzer</div>
+                        <div style="font-size: 9px; color: #06b6d4; font-weight: 600;">Active</div>
                       </div>
-                      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Scans codebase &
-                        builds graph</div>
+                      <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 4px;">Scans codebase & builds
+                        dependency graph</div>
                       <div class="agent-detail" id="analyzer-details">
-                        <div class="detail-item"><span class="detail-icon">📄</span> src/auth/index.ts</div>
-                        <div class="detail-item"><span class="detail-icon">📄</span> src/middleware/jwt.ts</div>
-                        <div class="detail-item"><span class="detail-icon">📄</span> src/tests/auth.test.ts</div>
-                      </div>
-                      <div style="margin-top: 6px; background: #f0f9ff; border-radius: 4px; padding: 4px 6px;">
-                        <div style="font-size: 9px; color: #0369a1; margin-bottom: 2px;">Graph Analysis</div>
-                        <div class="complexity-meter" style="background: #bae6fd;">
-                          <div class="complexity-fill" style="width: 100%; background: #0ea5e9;"></div>
-                        </div>
+                        <div class="detail-item" style="font-size: 9px;"><span class="detail-icon">📄</span>
+                          src/auth/index.ts</div>
+                        <div class="detail-item" style="font-size: 9px;"><span class="detail-icon">📄</span>
+                          src/middleware/jwt.ts</div>
                       </div>
                     </div>
 
-                    <div class="te-card" style="padding: 12px; border-left: 3px solid #8b5cf6;">
+                    <div class="te-card" style="padding: 8px; border-left: 3px solid #8b5cf6;">
                       <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <div style="font-weight: 600; font-size: 13px;">Planner (Query)</div>
-                        <div style="font-size: 10px; color: #8b5cf6; font-weight: 600;">📝 Planning</div>
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                        <div style="font-weight: 600; font-size: 11px;">Planner</div>
+                        <div style="font-size: 9px; color: #8b5cf6; font-weight: 600;">Planning</div>
                       </div>
-                      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Creates implementation
-                        plan</div>
+                      <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 4px;">Creates structured
+                        implementation plan</div>
                       <div class="agent-detail" id="planner-details">
-                        <div class="detail-item"><span class="detail-icon">1</span> Define JWT schema</div>
-                        <div class="detail-item"><span class="detail-icon">2</span> Update auth middleware</div>
-                        <div class="detail-item"><span class="detail-icon">3</span> Verify with tests</div>
-                        <div class="detail-item" style="color: var(--prob-purple); margin-top: 4px; font-size: 10px;">
-                          ⚡ Optimized for Intelligence (KAN)
-                        </div>
+                        <div class="detail-item" style="font-size: 9px;"><span class="detail-icon">1</span> Define JWT
+                          schema</div>
+                        <div class="detail-item" style="font-size: 9px;"><span class="detail-icon">2</span> Update
+                          middleware</div>
                       </div>
                     </div>
 
-                    <div class="te-card" style="padding: 12px; border-left: 3px solid #f59e0b;">
+                    <div class="te-card" style="padding: 8px; border-left: 3px solid #f59e0b;">
                       <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <div style="font-weight: 600; font-size: 13px;">Editor</div>
-                        <div style="font-size: 10px; color: #f59e0b; font-weight: 600;">✏️ Editing</div>
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                        <div style="font-weight: 600; font-size: 11px;">Editor</div>
+                        <div style="font-size: 9px; color: #f59e0b; font-weight: 600;">Editing</div>
                       </div>
-                      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Applies code changes
-                      </div>
-
-                      <!-- Auto Recovery Simulation -->
-                      <div class="agent-detail" id="recovery-block"
-                        style="background: #fff1f2; border-color: #fecdd3; color: #881337; margin-top: 8px;">
-                        <div style="font-weight: 600; font-size: 10px; margin-bottom: 3px;">⚠️ Attempt 1 Failed</div>
-                        <div style="font-size: 9px;">Tool 'read_file' not available</div>
-                      </div>
-
-                      <div class="agent-detail" id="recovery-fix"
-                        style="background: #ecfdf5; border-color: #6ee7b7; color: #065f46; margin-top: 4px;">
-                        <div style="font-weight: 600; font-size: 10px; margin-bottom: 3px;">🔄 Auto-Recovery</div>
-                        <div style="font-size: 9px;">openrouter/kimi:free (Score: 0.88)</div>
-                      </div>
-
+                      <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 4px;">Applies code changes to
+                        files</div>
                       <div class="agent-detail" id="editor-details">
-                        <div class="code-diff">
-                          <span class="diff-line diff-ctx"> import { verify } from 'jsonwebtoken';</span>
-                          <span class="diff-line diff-add">+ export const authMiddleware = (req, res, next) => {</span>
-                          <span class="diff-line diff-add">+ const token = req.headers.authorization;</span>
-                          <span class="diff-line diff-ctx"> // ... implementation</span>
+                        <div class="code-diff" style="font-size: 9px;">
+                          <span class="diff-line diff-add">+ export const authMiddleware...</span>
                         </div>
                       </div>
                     </div>
 
-                    <div class="te-card" style="padding: 12px; border-left: 3px solid #10b981;">
+                    <div class="te-card" style="padding: 8px; border-left: 3px solid #10b981;">
                       <div
-                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-                        <div style="font-weight: 600; font-size: 13px;">Validator</div>
-                        <div style="font-size: 10px; color: #10b981; font-weight: 600;">✅ Testing</div>
+                        style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+                        <div style="font-weight: 600; font-size: 11px;">Validator</div>
+                        <div style="font-size: 9px; color: #10b981; font-weight: 600;">Testing</div>
                       </div>
-                      <div style="font-size: 11px; color: var(--text-muted); margin-bottom: 6px;">Runs tests & linters
+                      <div style="font-size: 9px; color: var(--text-muted); margin-bottom: 4px;">Runs tests & linters
                       </div>
                       <div class="agent-detail" id="validator-details">
-                        <div class="detail-item success"><span class="detail-icon">✓</span> Build Successful</div>
-                        <div class="detail-item success"><span class="detail-icon">✓</span> Tests Passed (4/4)</div>
-                        <div class="detail-item success"><span class="detail-icon">✓</span> Lints Passed</div>
+                        <div class="detail-item success" style="font-size: 9px;"><span class="detail-icon">✓</span> All
+                          tests passed</div>
                       </div>
                     </div>
                   </div>
@@ -1439,61 +1428,61 @@
 
                 <!-- Routes -->
                 <section class="te-col">
-                  <div class="te-stage-caption">Execution Mode</div>
-                  <div class="te-card te-prob-card" style="padding: 8px 10px;">
-                    <div class="te-prob-row te-prob-row--main" data-route="0">
-                      <div class="te-prob-label">Orchestrated</div>
+                  <div class="te-stage-caption" style="font-size: 11px; margin-bottom: 6px;">Execution Mode</div>
+                  <div class="te-card te-prob-card" style="padding: 6px 8px;">
+                    <div class="te-prob-row te-prob-row--main" data-route="0" style="margin-bottom: 4px;">
+                      <div class="te-prob-label" style="font-size: 11px;">Orchestrated</div>
                       <div class="te-prob-bar-wrap">
-                        <div class="te-prob-bar">
+                        <div class="te-prob-bar" style="height: 6px;">
                           <div class="te-prob-bar-inner"></div>
                         </div>
-                        <div class="te-prob-percent">92%</div>
+                        <div class="te-prob-percent" style="font-size: 10px;">92%</div>
                       </div>
                     </div>
-                    <div class="te-prob-row te-prob-row--mid" data-route="1">
-                      <div class="te-prob-label">Single Agent</div>
+                    <div class="te-prob-row te-prob-row--mid" data-route="1" style="margin-bottom: 4px;">
+                      <div class="te-prob-label" style="font-size: 11px;">Single Agent</div>
                       <div class="te-prob-bar-wrap">
-                        <div class="te-prob-bar">
+                        <div class="te-prob-bar" style="height: 6px;">
                           <div class="te-prob-bar-inner"></div>
                         </div>
-                        <div class="te-prob-percent">6%</div>
+                        <div class="te-prob-percent" style="font-size: 10px;">6%</div>
                       </div>
                     </div>
                     <div class="te-prob-row te-prob-row--low" data-route="2">
-                      <div class="te-prob-label">Direct LLM</div>
+                      <div class="te-prob-label" style="font-size: 11px;">Direct LLM</div>
                       <div class="te-prob-bar-wrap">
-                        <div class="te-prob-bar">
+                        <div class="te-prob-bar" style="height: 6px;">
                           <div class="te-prob-bar-inner"></div>
                         </div>
-                        <div class="te-prob-percent">2%</div>
+                        <div class="te-prob-percent" style="font-size: 10px;">2%</div>
                       </div>
                     </div>
                   </div>
 
                   <!-- Ensemble below Execution Mode -->
-                  <div class="te-card te-block-card" style="padding:12px; margin-top:12px;">
-                    <div style="font-size:12px; font-weight:600; margin-bottom:6px; text-align:center;">Ensemble
+                  <div class="te-card te-block-card" style="padding:8px; margin-top:8px;">
+                    <div style="font-size:10px; font-weight:600; margin-bottom:4px; text-align:center;">Ensemble
                       Optimization</div>
 
                     <div class="ensemble-viz visible" id="ensemble-viz"
-                      style="margin-top:4px; background:transparent; border:none; padding:0;">
-                      <div class="ensemble-models">
-                        <div class="ensemble-model xgboost">
+                      style="margin-top:2px; background:transparent; border:none; padding:0;">
+                      <div class="ensemble-models" style="gap: 6px;">
+                        <div class="ensemble-model xgboost" style="height: 60px;">
                           <div class="ensemble-bar" id="bar-xgb"></div>
-                          <div style="position: relative; z-index: 1; font-size: 10px;">XGBoost<br />(Speed)</div>
+                          <div style="position: relative; z-index: 1; font-size: 9px;">XGBoost<br />(Speed)</div>
                         </div>
-                        <div class="ensemble-model kan">
+                        <div class="ensemble-model kan" style="height: 60px;">
                           <div class="ensemble-bar" id="bar-kan"></div>
-                          <div style="position: relative; z-index: 1; font-size: 10px;">KAN<br />(Logic)</div>
+                          <div style="position: relative; z-index: 1; font-size: 9px;">KAN<br />(Logic)</div>
                         </div>
                       </div>
-                      <div class="ensemble-mixing">
+                      <div class="ensemble-mixing" style="margin-top: 2px;">
                         <div class="mixing-line"></div>
-                        <span style="font-size: 9px;">Unbiased Sampling</span>
+                        <span style="font-size: 8px;">Unbiased Sampling</span>
                         <div class="mixing-line"></div>
                       </div>
                       <div
-                        style="text-align: center; font-size: 10px; margin-top: 4px; color: var(--prob-purple); font-weight: 600;"
+                        style="text-align: center; font-size: 9px; margin-top: 3px; color: var(--prob-purple); font-weight: 600;"
                         id="ensemble-result">
                         Calculating...
                       </div>
@@ -1581,6 +1570,29 @@
               </p>
             </header>
 
+            <!-- Execution Timeline -->
+            <div
+              style="background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%); border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <div style="font-size: 11px; font-weight: 600; color: #64748b;">Execution Timeline</div>
+                <div style="font-size: 10px; color: #94a3b8;">Total: 9.2s • Cost: $0.048</div>
+              </div>
+              <div style="display: flex; gap: 4px; height: 24px;">
+                <div
+                  style="flex: 3; background: #06b6d4; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; font-weight: 600;">
+                  Analyzer 2.1s</div>
+                <div
+                  style="flex: 2; background: #8b5cf6; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; font-weight: 600;">
+                  Planner 1.8s</div>
+                <div
+                  style="flex: 4; background: #f59e0b; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; font-weight: 600;">
+                  Editor 4.1s</div>
+                <div
+                  style="flex: 1; background: #10b981; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 9px; color: white; font-weight: 600;">
+                  Val 1.2s</div>
+              </div>
+            </div>
+
             <div class="te-diagram-wrapper" id="exec-root">
               <svg class="te-curve-layer" id="exec-curves"></svg>
 
@@ -1645,6 +1657,46 @@
               </div>
             </div>
 
+            <!-- Agent Workflow Explanation -->
+            <div style="margin-top: 16px; background: #f8fafc; border-radius: 8px; padding: 12px;">
+              <div style="font-size: 11px; font-weight: 600; margin-bottom: 8px; color: #475569;">How Agents Collaborate
+              </div>
+              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px;">
+                <div>
+                  <div style="font-size: 10px; font-weight: 600; color: #06b6d4; margin-bottom: 4px;">Analyzer Role
+                  </div>
+                  <div style="font-size: 9px; color: #64748b; line-height: 1.4;">
+                    Scans the entire codebase using AST parsing to build a dependency graph. Identifies relevant files,
+                    extracts context, and provides structural insights for subsequent agents.
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size: 10px; font-weight: 600; color: #8b5cf6; margin-bottom: 4px;">Planner Role</div>
+                  <div style="font-size: 9px; color: #64748b; line-height: 1.4;">
+                    Takes high-level goals and breaks them into executable steps. Uses context from Analyzer to create
+                    structured implementation plans with constraints and dependencies.
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size: 10px; font-weight: 600; color: #f59e0b; margin-bottom: 4px;">Editor Role</div>
+                  <div style="font-size: 9px; color: #64748b; line-height: 1.4;">
+                    Executes the plan by generating code snippets, applying changes to files, and refactoring existing
+                    code.
+                    Includes auto-recovery for tool failures.
+                  </div>
+                </div>
+                <div>
+                  <div style="font-size: 10px; font-weight: 600; color: #10b981; margin-bottom: 4px;">Validator Role
+                  </div>
+                  <div style="font-size: 9px; color: #64748b; line-height: 1.4;">
+                    Ensures correctness by running automated tests, linters, and syntax checks. Validates that changes
+                    meet
+                    quality standards before completion.
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <script>
               (function () {
                 const root = document.getElementById('exec-root');
@@ -1704,8 +1756,7 @@
                 <div class="te-top-left">
                   <span class="te-label-strong">Context</span>
                 </div>
-                <div class="te-top-right">
-                  <span class="te-label-strong">Transformer Decoder</span>
+                <div class="te-top-right" style="display: flex; gap: 80px;">
                   <span class="te-label-strong">Generated Response</span>
                 </div>
               </div>
@@ -1717,48 +1768,77 @@
                     <div class="te-embed-tube"></div>
 
                     <!-- Context Retrieval Details -->
-                    <div style="padding: 8px; margin-bottom: 6px;">
+                    <div style="padding: 6px; margin-bottom: 4px;">
                       <div style="font-weight: 600; font-size: 11px; margin-bottom: 4px;">Retrieved Context</div>
-                      <div class="agent-detail visible" id="context-items">
-                        <div class="detail-item"><span class="detail-icon">📄</span> auth/index.ts</div>
-                        <div class="detail-item"><span class="detail-icon">📄</span> middleware/jwt.ts</div>
-                        <div class="detail-item"><span class="detail-icon">🧠</span> Implementation Plan</div>
+                      <div class="visible" id="context-items" style="opacity: 1; max-height: none;">
+                        <div class="detail-item visible" style="opacity: 1; transform: none;"><span
+                            class="detail-icon">📄</span> auth/index.ts</div>
+                        <div class="detail-item visible" style="opacity: 1; transform: none;"><span
+                            class="detail-icon">📄</span> middleware/jwt.ts</div>
+                        <div class="detail-item visible" style="opacity: 1; transform: none;"><span
+                            class="detail-icon">🧠</span> Implementation Plan</div>
                       </div>
                       <div style="margin-top: 6px; font-size: 9px; color: var(--text-muted);">Tokens: 4,102 / 128,000
                       </div>
                     </div>
 
-                    <div class="te-token-row" data-ctx="0">
-                      <div class="te-token-label">files_modified</div>
-                      <div class="te-token-vec-wrap">
-                        <div class="te-token-vec"></div>
+                    <!-- Embedding Visualization -->
+                    <div
+                      style="margin-top: 6px; padding: 6px; background: linear-gradient(135deg, #fce7f3 0%, #f3e8ff 100%); border-radius: 4px; border: 1px dashed #d946ef;">
+                      <div
+                        style="font-size: 9px; font-weight: 600; color: #a21caf; margin-bottom: 4px; text-align: center;">
+                        Chunk Embedding Animation</div>
+                      <div style="display: flex; gap: 4px; align-items: center; justify-content: center;">
+                        <div
+                          style="width: 40px; height: 6px; background: linear-gradient(90deg, #ec4899, #d946ef); border-radius: 3px; animation: pulse 2s ease-in-out infinite;">
+                        </div>
+                        <div style="font-size: 20px; color: #d946ef;">→</div>
+                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px;">
+                          <div style="width: 8px; height: 8px; background: #f0abfc; border-radius: 2px;"></div>
+                          <div style="width: 8px; height: 8px; background: #e879f9; border-radius: 2px;"></div>
+                          <div style="width: 8px; height: 8px; background: #d946ef; border-radius: 2px;"></div>
+                          <div style="width: 8px; height: 8px; background: #c026d3; border-radius: 2px;"></div>
+                        </div>
                       </div>
+                      <div style="font-size: 7px; color: #86198f; text-align: center; margin-top: 3px;">Vector
+                        representation (128K dims)</div>
                     </div>
-                    <div class="te-token-row" data-ctx="1">
-                      <div class="te-token-label">tests_passed</div>
-                      <div class="te-token-vec-wrap">
-                        <div class="te-token-vec"></div>
-                      </div>
+                  </div>
+
+                  <div class="te-token-row" data-ctx="0">
+                    <div class="te-token-label">files_modified</div>
+                    <div class="te-token-vec-wrap">
+                      <div class="te-token-vec"></div>
                     </div>
-                    <div class="te-token-row" data-ctx="2">
-                      <div class="te-token-label">validation_ok</div>
-                      <div class="te-token-vec-wrap">
-                        <div class="te-token-vec"></div>
-                      </div>
+                  </div>
+                  <div class="te-token-row" data-ctx="1">
+                    <div class="te-token-label">tests_passed</div>
+                    <div class="te-token-vec-wrap">
+                      <div class="te-token-vec"></div>
+                    </div>
+                  </div>
+                  <div class="te-token-row" data-ctx="2">
+                    <div class="te-token-label">validation_ok</div>
+                    <div class="te-token-vec-wrap">
+                      <div class="te-token-vec"></div>
                     </div>
                   </div>
                 </section>
 
                 <!-- Decoder -->
                 <section class="te-col">
-                  <div class="te-card te-block-card">
+                  <div style="text-align: center; margin-bottom: 4px;">
+                    <span class="te-label-strong">Transformer Decoder</span>
+                  </div>
+                  <div class="te-card te-block-card" style="padding: 12px;">
                     <div class="te-block-tube"></div>
                     <div class="te-block-inner" style="grid-template-columns:1fr">
                       <div style="text-align:center; position:relative; z-index:1">
-                        <div style="font-size:11px; color:var(--text-soft); margin-bottom:8px">DECODING ATTENTION
+                        <div style="font-size:13px; font-weight: 600; color:#64748b; margin-bottom:4px">DECODING
+                          ATTENTION
                         </div>
                         <div class="te-attention-dots"
-                          style="display:inline-grid; grid-template-columns:repeat(4,10px)">
+                          style="display:inline-grid; grid-template-columns:repeat(4,12px); gap: 3px;">
                           <div class="te-attn-dot"></div>
                           <div class="te-attn-dot"></div>
                           <div class="te-attn-dot"></div>
@@ -1788,6 +1868,8 @@
                         </div>
                         <div class="te-prob-percent">95%</div>
                       </div>
+                      <div style="font-size: 8px; color: #cbd5e1; margin-top: 2px; padding-left: 4px;">Complete •
+                        Finished • Ready</div>
                     </div>
                     <div class="te-prob-row te-prob-row--main" data-out="1">
                       <div class="te-prob-label">I've</div>
@@ -1797,6 +1879,8 @@
                         </div>
                         <div class="te-prob-percent">92%</div>
                       </div>
+                      <div style="font-size: 8px; color: #cbd5e1; margin-top: 2px; padding-left: 4px;">We've • You've •
+                        They've</div>
                     </div>
                     <div class="te-prob-row te-prob-row--main" data-out="2">
                       <div class="te-prob-label">added</div>
@@ -1806,6 +1890,8 @@
                         </div>
                         <div class="te-prob-percent">88%</div>
                       </div>
+                      <div style="font-size: 8px; color: #cbd5e1; margin-top: 2px; padding-left: 4px;">created •
+                        implemented • built</div>
                     </div>
                     <div class="te-prob-row te-prob-row--main" data-out="3">
                       <div class="te-prob-label">authentication</div>
@@ -1815,9 +1901,39 @@
                         </div>
                         <div class="te-prob-percent">97%</div>
                       </div>
+                      <div style="font-size: 8px; color: #cbd5e1; margin-top: 2px; padding-left: 4px;">JWT • auth •
+                        token</div>
                     </div>
                   </div>
                 </section>
+              </div>
+            </div>
+
+            <!-- Technical Insights Section -->
+            <div style="margin-top: 16px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+              <div style="background: #ecfdf5; border-radius: 6px; padding: 8px; border-left: 3px solid #10b981;">
+                <div style="font-size: 10px; font-weight: 600; color: #065f46; margin-bottom: 4px;">Context Retrieval
+                </div>
+                <div style="font-size: 8px; color: #064e3b; line-height: 1.3;">
+                  RAG (Retrieval-Augmented Generation) combines semantic search with generation for accurate,
+                  context-aware responses.
+                </div>
+              </div>
+              <div style="background: #fef3c7; border-radius: 6px; padding: 8px; border-left: 3px solid #f59e0b;">
+                <div style="font-size: 10px; font-weight: 600; color: #92400e; margin-bottom: 4px;">Attention Mechanism
+                </div>
+                <div style="font-size: 8px; color: #78350f; line-height: 1.3;">
+                  Transformer attention allows parallel processing of all tokens, capturing long-range dependencies
+                  efficiently.
+                </div>
+              </div>
+              <div style="background: #f0f9ff; border-radius: 6px; padding: 8px; border-left: 3px solid #06b6d4;">
+                <div style="font-size: 10px; font-weight: 600; color: #0369a1; margin-bottom: 4px;">Token Selection
+                </div>
+                <div style="font-size: 8px; color: #0c4a6e; line-height: 1.3;">
+                  Softmax probabilities determine next token. Temperature and top-p sampling control creativity vs
+                  accuracy.
+                </div>
               </div>
             </div>
 
@@ -2228,8 +2344,18 @@
       const l = document.createElement('div');
       l.className = 'term-line ' + cls;
       this.terminal.appendChild(l);
+
+      // Remove old lines to simulate scrolling "disappearing"
+      while (this.terminal.children.length > 12) {
+        this.terminal.removeChild(this.terminal.firstChild);
+      }
+
       for (const c of txt) { l.textContent += c; await new Promise(r => setTimeout(r, 5)); }
-      this.terminal.scrollTop = this.terminal.scrollHeight;
+      // Force scroll aggressively with multiple attempts to ensure it works
+      const forceScroll = () => { this.terminal.scrollTop = this.terminal.scrollHeight; };
+      requestAnimationFrame(forceScroll);
+      setTimeout(forceScroll, 10);
+      setTimeout(forceScroll, 50);
     }
 
     wait(ms) { return new Promise(r => setTimeout(r, ms)); }
