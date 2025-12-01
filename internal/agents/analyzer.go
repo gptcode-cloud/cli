@@ -37,6 +37,34 @@ CRITICAL RULES:
 - ONLY analyze and report what exists
 - Be concise and factual
 
+EXAMPLE 1 - Analyzing Go authentication code:
+Task: "How does user authentication work?"
+Analysis:
+  Files found:
+    - auth/handler.go (Login, Logout functions)
+    - middleware/jwt.go (JWT verification)
+  
+  Dependencies:
+    middleware/jwt.go imports auth/handler.go
+  
+  Summary:  
+    - Login handler generates JWT tokens
+    - Middleware verifies tokens on protected routes
+    - Uses bcrypt for password hashing
+
+EXAMPLE 2 - Finding relevant files for feature:
+Task: "add user registration"
+Analysis:
+  Existing auth structure:
+    - auth/handler.go (login/logout)
+    - models/user.go (User struct)
+    - middleware/auth.go (auth middleware)
+  
+  For registration, will need:
+    - Modify: auth/handler.go (add Register function)
+    - Modify: models/user.go (validation methods)
+    - Possibly create: migrations/ (if DB schema changes)
+
 Focus on understanding the codebase.`
 
 func (a *AnalyzerAgent) Analyze(ctx context.Context, task string, statusCallback StatusCallback) (string, error) {

@@ -47,6 +47,49 @@ CRITICAL RULES:
 - If criteria is met, say "SUCCESS"
 - Focus on the actual requirements, not style
 
+EXAMPLE 1 - Validation SUCCESS:
+Success Criteria:
+  - Tests pass: go test ./auth/...
+  - File auth/handler.go contains Login function
+  - Lints clean: golangci-lint run
+
+Validation:
+  1. Read auth/handler.go → contains func Login()
+  2. Would run: go test ./auth/... → (assume passes)
+  3. Would run: golangci-lint run → (assume clean)
+
+Result: SUCCESS
+
+EXAMPLE 2 - Validation FAIL with specific issues:
+Success Criteria:
+  - Tests pass: make test
+  - File middleware/jwt.go exports VerifyToken function
+  - No hardcoded secrets
+
+Validation:
+  1. Read middleware/jwt.go
+  
+Issues found:
+  - FAIL: VerifyToken is not exported (lowercase verifyToken)
+  - FAIL: JWT secret is hardcoded on line 15: "hardcoded-secret-123"
+  - Tests: Would need to run make test to verify
+
+Result:
+FAIL
+
+Issues:
+- VerifyToken function must be exported (capitalize: VerifyToken)
+- Remove hardcoded secret on line 15, use environment variable
+- Run make test to verify tests pass
+
+EXAMPLE 3 - Clear issue reporting:
+BAD:
+  "Something is wrong with the file"
+  
+GOOD:
+  "middleware/auth.go line 42: Missing error handling for jwt.Parse"
+  "tests/auth_test.go: No test for Login with invalid password case"
+
 Be direct and precise.`
 
 func (v *ValidatorAgent) Validate(ctx context.Context, plan string, modifiedFiles []string, statusCallback StatusCallback) (*ValidationResult, error) {

@@ -49,11 +49,35 @@ CRITICAL RULES:
 - For write_file, provide the COMPLETE file content.
 - NEVER use placeholders like "[previous content]" or "[rest of file]".
 
-Example (Patch):
-User: "Remove line 3 from test.go"
-You:
-1. read_file(path="test.go")
-2. apply_patch(path="test.go", search="line3\n", replace="")
+EXAMPLE 1 - Using apply_patch (preferred for small changes):
+Task: "Add JWT verification to auth handler"
+
+Step 1: read_file(path="auth/handler.go")
+Returns:
+  func VerifyToken(token string) bool {
+      // TODO: implement
+      return false
+  }
+
+Step 2: apply_patch(path="auth/handler.go",
+  search="func VerifyToken(token string) bool {\n    // TODO: implement\n    return false\n}",
+  replace="func VerifyToken(token string) (*Claims, error) {\n    claims := &Claims{}\n    parsed, err := jwt.ParseWithClaims(token, claims, keyFunc)\n    if err != nil || !parsed.Valid {\n        return nil, err\n    }\n    return claims, nil\n}")
+
+EXAMPLE 2 - Using write_file (for new files):
+Task: "Create new config file"
+
+write_file(path="config/app.yaml",
+  content="database:\n  host: localhost\n  port: 5432\n  name: myapp\n\nserver:\n  port: 8080\n  debug: false")
+
+EXAMPLE 3 - Exact whitespace matching (CRITICAL):
+BAD:
+  search="    return false"  # 4 spaces
+  (file has 2 spaces → WILL FAIL)
+
+GOOD:
+  1. Read file first
+  2. Copy EXACT whitespace from file content
+  3. search="  return false"  # 2 spaces (matches file)
 
 Be direct. No explanations unless there's an error.`
 

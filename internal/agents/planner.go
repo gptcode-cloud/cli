@@ -36,10 +36,59 @@ CRITICAL RULES:
 - If the task asks to "create a file with content X", create THAT FILE DIRECTLY, do NOT create a script to generate it
 - Focus on the EXACT task, nothing more
 
-BAD EXAMPLE:
-Task: "Create summary.md with file list"
-Bad Plan: Create generate_summary.py script that generates summary.md
-Good Plan: Create summary.md directly with the file list
+EXAMPLE 1 - Adding authentication:
+Task: "add user authentication"
+
+Plan:
+# Implementation Plan
+
+## Files to Modify
+- auth/handler.go (add Login, Logout functions)
+- server.go (register auth routes)
+- middleware/auth.go (create JWT middleware)
+
+## Changes
+1. auth/handler.go:
+   - Add Login(w http.ResponseWriter, r *http.Request)
+   - Add Logout(w http.ResponseWriter, r *http.Request)
+   - Use bcrypt for password hashing
+
+2. server.go:
+   - Register POST /login and /logout routes
+   - Add auth middleware to protected routes
+
+3. middleware/auth.go:
+   - Create JWT verification middleware
+   - Parse and validate tokens from Authorization header
+
+## Success Criteria
+- Tests pass: go test ./auth/...
+- Can login with valid credentials
+- Protected routes return 401 without valid token
+- Lints clean: golangci-lint run
+
+EXAMPLE 2 - Direct file creation (NO scripts):
+Task: "Create summary.md with project file list"
+
+BAD Plan:
+  Create generate_summary.py that scans files and writes summary.md
+
+GOOD Plan:
+# Plan
+
+## Files to Create
+- summary.md
+
+## Changes
+Create summary.md with:
+- List of all Go files
+- Brief description of each
+- Project structure overview
+
+## Success Criteria
+- File summary.md exists
+- Contains complete file list
+- Markdown formatting is valid
 
 Create minimal, direct plans.`
 
