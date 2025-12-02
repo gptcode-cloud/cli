@@ -27,14 +27,14 @@ type ModelCapabilities struct {
 }
 
 type ModelInfo struct {
-	ID              string            `json:"id"`
-	Name            string            `json:"name"`
-	CostPer1M       float64           `json:"cost_per_1m"`
-	RateLimitDaily  int               `json:"rate_limit_daily"`
-	ContextWindow   int               `json:"context_window"`
-	TokensPerSec    int               `json:"tokens_per_sec"`
-	Capabilities    ModelCapabilities `json:"capabilities"`
-	Backend         string
+	ID             string            `json:"id"`
+	Name           string            `json:"name"`
+	CostPer1M      float64           `json:"cost_per_1m"`
+	RateLimitDaily int               `json:"rate_limit_daily"`
+	ContextWindow  int               `json:"context_window"`
+	TokensPerSec   int               `json:"tokens_per_sec"`
+	Capabilities   ModelCapabilities `json:"capabilities"`
+	Backend        string
 }
 
 type ModelFeedback struct {
@@ -244,8 +244,8 @@ func (ms *ModelSelector) convertFeedbackEvent(event map[string]interface{}) Mode
 		// Determine complexity
 		fb.Complexity = "simple"
 		if strings.Contains(taskLower, "refactor") ||
-		   strings.Contains(taskLower, "reorganize") ||
-		   strings.Contains(taskLower, "complex") {
+			strings.Contains(taskLower, "reorganize") ||
+			strings.Contains(taskLower, "complex") {
 			fb.Complexity = "complex"
 		}
 	}
@@ -304,7 +304,9 @@ func (ms *ModelSelector) RecordUsage(backend, model string, success bool, errorM
 	}
 	ms.usage[today][key] = usage
 
-	ms.saveUsage()
+	if err := ms.saveUsage(); err != nil && os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[WARN] Failed to save usage: %v\n", err)
+	}
 }
 
 func (ms *ModelSelector) getTodayUsage(backend, model string) ModelUsage {

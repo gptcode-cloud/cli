@@ -16,7 +16,7 @@ type Profile struct {
 
 type Setup struct {
 	Defaults struct {
-		Mode               string  `yaml:"mode,omitempty"`        // local or cloud
+		Mode               string  `yaml:"mode,omitempty"` // local or cloud
 		Backend            string  `yaml:"backend"`
 		Profile            string  `yaml:"profile,omitempty"`
 		Model              string  `yaml:"model,omitempty"`

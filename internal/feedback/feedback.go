@@ -148,7 +148,7 @@ type AgentStats struct {
 // ConvertToModelFeedback converts feedback events to model selector format
 func ConvertToModelFeedback(events []Event, language string) []map[string]interface{} {
 	var result []map[string]interface{}
-	
+
 	for _, e := range events {
 		// Map agent to action
 		var action string
@@ -165,15 +165,15 @@ func ConvertToModelFeedback(events []Event, language string) []map[string]interf
 			// Skip events without clear action mapping
 			continue
 		}
-		
+
 		// Determine complexity from context/task
 		complexity := "simple"
 		if strings.Contains(strings.ToLower(e.Context), "complex") ||
-		   strings.Contains(strings.ToLower(e.Task), "refactor") ||
-		   strings.Contains(strings.ToLower(e.Task), "reorganize") {
+			strings.Contains(strings.ToLower(e.Task), "refactor") ||
+			strings.Contains(strings.ToLower(e.Task), "reorganize") {
 			complexity = "complex"
 		}
-		
+
 		// Detect language from task or use provided
 		lang := language
 		if strings.Contains(strings.ToLower(e.Task), ".go") {
@@ -183,20 +183,20 @@ func ConvertToModelFeedback(events []Event, language string) []map[string]interf
 		} else if strings.Contains(strings.ToLower(e.Task), ".ts") || strings.Contains(strings.ToLower(e.Task), ".js") {
 			lang = "typescript"
 		}
-		
+
 		fb := map[string]interface{}{
-			"model_id":    e.Model,
-			"action":      action,
-			"language":    lang,
-			"success":     e.Sentiment == SentimentGood,
-			"complexity":  complexity,
-			"backend":     e.Backend,
-			"timestamp":   e.Timestamp,
+			"model_id":   e.Model,
+			"action":     action,
+			"language":   lang,
+			"success":    e.Sentiment == SentimentGood,
+			"complexity": complexity,
+			"backend":    e.Backend,
+			"timestamp":  e.Timestamp,
 		}
-		
+
 		result = append(result, fb)
 	}
-	
+
 	return result
 }
 

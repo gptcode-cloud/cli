@@ -88,8 +88,25 @@ python3 ml/scripts/enrich_catalog.py
 
 Or edit `models_catalog.json` directly with cost/limits/context/speed.
 
-## Debug Mode
+## Monitoring
 
+**View usage statistics**:
+```bash
+python3 ml/scripts/show_usage.py
+```
+
+Output:
+```
+📊 Model Usage Statistics
+
+🔥 2025-12-02
+  ✓ openrouter/gemini-2.0-flash-exp:free: 47 requests
+  ✓ groq/llama-3.3-70b-versatile: 12 requests
+  ❌ groq/compound: 3 requests
+     └─ Last error: Provider error...
+```
+
+**Debug mode**:
 ```bash
 CHUCHU_DEBUG=1 chu do "add function"
 ```

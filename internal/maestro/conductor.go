@@ -53,6 +53,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 
 	fmt.Println("Creating plan...")
 	plan, err := planner.CreatePlan(ctx, task, "", nil)
+	c.selector.RecordUsage(planBackend, planModel, err == nil, errorMsg(err))
 	if err != nil {
 		return fmt.Errorf("planning failed: %w", err)
 	}
@@ -85,6 +86,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		// Execute with editor
 		fmt.Println("Executing changes...")
 		result, modifiedFiles, err := editor.Execute(ctx, history, nil)
+		c.selector.RecordUsage(editBackend, editModel, err == nil, errorMsg(err))
 		if err != nil {
 			if attempt < maxAttempts {
 				fmt.Printf("[WARNING] Execution error: %v\n", err)
@@ -115,6 +117,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		// Validate
 		fmt.Println("Validating...")
 		review, err := reviewer.Review(ctx, plan, modifiedFiles, nil)
+		c.selector.RecordUsage(reviewBackend, reviewModel, err == nil, errorMsg(err))
 		if err != nil {
 			if attempt < maxAttempts {
 				fmt.Printf("[WARNING] Validation error: %v\n", err)
@@ -145,7 +148,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		// Success! Record positive feedback
 		c.recordFeedback(editBackend, editModel, "editor", task, true)
 		c.recordFeedback(reviewBackend, reviewModel, "reviewer", task, true)
-		
+
 		fmt.Printf("\n[OK] Task complete!\n")
 		fmt.Printf("   Modified: %d files\n", len(modifiedFiles))
 		if result != "" {
@@ -159,17 +162,23 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 	reviewBackend, reviewModel, _ := c.selector.SelectModel(config.ActionReview, c.language, complexity)
 	c.recordFeedback(editBackend, editModel, "editor", task, false)
 	c.recordFeedback(reviewBackend, reviewModel, "reviewer", task, false)
-	
+
 	return fmt.Errorf("task failed after %d attempts", maxAttempts)
 }
 
-// recordFeedback records execution feedback for model selection learning
+func errorMsg(err error) string {
+	if err == nil {
+		return ""
+	}
+	return err.Error()
+}
+
 func (c *Conductor) recordFeedback(backend, model, agent, task string, success bool) {
 	sentiment := feedback.SentimentBad
 	if success {
 		sentiment = feedback.SentimentGood
 	}
-	
+
 	event := feedback.Event{
 		Sentiment: sentiment,
 		Backend:   backend,
@@ -178,7 +187,7 @@ func (c *Conductor) recordFeedback(backend, model, agent, task string, success b
 		Task:      task,
 		Context:   fmt.Sprintf("language=%s", c.language),
 	}
-	
+
 	if err := feedback.Record(event); err != nil {
 		if os.Getenv("CHUCHU_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[WARN] Failed to record feedback: %v\n", err)

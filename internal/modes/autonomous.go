@@ -14,11 +14,11 @@ import (
 
 // AutonomousExecutor wraps autonomous execution for use across modes
 type AutonomousExecutor struct {
-	events       *events.Emitter
-	provider     llm.Provider
-	cwd          string
-	model        string
-	executor     *autonomous.Executor
+	events   *events.Emitter
+	provider llm.Provider
+	cwd      string
+	model    string
+	executor *autonomous.Executor
 }
 
 // NewAutonomousExecutor creates a new autonomous executor

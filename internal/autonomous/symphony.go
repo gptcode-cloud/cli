@@ -118,14 +118,14 @@ func (e *Executor) executeDirect(ctx context.Context, task string, analysis *Tas
 // executeMovement executes a single movement with retry on review failure
 func (e *Executor) executeMovement(ctx context.Context, movement *Movement) error {
 	movement.Status = "executing"
-	
+
 	// Delegate to Maestro (movements are complex by definition)
 	err := e.maestro.ExecuteTask(ctx, movement.Goal, "complex")
 	if err != nil {
 		movement.Status = "failed"
 		return err
 	}
-	
+
 	movement.Status = "completed"
 	return nil
 }
