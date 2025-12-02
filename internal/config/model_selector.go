@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type ActionType string
@@ -26,10 +27,14 @@ type ModelCapabilities struct {
 }
 
 type ModelInfo struct {
-	ID           string            `json:"id"`
-	Name         string            `json:"name"`
-	Capabilities ModelCapabilities `json:"capabilities"`
-	Backend      string            // inferred from catalog structure
+	ID              string            `json:"id"`
+	Name            string            `json:"name"`
+	CostPer1M       float64           `json:"cost_per_1m"`
+	RateLimitDaily  int               `json:"rate_limit_daily"`
+	ContextWindow   int               `json:"context_window"`
+	TokensPerSec    int               `json:"tokens_per_sec"`
+	Capabilities    ModelCapabilities `json:"capabilities"`
+	Backend         string
 }
 
 type ModelFeedback struct {
@@ -40,9 +45,15 @@ type ModelFeedback struct {
 	Complexity string     `json:"complexity"` // simple, complex, multistep
 }
 
+type ModelUsage struct {
+	Requests  int    `json:"requests"`
+	LastError string `json:"last_error,omitempty"`
+}
+
 type ModelSelector struct {
-	catalog  map[string][]ModelInfo // backend -> models
+	catalog  map[string][]ModelInfo
 	feedback []ModelFeedback
+	usage    map[string]map[string]ModelUsage
 	setup    *Setup
 }
 
@@ -50,6 +61,7 @@ func NewModelSelector(setup *Setup) (*ModelSelector, error) {
 	selector := &ModelSelector{
 		catalog:  make(map[string][]ModelInfo),
 		feedback: []ModelFeedback{},
+		usage:    make(map[string]map[string]ModelUsage),
 		setup:    setup,
 	}
 
@@ -58,8 +70,11 @@ func NewModelSelector(setup *Setup) (*ModelSelector, error) {
 	}
 
 	if err := selector.loadFeedback(); err != nil {
-		// Non-critical, just log
 		fmt.Fprintf(os.Stderr, "[WARN] Could not load feedback: %v\n", err)
+	}
+
+	if err := selector.loadUsage(); err != nil {
+		fmt.Fprintf(os.Stderr, "[WARN] Could not load usage: %v\n", err)
 	}
 
 	return selector, nil
@@ -104,8 +119,19 @@ func (ms *ModelSelector) loadCatalog() error {
 			if name, ok := modelMap["name"].(string); ok {
 				model.Name = name
 			}
+			if cost, ok := modelMap["cost_per_1m"].(float64); ok {
+				model.CostPer1M = cost
+			}
+			if limit, ok := modelMap["rate_limit_daily"].(float64); ok {
+				model.RateLimitDaily = int(limit)
+			}
+			if ctx, ok := modelMap["context_window"].(float64); ok {
+				model.ContextWindow = int(ctx)
+			}
+			if tps, ok := modelMap["tokens_per_sec"].(float64); ok {
+				model.TokensPerSec = int(tps)
+			}
 
-			// Parse capabilities
 			if caps, ok := modelMap["capabilities"].(map[string]interface{}); ok {
 				if val, ok := caps["supports_tools"].(bool); ok {
 					model.Capabilities.SupportsTools = val
@@ -227,40 +253,73 @@ func (ms *ModelSelector) convertFeedbackEvent(event map[string]interface{}) Mode
 	return fb
 }
 
-// SelectModel escolhe o melhor modelo para a ação
-func (ms *ModelSelector) SelectModel(action ActionType, language string, complexity string) (backend string, model string, err error) {
-	// Determine preferred backend order based on mode
-	preferredBackend := ms.setup.Defaults.Backend
-	
-	// Use mode to determine backend preference
-	mode := ms.setup.Defaults.Mode
-	if mode == "local" {
-		preferredBackend = "ollama"
-	} else if mode == "cloud" || mode == "" {
-		// Cloud mode: prefer groq or openrouter
-		if preferredBackend == "" || preferredBackend == "ollama" {
-			preferredBackend = "groq"
-		}
-	}
-	
-	backendOrder := []string{preferredBackend}
-	
-	// Add fallbacks based on mode
-	if mode == "local" || mode == "" {
-		for _, backend := range []string{"ollama", "groq", "openrouter"} {
-			if backend != preferredBackend {
-				backendOrder = append(backendOrder, backend)
-			}
-		}
-	} else {
-		for _, backend := range []string{"groq", "openrouter", "ollama"} {
-			if backend != preferredBackend {
-				backendOrder = append(backendOrder, backend)
-			}
-		}
+func (ms *ModelSelector) loadUsage() error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
 	}
 
-	// Score each available model
+	usagePath := filepath.Join(home, ".chuchu", "usage.json")
+	data, err := os.ReadFile(usagePath)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return nil
+		}
+		return err
+	}
+
+	if err := json.Unmarshal(data, &ms.usage); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (ms *ModelSelector) saveUsage() error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	usagePath := filepath.Join(home, ".chuchu", "usage.json")
+	data, err := json.MarshalIndent(ms.usage, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(usagePath, data, 0644)
+}
+
+func (ms *ModelSelector) RecordUsage(backend, model string, success bool, errorMsg string) {
+	today := time.Now().Format("2006-01-02")
+	if ms.usage[today] == nil {
+		ms.usage[today] = make(map[string]ModelUsage)
+	}
+
+	key := backend + "/" + model
+	usage := ms.usage[today][key]
+	usage.Requests++
+	if !success {
+		usage.LastError = errorMsg
+	}
+	ms.usage[today][key] = usage
+
+	ms.saveUsage()
+}
+
+func (ms *ModelSelector) getTodayUsage(backend, model string) ModelUsage {
+	today := time.Now().Format("2006-01-02")
+	if ms.usage[today] == nil {
+		return ModelUsage{}
+	}
+
+	key := backend + "/" + model
+	return ms.usage[today][key]
+}
+
+func (ms *ModelSelector) SelectModel(action ActionType, language string, complexity string) (backend string, model string, err error) {
+	mode := ms.setup.Defaults.Mode
+
 	type scoredModel struct {
 		backend string
 		model   string
@@ -268,9 +327,8 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 	}
 	var scored []scoredModel
 
-	for _, backend := range backendOrder {
-		models, ok := ms.catalog[backend]
-		if !ok {
+	for backend, models := range ms.catalog {
+		if mode == "local" && backend != "ollama" {
 			continue
 		}
 
@@ -290,7 +348,6 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 		return "", "", fmt.Errorf("no suitable model found for action=%s lang=%s", action, language)
 	}
 
-	// Sort by score (highest first)
 	for i := 0; i < len(scored); i++ {
 		for j := i + 1; j < len(scored); j++ {
 			if scored[j].score > scored[i].score {
@@ -310,57 +367,72 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 }
 
 func (ms *ModelSelector) scoreModel(model ModelInfo, action ActionType, language string, complexity string) float64 {
-	score := 0.0
-
-	// Base requirements
 	if action == ActionEdit || action == ActionReview {
 		if !model.Capabilities.SupportsFileOperations {
-			return 0 // Hard requirement
+			return 0
 		}
-		score += 50
 	}
 
-	// Feedback-based scoring
+	score := 100.0
+
+	usage := ms.getTodayUsage(model.Backend, model.ID)
+	if model.RateLimitDaily > 0 {
+		utilization := float64(usage.Requests) / float64(model.RateLimitDaily)
+		score -= utilization * 50
+		if utilization >= 0.9 {
+			score -= 50
+		}
+	}
+
+	if usage.LastError != "" {
+		score -= 30
+	}
+
+	if model.CostPer1M > 0 {
+		score -= (model.CostPer1M / 10.0) * 30
+	}
+
+	if model.ContextWindow > 0 {
+		score += (float64(model.ContextWindow) / 100000.0) * 10
+	}
+
+	if model.TokensPerSec > 0 {
+		score += (float64(model.TokensPerSec) / 100.0) * 5
+	}
+
 	for _, fb := range ms.feedback {
 		if fb.ModelID != model.ID {
 			continue
 		}
 		if fb.Action == action && strings.EqualFold(fb.Language, language) {
 			if fb.Success {
-				score += 30
+				score += 20
 			} else {
-				score -= 50 // Strong penalty for known failures
+				score -= 40
 			}
 		}
 	}
 
-	// Prefer faster models for simple tasks
 	if complexity == "simple" {
 		if strings.Contains(strings.ToLower(model.ID), "instant") ||
-			strings.Contains(strings.ToLower(model.ID), "8b") {
-			score += 10
-		}
-	}
-
-	// Prefer larger models for complex tasks
-	if complexity == "complex" || complexity == "multistep" {
-		if strings.Contains(strings.ToLower(model.ID), "70b") ||
-			strings.Contains(strings.ToLower(model.ID), "large") {
+			strings.Contains(strings.ToLower(model.ID), "8b") ||
+			strings.Contains(strings.ToLower(model.ID), "3b") {
 			score += 15
 		}
 	}
 
-	// Code-specialized models bonus for edit/review
-	if action == ActionEdit || action == ActionReview {
-		if strings.Contains(strings.ToLower(model.ID), "coder") ||
-			strings.Contains(strings.ToLower(model.ID), "code") {
+	if complexity == "complex" || complexity == "multistep" {
+		if strings.Contains(strings.ToLower(model.ID), "70b") ||
+			strings.Contains(strings.ToLower(model.ID), "large") {
 			score += 20
 		}
 	}
 
-	// Backend preference (prefer configured backend)
-	if model.Backend == ms.setup.Defaults.Backend {
-		score += 5
+	if action == ActionEdit || action == ActionReview {
+		if strings.Contains(strings.ToLower(model.ID), "coder") ||
+			strings.Contains(strings.ToLower(model.ID), "code") {
+			score += 25
+		}
 	}
 
 	return score
