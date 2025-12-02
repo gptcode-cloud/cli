@@ -63,6 +63,12 @@ func (e *Executor) Execute(ctx context.Context, task string) error {
 	}
 
 	// 3. Complex task (ML scored >= 7): decompose into Symphony movements
+	if len(analysis.Movements) == 0 {
+		fmt.Println("\n[WARNING] Model failed to decompose task (returned empty plan).")
+		fmt.Println("Falling back to direct execution...")
+		return e.executeDirect(ctx, task, analysis)
+	}
+
 	fmt.Printf("\nComplex task detected! Creating symphony with %d movements...\n\n", len(analysis.Movements))
 
 	symphony := &Symphony{

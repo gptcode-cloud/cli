@@ -211,6 +211,7 @@ Response:
 
 Return ONLY valid JSON array of movements, no explanation.`, task, analysis.Intent, analysis.Verb)
 
+	// Try with configured model first
 	resp, err := a.llm.Chat(ctx, llm.ChatRequest{
 		SystemPrompt: "You are a task decomposition assistant. Return only valid JSON.",
 		UserPrompt:   prompt,
@@ -233,6 +234,11 @@ Return ONLY valid JSON array of movements, no explanation.`, task, analysis.Inte
 	err = json.Unmarshal([]byte(responseText), &movements)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse movements JSON: %w\nResponse: %s", err, responseText)
+	}
+
+	// Validate that movements is not empty
+	if len(movements) == 0 {
+		return nil, fmt.Errorf("model returned empty movements array - decomposition failed")
 	}
 
 	// Initialize status
