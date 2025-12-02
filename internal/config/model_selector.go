@@ -129,40 +129,102 @@ func (ms *ModelSelector) loadCatalog() error {
 }
 
 func (ms *ModelSelector) loadFeedback() error {
-	feedbackPath := filepath.Join(configDir(), "feedback.json")
-	data, err := os.ReadFile(feedbackPath)
+	// Try to load from feedback system first (new location)
+	home, err := os.UserHomeDir()
 	if err != nil {
 		return err
 	}
 
-	var rawFeedback []map[string]interface{}
-	if err := json.Unmarshal(data, &rawFeedback); err != nil {
-		return err
+	// Import feedback package to use existing system
+	// For now, we'll load directly from the feedback directory
+	feedbackDir := filepath.Join(home, ".chuchu", "feedback")
+	entries, err := os.ReadDir(feedbackDir)
+	if err != nil {
+		// Feedback dir doesn't exist yet, that's OK
+		return nil
 	}
 
-	for _, entry := range rawFeedback {
-		fb := ModelFeedback{}
-
-		if val, ok := entry["model_id"].(string); ok {
-			fb.ModelID = val
-		}
-		if val, ok := entry["action"].(string); ok {
-			fb.Action = ActionType(val)
-		}
-		if val, ok := entry["language"].(string); ok {
-			fb.Language = val
-		}
-		if val, ok := entry["success"].(bool); ok {
-			fb.Success = val
-		}
-		if val, ok := entry["complexity"].(string); ok {
-			fb.Complexity = val
+	// Load all feedback events
+	for _, entry := range entries {
+		if entry.IsDir() || filepath.Ext(entry.Name()) != ".json" {
+			continue
 		}
 
-		ms.feedback = append(ms.feedback, fb)
+		path := filepath.Join(feedbackDir, entry.Name())
+		data, err := os.ReadFile(path)
+		if err != nil {
+			continue
+		}
+
+		var rawEvents []map[string]interface{}
+		if err := json.Unmarshal(data, &rawEvents); err != nil {
+			continue
+		}
+
+		// Convert feedback events to model feedback format
+		for _, event := range rawEvents {
+			fb := ms.convertFeedbackEvent(event)
+			if fb.ModelID != "" && fb.Action != "" {
+				ms.feedback = append(ms.feedback, fb)
+			}
+		}
 	}
 
 	return nil
+}
+
+// convertFeedbackEvent converts a feedback event to ModelFeedback
+func (ms *ModelSelector) convertFeedbackEvent(event map[string]interface{}) ModelFeedback {
+	fb := ModelFeedback{}
+
+	// Extract model
+	if val, ok := event["model"].(string); ok {
+		fb.ModelID = val
+	}
+
+	// Map agent to action
+	if agent, ok := event["agent"].(string); ok {
+		switch strings.ToLower(agent) {
+		case "editor":
+			fb.Action = ActionEdit
+		case "reviewer", "validator":
+			fb.Action = ActionReview
+		case "planner":
+			fb.Action = ActionPlan
+		case "research":
+			fb.Action = ActionResearch
+		}
+	}
+
+	// Determine success from sentiment
+	if sentiment, ok := event["sentiment"].(string); ok {
+		fb.Success = sentiment == "good"
+	}
+
+	// Try to extract language from task
+	fb.Language = "unknown"
+	if task, ok := event["task"].(string); ok {
+		taskLower := strings.ToLower(task)
+		if strings.Contains(taskLower, ".go") {
+			fb.Language = "go"
+		} else if strings.Contains(taskLower, ".py") {
+			fb.Language = "python"
+		} else if strings.Contains(taskLower, ".ts") || strings.Contains(taskLower, ".js") {
+			fb.Language = "typescript"
+		} else if strings.Contains(taskLower, ".ex") || strings.Contains(taskLower, ".exs") {
+			fb.Language = "elixir"
+		}
+
+		// Determine complexity
+		fb.Complexity = "simple"
+		if strings.Contains(taskLower, "refactor") ||
+		   strings.Contains(taskLower, "reorganize") ||
+		   strings.Contains(taskLower, "complex") {
+			fb.Complexity = "complex"
+		}
+	}
+
+	return fb
 }
 
 // SelectModel escolhe o melhor modelo para a ação
