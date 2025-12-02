@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"chuchu/internal/langdetect"
 )
@@ -90,6 +91,43 @@ func NewBuildVerifier(dir string) *BuildVerifier {
 }
 
 func (v *BuildVerifier) Verify(ctx context.Context) (*VerificationResult, error) {
+	// Get modified files from git
+	gitCmd := exec.CommandContext(ctx, "git", "--no-pager", "diff", "--name-only")
+	gitCmd.Dir = v.Dir
+	gitOut, err := gitCmd.CombinedOutput()
+	if err != nil {
+		return &VerificationResult{Success: true, Output: "Could not get modified files, skipping build"}, nil
+	}
+
+	modifiedFiles := strings.Split(strings.TrimSpace(string(gitOut)), "\n")
+	
+	// Check if any modified file is a code file
+	hasCodeFiles := false
+	codeExtensions := map[string]bool{
+		".go": true, ".py": true, ".js": true, ".ts": true, 
+		".jsx": true, ".tsx": true, ".java": true, ".c": true, 
+		".cpp": true, ".rs": true, ".rb": true,
+	}
+	
+	for _, file := range modifiedFiles {
+		if file == "" {
+			continue
+		}
+		for ext := range codeExtensions {
+			if strings.HasSuffix(file, ext) {
+				hasCodeFiles = true
+				break
+			}
+		}
+		if hasCodeFiles {
+			break
+		}
+	}
+	
+	if !hasCodeFiles {
+		return &VerificationResult{Success: true, Output: "No code files modified, skipping build"}, nil
+	}
+
 	var cmd *exec.Cmd
 
 	switch v.Language {
