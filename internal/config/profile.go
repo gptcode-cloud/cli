@@ -16,9 +16,10 @@ type Profile struct {
 
 type Setup struct {
 	Defaults struct {
+		Mode               string  `yaml:"mode,omitempty"`        // local or cloud
 		Backend            string  `yaml:"backend"`
 		Profile            string  `yaml:"profile,omitempty"`
-		Model              string  `yaml:"model"`
+		Model              string  `yaml:"model,omitempty"`
 		Lang               string  `yaml:"lang"`
 		SystemPromptFile   string  `yaml:"system_prompt_file,omitempty"`
 		MLComplexThreshold float64 `yaml:"ml_complex_threshold,omitempty"`

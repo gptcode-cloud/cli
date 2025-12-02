@@ -229,14 +229,34 @@ func (ms *ModelSelector) convertFeedbackEvent(event map[string]interface{}) Mode
 
 // SelectModel escolhe o melhor modelo para a ação
 func (ms *ModelSelector) SelectModel(action ActionType, language string, complexity string) (backend string, model string, err error) {
-	// Determine preferred backend order based on setup
+	// Determine preferred backend order based on mode
 	preferredBackend := ms.setup.Defaults.Backend
+	
+	// Use mode to determine backend preference
+	mode := ms.setup.Defaults.Mode
+	if mode == "local" {
+		preferredBackend = "ollama"
+	} else if mode == "cloud" || mode == "" {
+		// Cloud mode: prefer groq or openrouter
+		if preferredBackend == "" || preferredBackend == "ollama" {
+			preferredBackend = "groq"
+		}
+	}
+	
 	backendOrder := []string{preferredBackend}
-
-	// Add fallbacks
-	for _, backend := range []string{"groq", "ollama", "openrouter"} {
-		if backend != preferredBackend {
-			backendOrder = append(backendOrder, backend)
+	
+	// Add fallbacks based on mode
+	if mode == "local" || mode == "" {
+		for _, backend := range []string{"ollama", "groq", "openrouter"} {
+			if backend != preferredBackend {
+				backendOrder = append(backendOrder, backend)
+			}
+		}
+	} else {
+		for _, backend := range []string{"groq", "openrouter", "ollama"} {
+			if backend != preferredBackend {
+				backendOrder = append(backendOrder, backend)
+			}
 		}
 	}
 

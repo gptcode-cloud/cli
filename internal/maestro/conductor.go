@@ -8,6 +8,7 @@ import (
 
 	"chuchu/internal/agents"
 	"chuchu/internal/config"
+	"chuchu/internal/feedback"
 	"chuchu/internal/llm"
 )
 
@@ -141,7 +142,10 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 			return fmt.Errorf("review failed after %d attempts: %v", maxAttempts, review.Issues)
 		}
 
-		// Success!
+		// Success! Record positive feedback
+		c.recordFeedback(editBackend, editModel, "editor", task, true)
+		c.recordFeedback(reviewBackend, reviewModel, "reviewer", task, true)
+		
 		fmt.Printf("\n[OK] Task complete!\n")
 		fmt.Printf("   Modified: %d files\n", len(modifiedFiles))
 		if result != "" {
@@ -150,7 +154,36 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		return nil
 	}
 
+	// Task failed after all attempts - record negative feedback
+	editBackend, editModel, _ := c.selector.SelectModel(config.ActionEdit, c.language, complexity)
+	reviewBackend, reviewModel, _ := c.selector.SelectModel(config.ActionReview, c.language, complexity)
+	c.recordFeedback(editBackend, editModel, "editor", task, false)
+	c.recordFeedback(reviewBackend, reviewModel, "reviewer", task, false)
+	
 	return fmt.Errorf("task failed after %d attempts", maxAttempts)
+}
+
+// recordFeedback records execution feedback for model selection learning
+func (c *Conductor) recordFeedback(backend, model, agent, task string, success bool) {
+	sentiment := feedback.SentimentBad
+	if success {
+		sentiment = feedback.SentimentGood
+	}
+	
+	event := feedback.Event{
+		Sentiment: sentiment,
+		Backend:   backend,
+		Model:     model,
+		Agent:     agent,
+		Task:      task,
+		Context:   fmt.Sprintf("language=%s", c.language),
+	}
+	
+	if err := feedback.Record(event); err != nil {
+		if os.Getenv("CHUCHU_DEBUG") == "1" {
+			fmt.Fprintf(os.Stderr, "[WARN] Failed to record feedback: %v\n", err)
+		}
+	}
 }
 
 // createProvider creates an LLM provider for the given backend
