@@ -282,6 +282,13 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 						content = "Success"
 					}
 
+					// For read-only operations, return result immediately
+					if tc.Name == "read_file" || (tc.Name == "run_command" && result.Error == "") {
+						if result.Result != "" && result.Error == "" {
+							return result.Result, modifiedFiles, nil
+						}
+					}
+
 					messages = append(messages, llm.ChatMessage{
 						Role:       "tool",
 						Content:    content,
@@ -340,6 +347,13 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 			}
 			if content == "" {
 				content = "Success"
+			}
+
+			// For read-only operations (read_file, run_command that reads), return result immediately
+			if tc.Name == "read_file" || (tc.Name == "run_command" && result.Error == "") {
+				if result.Result != "" && result.Error == "" {
+					return result.Result, modifiedFiles, nil
+				}
 			}
 
 			messages = append(messages, llm.ChatMessage{

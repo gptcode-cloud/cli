@@ -7,36 +7,12 @@ import (
 	"chuchu/internal/llm"
 )
 
-type MockProvider struct {
-	Response    string
-	ToolCalls   []llm.ChatToolCall
-	CallCount   int
-	Responses   []string
-	ToolCallsAt [][]llm.ChatToolCall
-}
-
-func (m *MockProvider) Chat(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
-	if len(m.Responses) > 0 && m.CallCount < len(m.Responses) {
-		resp := &llm.ChatResponse{
-			Text: m.Responses[m.CallCount],
-		}
-		if len(m.ToolCallsAt) > m.CallCount {
-			resp.ToolCalls = m.ToolCallsAt[m.CallCount]
-		}
-		m.CallCount++
-		return resp, nil
-	}
-
-	return &llm.ChatResponse{
-		Text:      m.Response,
-		ToolCalls: m.ToolCalls,
-	}, nil
-}
-
 func TestReviewAgent(t *testing.T) {
 	t.Run("simple review without tools", func(t *testing.T) {
-		mock := &MockProvider{
-			Response: "Code looks good.",
+		mock := &mockProvider{
+			responses: []llm.ChatResponse{
+				{Text: "Code looks good."},
+			},
 		}
 
 		agent := NewReview(mock, ".", "test-model")
@@ -51,16 +27,15 @@ func TestReviewAgent(t *testing.T) {
 	})
 
 	t.Run("review with tool calls", func(t *testing.T) {
-		mock := &MockProvider{
-			Responses: []string{
-				"Need to read file",
-				"File analyzed. Found issues.",
-			},
-			ToolCallsAt: [][]llm.ChatToolCall{
+		mock := &mockProvider{
+			responses: []llm.ChatResponse{
 				{
-					{ID: "1", Name: "read_file", Arguments: `{"path": "test.go"}`},
+					Text: "Need to read file",
+					ToolCalls: []llm.ChatToolCall{
+						{ID: "1", Name: "read_file", Arguments: `{"path": "test.go"}`},
+					},
 				},
-				{},
+				{Text: "File analyzed. Found issues."},
 			},
 		}
 
@@ -76,8 +51,10 @@ func TestReviewAgent(t *testing.T) {
 	})
 
 	t.Run("with status callback", func(t *testing.T) {
-		mock := &MockProvider{
-			Response: "Analysis complete.",
+		mock := &mockProvider{
+			responses: []llm.ChatResponse{
+				{Text: "Analysis complete."},
+			},
 		}
 
 		var statusUpdates []string
