@@ -19,12 +19,18 @@ type LanguageBreakdown struct {
 
 // Detector uses go-enry (GitHub Linguist) for language detection
 type Detector struct {
-	path string
+	path      string
+	mlContext *ContextPredictor
 }
 
 // NewDetector creates a new language detector for a project path
 func NewDetector(path string) *Detector {
-	return &Detector{path: path}
+	// Load ML model (fallback to rules if load fails)
+	mlContext, _ := NewContextPredictor()
+	return &Detector{
+		path:      path,
+		mlContext: mlContext,
+	}
 }
 
 // Detect analyzes the project and returns language breakdown
@@ -100,8 +106,19 @@ func (d *Detector) Detect() (*LanguageBreakdown, error) {
 	// Find primary language
 	primary := d.findPrimary(languages)
 
-	// Determine context
-	context := d.determineContext(languages)
+	// Create temporary breakdown for ML
+	tempBreakdown := &LanguageBreakdown{
+		Languages: languages,
+		Primary:   primary,
+	}
+
+	// Determine context using ML or fallback to rules
+	var context string
+	if d.mlContext != nil {
+		context = d.mlContext.Predict(tempBreakdown)
+	} else {
+		context = d.determineContext(languages)
+	}
 
 	return &LanguageBreakdown{
 		Languages: languages,
