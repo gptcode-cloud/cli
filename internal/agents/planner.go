@@ -32,8 +32,10 @@ CRITICAL RULES:
 - NO automation scripts
 - NO tests unless explicitly requested
 - NO documentation unless explicitly requested
+- NO intermediate/temporary files for data storage - use shell commands to get data
 - ONLY modify existing files OR files explicitly requested in the task
 - If the task asks to "create a file with content X", create THAT FILE DIRECTLY, do NOT create a script to generate it
+- If task is about "retrieving" or "getting" data, use shell commands, NOT file creation
 - Focus on the EXACT task, nothing more
 
 EXAMPLE 1 - Adding authentication:
