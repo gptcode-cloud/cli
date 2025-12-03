@@ -135,6 +135,11 @@ func (ms *ModelSelector) loadCatalog() error {
 				model.TokensPerSec = int(tps)
 			}
 
+			// Default capabilities to true for backward compatibility
+			model.Capabilities.SupportsTools = true
+			model.Capabilities.SupportsFileOperations = true
+			model.Capabilities.SupportsCodeExecution = false
+			
 			if caps, ok := modelMap["capabilities"].(map[string]interface{}); ok {
 				if val, ok := caps["supports_tools"].(bool); ok {
 					model.Capabilities.SupportsTools = val
