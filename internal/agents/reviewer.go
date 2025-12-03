@@ -249,13 +249,27 @@ Be precise and specific.`, plan, filesStr)
 
 func containsSuccess(text string) bool {
 	lowerText := strings.ToLower(text)
-	// Must explicitly say SUCCESS and not have any failure indicators
-	hasSuccess := strings.Contains(lowerText, "success")
-	hasFail := strings.Contains(lowerText, "fail") ||
-		strings.Contains(lowerText, "error") ||
-		strings.Contains(lowerText, "issue") ||
-		strings.Contains(lowerText, "problem")
-	return hasSuccess && !hasFail
+	
+	// Check for explicit success statements
+	if strings.Contains(lowerText, "task is complete") ||
+		strings.Contains(lowerText, "task was completed") ||
+		strings.Contains(lowerText, "success criteria are met") ||
+		strings.Contains(lowerText, "all criteria are met") ||
+		strings.Contains(lowerText, "requirements are met") ||
+		strings.Contains(lowerText, "successfully completed") {
+		return true
+	}
+	
+	// Fallback: explicit SUCCESS keyword without failure indicators
+	if strings.Contains(lowerText, " success") || strings.HasPrefix(lowerText, "success") {
+		hasFail := strings.Contains(lowerText, " fail") ||
+			strings.Contains(lowerText, "failed") ||
+			strings.Contains(lowerText, " error") ||
+			strings.Contains(lowerText, "not met")
+		return !hasFail
+	}
+	
+	return false
 }
 
 func extractIssues(text string) []string {

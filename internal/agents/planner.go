@@ -64,10 +64,9 @@ Plan:
    - Parse and validate tokens from Authorization header
 
 ## Success Criteria
-- Tests pass: go test ./auth/...
-- Can login with valid credentials
-- Protected routes return 401 without valid token
-- Lints clean: golangci-lint run
+- Authentication endpoints exist and are functional
+- Login/logout routes work
+- Protected routes require authentication
 
 EXAMPLE 2 - Direct file creation (NO scripts):
 Task: "Create summary.md with project file list"
@@ -119,8 +118,25 @@ Create a brief plan:
 [If task asks to create file with content, create THAT file, NOT a script]
 
 ## Success Criteria
-[2-5 specific, testable criteria to verify the changes work]
-[Examples: "Tests pass: make test", "File X contains Y", "Command Z produces output W"]
+[2-5 GOAL-BASED criteria focused on what was accomplished, NOT output format]
+
+GOOD Criteria (goal-based):
+- "File X was created with required content"
+- "Task completed successfully"
+- "Requested information was obtained"
+
+BAD Criteria (too specific):
+- "Output must include specific text format"
+- "Must show exact number of X"
+- "Repository status must contain remote info" (if not requested)
+
+For read-only tasks (git status, list files, get info):
+- Just verify the command ran successfully
+- Don't require specific output formats
+
+For file creation tasks:
+- Verify file exists with content
+- Don't specify exact format unless critical
 
 REMEMBER:
 - NO scripts unless explicitly requested

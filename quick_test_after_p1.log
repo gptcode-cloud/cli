@@ -1,0 +1,27 @@
+🧪 Quick Capability Test
+========================
+
+## 1. Shell Commands
+Testing: Echo test... ❌ FAILED
+Testing: List files... ❌ FAILED
+Testing: Check date... ❌ FAILED
+
+## 2. File Operations
+Testing: Create file... ✅ PASSED
+Testing: Read file... ✅ PASSED
+Testing: Create JSON... ❌ FAILED
+
+## 3. Code Generation
+Testing: Create Python script... ❌ FAILED
+Testing: Create JS function... ✅ PASSED
+
+## 4. Documentation
+Testing: Create README... ❌ FAILED
+Testing: Create markdown list... ❌ FAILED
+
+## 5. Git Operations (lenient)
+❌ Git status
+
+========================
+Results: ✅ 3 passed, ❌ 7 failed
+
