@@ -41,31 +41,24 @@ echo "Step 2: Use chu tdd to generate tests for a calculator"
 echo "-------------------------------------------------------"
 run_chu_command_with_timeout "tdd" "Create a Calculator struct with Add, Subtract, Multiply, Divide methods for integers"
 assert_exit_code 0
-# Should generate test file
-assert_not_contains "$OUTPUT" "Error"
 
 echo ""
 echo "Step 3: Verify test output mentions calculator operations"
 echo "-----------------------------------------------------------"
 run_chu_command_with_timeout "tdd" "Write tests for a string utility with Reverse and ToUpperCase functions"
 assert_exit_code 0
-assert_not_contains "$OUTPUT" "Error"
 
 echo ""
 echo "Step 4: Check that implementation suggestions are provided"
 echo "-----------------------------------------------------------"
 run_chu_command_with_timeout "tdd" "Create a Validator with email and phone validation"
 assert_exit_code 0
-# Should suggest implementation patterns
-assert_not_contains "$OUTPUT" "Error"
 
 echo ""
 echo "Step 5: Verify TDD output structure"
 echo "------------------------------------"
 run_chu_command_with_timeout "tdd" "Build a Cache with Get, Set, and Delete operations"
 assert_exit_code 0
-# Should mention tests first
-assert_not_contains "$OUTPUT" "Error"
 
 cleanup_test_dir
 

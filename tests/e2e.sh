@@ -10,6 +10,49 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 E2E_DIR="$SCRIPT_DIR/e2e"
 
+BACKEND=""
+PROFILE=""
+
+parse_args() {
+    while [[ $# -gt 0 ]]; do
+        case $1 in
+            --backend)
+                BACKEND="$2"
+                shift 2
+                ;;
+            --profile)
+                PROFILE="$2"
+                shift 2
+                ;;
+            -h|--help)
+                echo "Usage: $0 [OPTIONS]"
+                echo ""
+                echo "Options:"
+                echo "  --backend BACKEND    Backend to use (e.g., groq, ollama, openai)"
+                echo "  --profile PROFILE    Profile to use (e.g., local, default)"
+                echo "  -h, --help           Show this help message"
+                echo ""
+                exit 0
+                ;;
+            *)
+                echo "Unknown option: $1"
+                echo "Run with --help for usage information"
+                exit 1
+                ;;
+        esac
+    done
+}
+
+parse_args "$@"
+
+if [ -n "$BACKEND" ]; then
+    export CHUCHU_E2E_BACKEND="$BACKEND"
+fi
+
+if [ -n "$PROFILE" ]; then
+    export CHUCHU_E2E_PROFILE="$PROFILE"
+fi
+
 source "$E2E_DIR/lib/helpers.sh"
 
 echo " Chuchu E2E Test Suite"
@@ -49,7 +92,7 @@ run_scenario() {
 
 main() {
     check_chu_installed
-    setup_e2e_backend
+    setup_e2e_backend "$BACKEND" "$PROFILE"
     
     local failed=0
     local passed=0
@@ -87,4 +130,4 @@ main() {
     fi
 }
 
-main "$@"
+main

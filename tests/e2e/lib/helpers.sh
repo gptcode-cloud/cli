@@ -16,62 +16,83 @@ CHUCHU_E2E_BACKEND="${CHUCHU_E2E_BACKEND:-ollama}"
 CHUCHU_E2E_PROFILE="${CHUCHU_E2E_PROFILE:-local}"
 
 setup_e2e_backend() {
-    echo "🔧 Configuring E2E test backend..."
+    local backend_arg="${1:-}"
+    local profile_arg="${2:-}"
     
-    # Check if Ollama is available
-    if ! command -v ollama &> /dev/null; then
-        echo ""
-        echo " ERROR: Ollama is required for E2E tests but not found"
-        echo ""
-        echo "To run E2E tests, you need:"
-        echo "  1. Install Ollama: https://ollama.ai"
-        echo "  2. Pull a recommended model:"
-        echo "     ollama pull qwen2.5-coder:7b  (recommended, ~4GB)"
-        echo "     ollama pull llama3.1:8b       (alternative, ~4.7GB)"
-        echo "     ollama pull codellama:7b      (alternative, ~3.8GB)"
-        echo ""
-        exit 1
+    if [ -n "$backend_arg" ]; then
+        CHUCHU_E2E_BACKEND="$backend_arg"
     fi
     
-    echo "✓ Ollama found"
+    if [ -n "$profile_arg" ]; then
+        CHUCHU_E2E_PROFILE="$profile_arg"
+    fi
     
-    # Check if required models are available
-    local required_models=("llama3.1:8b" "qwen3-coder:latest" "gpt-oss:latest")
-    local missing_models=()
+    echo "Configuring E2E test backend..."
+    echo "  Backend: $CHUCHU_E2E_BACKEND"
+    echo "  Profile: $CHUCHU_E2E_PROFILE"
+    echo ""
     
-    set +e +o pipefail
-    for model in "${required_models[@]}"; do
-        ollama list | grep -q "$model"
-        if [ $? -ne 0 ]; then
-            missing_models+=("$model")
+    if [ "$CHUCHU_E2E_BACKEND" = "ollama" ]; then
+        if ! command -v ollama &> /dev/null; then
+            echo ""
+            echo " ERROR: Ollama backend selected but ollama not found"
+            echo ""
+            echo "To run E2E tests with Ollama, you need:"
+            echo "  1. Install Ollama: https://ollama.ai"
+            echo "  2. Pull a recommended model:"
+            echo "     ollama pull qwen2.5-coder:7b  (recommended, ~4GB)"
+            echo "     ollama pull llama3.1:8b       (alternative, ~4.7GB)"
+            echo "     ollama pull codellama:7b      (alternative, ~3.8GB)"
+            echo ""
+            exit 1
         fi
-    done
-    set -e -o pipefail
-    
-    if [ ${#missing_models[@]} -gt 0 ]; then
-        echo ""
-        echo " ERROR: Missing required models for 'local' profile:"
-        for model in "${missing_models[@]}"; do
-            echo "  - $model"
-        done
-        echo ""
-        echo "Please pull the missing models:"
-        for model in "${missing_models[@]}"; do
-            echo "  ollama pull $model"
-        done
-        echo ""
-        exit 1
+        
+        echo "✓ Ollama found"
+        
+        if [ "$CHUCHU_E2E_PROFILE" = "local" ]; then
+            local required_models=("llama3.1:8b" "qwen3-coder:latest" "gpt-oss:latest")
+            local missing_models=()
+            
+            set +e +o pipefail
+            for model in "${required_models[@]}"; do
+                ollama list | grep -q "$model"
+                if [ $? -ne 0 ]; then
+                    missing_models+=("$model")
+                fi
+            done
+            set -e -o pipefail
+            
+            if [ ${#missing_models[@]} -gt 0 ]; then
+                echo ""
+                echo " ERROR: Missing required models for 'local' profile:"
+                for model in "${missing_models[@]}"; do
+                    echo "  - $model"
+                done
+                echo ""
+                echo "Please pull the missing models:"
+                for model in "${missing_models[@]}"; do
+                    echo "  ollama pull $model"
+                done
+                echo ""
+                exit 1
+            fi
+            
+            echo "✓ All required models available (llama3.1:8b, qwen3-coder:latest, gpt-oss:latest)"
+        fi
     fi
     
-    echo "✓ All required models available (llama3.1:8b, qwen3-coder:latest, gpt-oss:latest)"
-    
-    # Configure Chuchu to use Ollama with local profile
     export CHUCHU_BACKEND="$CHUCHU_E2E_BACKEND"
-    chu config set defaults.backend ollama 2>&1 > /dev/null || true
-    chu config set defaults.profile "$CHUCHU_E2E_PROFILE" 2>&1 > /dev/null || true
+    
+    echo "Configuring chu backend and profile..."
+    chu config set defaults.backend "$CHUCHU_E2E_BACKEND" 2>&1 > /dev/null
+    chu config set defaults.profile "$CHUCHU_E2E_PROFILE" 2>&1 > /dev/null
     
     echo "✓ Backend configured: $CHUCHU_E2E_BACKEND with profile $CHUCHU_E2E_PROFILE"
-    echo "  Router: llama3.1:8b | Query: gpt-oss:latest | Editor: qwen3-coder:latest"
+    if [ "$CHUCHU_E2E_BACKEND" = "ollama" ] && [ "$CHUCHU_E2E_PROFILE" = "local" ]; then
+        echo "  Router: llama3.1:8b | Query: gpt-oss:latest | Editor: qwen3-coder:latest"
+    elif [ "$CHUCHU_E2E_BACKEND" = "groq" ] && [ "$CHUCHU_E2E_PROFILE" = "budget" ]; then
+        echo "  Router: llama-3.1-8b-instant | Query: openai/gpt-oss-120b | Editor: qwen/qwen3-32b"
+    fi
     echo ""
 }
 
@@ -211,6 +232,25 @@ assert_dir_exists() {
         echo "✓ Directory exists: $dirpath"
     else
         echo "✗ FAILED: Directory does not exist: $dirpath"
+        exit 1
+    fi
+}
+
+assert_file_contains() {
+    local filepath="$1"
+    local expected="$2"
+    
+    if [ ! -f "$filepath" ]; then
+        echo "✗ FAILED: File does not exist: $filepath"
+        exit 1
+    fi
+    
+    if grep -q "$expected" "$filepath"; then
+        echo "✓ File contains '$expected': $filepath"
+    else
+        echo "✗ FAILED: File does not contain '$expected': $filepath"
+        echo "File contents:"
+        cat "$filepath"
         exit 1
     fi
 }
