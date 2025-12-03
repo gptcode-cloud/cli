@@ -365,9 +365,9 @@ Examples:
 }
 
 var detectLanguageCmd = &cobra.Command{
-	Use:   "detect-language [path]",
+	Use:     "detect-language [path]",
 	Aliases: []string{"detect"},
-	Short: "Detect project language distribution using GitHub Linguist",
+	Short:   "Detect project language distribution using GitHub Linguist",
 	Long: `Analyze the project and show language breakdown.
 
 Uses go-enry (GitHub Linguist port) for accurate multi-language detection.
@@ -383,13 +383,13 @@ Examples:
 		if len(args) > 0 {
 			path = args[0]
 		}
-		
+
 		detector := langdetect.NewDetector(path)
 		breakdown, err := detector.Detect()
 		if err != nil {
 			return fmt.Errorf("failed to detect languages: %w", err)
 		}
-		
+
 		fmt.Print(langdetect.FormatBreakdown(breakdown))
 		return nil
 	},

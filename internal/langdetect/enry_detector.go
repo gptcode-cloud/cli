@@ -13,8 +13,8 @@ import (
 // LanguageBreakdown represents language distribution in a project
 type LanguageBreakdown struct {
 	Languages map[string]float64 // language -> percentage
-	Primary   string              // dominant language
-	Context   string              // "pure_code", "polyglot_balanced", etc
+	Primary   string             // dominant language
+	Context   string             // "pure_code", "polyglot_balanced", etc
 }
 
 // Detector uses go-enry (GitHub Linguist) for language detection
@@ -46,9 +46,9 @@ func (d *Detector) Detect() (*LanguageBreakdown, error) {
 		if info.IsDir() {
 			// Skip common directories to ignore
 			name := info.Name()
-			if name == ".git" || name == "node_modules" || name == "vendor" || 
-			   name == ".venv" || name == "venv" || name == "dist" || name == "build" ||
-			   name == "bin" {
+			if name == ".git" || name == "node_modules" || name == "vendor" ||
+				name == ".venv" || name == "venv" || name == "dist" || name == "build" ||
+				name == "bin" {
 				return filepath.SkipDir
 			}
 			return nil
