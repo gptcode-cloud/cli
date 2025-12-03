@@ -111,6 +111,10 @@ func (e *Executor) Execute(ctx context.Context, task string) error {
 
 // executeDirect executes a simple task without decomposition
 func (e *Executor) executeDirect(ctx context.Context, task string, analysis *TaskAnalysis) error {
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[SYMPHONY] executeDirect called: complexity=%d\n", analysis.Complexity)
+	}
+	
 	// Delegate to Maestro with complexity
 	complexityStr := "simple"
 	if analysis.Complexity >= 7 {
@@ -118,6 +122,11 @@ func (e *Executor) executeDirect(ctx context.Context, task string, analysis *Tas
 	} else if analysis.Complexity >= 5 {
 		complexityStr = "medium"
 	}
+	
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[SYMPHONY] Calling maestro.ExecuteTask with complexityStr=%s\n", complexityStr)
+	}
+	
 	return e.maestro.ExecuteTask(ctx, task, complexityStr)
 }
 

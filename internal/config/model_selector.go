@@ -335,6 +335,11 @@ func (ms *ModelSelector) getTodayUsage(backend, model string) ModelUsage {
 }
 
 func (ms *ModelSelector) SelectModel(action ActionType, language string, complexity string) (backend string, model string, err error) {
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] SelectModel called: action=%s lang=%s complexity=%s\n",
+			action, language, complexity)
+	}
+	
 	mode := ms.setup.Defaults.Mode
 	defaultBackend := ms.setup.Defaults.Backend
 
@@ -344,12 +349,23 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 		score   float64
 	}
 	var scored []scoredModel
+	
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] SelectModel action=%s lang=%s mode=%s defaultBackend=%s\n",
+			action, language, mode, defaultBackend)
+		fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Catalog has %d backends\n", len(ms.catalog))
+	}
+	
 	for backend, models := range ms.catalog {
 		if mode == "local" && backend != "ollama" {
 			continue
 		}
 		if mode == "cloud" && backend == "ollama" {
 			continue
+		}
+		
+		if os.Getenv("CHUCHU_DEBUG") == "1" {
+			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Checking backend=%s with %d models\n", backend, len(models))
 		}
 
 		for _, modelInfo := range models {
@@ -369,6 +385,10 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 	}
 
 	if len(scored) == 0 {
+		if os.Getenv("CHUCHU_DEBUG") == "1" {
+			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] No models scored > 0 for action=%s lang=%s\n", action, language)
+			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Checked %d models in catalog\n", len(ms.catalog[defaultBackend]))
+		}
 		return "", "", fmt.Errorf("no suitable model found for action=%s lang=%s", action, language)
 	}
 
@@ -393,6 +413,9 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 func (ms *ModelSelector) scoreModel(model ModelInfo, action ActionType, language string, complexity string) float64 {
 	if action == ActionEdit || action == ActionReview {
 		if !model.Capabilities.SupportsFileOperations {
+			if os.Getenv("CHUCHU_DEBUG") == "1" && action == ActionEdit {
+				fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Model %s/%s rejected: no file operations support\n", model.Backend, model.ID)
+			}
 			return 0
 		}
 	}

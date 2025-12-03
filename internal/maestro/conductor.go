@@ -37,6 +37,10 @@ func NewConductor(
 
 // ExecuteTask orchestrates the execution of a task
 func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity string) error {
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[MAESTRO] ExecuteTask called: task=%s complexity=%s lang=%s\n", task, complexity, c.language)
+	}
+	
 	// Select model for planning
 	planBackend, planModel, err := c.selector.SelectModel(config.ActionPlan, c.language, complexity)
 	if err != nil {
@@ -70,8 +74,14 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		}
 
 		// Select model for editing
+		if os.Getenv("CHUCHU_DEBUG") == "1" {
+			fmt.Fprintf(os.Stderr, "[MAESTRO] About to select editor model for lang=%s complexity=%s\n", c.language, complexity)
+		}
 		editBackend, editModel, err := c.selector.SelectModel(config.ActionEdit, c.language, complexity)
 		if err != nil {
+			if os.Getenv("CHUCHU_DEBUG") == "1" {
+				fmt.Fprintf(os.Stderr, "[MAESTRO] SelectModel failed: %v\n", err)
+			}
 			return fmt.Errorf("failed to select editor model: %w", err)
 		}
 
