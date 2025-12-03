@@ -174,37 +174,38 @@ Rules:
 - Each movement should have 1-3 success criteria
 - Movements should be sequential (not parallel)
 - Be specific about files to read/create
+- AVOID creating intermediate/temporary files - process data in memory when possible
+- Only create files that are part of the final task goal
 
 Example:
-Task: "reorganize all docs files"
+Task: "Use gh CLI to review and publish blog posts from open PRs in docs/_posts"
 Response:
 [
   {
     "id": "movement-1",
-    "name": "Analyze Structure",
-    "description": "Create inventory of all documentation files",
-    "goal": "Understand current docs organization",
+    "name": "Get PR Content",
+    "description": "Use gh CLI to fetch file changes from open PRs",
+    "goal": "Retrieve blog post content from PR diffs",
     "dependencies": [],
-    "required_files": ["docs/**/*.md"],
-    "output_files": ["~/.chuchu/inventory.json"],
+    "required_files": [],
+    "output_files": [],
     "success_criteria": [
-      "inventory.json exists",
-      "all docs files are cataloged",
-      "files are categorized by type"
+      "gh pr list executes successfully",
+      "PR content is retrieved"
     ]
   },
   {
     "id": "movement-2",
-    "name": "Split Features",
-    "description": "Break features.md into individual feature pages",
-    "goal": "Create separate page for each feature",
+    "name": "Review and Publish",
+    "description": "Review posts format, update date, publish to docs/_posts/",
+    "goal": "Create properly formatted blog posts with correct dates",
     "dependencies": ["movement-1"],
-    "required_files": ["docs/features.md"],
-    "output_files": ["docs/features/*.md"],
+    "required_files": ["docs/_posts/*.md"],
+    "output_files": ["docs/_posts/2025-12-03-new-post.md"],
     "success_criteria": [
-      "docs/features/ directory exists",
-      "6+ feature files created",
-      "each file has proper front matter"
+      "posts match existing format in docs/_posts",
+      "filenames use next available date",
+      "posts are valid markdown"
     ]
   }
 ]
