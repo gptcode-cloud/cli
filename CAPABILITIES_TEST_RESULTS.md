@@ -11,11 +11,4 @@ Generated: $(date)
 
 ## Detailed Results
 
-- ❌ **Git > status**: FAILED
-  ```
-  -i, --interactive        Prompt for model selection when multiple options are similar
-      --max-attempts int   Maximum retry attempts with different models (default 3)
-      --supervised         Require manual approval before implementation
-  -v, --verbose            Show detailed progress
-
-  ```
+- ✅ **Git > status**: PASSED

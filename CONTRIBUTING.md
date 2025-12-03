@@ -98,8 +98,16 @@ chuchu/
 
 ### Building
 
+**IMPORTANT:** The main entry point is `cmd/chu/main.go`, NOT `main.go` in the root.
+The root `main.go` is in `.gitignore` and should never exist.
+
 ```bash
-# Install to $GOPATH/bin
+# Recommended: Use Makefile
+make build          # Builds to bin/chu
+make install        # Builds and installs to $GOPATH/bin
+
+# Alternative: Direct Go commands
+go build -o bin/chu ./cmd/chu
 go install ./cmd/chu
 
 # Run tests

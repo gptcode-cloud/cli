@@ -6,6 +6,11 @@ chu
 *.so
 *.dylib
 
+# IMPORTANT: main.go should NEVER exist in root!
+# The actual main is in cmd/chu/main.go
+# Use `make build` or `go build -o bin/chu ./cmd/chu`
+main.go
+
 # Test binaries
 *.test
 

@@ -249,7 +249,7 @@ Be precise and specific.`, plan, filesStr)
 
 func containsSuccess(text string) bool {
 	lowerText := strings.ToLower(text)
-	
+
 	// Check for explicit success statements
 	if strings.Contains(lowerText, "task is complete") ||
 		strings.Contains(lowerText, "task was completed") ||
@@ -259,7 +259,7 @@ func containsSuccess(text string) bool {
 		strings.Contains(lowerText, "successfully completed") {
 		return true
 	}
-	
+
 	// Fallback: explicit SUCCESS keyword without failure indicators
 	if strings.Contains(lowerText, " success") || strings.HasPrefix(lowerText, "success") {
 		hasFail := strings.Contains(lowerText, " fail") ||
@@ -268,7 +268,7 @@ func containsSuccess(text string) bool {
 			strings.Contains(lowerText, "not met")
 		return !hasFail
 	}
-	
+
 	return false
 }
 
