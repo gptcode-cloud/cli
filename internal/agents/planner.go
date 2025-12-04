@@ -91,6 +91,22 @@ Create summary.md with:
 - Contains complete file list
 - Markdown formatting is valid
 
+EXAMPLE 3 - Appending to existing file:
+Task: "Add 'Goodbye' line to hello.txt"
+
+Plan:
+# Plan
+
+## Files to modify
+- hello.txt
+
+## Changes
+Append "Goodbye" to the end of hello.txt (preserve existing content)
+
+## Success Criteria
+- hello.txt contains original content plus "Goodbye"
+- File was modified exactly once (not multiple times)
+
 Create minimal, direct plans.`
 
 func (p *PlannerAgent) CreatePlan(ctx context.Context, task string, analysis string, statusCallback StatusCallback) (string, error) {
@@ -118,25 +134,28 @@ Create a brief plan:
 [If task asks to create file with content, create THAT file, NOT a script]
 
 ## Success Criteria
-[2-5 GOAL-BASED criteria focused on what was accomplished, NOT output format]
+[2-4 SPECIFIC, VERIFIABLE criteria - things a validator can CHECK]
 
-GOOD Criteria (goal-based):
-- "File X was created with required content"
-- "Task completed successfully"
-- "Requested information was obtained"
+GOOD Criteria (specific and checkable):
+- "File X exists and contains [specific content/text]"
+- "File Y was modified and now includes [specific change]"
+- "Command completed without errors"
 
-BAD Criteria (too specific):
-- "Output must include specific text format"
-- "Must show exact number of X"
-- "Repository status must contain remote info" (if not requested)
+BAD Criteria (vague or subjective):
+- "Task completed successfully" (too vague)
+- "Looks correct" (subjective)
+- "Output must include specific text format" (unless truly required)
 
 For read-only tasks (git status, list files, get info):
-- Just verify the command ran successfully
+- "Command executed successfully" (that's enough)
 - Don't require specific output formats
 
-For file creation tasks:
-- Verify file exists with content
-- Don't specify exact format unless critical
+For file modification tasks:
+- "File X exists" + "File X contains [specific new content]"
+- Be specific about what changed, not how it's formatted
+
+For append tasks:
+- "File contains BOTH old and new content" (to catch duplicates)
 
 REMEMBER:
 - NO scripts unless explicitly requested

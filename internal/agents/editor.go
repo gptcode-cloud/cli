@@ -41,16 +41,19 @@ const editorPrompt = `You are a code editor and executor. Your job is to modify 
 WORKFLOW:
 1. For file reading: Call read_file to get current content
 2. For shell commands: Call run_command (e.g., "gh pr list", "go test", "npm run lint")
-3. For file modification: Call apply_patch for small changes, or write_file for new files/large rewrites.
+3. For file modification: Call apply_patch for small changes, or write_file for new files/large rewrites
+4. **WHEN DONE**: Stop immediately. Do NOT call tools again. Return success message.
 
 CRITICAL RULES:
-- Use run_command for ANY shell operation (git, gh, tests, linters, etc).
-- Use apply_patch whenever possible to save tokens and reduce risk.
-- For apply_patch, the "search" block must MATCH EXACTLY (including whitespace).
-- For write_file, provide the COMPLETE file content.
-- NEVER use placeholders like "[previous content]" or "[rest of file]".
-- NEVER create fake/placeholder files instead of using run_command.
-- **GO PACKAGE NAMES**: When editing Go files, NEVER change the package declaration unless explicitly asked. If main.go has "package main", ALL files in the same directory MUST use "package main". Do NOT infer package names from filenames (e.g., utils.go should NOT have "package utils" if it's in a package main directory).
+- Use run_command for ANY shell operation (git, gh, tests, linters, etc)
+- Use apply_patch whenever possible to save tokens and reduce risk
+- For apply_patch, the "search" block must MATCH EXACTLY (including whitespace)
+- For write_file, provide the COMPLETE file content
+- NEVER use placeholders like "[previous content]" or "[rest of file]"
+- NEVER create fake/placeholder files instead of using run_command
+- **IDEMPOTENCY**: Before modifying, check if change already exists. Don't apply same patch twice
+- **ONE CHANGE PER FILE**: After modifying a file, do NOT modify it again in same turn
+- **GO PACKAGE NAMES**: When editing Go files, NEVER change the package declaration unless explicitly asked. If main.go has "package main", ALL files in the same directory MUST use "package main". Do NOT infer package names from filenames (e.g., utils.go should NOT have "package utils" if it's in a package main directory)
 
 EXAMPLE 1 - Using run_command (for shell operations):
 Task: "Get list of open pull requests"
@@ -89,6 +92,24 @@ GOOD:
   1. Read file first
   2. Copy EXACT whitespace from file content
   3. search="  return false"  # 2 spaces (matches file)
+
+EXAMPLE 5 - Appending to file (ONE TIME ONLY):
+Task: "Add 'Goodbye' to hello.txt"
+
+Step 1: read_file(path="hello.txt")
+Returns: "Hello World"
+
+Step 2: apply_patch(path="hello.txt",
+  search="Hello World",
+  replace="Hello World\nGoodbye")
+
+Step 3: STOP. Return "Line added successfully". DO NOT read file again.
+
+EXAMPLE 6 - Completion (CRITICAL):
+After executing ALL required changes:
+- Return a brief success message
+- DO NOT call any more tools
+- DO NOT verify by reading files again unless validation failed
 
 Be direct. No explanations unless there's an error.`
 
@@ -393,16 +414,16 @@ func containsEditKeywords(text string) bool {
 	// Check both "Files to modify:" and "## Files to modify" formats
 	if strings.Contains(lower, "files to modify") {
 		// Make sure it's not "Files to Modify: None" or "Files to modify\nNone"
-		if !strings.Contains(lower, "modify\nnone") && 
-		   !strings.Contains(lower, "modify: none") &&
-		   !strings.Contains(lower, "modify:\nnone") {
+		if !strings.Contains(lower, "modify\nnone") &&
+			!strings.Contains(lower, "modify: none") &&
+			!strings.Contains(lower, "modify:\nnone") {
 			return true
 		}
 	}
 	if strings.Contains(lower, "files to create") {
-		if !strings.Contains(lower, "create\nnone") && 
-		   !strings.Contains(lower, "create: none") &&
-		   !strings.Contains(lower, "create:\nnone") {
+		if !strings.Contains(lower, "create\nnone") &&
+			!strings.Contains(lower, "create: none") &&
+			!strings.Contains(lower, "create:\nnone") {
 			return true
 		}
 	}
