@@ -42,6 +42,12 @@ WORKFLOW:
 3. Run commands to verify if needed (build, test, lint, etc)
 4. Report pass/fail - be STRICT, not lenient
 
+SPECIAL CASE - QUERY/READ-ONLY TASKS:
+- If NO files were modified AND the task was a query/read-only command (git status, read file, show data)
+- AND the command executed successfully without errors
+- Then immediately report SUCCESS - there's nothing to validate
+- Query tasks don't need build/compile validation
+
 CRITICAL RULES:
 - **ALL CRITERIA MUST PASS** - if even ONE fails, report FAIL
 - **BE SPECIFIC**: Don't say "looks good" - verify each criterion explicitly
@@ -259,12 +265,16 @@ func containsSuccess(text string) bool {
 		strings.Contains(lowerText, "success criteria are met") ||
 		strings.Contains(lowerText, "all criteria are met") ||
 		strings.Contains(lowerText, "requirements are met") ||
-		strings.Contains(lowerText, "successfully completed") {
+		strings.Contains(lowerText, "successfully completed") ||
+		strings.Contains(lowerText, "executed successfully") ||
+		strings.Contains(lowerText, "completed successfully") ||
+		strings.Contains(lowerText, "ran successfully") ||
+		strings.Contains(lowerText, "no errors") {
 		return true
 	}
 
 	// Fallback: explicit SUCCESS keyword without failure indicators
-	if strings.Contains(lowerText, " success") || strings.HasPrefix(lowerText, "success") {
+	if strings.Contains(lowerText, "success") {
 		hasFail := strings.Contains(lowerText, " fail") ||
 			strings.Contains(lowerText, "failed") ||
 			strings.Contains(lowerText, " error") ||
@@ -282,13 +292,43 @@ func extractIssues(text string) []string {
 	for _, line := range lines {
 		trimmed := strings.TrimSpace(line)
 		lower := strings.ToLower(trimmed)
-		if trimmed != "" && (strings.HasPrefix(trimmed, "-") || strings.HasPrefix(trimmed, "•") || strings.Contains(lower, "issue") || strings.Contains(lower, "missing") || strings.Contains(lower, "error")) {
-			issues = append(issues, trimmed)
+		
+		if trimmed == "" {
+			continue
 		}
-	}
+		
+		if strings.HasSuffix(trimmed, ":") {
+			continue
+		}
 
-	if len(issues) == 0 {
-		issues = append(issues, text)
+		isFailureKeyword := strings.Contains(lower, "fail") ||
+			strings.Contains(lower, "error") ||
+			strings.Contains(lower, "not met") ||
+			strings.Contains(lower, "missing") ||
+			strings.Contains(lower, "incorrect") ||
+			strings.Contains(lower, "invalid") ||
+			strings.Contains(lower, "does not") ||
+			strings.Contains(lower, "did not") ||
+			strings.Contains(lower, "no such") ||
+			strings.Contains(lower, "cannot")
+		
+		isSuccessPhrase := strings.Contains(lower, "success") ||
+			strings.Contains(lower, "complete") ||
+			strings.Contains(lower, "correct") ||
+			strings.Contains(lower, "includes") ||
+			strings.Contains(lower, "met") ||
+			strings.Contains(lower, "display") ||
+			strings.Contains(lower, "show") ||
+			strings.Contains(lower, "executed successfully") ||
+			strings.Contains(lower, "no errors")
+		
+		if isFailureKeyword && !isSuccessPhrase {
+			issues = append(issues, trimmed)
+		} else if strings.HasPrefix(trimmed, "-") || strings.HasPrefix(trimmed, "•") {
+			if isFailureKeyword && !isSuccessPhrase {
+				issues = append(issues, trimmed)
+			}
+		}
 	}
 
 	return issues
