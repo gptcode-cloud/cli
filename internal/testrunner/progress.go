@@ -205,7 +205,7 @@ func RunTestsWithProgress(category, backend, profile string, timeout int, notify
 		return fmt.Errorf("test directory not found: %s\n\nAvailable categories: run, chat, tdd, integration", testDir)
 	}
 
-	args := []string{"test", "-v", "-timeout", fmt.Sprintf("%ds", timeout), fmt.Sprintf("./%s/...", testDir)}
+	args := []string{"test", "-tags=e2e", "-v", "-timeout", fmt.Sprintf("%ds", timeout), fmt.Sprintf("./%s/...", testDir)}
 
 	os.Setenv("E2E_BACKEND", backend)
 	os.Setenv("E2E_PROFILE", profile)
