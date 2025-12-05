@@ -24,48 +24,48 @@ func TestDevOpsCommandHistory(t *testing.T) {
 
 	t.Run("Run directory listing", func(t *testing.T) {
 		output := runChuRun(t, tmpDir, "ls -la", "--raw", 1*time.Minute)
-		
+
 		if !strings.Contains(output, "app.log") {
 			t.Errorf("Expected 'app.log' in output, got: %s", output)
 		}
 		if !strings.Contains(output, "system.log") {
 			t.Errorf("Expected 'system.log' in output, got: %s", output)
 		}
-		
+
 		t.Logf("✓ Listed directory")
 	})
 
 	t.Run("View log file", func(t *testing.T) {
 		output := runChuRun(t, tmpDir, "cat app.log", "--raw", 1*time.Minute)
-		
+
 		if !strings.Contains(output, "ERROR Failed to load config") {
 			t.Errorf("Expected error message in output, got: %s", output)
 		}
-		
+
 		t.Logf("✓ Viewed log file")
 	})
 
 	t.Run("Check command history", func(t *testing.T) {
 		input := "ls -la\ncat app.log\n/history\n/exit\n"
 		output := runChuRunWithInput(t, tmpDir, input, 1*time.Minute)
-		
+
 		// History command should show previous commands
 		if !strings.Contains(output, "ls -la") || !strings.Contains(output, "cat app.log") {
 			t.Logf("History output: %s", output)
 			t.Skip("History command may not be fully implemented yet")
 		}
-		
+
 		t.Logf("✓ Checked command history")
 	})
 
 	t.Run("Reference previous command output", func(t *testing.T) {
 		input := "echo hello\n/output 1\n/exit\n"
 		output := runChuRunWithInput(t, tmpDir, input, 1*time.Minute)
-		
+
 		if !strings.Contains(output, "hello") {
 			t.Errorf("Expected 'hello' in output, got: %s", output)
 		}
-		
+
 		t.Logf("✓ Referenced previous output")
 	})
 
