@@ -308,6 +308,9 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 						if result.Result != "" && result.Error == "" {
 							isQueryTask := len(messages) > 0 && !containsEditKeywords(messages[0].Content)
 							if isQueryTask {
+								if os.Getenv("CHUCHU_DEBUG") == "1" {
+									fmt.Fprintf(os.Stderr, "[EDITOR] Early return for query task, result length=%d\n", len(result.Result))
+								}
 								return result.Result, modifiedFiles, nil
 							}
 						}
@@ -378,6 +381,9 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 				if result.Result != "" && result.Error == "" {
 					isQueryTask := len(messages) > 0 && !containsEditKeywords(messages[0].Content)
 					if isQueryTask {
+						if os.Getenv("CHUCHU_DEBUG") == "1" {
+							fmt.Fprintf(os.Stderr, "[EDITOR] Early return for query task (path 2), result length=%d\n", len(result.Result))
+						}
 						return result.Result, modifiedFiles, nil
 					}
 				}

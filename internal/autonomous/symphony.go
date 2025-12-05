@@ -201,7 +201,7 @@ func generateID() string {
 func isReadOnlyMovements(movements []Movement) bool {
 	for _, m := range movements {
 		lower := strings.ToLower(m.Goal)
-		
+
 		editPatterns := []string{
 			"modify the", "modify file",
 			"write to", "write the", "write file",
@@ -216,7 +216,7 @@ func isReadOnlyMovements(movements []Movement) bool {
 			"implement",
 			"fix the code", "fix bug",
 		}
-		
+
 		for _, pattern := range editPatterns {
 			if strings.Contains(lower, pattern) {
 				return false
@@ -229,7 +229,7 @@ func isReadOnlyMovements(movements []Movement) bool {
 // isObviousQuery checks if task is clearly a read-only query
 func isObviousQuery(task string) bool {
 	lower := strings.ToLower(strings.TrimSpace(task))
-	
+
 	// Check for question words at start
 	questionStarters := []string{
 		"what", "show", "list", "display", "tell", "which",
@@ -240,7 +240,7 @@ func isObviousQuery(task string) bool {
 			return true
 		}
 	}
-	
+
 	// Check for common query patterns
 	queryPatterns := []string{
 		"git status", "git log", "git diff", "git branch",
@@ -251,7 +251,7 @@ func isObviousQuery(task string) bool {
 			return true
 		}
 	}
-	
+
 	return false
 }
 
