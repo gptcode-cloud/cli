@@ -96,6 +96,10 @@ $0-5/month vs $20-30/month subscriptions.
   chu cfg list                  - List configuration files
   chu cfg update KEY VALUE      - Update config value across environments
 
+## PERFORMANCE
+  chu perf profile [target]     - Profile CPU/memory performance
+  chu perf bench [pattern]      - Run benchmarks with optimization tips
+
 ## ADVANCED
   chu config get/set       - Direct config manipulation (advanced)
   chu ml list|train|test|eval|predict - Machine learning features
