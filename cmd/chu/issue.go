@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"os/exec"
@@ -9,7 +10,11 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"chuchu/internal/config"
 	"chuchu/internal/github"
+	"chuchu/internal/langdetect"
+	"chuchu/internal/llm"
+	"chuchu/internal/modes"
 	"chuchu/internal/validation"
 )
 
@@ -52,6 +57,7 @@ Examples:
 		}
 
 		repo, _ := cmd.Flags().GetString("repo")
+		autonomous, _ := cmd.Flags().GetBool("autonomous")
 
 		if repo == "" {
 			repo = detectGitHubRepo()
@@ -90,14 +96,52 @@ Examples:
 
 		branchName := issue.CreateBranchName()
 		fmt.Printf("🌿 Creating branch: %s\n", branchName)
-		
+
 		if err := client.CreateBranch(branchName, ""); err != nil {
 			return fmt.Errorf("failed to create branch: %w", err)
 		}
 
-		fmt.Println("\n⚠️  Manual implementation required (Symphony integration coming soon)")
-		fmt.Println("   Please make your changes, then run:")
+		task := fmt.Sprintf("Fix issue #%d: %s", issue.Number, issue.Title)
+		if len(reqs) > 0 {
+			task += ", Requirements: " + strings.Join(reqs, "; ")
+		}
+
+		if autonomous {
+			setup, err := config.LoadSetup()
+			if err != nil {
+				return fmt.Errorf("failed to load setup: %w", err)
+			}
+			backendName := setup.Defaults.Backend
+			backendCfg := setup.Backend[backendName]
+			var provider llm.Provider
+			if backendCfg.Type == "ollama" {
+				provider = llm.NewOllama(backendCfg.BaseURL)
+			} else {
+				provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
+			}
+			queryModel := backendCfg.GetModelForAgent("query")
+			if queryModel == "" {
+				queryModel = backendCfg.DefaultModel
+			}
+			language := string(langdetect.DetectLanguage(workDir))
+			if language == "" || language == "unknown" {
+				language = setup.Defaults.Lang
+				if language == "" {
+					language = "go"
+				}
+			}
+			exec := modes.NewAutonomousExecutorWithBackend(provider, workDir, queryModel, language, backendName)
+			if err := exec.Execute(context.Background(), task); err != nil {
+				return fmt.Errorf("autonomous implementation failed: %w", err)
+			}
+			fmt.Println("\n[OK] Implementation complete")
+		} else {
+			fmt.Println("\nImplementation not executed (use --autonomous to enable)")
+		}
+
+		fmt.Println("\nNext steps:")
 		fmt.Printf("   chu issue commit %d\n", issueNum)
+		fmt.Printf("   chu issue push %d\n", issueNum)
 
 		return nil
 	},
@@ -133,11 +177,11 @@ var issueShowCmd = &cobra.Command{
 		fmt.Printf("URL: %s\n", issue.URL)
 		fmt.Printf("Created: %s\n", issue.CreatedAt)
 		fmt.Printf("Updated: %s\n", issue.UpdatedAt)
-		
+
 		if len(issue.Labels) > 0 {
 			fmt.Printf("Labels: %s\n", strings.Join(issue.Labels, ", "))
 		}
-		
+
 		if len(issue.Assignees) > 0 {
 			fmt.Printf("Assignees: %s\n", strings.Join(issue.Assignees, ", "))
 		}
@@ -193,7 +237,7 @@ This will:
 		client.SetWorkDir(workDir)
 
 		fmt.Printf("💾 Committing changes for issue #%d...\n", issueNum)
-		
+
 		err = client.CommitChanges(github.CommitOptions{
 			Message:     message,
 			IssueNumber: issueNum,
@@ -209,7 +253,7 @@ This will:
 			fmt.Println("\n🧪 Running tests...")
 			testExec := validation.NewTestExecutor(workDir)
 			result, err := testExec.RunTests()
-			
+
 			if err != nil {
 				fmt.Printf("⚠️  Tests encountered error: %v\n", err)
 			} else if result.Success {
@@ -226,7 +270,7 @@ This will:
 			fmt.Println("\n🔍 Running linters...")
 			lintExec := validation.NewLinterExecutor(workDir)
 			results, err := lintExec.RunLinters()
-			
+
 			if err != nil {
 				fmt.Printf("⚠️  Linters encountered error: %v\n", err)
 			} else {
@@ -236,11 +280,11 @@ This will:
 						fmt.Printf("✅ %s: no issues\n", result.Tool)
 					} else {
 						allPassed = false
-						fmt.Printf("❌ %s: %d issues (%d errors, %d warnings)\n", 
+						fmt.Printf("❌ %s: %d issues (%d errors, %d warnings)\n",
 							result.Tool, result.Issues, result.Errors, result.Warnings)
 					}
 				}
-				
+
 				if !allPassed {
 					return fmt.Errorf("linting issues found")
 				}
@@ -285,7 +329,7 @@ var issuePushCmd = &cobra.Command{
 		}
 
 		branchName := issue.CreateBranchName()
-		
+
 		fmt.Printf("🚀 Pushing branch %s...\n", branchName)
 		if err := client.PushBranch(branchName); err != nil {
 			return fmt.Errorf("failed to push branch: %w", err)
@@ -294,7 +338,7 @@ var issuePushCmd = &cobra.Command{
 		fmt.Println("✅ Branch pushed")
 
 		fmt.Println("\n📝 Creating pull request...")
-		
+
 		changes := []string{"Implemented fix for issue"}
 		prBody := github.GeneratePRBody(issue, changes)
 
@@ -313,7 +357,7 @@ var issuePushCmd = &cobra.Command{
 
 		fmt.Printf("✅ Pull request created: %s\n", pr.URL)
 		fmt.Printf("   PR #%d: %s\n", pr.Number, pr.Title)
-		
+
 		return nil
 	},
 }
@@ -326,16 +370,16 @@ func detectGitHubRepo() string {
 	}
 
 	url := strings.TrimSpace(string(output))
-	
+
 	if strings.Contains(url, "github.com") {
 		parts := strings.Split(url, "github.com")
 		if len(parts) < 2 {
 			return ""
 		}
-		
+
 		repo := strings.Trim(parts[1], ":/")
 		repo = strings.TrimSuffix(repo, ".git")
-		
+
 		return repo
 	}
 
@@ -352,6 +396,7 @@ func init() {
 	issueFixCmd.Flags().Bool("draft", false, "Create draft pull request")
 	issueFixCmd.Flags().Bool("skip-tests", false, "Skip running tests")
 	issueFixCmd.Flags().Bool("skip-lint", false, "Skip running linters")
+	issueFixCmd.Flags().Bool("autonomous", true, "Execute implementation autonomously")
 
 	issueShowCmd.Flags().String("repo", "", "GitHub repository (owner/repo)")
 
