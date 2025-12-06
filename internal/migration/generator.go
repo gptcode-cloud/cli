@@ -63,7 +63,7 @@ func (g *MigrationGenerator) GenerateMigration(ctx context.Context, name string)
 
 	timestamp := time.Now().Format("20060102150405")
 	filename := fmt.Sprintf("%s_%s.sql", timestamp, strings.ReplaceAll(name, " ", "_"))
-	
+
 	migrationsDir := filepath.Join(g.workDir, "migrations")
 	if err := os.MkdirAll(migrationsDir, 0755); err != nil {
 		return nil, fmt.Errorf("failed to create migrations directory: %w", err)
@@ -93,14 +93,14 @@ func (g *MigrationGenerator) detectModelChanges() ([]ModelChange, error) {
 
 	var changes []ModelChange
 	files := strings.Split(strings.TrimSpace(string(output)), "\n")
-	
+
 	for _, file := range files {
 		if !strings.HasSuffix(file, ".go") {
 			continue
 		}
 
-		if strings.Contains(file, "model") || strings.Contains(file, "entity") || 
-		   strings.Contains(file, "schema") {
+		if strings.Contains(file, "model") || strings.Contains(file, "entity") ||
+			strings.Contains(file, "schema") {
 			fileChanges, err := g.analyzeFileChanges(filepath.Join(g.workDir, file))
 			if err == nil {
 				changes = append(changes, fileChanges...)
@@ -217,8 +217,8 @@ func (g *MigrationGenerator) parseModels(content string) map[string]map[string]s
 
 			if field.Tag != nil {
 				tag := field.Tag.Value
-				if strings.Contains(tag, "gorm:") || strings.Contains(tag, "db:") || 
-				   strings.Contains(tag, "json:") {
+				if strings.Contains(tag, "gorm:") || strings.Contains(tag, "db:") ||
+					strings.Contains(tag, "json:") {
 					fields[fieldName] = fieldType
 				}
 			} else if !ast.IsExported(fieldName) {
@@ -259,21 +259,21 @@ func (g *MigrationGenerator) generateMigrationCode(ctx context.Context, name str
 		switch change.Type {
 		case "added":
 			if change.Field == "" {
-				changeDescriptions = append(changeDescriptions, 
+				changeDescriptions = append(changeDescriptions,
 					fmt.Sprintf("- Added model: %s", change.ModelName))
 			} else {
-				changeDescriptions = append(changeDescriptions, 
+				changeDescriptions = append(changeDescriptions,
 					fmt.Sprintf("- Added field %s.%s (%s)", change.ModelName, change.Field, change.NewType))
 			}
 		case "modified":
-			changeDescriptions = append(changeDescriptions, 
+			changeDescriptions = append(changeDescriptions,
 				fmt.Sprintf("- Modified %s.%s: %s -> %s", change.ModelName, change.Field, change.OldType, change.NewType))
 		case "removed":
 			if change.Field == "" {
-				changeDescriptions = append(changeDescriptions, 
+				changeDescriptions = append(changeDescriptions,
 					fmt.Sprintf("- Removed model: %s", change.ModelName))
 			} else {
-				changeDescriptions = append(changeDescriptions, 
+				changeDescriptions = append(changeDescriptions,
 					fmt.Sprintf("- Removed field %s.%s", change.ModelName, change.Field))
 			}
 		}
@@ -306,7 +306,7 @@ Return ONLY the SQL migration code, no explanations.`, name, strings.Join(change
 	}
 
 	code := strings.TrimSpace(resp.Text)
-	
+
 	if strings.HasPrefix(code, "```sql") {
 		code = strings.TrimPrefix(code, "```sql\n")
 		code = strings.TrimSuffix(code, "```")

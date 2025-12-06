@@ -132,16 +132,16 @@ Chuchu identifies:
 
 ## What Chuchu Cannot Do (Yet)
 
-### 🟡 Complex Code Modifications (1/12 scenarios)
+### 🟡 Complex Code Modifications (2/12 scenarios)
 
 **Implemented:**
 
 - ✅ Database migrations (`chu gen migration <name>`)
+- ✅ API changes coordination (`chu refactor api`)
 
 **Not yet implemented:**
 
 - **Multi-file refactoring** - Changing function signatures across 5+ files
-- **API changes** - Coordinated updates to routes, handlers, tests
 - **Breaking changes** - Updating all consumers of changed APIs
 - **Type system changes** - Complex type definition updates
 - **Performance optimizations** - Profiling and bottleneck identification
@@ -149,18 +149,22 @@ Chuchu identifies:
 - **Configuration changes** - Environment-specific configurations
 - **Backward compatibility** - Maintaining old APIs while adding new
 
-**Example:**
+**Examples:**
 ```bash
 chu gen migration "add user email"
 # Detects model changes
 # Generates SQL with up/down migrations
+
+chu refactor api
+# Scans routes in handlers/controllers
+# Generates/updates handler functions
+# Creates/updates corresponding tests
 ```
 
 **Limitations:**
-- Currently detects changes in Git working tree
-- Go structs only (models with gorm/db tags)
-- SQL output (PostgreSQL compatible)
-- Manual review recommended before applying
+- Migration: Git working tree only, Go structs with tags, PostgreSQL SQL
+- API coordination: Go HTTP handlers, standard patterns (Get/Post/etc)
+- Manual review recommended for both
 
 **Why others not implemented:** These require deep architectural understanding and multi-step coordination. Coming in future releases.
 
@@ -252,10 +256,10 @@ chu docs update --apply     # Apply updates automatically
 
 ### Next Release (Targeting 80% Autonomy)
 
-**Phase 7: Complex Code Modifications (11 remaining scenarios)**
+**Phase 7: Complex Code Modifications (10 remaining scenarios)**
 - ✅ Database migrations (DONE)
+- ✅ API changes with coordinated updates (DONE)
 - Multi-file refactoring
-- API changes with coordinated updates
 - Type system improvements
 
 **Phase 8: Test Generation (1 remaining scenario)**
@@ -304,7 +308,8 @@ Skipped tests (t.Skip()) represent features not yet implemented.
 - ✅ CHANGELOG generation
 - ✅ README updates
 - ✅ Database migrations
-- **Autonomy:** 47/64 (73%)
+- ✅ API change coordination
+- **Autonomy:** 48/64 (75%)
 - **MVAA Critical Path:** 17/17 (100%)
 
 ### Future Releases

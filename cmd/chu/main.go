@@ -81,6 +81,9 @@ $0-5/month vs $20-30/month subscriptions.
   chu profile list         - List all profiles
   chu profile use <backend>.<profile> - Switch profile
 
+## REFACTORING
+  chu refactor api         - Coordinate API changes (routes, handlers, tests)
+
 ## ADVANCED
   chu config get/set       - Direct config manipulation (advanced)
   chu ml list|train|test|eval|predict - Machine learning features
