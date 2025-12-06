@@ -86,6 +86,10 @@ $0-5/month vs $20-30/month subscriptions.
   chu refactor signature <func> - Change function signature and update all call sites
   chu refactor breaking         - Detect breaking changes and update all consumers
 
+## SECURITY
+  chu security scan             - Scan for vulnerabilities
+  chu security scan --fix       - Scan and auto-fix vulnerabilities
+
 ## ADVANCED
   chu config get/set       - Direct config manipulation (advanced)
   chu ml list|train|test|eval|predict - Machine learning features

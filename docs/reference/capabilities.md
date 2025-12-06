@@ -2,7 +2,7 @@
 
 **Last Updated:** December 2025  
 **Current Version:** 0.x (MVP)  
-**Overall Autonomy:** 50/64 scenarios (78%)
+**Overall Autonomy:** 51/64 scenarios (80%)
 
 This document describes what Chuchu can and cannot do autonomously. Updated with each major release.
 
@@ -132,7 +132,7 @@ Chuchu identifies:
 
 ## What Chuchu Cannot Do (Yet)
 
-### 🟡 Complex Code Modifications (4/12 scenarios)
+### 🟡 Complex Code Modifications (5/12 scenarios)
 
 **Implemented:**
 
@@ -140,12 +140,12 @@ Chuchu identifies:
 - ✅ API changes coordination (`chu refactor api`)
 - ✅ Multi-file refactoring (`chu refactor signature <func> <new-sig>`)
 - ✅ Breaking changes coordination (`chu refactor breaking`)
+- ✅ Security vulnerability fixes (`chu security scan --fix`)
 
 **Not yet implemented:**
 
 - **Type system changes** - Complex type definition updates
 - **Performance optimizations** - Profiling and bottleneck identification
-- **Security fixes** - Complex vulnerability patches
 - **Configuration changes** - Environment-specific configurations
 - **Backward compatibility** - Maintaining old APIs while adding new
 
@@ -170,6 +170,14 @@ chu refactor breaking
 # Finds all consumers (functions/types)
 # Generates migration plan
 # Updates consuming code automatically
+
+chu security scan
+# Scans vulnerabilities (govulncheck, npm audit, safety, bundle audit)
+# Reports severity and CVEs
+
+chu security scan --fix
+# Auto-updates dependencies
+# LLM fixes code if needed
 ```
 
 **Limitations:**
@@ -177,6 +185,7 @@ chu refactor breaking
 - API coordination: Go HTTP handlers, standard patterns (Get/Post/etc)
 - Signature refactoring: Go only, requires LLM for code generation
 - Breaking changes: Go only, exported symbols only, requires git HEAD
+- Security fixes: Requires external tools (govulncheck, npm audit, etc)
 - Manual review strongly recommended for all
 
 **Why others not implemented:** These require deep architectural understanding and multi-step coordination. Coming in future releases.

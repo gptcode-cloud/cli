@@ -173,7 +173,7 @@ func (c *BreakingCoordinator) compareASTs(file string, oldAST, newAST *ast.File)
 
 	for name, oldFunc := range oldFuncs {
 		newFunc, exists := newFuncs[name]
-		
+
 		if !exists {
 			changes = append(changes, BreakingChange{
 				Type:        "function_removed",
@@ -204,7 +204,7 @@ func (c *BreakingCoordinator) compareASTs(file string, oldAST, newAST *ast.File)
 
 	for name, oldType := range oldTypes {
 		newType, exists := newTypes[name]
-		
+
 		if !exists {
 			changes = append(changes, BreakingChange{
 				Type:        "type_removed",
@@ -235,7 +235,7 @@ func (c *BreakingCoordinator) compareASTs(file string, oldAST, newAST *ast.File)
 
 func (c *BreakingCoordinator) extractFunctions(file *ast.File) map[string]string {
 	funcs := make(map[string]string)
-	
+
 	ast.Inspect(file, func(n ast.Node) bool {
 		fn, ok := n.(*ast.FuncDecl)
 		if !ok || !fn.Name.IsExported() {
@@ -252,7 +252,7 @@ func (c *BreakingCoordinator) extractFunctions(file *ast.File) map[string]string
 
 func (c *BreakingCoordinator) extractTypes(file *ast.File) map[string]string {
 	types := make(map[string]string)
-	
+
 	ast.Inspect(file, func(n ast.Node) bool {
 		genDecl, ok := n.(*ast.GenDecl)
 		if !ok || genDecl.Tok != token.TYPE {
@@ -365,7 +365,7 @@ func (c *BreakingCoordinator) findConsumers(change BreakingChange) ([]Consumer, 
 		fmt.Sscanf(parts[1], "%d", &lineNum)
 
 		pkg, importPath := c.getPackageInfo(file)
-		
+
 		consumers = append(consumers, Consumer{
 			File:       file,
 			Package:    pkg,
@@ -401,7 +401,7 @@ func (c *BreakingCoordinator) generateMigrationPlan(ctx context.Context, changes
 		if change.NewAPI != "" {
 			changeDesc.WriteString(fmt.Sprintf("   New: %s\n", change.NewAPI))
 		}
-		
+
 		key := fmt.Sprintf("%s.%s", change.Package, change.Symbol)
 		if cons, ok := consumers[key]; ok {
 			changeDesc.WriteString(fmt.Sprintf("   Affected files: %d\n", len(cons)))
@@ -471,7 +471,7 @@ Update the code to use the new API. Return ONLY the complete updated file conten
 
 func (c *BreakingCoordinator) extractCode(text string) string {
 	text = strings.TrimSpace(text)
-	
+
 	if strings.HasPrefix(text, "```go") {
 		text = strings.TrimPrefix(text, "```go\n")
 		text = strings.TrimSuffix(text, "```")
