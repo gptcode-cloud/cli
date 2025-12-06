@@ -18,10 +18,10 @@ type ReadmeUpdater struct {
 }
 
 type UpdateResult struct {
-	Updated  bool
-	Changes  []string
-	NewText  string
-	Error    error
+	Updated bool
+	Changes []string
+	NewText string
+	Error   error
 }
 
 func NewReadmeUpdater(provider llm.Provider, model, workDir string) *ReadmeUpdater {
@@ -34,7 +34,7 @@ func NewReadmeUpdater(provider llm.Provider, model, workDir string) *ReadmeUpdat
 
 func (u *ReadmeUpdater) UpdateReadme(ctx context.Context) (*UpdateResult, error) {
 	readmePath := filepath.Join(u.workDir, "README.md")
-	
+
 	currentReadme, err := os.ReadFile(readmePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read README: %w", err)
@@ -142,7 +142,7 @@ func (u *ReadmeUpdater) getNewFiles() ([]string, error) {
 
 func (u *ReadmeUpdater) detectNewCommands() ([]string, error) {
 	cmdPath := filepath.Join(u.workDir, "cmd/chu")
-	
+
 	entries, err := os.ReadDir(cmdPath)
 	if err != nil {
 		return nil, err
@@ -194,7 +194,7 @@ Return ONLY the complete updated README.md, no explanations.`, currentReadme, ch
 	}
 
 	updated := strings.TrimSpace(resp.Text)
-	
+
 	if strings.HasPrefix(updated, "```markdown") {
 		updated = strings.TrimPrefix(updated, "```markdown\n")
 		updated = strings.TrimSuffix(updated, "```")
@@ -208,7 +208,7 @@ Return ONLY the complete updated README.md, no explanations.`, currentReadme, ch
 
 func (u *ReadmeUpdater) ApplyUpdate(readmePath, newContent string) error {
 	backupPath := readmePath + ".backup"
-	
+
 	if err := os.Rename(readmePath, backupPath); err != nil {
 		return fmt.Errorf("failed to create backup: %w", err)
 	}

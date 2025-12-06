@@ -132,12 +132,15 @@ Chuchu identifies:
 
 ## What Chuchu Cannot Do (Yet)
 
-### ❌ Complex Code Modifications (0/12 scenarios)
+### 🟡 Complex Code Modifications (1/12 scenarios)
 
-The following require human intervention:
+**Implemented:**
+
+- ✅ Database migrations (`chu gen migration <name>`)
+
+**Not yet implemented:**
 
 - **Multi-file refactoring** - Changing function signatures across 5+ files
-- **Database migrations** - Creating migrations and updating models
 - **API changes** - Coordinated updates to routes, handlers, tests
 - **Breaking changes** - Updating all consumers of changed APIs
 - **Type system changes** - Complex type definition updates
@@ -146,7 +149,20 @@ The following require human intervention:
 - **Configuration changes** - Environment-specific configurations
 - **Backward compatibility** - Maintaining old APIs while adding new
 
-**Why:** These require deep architectural understanding and multi-step coordination. Coming in future releases.
+**Example:**
+```bash
+chu gen migration "add user email"
+# Detects model changes
+# Generates SQL with up/down migrations
+```
+
+**Limitations:**
+- Currently detects changes in Git working tree
+- Go structs only (models with gorm/db tags)
+- SQL output (PostgreSQL compatible)
+- Manual review recommended before applying
+
+**Why others not implemented:** These require deep architectural understanding and multi-step coordination. Coming in future releases.
 
 ---
 
@@ -236,10 +252,10 @@ chu docs update --apply     # Apply updates automatically
 
 ### Next Release (Targeting 80% Autonomy)
 
-**Phase 7: Complex Code Modifications (12 scenarios)**
+**Phase 7: Complex Code Modifications (11 remaining scenarios)**
+- ✅ Database migrations (DONE)
 - Multi-file refactoring
 - API changes with coordinated updates
-- Database migrations
 - Type system improvements
 
 **Phase 8: Test Generation (1 remaining scenario)**
@@ -287,7 +303,8 @@ Skipped tests (t.Skip()) represent features not yet implemented.
 - ✅ Coverage gap identification
 - ✅ CHANGELOG generation
 - ✅ README updates
-- **Autonomy:** 46/64 (72%)
+- ✅ Database migrations
+- **Autonomy:** 47/64 (73%)
 - **MVAA Critical Path:** 17/17 (100%)
 
 ### Future Releases
