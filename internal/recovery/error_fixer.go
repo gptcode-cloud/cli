@@ -17,12 +17,12 @@ type ErrorFixer struct {
 }
 
 type FixResult struct {
-	Success      bool
-	FixAttempts  int
-	ErrorType    string
+	Success       bool
+	FixAttempts   int
+	ErrorType     string
 	OriginalError string
-	FixApplied   string
-	FinalStatus  string
+	FixApplied    string
+	FinalStatus   string
 }
 
 func NewErrorFixer(provider llm.Provider, model string, workDir string) *ErrorFixer {
@@ -55,7 +55,7 @@ func (ef *ErrorFixer) FixTestFailures(ctx context.Context, testResult *validatio
 		result.FixAttempts = attempt
 
 		fixPrompt := ef.buildTestFixPrompt(failures, testResult.Output)
-		
+
 		resp, err := ef.provider.Chat(ctx, llm.ChatRequest{
 			SystemPrompt: `You are a code fixing expert. Analyze test failures and provide exact fixes.
 Your response must be in this format:
@@ -124,7 +124,7 @@ func (ef *ErrorFixer) FixLintIssues(ctx context.Context, lintResults []*validati
 		result.FixAttempts = attempt
 
 		fixPrompt := ef.buildLintFixPrompt(lintResults)
-		
+
 		resp, err := ef.provider.Chat(ctx, llm.ChatRequest{
 			SystemPrompt: `You are a code quality expert. Fix linting issues automatically.
 Your response must include exact code changes.`,
@@ -198,9 +198,44 @@ Provide the exact code fix needed.`, language, syntaxError)
 	return result, nil
 }
 
+func (ef *ErrorFixer) FixGenericError(ctx context.Context, prompt string, errorOutput string, maxAttempts int) (*FixResult, error) {
+	result := &FixResult{
+		ErrorType:     "generic_error",
+		OriginalError: errorOutput,
+		FixAttempts:   1,
+	}
+
+	resp, err := ef.provider.Chat(ctx, llm.ChatRequest{
+		SystemPrompt: `You are an expert at diagnosing and fixing code errors.
+Analyze the error, identify the root cause, and provide specific fixes.
+
+Format your response as:
+## Analysis
+[What went wrong]
+
+## Solution
+[How to fix it]
+
+## Changes
+[Specific file and code changes]`,
+		UserPrompt: prompt,
+		Model:      ef.model,
+	})
+
+	if err != nil {
+		return result, fmt.Errorf("LLM request failed: %w", err)
+	}
+
+	result.FixApplied = resp.Text
+	result.Success = true
+	result.FinalStatus = "Fix analysis provided"
+
+	return result, nil
+}
+
 func (ef *ErrorFixer) extractTestFailures(output string) []string {
 	var failures []string
-	
+
 	lines := strings.Split(output, "\n")
 	for _, line := range lines {
 		if strings.Contains(line, "FAIL:") || strings.Contains(line, "Error:") {
@@ -221,13 +256,13 @@ func (ef *ErrorFixer) extractTestFailures(output string) []string {
 
 func (ef *ErrorFixer) extractSyntaxError(output string, language string) string {
 	lines := strings.Split(output, "\n")
-	
+
 	var errorLines []string
 	for _, line := range lines {
 		lower := strings.ToLower(line)
-		if strings.Contains(lower, "error:") || 
-		   strings.Contains(lower, "syntaxerror") ||
-		   strings.Contains(lower, "unexpected") {
+		if strings.Contains(lower, "error:") ||
+			strings.Contains(lower, "syntaxerror") ||
+			strings.Contains(lower, "unexpected") {
 			errorLines = append(errorLines, line)
 		}
 	}
@@ -241,7 +276,7 @@ func (ef *ErrorFixer) extractSyntaxError(output string, language string) string 
 
 func (ef *ErrorFixer) buildTestFixPrompt(failures []string, fullOutput string) string {
 	prompt := "Fix these test failures:\n\n"
-	
+
 	for i, failure := range failures {
 		if i >= 5 {
 			prompt += fmt.Sprintf("\n...and %d more failures", len(failures)-5)
@@ -251,7 +286,7 @@ func (ef *ErrorFixer) buildTestFixPrompt(failures []string, fullOutput string) s
 	}
 
 	prompt += "\nFull test output:\n```\n"
-	
+
 	outputLines := strings.Split(fullOutput, "\n")
 	if len(outputLines) > 50 {
 		prompt += strings.Join(outputLines[:50], "\n")
@@ -267,11 +302,11 @@ func (ef *ErrorFixer) buildTestFixPrompt(failures []string, fullOutput string) s
 
 func (ef *ErrorFixer) buildLintFixPrompt(lintResults []*validation.LintResult) string {
 	prompt := "Fix these linting issues:\n\n"
-	
+
 	for _, result := range lintResults {
 		if !result.Success || result.Issues > 0 {
 			prompt += fmt.Sprintf("## %s (%d issues)\n", result.Tool, result.Issues)
-			
+
 			outputLines := strings.Split(result.Output, "\n")
 			lineCount := 0
 			for _, line := range outputLines {

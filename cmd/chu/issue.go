@@ -7,9 +7,11 @@ import (
 	"os/exec"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
+	"chuchu/internal/ci"
 	"chuchu/internal/codebase"
 	"chuchu/internal/config"
 	"chuchu/internal/github"
@@ -668,7 +670,7 @@ This will:
 File: %s (line %d)
 Comment: %s
 
-Please read the file, understand the context, and implement the requested change.`, 
+Please read the file, understand the context, and implement the requested change.`,
 				comment.Path, comment.Line, comment.Body)
 
 			exec := modes.NewAutonomousExecutorWithBackend(provider, workDir, queryModel, language, backendName)
@@ -683,7 +685,7 @@ Please read the file, understand the context, and implement the requested change
 		fmt.Println("\n📦 Committing changes...")
 
 		err = client.CommitChanges(github.CommitOptions{
-			Message: fmt.Sprintf("Address review comments on PR #%d", prNumber),
+			Message:  fmt.Sprintf("Address review comments on PR #%d", prNumber),
 			AllFiles: true,
 		})
 		if err != nil {
@@ -713,12 +715,148 @@ Please read the file, understand the context, and implement the requested change
 	},
 }
 
+var issueCICmd = &cobra.Command{
+	Use:   "ci <pr-number>",
+	Short: "Handle CI failures on a PR",
+	Long: `Monitor CI checks and automatically fix failures.
+
+This will:
+1. Wait for CI checks to complete
+2. Fetch logs from failed checks
+3. Analyze failures and apply fixes
+4. Re-push and verify`,
+	Args: cobra.ExactArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		prNumber, err := strconv.Atoi(args[0])
+		if err != nil {
+			return fmt.Errorf("invalid PR number: %s", args[0])
+		}
+
+		repo, _ := cmd.Flags().GetString("repo")
+		if repo == "" {
+			repo = detectGitHubRepo()
+			if repo == "" {
+				return fmt.Errorf("could not detect GitHub repository. Use --repo flag")
+			}
+		}
+
+		workDir, _ := os.Getwd()
+
+		setup, err := config.LoadSetup()
+		if err != nil {
+			return fmt.Errorf("failed to load setup: %w", err)
+		}
+
+		backendName := setup.Defaults.Backend
+		backendCfg := setup.Backend[backendName]
+		var provider llm.Provider
+		if backendCfg.Type == "ollama" {
+			provider = llm.NewOllama(backendCfg.BaseURL)
+		} else {
+			provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
+		}
+
+		model := backendCfg.GetModelForAgent("editor")
+		if model == "" {
+			model = backendCfg.DefaultModel
+		}
+
+		handler := ci.NewHandler(repo, workDir, provider, model)
+
+		fmt.Printf("🔍 Checking CI status for PR #%d...\n", prNumber)
+
+		time.Sleep(2 * time.Second)
+
+		failed, err := handler.GetFailedChecks(prNumber)
+		if err != nil {
+			return fmt.Errorf("failed to get CI status: %w", err)
+		}
+
+		if len(failed) == 0 {
+			fmt.Println("✅ All CI checks passing")
+			return nil
+		}
+
+		fmt.Printf("\n❌ Found %d failed check(s):\n\n", len(failed))
+		for i, check := range failed {
+			fmt.Printf("%d. %s - %s\n", i+1, check.Name, check.State)
+		}
+
+		fmt.Println("\n📜 Fetching CI logs...")
+
+		logs, err := handler.FetchCILogs(prNumber, "")
+		if err != nil {
+			fmt.Printf("⚠️  Could not fetch full logs: %v\n", err)
+			logs = "No detailed logs available"
+		}
+
+		fmt.Println("🔎 Analyzing failures...")
+
+		failure := handler.ParseCIFailure(logs)
+		fmt.Printf("\nDetected error: %s\n", failure.Error)
+
+		fmt.Println("\n🔧 Generating fix...")
+
+		fixResult, err := handler.AnalyzeFailure(*failure)
+		if err != nil {
+			return fmt.Errorf("failed to analyze failure: %w", err)
+		}
+
+		if !fixResult.Success {
+			fmt.Println("⚠️  Could not generate automatic fix")
+			fmt.Println("\nAnalysis:")
+			fmt.Println(fixResult.FixApplied)
+			return fmt.Errorf("manual intervention required")
+		}
+
+		fmt.Println("✅ Fix generated")
+		fmt.Println("\nRecommended changes:")
+		fmt.Println(fixResult.FixApplied)
+
+		fmt.Println("\n📦 Committing fix...")
+
+		client := github.NewClient(repo)
+		client.SetWorkDir(workDir)
+
+		err = client.CommitChanges(github.CommitOptions{
+			Message:  fmt.Sprintf("Fix CI failure on PR #%d", prNumber),
+			AllFiles: true,
+		})
+		if err != nil {
+			return fmt.Errorf("failed to commit: %w", err)
+		}
+
+		fmt.Println("✅ Changes committed")
+
+		currentBranch := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
+		currentBranch.Dir = workDir
+		branchOutput, err := currentBranch.Output()
+		if err != nil {
+			return fmt.Errorf("failed to get current branch: %w", err)
+		}
+
+		branchName := strings.TrimSpace(string(branchOutput))
+		fmt.Printf("🚀 Pushing %s...\n", branchName)
+
+		if err := client.PushBranch(branchName); err != nil {
+			return fmt.Errorf("failed to push: %w", err)
+		}
+
+		fmt.Println("\n✅ CI fix pushed")
+		fmt.Printf("   View PR: https://github.com/%s/pull/%d\n", repo, prNumber)
+		fmt.Println("\n⏳ CI checks will run again automatically")
+
+		return nil
+	},
+}
+
 func init() {
 	issueCmd.AddCommand(issueFixCmd)
 	issueCmd.AddCommand(issueShowCmd)
 	issueCmd.AddCommand(issueCommitCmd)
 	issueCmd.AddCommand(issuePushCmd)
 	issueCmd.AddCommand(issueReviewCmd)
+	issueCmd.AddCommand(issueCICmd)
 
 	issueFixCmd.Flags().String("repo", "", "GitHub repository (owner/repo)")
 	issueFixCmd.Flags().Bool("draft", false, "Create draft pull request")
@@ -743,4 +881,6 @@ func init() {
 	issuePushCmd.Flags().Bool("draft", false, "Create draft pull request")
 
 	issueReviewCmd.Flags().String("repo", "", "GitHub repository (owner/repo)")
+
+	issueCICmd.Flags().String("repo", "", "GitHub repository (owner/repo)")
 }
