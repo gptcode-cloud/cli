@@ -224,6 +224,9 @@ This will:
 		skipTests, _ := cmd.Flags().GetBool("skip-tests")
 		skipLint, _ := cmd.Flags().GetBool("skip-lint")
 		skipBuild, _ := cmd.Flags().GetBool("skip-build")
+		checkCoverage, _ := cmd.Flags().GetBool("check-coverage")
+		minCoverage, _ := cmd.Flags().GetFloat64("min-coverage")
+		securityScan, _ := cmd.Flags().GetBool("security-scan")
 		autoFix, _ := cmd.Flags().GetBool("auto-fix")
 		repo, _ := cmd.Flags().GetString("repo")
 
@@ -329,6 +332,40 @@ This will:
 					} else {
 						return fmt.Errorf("linting issues found (use --auto-fix to attempt automatic fixes)")
 					}
+			}
+		}
+		}
+
+		if checkCoverage {
+			fmt.Println("\n📊 Checking code coverage...")
+			covExec := validation.NewCoverageExecutor(workDir)
+			covResult, err := covExec.RunCoverage(minCoverage)
+			if err != nil {
+				if covResult != nil && covResult.Coverage > 0 {
+					fmt.Printf("⚠️  Coverage %.1f%% below minimum %.1f%%\n", covResult.Coverage, minCoverage)
+				} else {
+					fmt.Printf("⚠️  Coverage check failed: %v\n", err)
+				}
+			} else {
+				fmt.Printf("✅ Coverage: %.1f%%\n", covResult.Coverage)
+			}
+		}
+
+		if securityScan {
+			fmt.Println("\n🔒 Running security scan...")
+			secScanner := validation.NewSecurityScanner(workDir)
+			secResult, err := secScanner.RunScan()
+			if err != nil {
+				if secResult != nil && secResult.Vulnerabilities > 0 {
+					fmt.Printf("❌ Found %d vulnerabilities\n", secResult.Vulnerabilities)
+					return fmt.Errorf("security vulnerabilities found")
+				}
+				fmt.Printf("⚠️  Security scan failed: %v\n", err)
+			} else {
+				if strings.Contains(secResult.Output, "skipping") {
+					fmt.Println("⚠️  Security scanner not available (skipped)")
+				} else {
+					fmt.Println("✅ No security vulnerabilities found")
 				}
 			}
 		}
@@ -512,6 +549,9 @@ func init() {
 	issueCommitCmd.Flags().Bool("skip-tests", false, "Skip running tests")
 	issueCommitCmd.Flags().Bool("skip-lint", false, "Skip running linters")
 	issueCommitCmd.Flags().Bool("skip-build", false, "Skip build check")
+	issueCommitCmd.Flags().Bool("check-coverage", false, "Check code coverage")
+	issueCommitCmd.Flags().Float64("min-coverage", 0.0, "Minimum coverage threshold (0-100)")
+	issueCommitCmd.Flags().Bool("security-scan", false, "Run security vulnerability scan")
 	issueCommitCmd.Flags().Bool("auto-fix", true, "Automatically fix test/lint failures")
 	issueCommitCmd.Flags().String("repo", "", "GitHub repository (owner/repo)")
 
