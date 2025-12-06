@@ -56,6 +56,7 @@ $0-5/month vs $20-30/month subscriptions.
 ## SPECIALIZED TOOLS
   chu gen test <file>        - Generate unit tests for a file
   chu gen integration <pkg>  - Generate integration tests for a package
+  chu gen snapshot <file>    - Generate snapshot tests for regression
   chu gen mock <file>        - Generate mocks for interfaces
   chu gen migration <name>   - Generate DB migration from model changes
   chu gen changelog          - Generate CHANGELOG from git commits

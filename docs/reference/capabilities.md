@@ -2,7 +2,7 @@
 
 **Last Updated:** December 2025  
 **Current Version:** 0.x (MVP)  
-**Overall Autonomy:** 52/64 scenarios (81%)
+**Overall Autonomy:** 53/64 scenarios (83%)
 
 This document describes what Chuchu can and cannot do autonomously. Updated with each major release.
 
@@ -192,20 +192,17 @@ chu security scan --fix
 
 ---
 
-### 🟡 Test Generation (7/8 scenarios)
+### ✅ Test Generation (8/8 scenarios) - 100% COMPLETE
 
 **Implemented:**
 
 - ✅ Generate unit tests for new code (`chu gen test <file>`)
 - ✅ Generate integration tests (`chu gen integration <pkg>`)
 - ✅ Validate generated tests (compile + run)
-- ✅ Multi-language support (Go, TypeScript, Python)
+- ✅ Multi-language support (Go, TypeScript, Python, Ruby)
 - ✅ Generate mock objects (`chu gen mock <file>`)
 - ✅ Identify coverage gaps (`chu coverage`)
-
-**Not yet implemented:**
-
-- Snapshot testing
+- ✅ Generate snapshot tests (`chu gen snapshot <file>`)
 
 **Example:**
 ```bash

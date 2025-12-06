@@ -28,10 +28,10 @@ type ConfigChange struct {
 }
 
 type ConfigReport struct {
-	Detected      []ConfigFile
-	Changes       []ConfigChange
-	UpdatedFiles  []string
-	Errors        []error
+	Detected     []ConfigFile
+	Changes      []ConfigChange
+	UpdatedFiles []string
+	Errors       []error
 }
 
 type Manager struct {
@@ -50,7 +50,7 @@ func NewManager(provider llm.Provider, model, workDir string) *Manager {
 
 func (m *Manager) DetectAndUpdate(ctx context.Context, env, key, value string, autoApply bool) (*ConfigReport, error) {
 	lang := langdetect.DetectLanguage(m.workDir)
-	
+
 	configs, err := m.findConfigFiles(lang)
 	if err != nil {
 		return nil, fmt.Errorf("failed to find config files: %w", err)
@@ -101,7 +101,7 @@ func (m *Manager) findConfigFiles(lang langdetect.Language) ([]ConfigFile, error
 			}
 
 			relPath, _ := filepath.Rel(m.workDir, match)
-			
+
 			cfg := ConfigFile{
 				Path:        relPath,
 				Format:      detectFormat(relPath),
@@ -169,7 +169,7 @@ Update the configuration. Return ONLY the complete updated file content, no expl
 	}
 
 	updated := m.extractCode(resp.Text)
-	
+
 	oldValue := m.extractValue(cfg.Content, key)
 
 	change := &ConfigChange{
@@ -211,7 +211,7 @@ func (m *Manager) extractValue(content, key string) string {
 
 func (m *Manager) extractCode(text string) string {
 	text = strings.TrimSpace(text)
-	
+
 	for _, marker := range []string{"```yaml", "```json", "```toml", "```env", "```"} {
 		if strings.HasPrefix(text, marker) {
 			text = strings.TrimPrefix(text, marker)
@@ -248,7 +248,7 @@ func detectFormat(path string) string {
 
 func detectEnvironment(path string) string {
 	lower := strings.ToLower(path)
-	
+
 	if strings.Contains(lower, "prod") || strings.Contains(lower, "production") {
 		return "production"
 	}
@@ -261,7 +261,7 @@ func detectEnvironment(path string) string {
 	if strings.Contains(lower, "stag") {
 		return "staging"
 	}
-	
+
 	return "all"
 }
 
