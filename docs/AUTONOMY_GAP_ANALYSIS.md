@@ -1,7 +1,7 @@
 # Autonomy Gap Analysis: GitHub Issue → PR Workflow
 
-**Status**: 35/64 scenarios (55%) ✅ | **29 critical scenarios remaining** 🚧  
-**Date**: 2025-12-06 (Updated after Phase 5)
+**Status**: 36/64 scenarios (56%) ✅ | **28 critical scenarios remaining** 🚧  
+**Date**: 2025-12-06 (Updated after file finder)
 **Goal**: Full autonomy for chu to resolve GitHub issues end-to-end
 
 ---
@@ -10,18 +10,19 @@
 
 ### Progress: 14% → 55% Autonomy (41 percentage points in 1 session)
 
-**5 Phases Completed**:
-1. ✅ **GitHub Integration** (Phases 1) - Issue fetching, PR creation, branch management
+**6 Phases Completed**:
+1. ✅ **GitHub Integration** (Phase 1) - Issue fetching, PR creation, branch management
 2. ✅ **Test Execution & Validation** (Phase 2) - Multi-language test running, linting, builds
 3. ✅ **CLI Integration** (Phase 3) - `chu issue fix/show/commit/push` commands
 4. ✅ **Error Recovery** (Phase 4) - LLM-powered auto-fix for test/lint failures
 5. ✅ **Enhanced Validation** (Phase 5) - Coverage checking + security scanning
+6. ✅ **Codebase Understanding** (Phase 6) - AI-powered file discovery
 
 **Key Metrics**:
-- **13 commits** total (863775d → c78846f)
-- **2,020+ LOC** added across 9 new files
+- **15 commits** total (863775d → 30f406b)
+- **2,275+ LOC** added across 10 new files
 - **35 E2E tests** passing
-- **MVAA Critical Path**: 14/17 (82%) - Near MVP for simple bug fixes
+- **MVAA Critical Path**: 15/17 (88%) - Near MVP for simple bug fixes
 - **5 languages** supported: Go, TypeScript, Python, Elixir, Ruby
 
 **Architecture Created**:
@@ -29,6 +30,7 @@
 internal/github/      - Issue fetching, PR creation (577 LOC)
 internal/validation/  - Test/lint/build/coverage/security (608 LOC)
 internal/recovery/    - LLM auto-fix (318 LOC)
+internal/codebase/    - File finder (255 LOC)
 cmd/chu/issue.go      - CLI interface (517 LOC)
 ```
 
@@ -145,15 +147,16 @@ chu issue push 123                   # Create PR, link to issue
 
 ### 🟡 MEDIUM PRIORITY (Should Have)
 
-#### 5. Codebase Understanding (0/5 scenarios)
-- [ ] **Find relevant files** - Given issue, locate files to modify
+#### 5. Codebase Understanding (1/5 scenarios) ✅
+- [x] **Find relevant files** - Given issue, locate files to modify ✅
 - [ ] **Understand dependencies** - Trace function calls across files
-- [ ] **Identify test files** - Find where to add new tests
-- [ ] **Analyze git history** - See how similar issues were fixed
+- [x] **Identify test files** - Find where to add new tests ✅
+- [x] **Analyze git history** - See how similar issues were fixed ✅
 - [ ] **Parse documentation** - Extract conventions from README/docs
 
-**Current**: ⚠️ Basic research exists, needs integration testing  
-**Impact**: Slower/incorrect fixes
+**Current**: ✅ 3/5 complete (60%) - Commit 30f406b  
+**Implementation**: `internal/codebase/finder.go` (255 LOC)  
+**Impact**: ✅ AI-powered file discovery with confidence levels
 
 ---
 
@@ -195,11 +198,11 @@ chu issue push 123                   # Create PR, link to issue
 | **Complex Code Mods** | 🔴 HIGH | 12 | Not Started | 0% |
 | **Test Gen/Execution** | 🔴 HIGH | 8 | 38% Done | 38% |
 | **Validation/Review** | 🔴 HIGH | 7 | 71% Done | 71% |
-| **Codebase Understanding** | 🟡 MED | 5 | Not Started | 0% |
+| **Codebase Understanding** | 🟡 MED | 5 | 60% Done | 60% |
 | **Error Recovery** | 🟡 MED | 5 | 60% Done | 60% |
 | **Advanced Git** | 🟢 LOW | 5 | Not Started | 0% |
 | **Documentation** | 🟢 LOW | 3 | Not Started | 0% |
-| **TOTAL** | | **64** | **35/64** | **55%** |
+| **TOTAL** | | **64** | **36/64** | **56%** |
 
 ---
 
@@ -211,7 +214,7 @@ To handle a **simple bug fix** autonomously, chu needs:
 1. ✅ Fetch issue details (HIGH #1) - DONE
 2. ✅ Parse requirements (HIGH #1) - DONE
 3. ✅ Create branch (HIGH #1) - DONE
-4. ⏸️ Find relevant files (MED #5) - Next
+4. ✅ Find relevant files (MED #5) - DONE
 5. ✅ Read/understand code (✅ Already works)
 6. ⚠️ Modify 1-3 files (⚠️ Partially works)
 7. ✅ Run existing tests (HIGH #3) - DONE
@@ -226,7 +229,7 @@ To handle a **simple bug fix** autonomously, chu needs:
 16. ⏸️ Handle review comments (HIGH #1) - Later
 17. ⏸️ Merge PR (HIGH #1) - Later
 
-**Current MVAA Coverage**: 14/17 (82%) 🎉  
+**Current MVAA Coverage**: 15/17 (88%) 🎉  
 **Target**: 17/17 (100%) for simple bugs
 
 ---
@@ -280,7 +283,20 @@ To handle a **simple bug fix** autonomously, chu needs:
 
 ---
 
-### Phase 5: Complex Modifications (3 weeks)
+### Phase 6: Codebase Understanding ✅ COMPLETE
+**Goal**: AI-powered file discovery for issue resolution
+
+- ✅ FindRelevantFiles() - Analyze issue and identify 3-5 files to modify
+- ✅ IdentifyTestFiles() - Locate corresponding test files
+- ✅ AnalyzeGitHistory() - Find similar past changes
+- ✅ Confidence scoring (HIGH/MED/LOW)
+
+**Implementation**: `internal/codebase/finder.go` (255 LOC)  
+**Commit**: 30f406b
+
+---
+
+### Phase 7: Complex Modifications (3 weeks)
 **Goal**: Handle multi-file refactoring and real-world fixes
 
 - Week 5-6: Multi-file changes, dependency updates, API changes
