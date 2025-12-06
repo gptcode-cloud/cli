@@ -205,17 +205,28 @@ Not implemented:
 
 ---
 
-### ❌ Documentation Updates (0/3 scenarios)
+### 🟡 Documentation Updates (1/3 scenarios)
 
-Chuchu cannot automatically:
+**Implemented:**
+
+- ✅ Generate CHANGELOG entries (`chu gen changelog`)
+
+**Not yet implemented:**
 
 - Update README files
-- Generate CHANGELOG entries
 - Update API documentation
 
-**Why:** Documentation requires understanding of user impact and communication style. Coming soon.
+**Example:**
+```bash
+chu gen changelog           # All commits since last tag
+chu gen changelog v1.0.0    # From v1.0.0 to HEAD
+```
 
-**Workaround:** Use `chu chat` mode to draft documentation, then review and commit manually.
+**Limitations:**
+- README and API docs require contextual understanding
+- Uses conventional commits format
+
+**Workaround:** Use `chu chat` mode to draft README updates and API docs.
 
 ---
 
@@ -235,9 +246,9 @@ Chuchu cannot automatically:
 - Coverage gap identification
 - Mock generation
 
-**Phase 9: Documentation (3 scenarios)**
+**Phase 9: Documentation (2 remaining scenarios)**
+- ✅ CHANGELOG generation (DONE)
 - README updates
-- CHANGELOG generation
 - API docs synchronization
 
 ---
@@ -268,7 +279,8 @@ Skipped tests (t.Skip()) represent features not yet implemented.
 - ✅ CI failure handling
 - ✅ PR review iteration
 - ✅ Unit test generation
-- **Autonomy:** 41/64 (64%)
+- ✅ CHANGELOG generation
+- **Autonomy:** 42/64 (66%)
 - **MVAA Critical Path:** 17/17 (100%)
 
 ### Future Releases
