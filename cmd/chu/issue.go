@@ -10,6 +10,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"chuchu/internal/codebase"
 	"chuchu/internal/config"
 	"chuchu/internal/github"
 	"chuchu/internal/langdetect"
@@ -59,6 +60,7 @@ Examples:
 
 		repo, _ := cmd.Flags().GetString("repo")
 		autonomous, _ := cmd.Flags().GetBool("autonomous")
+		findFiles, _ := cmd.Flags().GetBool("find-files")
 
 		if repo == "" {
 			repo = detectGitHubRepo()
@@ -102,9 +104,63 @@ Examples:
 			return fmt.Errorf("failed to create branch: %w", err)
 		}
 
+		var relevantFiles []codebase.RelevantFile
+		if findFiles {
+			fmt.Println("\n🔍 Finding relevant files...")
+			setup, _ := config.LoadSetup()
+			backendName := setup.Defaults.Backend
+			if backendName == "" {
+				backendName = "anthropic"
+			}
+			backendCfg := setup.Backend[backendName]
+			var provider llm.Provider
+			if backendCfg.Type == "ollama" {
+				provider = llm.NewOllama(backendCfg.BaseURL)
+			} else {
+				provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
+			}
+			queryModel := backendCfg.GetModelForAgent("query")
+			if queryModel == "" {
+				queryModel = backendCfg.DefaultModel
+			}
+
+			finder, err := codebase.NewFileFinder(provider, workDir, queryModel)
+			if err != nil {
+				fmt.Printf("⚠️  Failed to create file finder: %v\n", err)
+			} else {
+				issueDesc := fmt.Sprintf("%s\n\n%s", issue.Title, issue.Body)
+				relevantFiles, err = finder.FindRelevantFiles(context.Background(), issueDesc)
+				if err != nil {
+					fmt.Printf("⚠️  Failed to find relevant files: %v\n", err)
+				} else if len(relevantFiles) > 0 {
+					fmt.Println("\nRelevant files identified:")
+					for i, file := range relevantFiles {
+						confLevel := "?"
+						if file.Confidence >= 0.8 {
+							confLevel = "HIGH"
+						} else if file.Confidence >= 0.5 {
+							confLevel = "MED"
+						} else {
+							confLevel = "LOW"
+						}
+						fmt.Printf("%d. [%s] %s - %s\n", i+1, confLevel, file.Path, file.Reason)
+					}
+				} else {
+					fmt.Println("⚠️  No relevant files found")
+				}
+			}
+		}
+
 		task := fmt.Sprintf("Fix issue #%d: %s", issue.Number, issue.Title)
 		if len(reqs) > 0 {
 			task += ", Requirements: " + strings.Join(reqs, "; ")
+		}
+		if len(relevantFiles) > 0 {
+			var filePaths []string
+			for _, f := range relevantFiles {
+				filePaths = append(filePaths, f.Path)
+			}
+			task += ". Focus on files: " + strings.Join(filePaths, ", ")
 		}
 
 		if autonomous {
@@ -542,6 +598,7 @@ func init() {
 	issueFixCmd.Flags().Bool("skip-tests", false, "Skip running tests")
 	issueFixCmd.Flags().Bool("skip-lint", false, "Skip running linters")
 	issueFixCmd.Flags().Bool("autonomous", true, "Execute implementation autonomously")
+	issueFixCmd.Flags().Bool("find-files", true, "Find relevant files before implementation")
 
 	issueShowCmd.Flags().String("repo", "", "GitHub repository (owner/repo)")
 
