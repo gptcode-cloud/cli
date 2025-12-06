@@ -108,6 +108,7 @@ chu issue review 42                  # Address review comments
 - [ ] **Backward compatibility** - Maintain old API while adding new
 
 **Current**: ❌ Only simple single-file changes tested  
+**Tests**: Test skeletons created (tests/e2e/run/complex_modifications_test.go)  
 **Impact**: Can't handle 80% of real issues
 
 ---
@@ -125,7 +126,7 @@ chu issue review 42                  # Address review comments
 - [ ] **E2E test creation** - Full user journey tests
 
 **Current**: ✅ 3/8 complete (38%) - Commits a2cd197, ec2caae, bce93df  
-**Tests**: 6 E2E tests passing (validation_test.go)  
+**Tests**: 6 E2E tests passing (validation_test.go), 5 skeletons created (test_generation_test.go, advanced_validation_test.go)  
 **Implementation**: `internal/validation/test_executor.go`, `internal/recovery/error_fixer.go`  
 **Impact**: ✅ Can now run tests and auto-fix failures for Go, TypeScript, Python, Elixir, Ruby
 
@@ -143,7 +144,7 @@ chu issue review 42                  # Address review comments
 - [x] **Security scan** - Run `npm audit`, `snyk test` ✅
 
 **Current**: ✅ 5/7 complete (71%) - Commits a2cd197, f4ca776, c78846f  
-**Tests**: Integrated into validation_test.go  
+**Tests**: Integrated into validation_test.go, 2 skeletons created (advanced_validation_test.go)  
 **Implementation**: `internal/validation/linter.go`, `build.go`, `coverage.go`, `security.go`  
 **Impact**: ✅ Comprehensive validation pipeline: tests + lint + build + coverage + security
 
@@ -159,6 +160,7 @@ chu issue review 42                  # Address review comments
 - [ ] **Parse documentation** - Extract conventions from README/docs
 
 **Current**: ✅ 3/5 complete (60%) - Commit 30f406b  
+**Tests**: 2 skeletons created (codebase_understanding_test.go)  
 **Implementation**: `internal/codebase/finder.go` (255 LOC)  
 **Impact**: ✅ AI-powered file discovery with confidence levels
 
@@ -172,6 +174,7 @@ chu issue review 42                  # Address review comments
 - [x] **Rollback on critical failure** - Undo changes if irreversible error ✅
 
 **Current**: ✅ 4/5 complete (80%) - Commits ec2caae, bce93df, 1ff757a  
+**Tests**: 1 skeleton created (merge_conflicts_test.go)  
 **Implementation**: `internal/recovery/error_fixer.go` (318 LOC), `internal/ci/handler.go` (237 LOC)  
 **Impact**: ✅ LLM-powered auto-fix with CI failure detection and remediation
 
@@ -186,10 +189,14 @@ chu issue review 42                  # Address review comments
 - [ ] **Resolve complex conflicts** - 3-way merge conflicts
 - [ ] **Git bisect** - Find commit that introduced bug
 
+**Tests**: Test skeletons created (advanced_git_test.go)
+
 #### 8. Documentation (0/3 scenarios)
 - [ ] **Update README** - Reflect new features/changes
 - [ ] **Update CHANGELOG** - Add entry for fix
 - [ ] **Update API docs** - Reflect changed endpoints
+
+**Tests**: Test skeletons created (documentation_test.go)
 
 ---
 
