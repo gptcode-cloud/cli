@@ -97,6 +97,7 @@ func init() {
 	rootCmd.AddCommand(implementCmd)
 	rootCmd.AddCommand(featureCmd)
 	rootCmd.AddCommand(reviewCmd)
+	rootCmd.AddCommand(issueCmd)
 }
 
 func newBuilderAndLLM(lang, mode, hint string) (*prompt.Builder, llm.Provider, string, error) {
