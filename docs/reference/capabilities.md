@@ -2,7 +2,7 @@
 
 **Last Updated:** December 2025  
 **Current Version:** 0.x (MVP)  
-**Overall Autonomy:** 55/64 scenarios (86%)
+**Overall Autonomy:** 60/64 scenarios (94%)
 
 This document describes what Chuchu can and cannot do autonomously. Updated with each major release.
 
@@ -132,7 +132,7 @@ Chuchu identifies:
 
 ## What Chuchu Cannot Do (Yet)
 
-### 🟡 Complex Code Modifications (7/12 scenarios)
+### 🟡 Complex Code Modifications (9/12 scenarios)
 
 **Implemented:**
 
@@ -143,11 +143,14 @@ Chuchu identifies:
 - ✅ Security vulnerability fixes (`chu security scan --fix`)
 - ✅ Configuration management (`chu cfg update KEY VALUE`)
 - ✅ Performance profiling (`chu perf profile`, `chu perf bench`)
+- ✅ Type system refactoring (`chu refactor type <name> <def>`)
+- ✅ Backward compatibility (`chu refactor compat <old> <new> <ver>`)
 
 **Not yet implemented:**
 
-- **Type system changes** - Complex type definition updates
-- **Backward compatibility** - Maintaining old APIs while adding new
+- **Environment-specific deployments** - Multi-environment coordination
+- **Database schema evolution** - Zero-downtime migrations
+- **Service mesh integration** - Microservices coordination
 
 **Examples:**
 ```bash
@@ -218,29 +221,58 @@ chu gen test pkg/calculator/calculator.go
 
 ---
 
-### ❌ Merge Conflicts (1/5 scenarios missing)
+### 🟡 Merge Conflicts (2/5 scenarios)
 
-Chuchu cannot:
+**Implemented:**
 
-- Automatically resolve merge conflicts with main branch
+- ✅ Resolve conflicts during cherry-pick (`chu git cherry-pick <commit>`)
+- ✅ Resolve conflicts during rebase (`chu git rebase <branch>`)
 
-**Why:** Conflict resolution requires semantic understanding of both changes and intent. Risky to automate without human review.
+**Not yet implemented:**
 
-**Workaround:** Resolve conflicts manually, then use Chuchu to validate the merged code.
+- Auto-resolve merge conflicts with main branch
+- 3-way merge conflicts
+- Advanced conflict strategies
+
+**Limitations:** AI-powered conflict resolution using LLM - always review resolved conflicts before continuing.
+
+**Workaround:** For non-cherry-pick/rebase conflicts, resolve manually and validate.
 
 ---
 
-### ❌ Advanced Git Operations (0/5 scenarios)
+### ✅ Advanced Git Operations (3/5 scenarios)
 
-Not implemented:
+**Implemented:**
+
+- ✅ Git bisect for bug hunting (`chu git bisect <good> <bad>`)
+- ✅ Cherry-picking commits (`chu git cherry-pick <commits...>`)
+- ✅ Branch rebasing (`chu git rebase [branch]`)
+
+**Not yet implemented:**
 
 - Interactive rebase (squash, reword)
-- Cherry-picking commits
-- Git bisect for bug hunting
-- Complex 3-way merge conflicts
-- Branch rebasing
+- Advanced branch strategies
 
-**Why:** Low priority - these operations are infrequent and risky to automate.
+**Examples:**
+```bash
+chu git bisect v1.0.0 HEAD
+# Automatically runs tests on each commit
+# Finds which commit introduced the bug
+# Provides LLM analysis of the breaking commit
+
+chu git cherry-pick abc123 def456
+# Applies commits with automatic conflict resolution
+# Uses LLM to resolve conflicts intelligently
+
+chu git rebase main
+# Rebases with AI-powered conflict resolution
+# Continues automatically after resolving
+```
+
+**Limitations:**
+- Bisect runs `go test ./...` by default (Go projects only)
+- Conflict resolution powered by LLM - review recommended
+- Cherry-pick and rebase assume standard Git workflows
 
 ---
 
