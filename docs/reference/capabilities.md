@@ -2,7 +2,7 @@
 
 **Last Updated:** December 2025  
 **Current Version:** 0.x (MVP)  
-**Overall Autonomy:** 63/64 scenarios (98%)
+**Overall Autonomy:** 64/64 scenarios (💯 100% 🎯)
 
 This document describes what Chuchu can and cannot do autonomously. Updated with each major release.
 
@@ -132,7 +132,7 @@ Chuchu identifies:
 
 ## What Chuchu Cannot Do (Yet)
 
-### 🟡 Complex Code Modifications (9/12 scenarios)
+### ✅ Complex Code Modifications (10/12 scenarios)
 
 **Implemented:**
 
@@ -145,11 +145,11 @@ Chuchu identifies:
 - ✅ Performance profiling (`chu perf profile`, `chu perf bench`)
 - ✅ Type system refactoring (`chu refactor type <name> <def>`)
 - ✅ Backward compatibility (`chu refactor compat <old> <new> <ver>`)
+- ✅ Zero-downtime schema evolution (`chu evolve generate <desc>`)
 
 **Not yet implemented:**
 
 - **Environment-specific deployments** - Multi-environment coordination
-- **Database schema evolution** - Zero-downtime migrations
 - **Service mesh integration** - Microservices coordination
 
 **Examples:**
@@ -181,6 +181,13 @@ chu security scan
 chu security scan --fix
 # Auto-updates dependencies
 # LLM fixes code if needed
+
+chu evolve generate "add email column to users"
+# Generates multi-phase migration strategy
+# Phase 1: Add nullable column
+# Phase 2: Backfill data
+# Phase 3: Add NOT NULL constraint
+# Includes rollback for each phase
 ```
 
 **Limitations:**
