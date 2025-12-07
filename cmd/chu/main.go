@@ -87,6 +87,8 @@ $0-5/month vs $20-30/month subscriptions.
   chu refactor api              - Coordinate API changes (routes, handlers, tests)
   chu refactor signature <func> - Change function signature and update all call sites
   chu refactor breaking         - Detect breaking changes and update all consumers
+  chu refactor type <name>      - Refactor type definition and propagate changes
+  chu refactor compat <old> <new> - Add backward compatibility wrapper
 
 ## SECURITY
   chu security scan             - Scan for vulnerabilities
