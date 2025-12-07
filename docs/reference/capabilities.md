@@ -2,7 +2,7 @@
 
 **Last Updated:** December 2025  
 **Current Version:** 0.x (MVP)  
-**Overall Autonomy:** 60/64 scenarios (94%)
+**Overall Autonomy:** 61/64 scenarios (95%)
 
 This document describes what Chuchu can and cannot do autonomously. Updated with each major release.
 
@@ -221,22 +221,29 @@ chu gen test pkg/calculator/calculator.go
 
 ---
 
-### 🟡 Merge Conflicts (2/5 scenarios)
+### 🟡 Merge Conflicts (3/5 scenarios)
 
 **Implemented:**
 
+- ✅ Standalone conflict resolver (`chu merge resolve`)
 - ✅ Resolve conflicts during cherry-pick (`chu git cherry-pick <commit>`)
 - ✅ Resolve conflicts during rebase (`chu git rebase <branch>`)
 
 **Not yet implemented:**
 
-- Auto-resolve merge conflicts with main branch
-- 3-way merge conflicts
-- Advanced conflict strategies
+- 3-way merge conflicts (complex)
+- Advanced conflict strategies (e.g. ours/theirs)
 
-**Limitations:** AI-powered conflict resolution using LLM - always review resolved conflicts before continuing.
+**Examples:**
+```bash
+chu merge resolve
+# Detects all conflicted files
+# Uses LLM to resolve each conflict
+# Validates resolution (no conflict markers)
+# Stages resolved files
+```
 
-**Workaround:** For non-cherry-pick/rebase conflicts, resolve manually and validate.
+**Limitations:** AI-powered conflict resolution using LLM - always review resolved conflicts before committing.
 
 ---
 
