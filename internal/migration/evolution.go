@@ -74,8 +74,9 @@ Example phases for adding a NOT NULL column:
 Be specific and safe.`, description)
 
 	resp, err := s.provider.Chat(ctx, llm.ChatRequest{
-		UserPrompt: prompt,
-		Model:      s.model,
+		SystemPrompt: "You are a database expert that generates safe, zero-downtime migration strategies.",
+		UserPrompt:   prompt,
+		Model:        s.model,
 	})
 
 	if err != nil {

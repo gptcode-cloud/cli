@@ -258,8 +258,9 @@ Rules:
 Return ONLY the complete Go code, no explanations.`, strings.Join(ifaceDescriptions, "\n"), interfaces[0].Package)
 
 	resp, err := g.provider.Chat(ctx, llm.ChatRequest{
-		UserPrompt: prompt,
-		Model:      g.model,
+		SystemPrompt: "You are a helpful assistant that generates Go mock implementations for testing.",
+		UserPrompt:   prompt,
+		Model:        g.model,
 	})
 
 	if err != nil {

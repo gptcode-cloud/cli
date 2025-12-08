@@ -160,8 +160,9 @@ Update the configuration. Return ONLY the complete updated file content, no expl
 		cfg.Path, cfg.Format, cfg.Environment, key, value, cfg.Content)
 
 	resp, err := m.provider.Chat(ctx, llm.ChatRequest{
-		UserPrompt: prompt,
-		Model:      m.model,
+		SystemPrompt: "You are a helpful assistant that updates configuration files accurately.",
+		UserPrompt:   prompt,
+		Model:        m.model,
 	})
 
 	if err != nil {

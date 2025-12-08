@@ -86,8 +86,9 @@ Requirements:
 Return ONLY the wrapper code with comments.`, oldAPI, newAPI, version, reason)
 
 	resp, err := m.provider.Chat(ctx, llm.ChatRequest{
-		UserPrompt: prompt,
-		Model:      m.model,
+		SystemPrompt: "You are a helpful assistant that generates backward compatibility wrapper code.",
+		UserPrompt:   prompt,
+		Model:        m.model,
 	})
 
 	if err != nil {
@@ -115,8 +116,9 @@ Include:
 Format as Markdown.`, oldAPI, newAPI, version, reason)
 
 	resp, err := m.provider.Chat(ctx, llm.ChatRequest{
-		UserPrompt: prompt,
-		Model:      m.model,
+		SystemPrompt: "You are a helpful assistant that writes clear migration guides.",
+		UserPrompt:   prompt,
+		Model:        m.model,
 	})
 
 	if err != nil {

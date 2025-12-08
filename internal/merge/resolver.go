@@ -94,8 +94,9 @@ func (r *Resolver) ResolveFile(ctx context.Context, path string) (ConflictFile, 
 
 	prompt := r.buildPrompt(path, string(content), branches)
 	resp, err := r.provider.Chat(ctx, llm.ChatRequest{
-		UserPrompt: prompt,
-		Model:      r.model,
+		SystemPrompt: "You are a helpful assistant that resolves Git merge conflicts intelligently.",
+		UserPrompt:   prompt,
+		Model:        r.model,
 	})
 
 	if err != nil {

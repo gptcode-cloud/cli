@@ -349,6 +349,47 @@ chu run "deploy to staging"
 chu run "migrate database"
 ```
 
+### Advanced Git Operations (NEW! 🎯)
+
+Chuchu provides AI-powered Git operations for complex workflows:
+
+```bash
+# Git Bisect - Find which commit introduced a bug
+chu git bisect v1.0.0 HEAD
+# Automatically runs tests on each commit
+# Uses LLM to analyze the breaking commit
+
+# Cherry-pick with conflict resolution
+chu git cherry-pick abc123 def456
+# Applies commits with AI-powered conflict resolution
+
+# Smart Rebase
+chu git rebase main
+# Rebases with automatic conflict resolution
+
+# Squash commits with AI-generated message
+chu git squash HEAD~3
+# Squashes last 3 commits
+# Generates professional commit message via LLM
+
+# Improve commit messages
+chu git reword HEAD
+# Suggests improved commit message following best practices
+
+# Resolve merge conflicts
+chu merge resolve
+# Detects and resolves all conflicted files
+# Uses LLM to merge changes intelligently
+```
+
+**Features:**
+- ✅ AI-powered conflict resolution
+- ✅ Automatic commit message generation
+- ✅ Test-based bisect automation
+- ✅ Context-aware merge decisions
+
+**[Complete Git Guide →](docs/guides/git-operations.md)**
+
 ### Autonomous Execution (Maestro)
 
 **Fully autonomous execution with verification and error recovery:**

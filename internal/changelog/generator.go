@@ -233,8 +233,9 @@ Original CHANGELOG:
 Return ONLY the improved CHANGELOG, no explanations.`, changelog)
 
 	resp, err := g.provider.Chat(ctx, llm.ChatRequest{
-		UserPrompt: prompt,
-		Model:      g.model,
+		SystemPrompt: "You are a technical writer that improves CHANGELOG entries for clarity and professionalism.",
+		UserPrompt:   prompt,
+		Model:        g.model,
 	})
 
 	if err != nil {
