@@ -310,10 +310,18 @@ func (c *Conductor) isQueryTask(plan string, modifiedFiles []string) bool {
 		"read file",
 		"show",
 		"display",
+		"explain",
+		"what is",
+		"what does",
+		"what means",
+		"tell me about",
+		"describe",
 		"files to modify\nnone",
 		"files to modify: none",
 		"files to create\nnone",
 		"files to create: none",
+		"no files to modify",
+		"no files to create",
 	}
 
 	for _, indicator := range queryIndicators {

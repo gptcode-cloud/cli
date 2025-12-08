@@ -121,6 +121,31 @@ Append "Goodbye" to the end of hello.txt (preserve existing content)
 - hello.txt contains original content plus "Goodbye"
 - File was modified exactly once (not multiple times)
 
+EXAMPLE 4 - Explanatory query (NO files):
+Task: "Explain what a slot entry is in Phoenix LiveView"
+
+BAD Plan:
+  Create explanation.md with the explanation
+
+GOOD Plan:
+# Plan
+
+## Files to modify
+None
+
+## Files to create
+None
+
+## Changes
+Use run_command to display explanation about slot entries:
+- Explain that slot entries are placeholders in LiveView components
+- Describe why they must be direct children (DOM tracking)
+- Use echo or printf to output the explanation
+
+## Success Criteria
+- Command executes successfully
+- Explanation is displayed in command output
+
 Create minimal, direct plans.`
 
 func (p *PlannerAgent) CreatePlan(ctx context.Context, task string, analysis string, statusCallback StatusCallback) (string, error) {
@@ -171,9 +196,16 @@ For file modification tasks:
 For append tasks:
 - "File contains BOTH old and new content" (to catch duplicates)
 
+For explanatory/query tasks ("explain", "what is", "tell me about"):
+- DO NOT create files to store explanations
+- Use run_command with echo or other output to display answer
+- Success criteria: "Command displays the explanation"
+- Keep explanation concise and directly in command output
+
 REMEMBER:
 - NO scripts unless explicitly requested
 - NO automation unless explicitly requested
+- NO files for explanations - use command output instead
 - Solve the task DIRECTLY in the simplest way
 - Keep it MINIMAL. NO extra features.`, task, analysis)
 
