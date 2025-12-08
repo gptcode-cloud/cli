@@ -218,7 +218,13 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 	messages := make([]llm.ChatMessage, len(history))
 	copy(messages, history)
 
-	maxIterations := 5
+	// Higher iteration limit for complex editing tasks
+	// The editor may need multiple tool calls to:
+	// 1. Read existing files
+	// 2. Apply patches or write files
+	// 3. Run verification commands
+	// 4. Fix errors discovered during execution
+	maxIterations := 10
 	for i := 0; i < maxIterations; i++ {
 		if statusCallback != nil {
 			statusCallback(fmt.Sprintf("Editor: Thinking (Iteration %d/%d)...", i+1, maxIterations))

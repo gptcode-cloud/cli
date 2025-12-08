@@ -192,6 +192,11 @@ For read-only tasks (git status, list files, get info):
 For file modification tasks:
 - "File X exists" + "File X contains [specific new content]"
 - Be specific about what changed, not how it's formatted
+- **CRITICAL**: For compiled languages (Go, Elixir, TypeScript, etc), ALWAYS include build command in criteria
+  - Elixir: "mix compile succeeds" or "mix phx.server starts"
+  - Go: "go build ./... succeeds"
+  - TypeScript: "tsc compiles without errors"
+  - This catches syntax errors immediately in the validation loop
 
 For append tasks:
 - "File contains BOTH old and new content" (to catch duplicates)

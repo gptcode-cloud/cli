@@ -67,7 +67,13 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		{Role: "user", Content: plan},
 	}
 
-	maxAttempts := 3
+	// Higher retry limit for autonomous error fixing loops
+	// For syntax errors, the agent needs multiple attempts to:
+	// 1. Fix initial error
+	// 2. Run build to discover new errors
+	// 3. Fix cascading errors
+	// 4. Verify final solution
+	maxAttempts := 10
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		if attempt > 1 {
 			fmt.Printf("Retrying (attempt %d/%d)...\n", attempt, maxAttempts)

@@ -53,12 +53,14 @@ CRITICAL RULES:
 - **BE SPECIFIC**: Don't say "looks good" - verify each criterion explicitly
 - **CHECK FILE EXISTENCE**: If criterion says "file X must exist", actually check it
 - **CHECK FILE CONTENT**: If criterion says "file must contain Y", read and verify
-- ONLY run build/compile commands if code files were modified
-- Skip build if no files were modified (read-only tasks like git status, gh pr list)
+- **ALWAYS RUN BUILD COMMANDS** if success criteria includes build/compile commands
+- ONLY skip build if no files were modified (read-only tasks like git status, gh pr list)
 - Skip build if only documentation files (.md, .txt, .json) were modified
-- For Go code changes: run 'go build' to check compilation
+- For Go code changes: run 'go build ./...' to check compilation
+- For Elixir/Phoenix: run 'mix compile' to check compilation
 - For TypeScript/Node code changes: run 'npm run build' or 'tsc'
 - For Python code changes: check syntax with 'python -m py_compile file.py'
+- **EXTRACT EXACT ERRORS**: When build fails, copy the EXACT error message with file:line
 - If something is missing or wrong, say EXACTLY what and where
 - **SAY "SUCCESS" ONLY if ALL criteria pass**
 - Focus on the actual requirements, not style
@@ -108,6 +110,25 @@ Issues:
 - VerifyToken function must be exported (capitalize: VerifyToken)
 - Remove hardcoded secret on line 15, use environment variable
 - Run make test to verify tests pass
+
+EXAMPLE 3 - Compilation error (extract exact error):
+Success Criteria:
+  - mix compile succeeds
+  - File lib/my_app.ex contains new function
+
+Validation:
+  1. Read lib/my_app.ex → looks good
+  2. Run: mix compile
+     Output: 
+     == Compilation error in file lib/my_app.ex ==
+     ** (SyntaxError) lib/my_app.ex:10: syntax error before: 'end'
+
+Result:
+FAIL
+
+Issues:
+- Syntax error at lib/my_app.ex:10 - missing 'do' keyword before 'end'
+- Run mix compile to verify after fix
 
 EXAMPLE 3 - Clear issue reporting:
 BAD:
@@ -193,7 +214,13 @@ Be precise and specific.`, plan, filesStr)
 		{Role: "user", Content: reviewPrompt},
 	}
 
-	maxIterations := 3
+	// Higher iteration limit for complex validation tasks
+	// The validator may need multiple tool calls to:
+	// 1. Read modified files
+	// 2. Run build command (mix compile, go build, etc)
+	// 3. Parse build output
+	// 4. Make final determination
+	maxIterations := 10
 	for i := 0; i < maxIterations; i++ {
 		if os.Getenv("CHUCHU_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[VALIDATOR] Iteration %d/%d\n", i+1, maxIterations)
