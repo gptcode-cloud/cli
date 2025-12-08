@@ -316,6 +316,23 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 						}
 					}
 
+					// Truncate very long content to prevent API errors
+					// Max ~10k chars (~2500 tokens) per tool result
+					maxContentLength := 10000
+					if len(content) > maxContentLength {
+						lines := strings.Split(content, "\n")
+						if len(lines) > 200 {
+							// Show first 100 and last 100 lines for large files
+							firstLines := strings.Join(lines[:100], "\n")
+							lastLines := strings.Join(lines[len(lines)-100:], "\n")
+							content = fmt.Sprintf("%s\n\n... [%d lines omitted] ...\n\n%s",
+								firstLines, len(lines)-200, lastLines)
+						} else {
+							// Just truncate by character count
+							content = content[:maxContentLength] + "\n\n... [truncated]"
+						}
+					}
+
 					messages = append(messages, llm.ChatMessage{
 						Role:       "tool",
 						Content:    content,
@@ -386,6 +403,23 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 						}
 						return result.Result, modifiedFiles, nil
 					}
+				}
+			}
+
+			// Truncate very long content to prevent API errors
+			// Max ~10k chars (~2500 tokens) per tool result
+			maxContentLength := 10000
+			if len(content) > maxContentLength {
+				lines := strings.Split(content, "\n")
+				if len(lines) > 200 {
+					// Show first 100 and last 100 lines for large files
+					firstLines := strings.Join(lines[:100], "\n")
+					lastLines := strings.Join(lines[len(lines)-100:], "\n")
+					content = fmt.Sprintf("%s\n\n... [%d lines omitted] ...\n\n%s",
+						firstLines, len(lines)-200, lastLines)
+				} else {
+					// Just truncate by character count
+					content = content[:maxContentLength] + "\n\n... [truncated]"
 				}
 			}
 

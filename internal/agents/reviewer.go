@@ -63,6 +63,17 @@ CRITICAL RULES:
 - **SAY "SUCCESS" ONLY if ALL criteria pass**
 - Focus on the actual requirements, not style
 
+VERSION VALIDATION FLEXIBILITY:
+When validating version numbers, be FLEXIBLE about format:
+- **Elixir (mix.exs)**: Accept "~> 1.15.4", ">= 1.15.4", "1.15.4" as valid for "version 1.15.4"
+- **Node.js (package.json)**: Accept "^18.2.0", "~18.2.0", "18.2.0" as valid for "version 18.2.0"
+- **Python (requirements.txt)**: Accept "==4.2.0", ">=4.2.0", "~=4.2.0" as valid for "version 4.2.0"
+- **Go (go.mod)**: Accept "v1.2.3" or "1.2.3" as valid for "version 1.2.3"
+- **Ruby (Gemfile)**: Accept "~> 7.0.0" or "7.0.0" as valid for "version 7.0.0"
+
+The SEMANTIC version is what matters, not the exact operator syntax.
+If criteria says "version 1.15.4" and file has "~> 1.15.4", that's SUCCESS.
+
 EXAMPLE 1 - Validation SUCCESS:
 Success Criteria:
   - Tests pass: go test ./auth/...
@@ -238,6 +249,23 @@ Be precise and specific.`, plan, filesStr)
 			}
 			if content == "" {
 				content = "Success"
+			}
+
+			// Truncate very long content to prevent API errors
+			// Max ~10k chars (~2500 tokens) per tool result
+			maxContentLength := 10000
+			if len(content) > maxContentLength {
+				lines := strings.Split(content, "\n")
+				if len(lines) > 200 {
+					// Show first 100 and last 100 lines for large files
+					firstLines := strings.Join(lines[:100], "\n")
+					lastLines := strings.Join(lines[len(lines)-100:], "\n")
+					content = fmt.Sprintf("%s\n\n... [%d lines omitted] ...\n\n%s",
+						firstLines, len(lines)-200, lastLines)
+				} else {
+					// Just truncate by character count
+					content = content[:maxContentLength] + "\n\n... [truncated]"
+				}
 			}
 
 			history = append(history, llm.ChatMessage{

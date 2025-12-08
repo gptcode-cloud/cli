@@ -38,6 +38,20 @@ CRITICAL RULES:
 - If task is about "retrieving" or "getting" data, use shell commands, NOT file creation
 - Focus on the EXACT task, nothing more
 
+VERSION FORMAT KNOWLEDGE:
+When specifying version numbers in success criteria, use the CORRECT format for each language:
+- **Elixir (mix.exs)**: Use "~> X.Y.Z" format (semver operator), e.g., "elixir: \"~> 1.15.4\""
+- **Node.js (package.json)**: Use "^X.Y.Z" or "~X.Y.Z" format, e.g., "\"react\": \"^18.2.0\""
+- **Python (requirements.txt)**: Use "package==X.Y.Z" or "package>=X.Y.Z", e.g., "django==4.2.0"
+- **Go (go.mod)**: Use "vX.Y.Z" format, e.g., "require github.com/foo/bar v1.2.3"
+- **Ruby (Gemfile)**: Use "~> X.Y.Z" format, e.g., "gem 'rails', '~> 7.0.0'"
+
+When creating success criteria for version updates, be FLEXIBLE:
+- GOOD: "mix.exs contains elixir version 1.15.4 (with ~> operator)"
+- GOOD: "package.json has react version ^18.2.0 or 18.2.0"
+- BAD: "mix.exs contains exactly elixir: \"1.15.4\"" (missing ~> operator)
+- BAD: Requiring exact string match without considering version operators
+
 EXAMPLE 1 - Adding authentication:
 Task: "add user authentication"
 
