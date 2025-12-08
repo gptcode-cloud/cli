@@ -189,7 +189,9 @@ func (g *GuidedMode) Implement(ctx context.Context, plan string) error {
 
 	reviewerAgent := agents.NewReviewer(g.baseProvider, g.cwd, g.model)
 
-	maxRetries := 2
+	// Higher retry limit for autonomous error fixing
+	// Allows multiple fix-verify-fix cycles
+	maxRetries := 9  // 10 total attempts (0-9)
 	for attempt := 0; attempt <= maxRetries; attempt++ {
 		if os.Getenv("CHUCHU_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[IMPLEMENT] Attempt %d/%d\n", attempt+1, maxRetries+1)

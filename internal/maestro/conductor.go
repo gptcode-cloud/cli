@@ -74,6 +74,9 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 	// 3. Fix cascading errors
 	// 4. Verify final solution
 	maxAttempts := 10
+	if os.Getenv("CHUCHU_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[MAESTRO] maxAttempts = %d\n", maxAttempts)
+	}
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		if attempt > 1 {
 			fmt.Printf("Retrying (attempt %d/%d)...\n", attempt, maxAttempts)
