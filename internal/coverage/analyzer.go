@@ -259,8 +259,9 @@ Create a brief report with:
 Keep it under 10 lines.`, data.Total, len(gaps), strings.Join(gapsSummary, "\n"))
 
 	resp, err := a.provider.Chat(ctx, llm.ChatRequest{
-		UserPrompt: prompt,
-		Model:      a.model,
+		SystemPrompt: "You are a test coverage expert that provides actionable recommendations.",
+		UserPrompt:   prompt,
+		Model:        a.model,
 	})
 
 	if err != nil {

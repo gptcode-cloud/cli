@@ -297,8 +297,9 @@ Generate SQL migration with:
 Return ONLY the SQL migration code, no explanations.`, name, strings.Join(changeDescriptions, "\n"))
 
 	resp, err := g.provider.Chat(ctx, llm.ChatRequest{
-		UserPrompt: prompt,
-		Model:      g.model,
+		SystemPrompt: "You are a database migration expert that generates safe, reversible SQL migrations.",
+		UserPrompt:   prompt,
+		Model:        g.model,
 	})
 
 	if err != nil {
