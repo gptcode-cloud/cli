@@ -1,39 +1,39 @@
 <style>
   :root {
-    /* Base Colors (Monocromático) */
-    --color-bg: #ffffff;
-    --color-surface: #fafbfc;
-    --color-border: #e1e4e8;
-    --color-text-primary: #24292e;
-    --color-text-secondary: #586069;
-    --color-text-tertiary: #6a737d;
-    
+    /* Tokyo Night Colors for Explainer */
+    --color-bg: #1a1b26;
+    --color-surface: #16161e;
+    --color-border: #3b4261;
+    --color-text-primary: #c0caf5;
+    --color-text-secondary: #a9b1d6;
+    --color-text-tertiary: #565f89;
+
     /* Functional Colors */
-    --color-primary: #0366d6;
-    --color-success: #28a745;
-    --color-warning: #ffd33d;
-    --color-error: #d73a49;
-    
-    /* Agent Colors (Subtle) */
-    --color-analyzer: #79b8ff;
-    --color-planner: #b392f0;
-    --color-editor: #ffdf5d;
-    --color-validator: #85e89d;
-    
+    --color-primary: #7aa2f7;
+    --color-success: #9ece6a;
+    --color-warning: #e0af68;
+    --color-error: #f7768e;
+
+    /* Agent Colors (Tokyo Night accents) */
+    --color-analyzer: #7dcfff;
+    --color-planner: #bb9af7;
+    --color-editor: #e0af68;
+    --color-validator: #9ece6a;
+
     /* Terminal Colors */
-    --color-terminal-bg: #0d1117;
-    --color-terminal-text: #c9d1d9;
-    
+    --color-terminal-bg: #16161e;
+    --color-terminal-text: #c0caf5;
+
     /* Legacy compatibility */
     --white: var(--color-bg);
     --text-main: var(--color-text-primary);
     --text-muted: var(--color-text-secondary);
     --text-soft: var(--color-text-tertiary);
-    
+
     /* Typography */
     --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
     --font-mono: "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-    
+
     /* Spacing (4px base grid) */
     --space-1: 4px;
     --space-2: 8px;
@@ -41,14 +41,14 @@
     --space-4: 16px;
     --space-6: 24px;
     --space-8: 32px;
-    
+
     /* Border Radius */
     --radius-sm: 3px;
     --radius-md: 6px;
-    
+
     /* Shadows */
-    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
-    --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.08);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 3px 6px rgba(0, 0, 0, 0.3);
   }
 
   * {
@@ -58,7 +58,7 @@
   body {
     margin: 0;
     font-family: var(--font-sans);
-    background: var(--color-surface);
+    background: var(--color-bg);
     color: var(--color-text-primary);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -604,13 +604,13 @@
 
   /* === OBSERVATORY-STYLE LAYOUT === */
   :root {
-    --obs-bg: #ffffff;
-    --obs-panel-bg: #f8f9fa;
-    --obs-border: #e2e8f0;
-    --obs-text: #1e293b;
-    --obs-text-muted: #64748b;
-    --obs-success: #10b981;
-    --obs-terminal-bg: #1e1e1e;
+    --obs-bg: #1a1b26;
+    --obs-panel-bg: #16161e;
+    --obs-border: #3b4261;
+    --obs-text: #c0caf5;
+    --obs-text-muted: #a9b1d6;
+    --obs-success: #9ece6a;
+    --obs-terminal-bg: #16161e;
   }
 
   .explainer-container {
@@ -1737,7 +1737,8 @@
                 <!-- Analyzer -->
                 <div class="te-card te-embed-card" data-agent="0">
                   <div style="position:relative">
-                    <div style="font-size:14px; font-weight:600; margin-bottom:6px; color:var(--color-analyzer)">Analyzer
+                    <div style="font-size:14px; font-weight:600; margin-bottom:6px; color:var(--color-analyzer)">
+                      Analyzer
                     </div>
                     <div style="font-size:10px; color:var(--text-muted); margin-bottom:8px">
                       <div>• Scan codebase</div>
@@ -1763,7 +1764,8 @@
                 <!-- Editor -->
                 <div class="te-card te-embed-card" data-agent="2">
                   <div style="position:relative">
-                    <div style="font-size:14px; font-weight:600; margin-bottom:6px; color:var(--color-editor)">Editor</div>
+                    <div style="font-size:14px; font-weight:600; margin-bottom:6px; color:var(--color-editor)">Editor
+                    </div>
                     <div style="font-size:10px; color:var(--text-muted); margin-bottom:8px">
                       <div>• Apply changes</div>
                       <div>• Generate code</div>
@@ -1897,22 +1899,28 @@
                 <section class="te-col">
                   <div class="te-stage-caption">RAG Context</div>
                   <div class="te-card te-embed-card">
-                    <div style="font-size: 10px; color: var(--color-text-tertiary); margin-bottom: var(--space-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">Retrieved Files</div>
-                    <div style="font-size: 10px; color: var(--color-text-secondary); margin-bottom: var(--space-2); line-height: 1.5;">
+                    <div
+                      style="font-size: 10px; color: var(--color-text-tertiary); margin-bottom: var(--space-2); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+                      Retrieved Files</div>
+                    <div
+                      style="font-size: 10px; color: var(--color-text-secondary); margin-bottom: var(--space-2); line-height: 1.5;">
                       <div style="margin-bottom: 4px;">→ auth/index.ts (342 lines)</div>
                       <div style="margin-bottom: 4px;">→ middleware/jwt.ts (89 lines)</div>
                       <div style="margin-bottom: 4px;">→ tests/auth.test.ts (156 lines)</div>
                     </div>
-                    
-                    <div style="font-size: 10px; color: var(--color-text-tertiary); margin: var(--space-3) 0 var(--space-2) 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding-top: var(--space-2); border-top: 1px solid var(--color-border);">Agent Results</div>
+
+                    <div
+                      style="font-size: 10px; color: var(--color-text-tertiary); margin: var(--space-3) 0 var(--space-2) 0; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; padding-top: var(--space-2); border-top: 1px solid var(--color-border);">
+                      Agent Results</div>
                     <div style="font-size: 10px; color: var(--color-text-secondary); line-height: 1.5;">
                       <div style="margin-bottom: 4px;">✓ Files modified: 3</div>
                       <div style="margin-bottom: 4px;">✓ Tests passed: 12/12</div>
                       <div style="margin-bottom: 4px;">✓ Lints clean</div>
                     </div>
 
-                    <div style="margin-top: var(--space-3); padding: var(--space-2); background: var(--color-surface); border-radius: var(--radius-sm); font-size: 9px; color: var(--color-text-tertiary);">
-                      Context: 4,102 tokens<br/>
+                    <div
+                      style="margin-top: var(--space-3); padding: var(--space-2); background: var(--color-surface); border-radius: var(--radius-sm); font-size: 9px; color: var(--color-text-tertiary);">
+                      Context: 4,102 tokens<br />
                       Window: 128K tokens
                     </div>
                   </div>
@@ -1925,17 +1933,25 @@
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4);">
                       <!-- Left: Process -->
                       <div>
-                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); font-weight: 600; margin-bottom: var(--space-2);">1. Context Embedding</div>
-                        <div style="font-size: 10px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: var(--space-3);">
+                        <div
+                          style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); font-weight: 600; margin-bottom: var(--space-2);">
+                          1. Context Embedding</div>
+                        <div
+                          style="font-size: 10px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: var(--space-3);">
                           RAG retrieves code and agent results as vector embeddings.
                         </div>
 
-                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); font-weight: 600; margin-bottom: var(--space-2);">2. Self-Attention</div>
-                        <div style="font-size: 10px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: var(--space-3);">
+                        <div
+                          style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); font-weight: 600; margin-bottom: var(--space-2);">
+                          2. Self-Attention</div>
+                        <div
+                          style="font-size: 10px; color: var(--color-text-secondary); line-height: 1.5; margin-bottom: var(--space-3);">
                           Cross-attention captures relationships between code and results.
                         </div>
 
-                        <div style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); font-weight: 600; margin-bottom: var(--space-2);">3. Token Generation</div>
+                        <div
+                          style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-tertiary); font-weight: 600; margin-bottom: var(--space-2);">
+                          3. Token Generation</div>
                         <div style="font-size: 10px; color: var(--color-text-secondary); line-height: 1.5;">
                           Softmax sampling with temperature control.
                         </div>
@@ -1943,8 +1959,11 @@
 
                       <!-- Right: Technical Details -->
                       <div>
-                        <div style="background: var(--color-surface); padding: var(--space-3); border-radius: var(--radius-md); margin-bottom: var(--space-3);">
-                          <div style="font-size: 10px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--space-2);">Model Configuration</div>
+                        <div
+                          style="background: var(--color-surface); padding: var(--space-3); border-radius: var(--radius-md); margin-bottom: var(--space-3);">
+                          <div
+                            style="font-size: 10px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--space-2);">
+                            Model Configuration</div>
                           <div style="font-size: 9px; color: var(--color-text-secondary); line-height: 1.6;">
                             <div style="margin-bottom: 4px;"><strong>Model:</strong> llama-3.1-8b</div>
                             <div style="margin-bottom: 4px;"><strong>Params:</strong> 8B</div>
@@ -1954,8 +1973,11 @@
                           </div>
                         </div>
 
-                        <div style="background: var(--color-surface); padding: var(--space-3); border-radius: var(--radius-md);">
-                          <div style="font-size: 10px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--space-2);">Performance Metrics</div>
+                        <div
+                          style="background: var(--color-surface); padding: var(--space-3); border-radius: var(--radius-md);">
+                          <div
+                            style="font-size: 10px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--space-2);">
+                            Performance Metrics</div>
                           <div style="font-size: 9px; color: var(--color-text-secondary); line-height: 1.6;">
                             <div style="margin-bottom: 4px;">Tokens/sec: <strong>142</strong></div>
                             <div style="margin-bottom: 4px;">Latency: <strong>48ms</strong></div>
@@ -1972,7 +1994,8 @@
                 <section class="te-col">
                   <div class="te-prob-title">Generated Response</div>
                   <div class="te-card te-prob-card">
-                    <div style="font-size: 10px; color: var(--color-text-secondary); margin-bottom: var(--space-3); line-height: 1.5;">
+                    <div
+                      style="font-size: 10px; color: var(--color-text-secondary); margin-bottom: var(--space-3); line-height: 1.5;">
                       Token-by-token generation with softmax sampling
                     </div>
 
@@ -2013,9 +2036,13 @@
                       </div>
                     </div>
 
-                    <div style="margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--color-border);">
-                      <div style="font-size: 10px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--space-2);">Final Response</div>
-                      <div id="final-response" style="font-size: 11px; color: var(--color-text-secondary); line-height: 1.6; font-family: var(--font-mono); background: var(--color-surface); padding: var(--space-2); border-radius: var(--radius-sm);">
+                    <div
+                      style="margin-top: var(--space-4); padding-top: var(--space-3); border-top: 1px solid var(--color-border);">
+                      <div
+                        style="font-size: 10px; font-weight: 600; color: var(--color-text-primary); margin-bottom: var(--space-2);">
+                        Final Response</div>
+                      <div id="final-response"
+                        style="font-size: 11px; color: var(--color-text-secondary); line-height: 1.6; font-family: var(--font-mono); background: var(--color-surface); padding: var(--space-2); border-radius: var(--radius-sm);">
                         "Done! Added authentication. All 12 tests passing."
                       </div>
                     </div>
@@ -2418,7 +2445,7 @@
 
       await this.wait(300);
       this.updateCost(0.000063); // Response generation cost
-      
+
       // Display final message in terminal
       await this.type('✓ [System] Done! Added authentication. 3 files modified, 12 tests passing.', 'term-log success');
       await this.wait(500);
