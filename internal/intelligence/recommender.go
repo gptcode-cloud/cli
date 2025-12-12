@@ -1,8 +1,8 @@
 package intelligence
 
 import (
-	"gptcode/internal/config"
 	"fmt"
+	"gptcode/internal/config"
 	"os"
 )
 

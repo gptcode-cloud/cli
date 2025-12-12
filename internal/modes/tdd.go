@@ -1,10 +1,10 @@
 package modes
 
 import (
-	"gptcode/internal/llm"
-	"gptcode/internal/prompt"
 	"context"
 	"fmt"
+	"gptcode/internal/llm"
+	"gptcode/internal/prompt"
 	"strings"
 )
 

@@ -6,10 +6,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/spf13/cobra"
 	"gptcode/internal/config"
 	"gptcode/internal/configmgmt"
 	"gptcode/internal/llm"
-	"github.com/spf13/cobra"
 )
 
 var configMgmtCmd = &cobra.Command{

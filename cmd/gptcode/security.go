@@ -6,10 +6,10 @@ import (
 	"os"
 	"time"
 
+	"github.com/spf13/cobra"
 	"gptcode/internal/config"
 	"gptcode/internal/llm"
 	"gptcode/internal/security"
-	"github.com/spf13/cobra"
 )
 
 var securityCmd = &cobra.Command{

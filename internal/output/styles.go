@@ -4,28 +4,29 @@ import (
 	"fmt"
 	"strings"
 
+	"os"
+
 	"github.com/charmbracelet/lipgloss"
 	"golang.org/x/term"
-	"os"
 )
 
 var (
 	HeaderStyle = lipgloss.NewStyle().
 			Bold(true).
-			Foreground(lipgloss.Color("12")).
+			Foreground(lipgloss.Color("#7aa2f7")). // Tokyo Night Blue
 			MarginTop(1).
 			MarginBottom(1)
 
 	SeparatorStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("240"))
+			Foreground(lipgloss.Color("#3b4261")) // Tokyo Night Gutter (Dark Grey)
 
 	SuccessStyle = lipgloss.NewStyle().
-			Foreground(lipgloss.Color("10")).
+			Foreground(lipgloss.Color("#9ece6a")). // Tokyo Night Green
 			Bold(true)
 
 	BoxStyle = lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder()).
-			BorderForeground(lipgloss.Color("240")).
+			BorderForeground(lipgloss.Color("#7dcfff")). // Tokyo Night Cyan
 			Padding(0, 1)
 )
 
@@ -52,12 +53,12 @@ func Success(text string) string {
 
 func CodeBlockBox(title, code string) string {
 	styledCode := lipgloss.NewStyle().
-		Foreground(lipgloss.Color("14")).
+		Foreground(lipgloss.Color("#c0caf5")). // Tokyo Night FG
 		Render(code)
 
 	titleStyle := lipgloss.NewStyle().
 		Bold(true).
-		Foreground(lipgloss.Color("11"))
+		Foreground(lipgloss.Color("#e0af68")) // Tokyo Night Yellow
 
 	content := fmt.Sprintf("%s\n\n%s", titleStyle.Render(title), styledCode)
 	return BoxStyle.Render(content)

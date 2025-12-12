@@ -2,8 +2,8 @@ package validation
 
 import (
 	"bytes"
-	"gptcode/internal/langdetect"
 	"fmt"
+	"gptcode/internal/langdetect"
 	"os/exec"
 	"path/filepath"
 	"strings"

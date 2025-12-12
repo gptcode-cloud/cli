@@ -1,10 +1,10 @@
 package catalog
 
 import (
-	"gptcode/internal/feedback"
-	"gptcode/internal/ollama"
 	"encoding/json"
 	"fmt"
+	"gptcode/internal/feedback"
+	"gptcode/internal/ollama"
 	"os"
 	"path/filepath"
 	"sort"

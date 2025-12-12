@@ -3,11 +3,11 @@ package llm
 import (
 	"bufio"
 	"bytes"
-	"gptcode/internal/config"
 	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
+	"gptcode/internal/config"
 	"io"
 	"net/http"
 	"os"

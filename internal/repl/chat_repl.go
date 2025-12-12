@@ -7,11 +7,11 @@ import (
 	"os/exec"
 	"strings"
 
+	"github.com/chzyer/readline"
 	"gptcode/internal/config"
 	"gptcode/internal/llm"
 	"gptcode/internal/modes"
 	"gptcode/internal/prompt"
-	"github.com/chzyer/readline"
 )
 
 // ChatREPL implements a Read-Eval-Print Loop for chat conversations

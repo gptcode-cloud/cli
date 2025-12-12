@@ -6,13 +6,13 @@ import (
 	"os"
 	"time"
 
+	"github.com/spf13/cobra"
 	"gptcode/internal/changelog"
 	"gptcode/internal/config"
 	"gptcode/internal/llm"
 	"gptcode/internal/migration"
 	"gptcode/internal/mockgen"
 	"gptcode/internal/testgen"
-	"github.com/spf13/cobra"
 )
 
 var genCmd = &cobra.Command{

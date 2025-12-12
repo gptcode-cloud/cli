@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"gptcode/internal/github"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"gptcode/internal/github"
 )
 
 func runCommand(t *testing.T, dir string, name string, args ...string) string {

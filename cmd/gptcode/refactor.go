@@ -6,11 +6,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/spf13/cobra"
 	"gptcode/internal/compat"
 	"gptcode/internal/config"
 	"gptcode/internal/llm"
 	"gptcode/internal/refactor"
-	"github.com/spf13/cobra"
 )
 
 var refactorCmd = &cobra.Command{
