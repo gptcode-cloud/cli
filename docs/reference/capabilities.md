@@ -8,7 +8,7 @@ permalink: /reference/capabilities/
 
 **Last Updated:** December 2025  
 **Current Version:** 0.x (MVP)  
-**Overall Autonomy:** 64/64 scenarios (💯 100% 🎯)
+**Overall Autonomy:** 64/64 scenarios
 
 This document describes what GPTCode can and cannot do autonomously. Updated with each major release.
 

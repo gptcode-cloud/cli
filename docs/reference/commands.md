@@ -27,24 +27,25 @@ Complete guide to all `chu` commands and their usage.
   flex-wrap: wrap;
   gap: 0.75rem;
   padding: 1rem;
-  background: #f5f5f5;
+  background: #16161e;
   border-radius: 8px;
   margin-bottom: 2rem;
+  border: 1px solid #3b4261;
 }
 .command-nav a {
   padding: 0.5rem 1rem;
-  background: white;
-  border: 1px solid #ddd;
+  background: #1a1b26;
+  border: 1px solid #3b4261;
   border-radius: 4px;
   text-decoration: none;
-  color: #333;
+  color: #c0caf5;
   font-weight: 500;
   transition: all 0.2s;
 }
 .command-nav a:hover {
-  background: #4a90e2;
-  color: white;
-  border-color: #4a90e2;
+  background: #7aa2f7;
+  color: #1a1b26;
+  border-color: #7aa2f7;
 }
 .copy-btn {
   position: absolute;

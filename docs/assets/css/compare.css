@@ -106,7 +106,8 @@ select {
     border-radius: 8px;
     font-family: var(--font-system);
     font-size: 15px;
-    background: var(--color-bg);
+    background: var(--color-card-bg);
+    color: var(--color-text);
     cursor: pointer;
     transition: var(--transition);
 }
@@ -191,30 +192,36 @@ select:hover {
 
 .tag {
     padding: 4px 12px;
-    background: var(--color-bg);
+    background: var(--color-card-bg);
+    border: 1px solid var(--color-border);
     border-radius: 16px;
     font-size: 12px;
     font-weight: 500;
+    color: var(--color-text);
 }
 
 .tag.free {
-    background: #e8f5e9;
-    color: #2e7d32;
+    background: rgba(158, 206, 106, 0.15);
+    border-color: #9ece6a;
+    color: #9ece6a;
 }
 
 .tag.budget {
-    background: #e3f2fd;
-    color: #1565c0;
+    background: rgba(122, 162, 247, 0.15);
+    border-color: #7aa2f7;
+    color: #7aa2f7;
 }
 
 .tag.fast {
-    background: #fff3e0;
-    color: #e65100;
+    background: rgba(224, 175, 104, 0.15);
+    border-color: #e0af68;
+    color: #e0af68;
 }
 
 .tag.quality {
-    background: #f3e5f5;
-    color: #6a1b9a;
+    background: rgba(187, 154, 247, 0.15);
+    border-color: #bb9af7;
+    color: #bb9af7;
 }
 
 .benchmarks {
@@ -359,7 +366,8 @@ button:hover {
     border-radius: 8px;
     font-family: var(--font-system);
     font-size: 15px;
-    background: var(--color-bg);
+    background: var(--color-card-bg);
+    color: var(--color-text);
 }
 
 .agent-breakdown {
