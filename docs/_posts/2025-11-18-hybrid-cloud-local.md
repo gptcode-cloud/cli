@@ -3,7 +3,7 @@ layout: post
 title: "Switching Between Local and Cloud: Flexibility When You Need It"
 date: 2025-11-18
 author: Jader Correa
-description: "Switch between local Ollama models for privacy and cloud providers for power. Get the best of both worlds with Chuchu's flexible backend configuration."
+description: "Switch between local Ollama models for privacy and cloud providers for power. Get the best of both worlds with GPTCode's flexible backend configuration."
 tags: [configuration, hybrid, cloud, local, strategy]
 ---
 
@@ -13,7 +13,7 @@ The debate between "Local AI" (privacy, free) and "Cloud AI" (intelligence, spee
 
 ## How It Works
 
-Chuchu uses **one backend at a time**, but you can easily switch between local and cloud configurations depending on your current context:
+GPTCode uses **one backend at a time**, but you can easily switch between local and cloud configurations depending on your current context:
 
 - **Working on sensitive code?** Switch to Ollama (local, private)
 - **Need maximum intelligence?** Switch to OpenRouter/Groq (cloud, powerful)
@@ -22,7 +22,7 @@ Chuchu uses **one backend at a time**, but you can easily switch between local a
 
 ## Configuration Setup
 
-Maintain both configurations in your `~/.chuchu/setup.yaml`:
+Maintain both configurations in your `~/.gptcode/setup.yaml`:
 
 ```yaml
 defaults:
@@ -60,7 +60,7 @@ Use the backend selector with `Ctrl+X` in the chat buffer to switch on the fly.
 
 ### Via Config File
 
-Edit `~/.chuchu/setup.yaml` and change the `defaults.backend` value:
+Edit `~/.gptcode/setup.yaml` and change the `defaults.backend` value:
 
 ```yaml
 defaults:

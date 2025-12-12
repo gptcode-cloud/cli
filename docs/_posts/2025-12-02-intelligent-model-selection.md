@@ -26,7 +26,7 @@ This rigid approach has several problems:
 
 ## The Solution: Multi-Dimensional Model Selection
 
-Chuchu now features an intelligent model selection system that **automatically** chooses the best model for each action based on:
+GPTCode now features an intelligent model selection system that **automatically** chooses the best model for each action based on:
 
 ### 1. Availability (Highest Priority)
 ```
@@ -73,7 +73,7 @@ Every LLM call records:
 - Error messages
 - Token usage (input/output/cached)
 
-Data stored in `~/.chuchu/usage.json`:
+Data stored in `~/.gptcode/usage.json`:
 ```json
 {
   "2025-12-02": {
@@ -156,7 +156,7 @@ Cost: ~$0-2/month, zero rate limit issues
 
 ## The Model Catalog
 
-`~/.chuchu/models_catalog.json` defines available models:
+`~/.gptcode/models_catalog.json` defines available models:
 
 ```json
 {
@@ -214,10 +214,10 @@ chu stats
 
 ---
 
-*Have questions about model selection? Join our [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)*
+*Have questions about model selection? Join our [GitHub Discussions](https://github.com/jadercorrea/gptcode/discussions)*
 
 ## See Also
 
 - [Groq Optimal Configurations](2025-11-15-groq-optimal-configs) - Budget-friendly model setups
 - [OpenRouter Multi-Provider](2025-11-16-openrouter-multi-provider) - Access to 200+ models
-- [ML-Powered Intelligence](2025-11-22-ml-powered-intelligence) - ML capabilities in Chuchu
+- [ML-Powered Intelligence](2025-11-22-ml-powered-intelligence) - ML capabilities in GPTCode

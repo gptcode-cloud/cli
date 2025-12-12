@@ -7,9 +7,9 @@ import (
 	"os/exec"
 	"strings"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/events"
-	"chuchu/internal/llm"
+	"gptcode/internal/agents"
+	"gptcode/internal/events"
+	"gptcode/internal/llm"
 )
 
 // Maestro orchestrates autonomous execution with verification and recovery
@@ -125,7 +125,7 @@ func (m *Maestro) ResumeExecution(ctx context.Context, planContent string) error
 	steps := m.parsePlan(planContent)
 
 	// Load latest checkpoint directory and infer step index
-	// Simple approach: scan .chuchu/checkpoints and pick the latest, then parse step index from id
+	// Simple approach: scan .gptcode/checkpoints and pick the latest, then parse step index from id
 	ckptDir := m.Checkpoints.RootDir
 	dirs, err := os.ReadDir(ckptDir)
 	if err != nil || len(dirs) == 0 {

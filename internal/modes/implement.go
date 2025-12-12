@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"os"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/config"
-	"chuchu/internal/llm"
-	"chuchu/internal/output"
+	"gptcode/internal/agents"
+	"gptcode/internal/config"
+	"gptcode/internal/llm"
+	"gptcode/internal/output"
 
 	"golang.org/x/term"
 )

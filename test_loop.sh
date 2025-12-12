@@ -1,6 +1,6 @@
 #!/bin/bash
 
-cd /Users/jadercorrea/workspace/opensource/chuchu
+cd /Users/jadercorrea/workspace/opensource/gptcode
 
 echo "=== Starting test loop ==="
 iteration=1

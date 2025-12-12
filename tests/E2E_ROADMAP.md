@@ -1,6 +1,6 @@
 # E2E Testing Roadmap
 
-This document outlines the plan for comprehensive end-to-end testing of Chuchu.
+This document outlines the plan for comprehensive end-to-end testing of GPTCode.
 
 ## Current Status (Phase 1) ✅
 
@@ -91,7 +91,7 @@ This document outlines the plan for comprehensive end-to-end testing of Chuchu.
 **Scenarios:**
 - `nvim_chat_interface.sh`
   - Open Neovim headless
-  - Trigger `:ChuchuChat`
+  - Trigger `:GPTCodeChat`
   - Send message via RPC
   - Verify response in buffer
 

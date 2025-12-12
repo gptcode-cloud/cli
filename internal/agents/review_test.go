@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"chuchu/internal/llm"
+	"gptcode/internal/llm"
 )
 
 func TestReviewAgent(t *testing.T) {

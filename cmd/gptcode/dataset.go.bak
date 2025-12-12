@@ -1,0 +1,89 @@
+package main
+
+import (
+	"fmt"
+	"strings"
+
+	"github.com/spf13/cobra"
+
+	"chuchu/internal/intelligence/recommender"
+)
+
+var datasetCmd = &cobra.Command{
+	Use:   "dataset",
+	Short: "Manage training dataset for ML models",
+}
+
+var datasetStatsCmd = &cobra.Command{
+	Use:   "stats",
+	Short: "Show training dataset statistics",
+	RunE: func(cmd *cobra.Command, args []string) error {
+		stats, err := recommender.GetTrainingDataStats()
+		if err != nil {
+			return fmt.Errorf("failed to get stats: %w", err)
+		}
+
+		fmt.Println("📊 Training Dataset Statistics")
+		fmt.Println(strings.Repeat("=", 60))
+		fmt.Println()
+
+		total := stats["total"]
+		good := stats["good"]
+		bad := stats["bad"]
+
+		fmt.Printf("Total examples: %d\n", total)
+		if total > 0 {
+			fmt.Printf("  Good: %d (%.1f%%)\n", good, float64(good)/float64(total)*100)
+			fmt.Printf("  Bad:  %d (%.1f%%)\n", bad, float64(bad)/float64(total)*100)
+		}
+
+		fmt.Println()
+		fmt.Println("By Model:")
+		for key, count := range stats {
+			if strings.HasPrefix(key, "model_") {
+				model := strings.TrimPrefix(key, "model_")
+				fmt.Printf("  %s: %d\n", model, count)
+			}
+		}
+
+		fmt.Println()
+		fmt.Println("By Backend:")
+		for key, count := range stats {
+			if strings.HasPrefix(key, "backend_") {
+				backend := strings.TrimPrefix(key, "backend_")
+				fmt.Printf("  %s: %d\n", backend, count)
+			}
+		}
+
+		fmt.Println()
+		path := recommender.GetTrainingDataPath()
+		fmt.Printf("Data file: %s\n", path)
+
+		if total < 100 {
+			fmt.Println()
+			fmt.Println("⚠️  Recommendation: Collect at least 100 examples for reliable training")
+		} else if total < 500 {
+			fmt.Println()
+			fmt.Println("✅ Good dataset size. Consider collecting 500+ for better accuracy")
+		} else {
+			fmt.Println()
+			fmt.Println("✅ Excellent dataset size!")
+		}
+
+		return nil
+	},
+}
+
+var datasetPathCmd = &cobra.Command{
+	Use:   "path",
+	Short: "Show path to training data file",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println(recommender.GetTrainingDataPath())
+	},
+}
+
+func init() {
+	datasetCmd.AddCommand(datasetStatsCmd)
+	datasetCmd.AddCommand(datasetPathCmd)
+	rootCmd.AddCommand(datasetCmd)
+}

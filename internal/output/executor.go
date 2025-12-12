@@ -54,7 +54,7 @@ func HandleCodeBlock(action Action, code string) error {
 }
 
 func openInEditor(content string) (string, error) {
-	tmpfile, err := os.CreateTemp("", "chuchu-*.sh")
+	tmpfile, err := os.CreateTemp("", "gptcode-*.sh")
 	if err != nil {
 		return "", err
 	}

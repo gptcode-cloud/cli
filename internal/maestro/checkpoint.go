@@ -27,7 +27,7 @@ type CheckpointSystem struct {
 // NewCheckpointSystem creates a new checkpoint system
 func NewCheckpointSystem(rootDir string) *CheckpointSystem {
 	return &CheckpointSystem{
-		RootDir: filepath.Join(rootDir, ".chuchu", "checkpoints"),
+		RootDir: filepath.Join(rootDir, ".gptcode", "checkpoints"),
 	}
 }
 

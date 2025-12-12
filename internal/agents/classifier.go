@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"chuchu/internal/ml"
+	"gptcode/internal/ml"
 )
 
 type Intent string

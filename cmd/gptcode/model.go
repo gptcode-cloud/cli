@@ -11,9 +11,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"chuchu/internal/catalog"
-	"chuchu/internal/config"
-	"chuchu/internal/intelligence"
+	"gptcode/internal/catalog"
+	"gptcode/internal/config"
+	"gptcode/internal/intelligence"
 )
 
 var modelCmd = &cobra.Command{
@@ -248,7 +248,7 @@ Examples:
 func updateSingleModel(modelName string) error {
 	fmt.Printf("Updating model: %s\n", modelName)
 
-	catalogPath := filepath.Join(os.Getenv("HOME"), ".chuchu", "models_catalog.json")
+	catalogPath := filepath.Join(os.Getenv("HOME"), ".gptcode", "models_catalog.json")
 
 	if _, err := os.Stat(catalogPath); os.IsNotExist(err) {
 		fmt.Println("No catalog found. Running full update first...")
@@ -355,7 +355,7 @@ func updateCatalogFromAllProviders() error {
 		return fmt.Errorf("failed to get home dir: %w", err)
 	}
 
-	outputPath := filepath.Join(home, ".chuchu", "models_catalog.json")
+	outputPath := filepath.Join(home, ".gptcode", "models_catalog.json")
 
 	fmt.Println("  OpenRouter (public API - no key needed)")
 	if _, ok := apiKeys["groq"]; ok {

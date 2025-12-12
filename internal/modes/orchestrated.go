@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"os"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/config"
-	"chuchu/internal/events"
-	"chuchu/internal/intelligence"
-	"chuchu/internal/llm"
+	"gptcode/internal/agents"
+	"gptcode/internal/config"
+	"gptcode/internal/events"
+	"gptcode/internal/intelligence"
+	"gptcode/internal/llm"
 )
 
 type OrchestratedMode struct {

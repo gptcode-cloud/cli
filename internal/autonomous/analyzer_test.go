@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/llm"
+	"gptcode/internal/agents"
+	"gptcode/internal/llm"
 )
 
 func TestExtractVerb(t *testing.T) {

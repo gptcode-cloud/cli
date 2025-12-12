@@ -29,14 +29,14 @@ You use **one backend at a time**, but can configure different agents to use dif
 
 1. Sign up at [openrouter.ai](https://openrouter.ai)
 2. Create an API key
-3. Add it to Chuchu:
+3. Add it to GPTCode:
    ```bash
    chu key openrouter sk-or-v1-...
    ```
 
 ### Step 2: Configure Agent Models
 
-Edit `~/.chuchu/setup.yaml` with this killer configuration:
+Edit `~/.gptcode/setup.yaml` with this killer configuration:
 
 ```yaml
 backend:
@@ -234,7 +234,7 @@ For maximum quality:
 - **Grok 4.1 Fast** for agentic research with massive context
 - **Llama 3.1** for cost-effective routing
 
-It's the most flexible and powerful way to run Chuchu.
+It's the most flexible and powerful way to run GPTCode.
 
 ## Tips
 
@@ -247,4 +247,4 @@ It's the most flexible and powerful way to run Chuchu.
 
 ---
 
-*Share your optimized OpenRouter configurations in [GitHub Discussions](https://github.com/yourusername/chuchu/discussions)!*
+*Share your optimized OpenRouter configurations in [GitHub Discussions](https://github.com/yourusername/gptcode/discussions)!*

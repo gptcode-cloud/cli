@@ -3,7 +3,7 @@ layout: post
 title: "Advanced Context Management: Handling Large Repositories"
 date: 2025-11-20
 author: Jader Correa
-description: "Learn how Chuchu uses RAG, smart retrieval, and context optimization to handle large repositories without dumping your entire codebase into the prompt."
+description: "Learn how GPTCode uses RAG, smart retrieval, and context optimization to handle large repositories without dumping your entire codebase into the prompt."
 tags: [context-management, advanced, optimization, rag]
 ---
 
@@ -11,9 +11,9 @@ tags: [context-management, advanced, optimization, rag]
 
 One of the biggest challenges in AI coding is the **Context Window**.
 
-## How Chuchu Manages Context
+## How GPTCode Manages Context
 
-Chuchu uses **Retrieval-Augmented Generation (RAG)**[^1] to fetch only relevant information:
+GPTCode uses **Retrieval-Augmented Generation (RAG)**[^1] to fetch only relevant information:
 
 1.  **Project Map**: The `project_map` tool generates a tree-like view of your project structure in ~500 tokens, giving the model a "mental map" of where things are.
 
@@ -29,11 +29,11 @@ Chuchu uses **Retrieval-Augmented Generation (RAG)**[^1] to fetch only relevant 
 
 ## Tips for Large Repos
 
-If you are working in a massive monorepo, here are some tips to help Chuchu stay focused:
+If you are working in a massive monorepo, here are some tips to help GPTCode stay focused:
 
-### 1. Chuchu Respects `.gitignore`
+### 1. GPTCode Respects `.gitignore`
 
-Chuchu automatically respects your `.gitignore` and skips common directories:
+GPTCode automatically respects your `.gitignore` and skips common directories:
 ```text
 # Automatically ignored:
 node_modules/
@@ -75,7 +75,7 @@ Each command starts with fresh context, preventing pollution.
 
 ## What Makes This Effective
 
-**Chuchu already uses RAG!** The combination of:
+**GPTCode already uses RAG!** The combination of:
 - `project_map` for structure overview
 - `search_code` for pattern-based retrieval  
 - `read_file` with smart truncation

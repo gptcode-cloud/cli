@@ -26,7 +26,7 @@ chu feedback hook install --shell=bash --with-diff
 chu feedback hook install --shell=fish --with-diff
 ```
 
-This creates and references a hook at `~/.chuchu/feedback_hook.<shell>` and updates your shell rc.
+This creates and references a hook at `~/.gptcode/feedback_hook.<shell>` and updates your shell rc.
 
 ## Usage
 
@@ -40,7 +40,7 @@ The hook compares what you ran with the suggestion:
 
 If the directory is a git repo:
 - `files` contains `git diff --name-only`
-- With `--with-diff`, the full patch is saved to `~/.chuchu/diffs/<timestamp>.patch` and the path is stored in `diff_path`.
+- With `--with-diff`, the full patch is saved to `~/.gptcode/diffs/<timestamp>.patch` and the path is stored in `diff_path`.
 
 ## Generate the demos via CLI
 ```bash

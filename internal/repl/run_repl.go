@@ -25,7 +25,7 @@ func NewRunREPL(maxCommands int) *RunREPL {
 
 // Run starts the REPL loop
 func (r *RunREPL) Run() error {
-	fmt.Println("Chuchu Run REPL - Type /help for commands")
+	fmt.Println("GPTCode Run REPL - Type /help for commands")
 	fmt.Println("")
 
 	// Initialize current directory

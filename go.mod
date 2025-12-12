@@ -1,4 +1,4 @@
-module chuchu
+module gptcode
 
 go 1.24
 

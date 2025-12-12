@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"os"
 
-	"chuchu/internal/config"
-	"chuchu/internal/testrunner"
+	"gptcode/internal/config"
+	"gptcode/internal/testrunner"
 
 	"github.com/spf13/cobra"
 )
@@ -21,7 +21,7 @@ var (
 var testCmd = &cobra.Command{
 	Use:   "test",
 	Short: "Run tests",
-	Long:  `Run unit or E2E tests for Chuchu`,
+	Long:  `Run unit or E2E tests for GPTCode`,
 }
 
 var testE2ECmd = &cobra.Command{
@@ -114,7 +114,7 @@ Or specify profile directly:
 
 	notify := notifyFlag || setup.E2E.Notify
 
-	fmt.Printf(" Chuchu E2E Tests\n")
+	fmt.Printf(" GPTCode E2E Tests\n")
 	fmt.Printf("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n")
 	fmt.Printf("Backend:  %s\n", backend)
 	fmt.Printf("Profile:  %s\n", profile)
@@ -136,7 +136,7 @@ func promptForProfile(backend string, setup *config.Setup) (string, error) {
 		return "", fmt.Errorf("no profiles configured for backend '%s'", backend)
 	}
 
-	fmt.Printf("\n Chuchu E2E Tests\n\n")
+	fmt.Printf("\n GPTCode E2E Tests\n\n")
 	fmt.Printf("Available profiles for '%s':\n", backend)
 	for i, p := range profiles {
 		fmt.Printf("  %d. %s\n", i+1, p)

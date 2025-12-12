@@ -13,7 +13,7 @@ func TestCatalogSearch(t *testing.T) {
 	}
 
 	homeDir, _ := os.UserHomeDir()
-	catalogPath := homeDir + "/.chuchu/models.json"
+	catalogPath := homeDir + "/.gptcode/models.json"
 
 	data, err := os.ReadFile(catalogPath)
 	if err != nil {

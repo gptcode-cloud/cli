@@ -11,7 +11,7 @@ Os posts anteriores a 2025-12-01 já seguiam uma estrutura consistente (frontmat
 - Garantir consistência editorial e técnica em todos os posts.
 - Transformar cada post em um vídeo curto em português com narrativa clara, demonstração e CTA.
 - Viabilizar publicação contínua no canal Zapfy-AI.
-- Preparar terreno para posicionamento de Chuchu dentro da org Zapfy.
+- Preparar terreno para posicionamento de GPTCode dentro da org Zapfy.
 
 ## Fases
 ### Fase 1 — Padronização dos posts (Concluída)
@@ -45,7 +45,7 @@ Saídas:
 - Checklist de QA: duração 3–5 min, áudio limpo, sem textos pequenos.
 
 ### Fase 5 — Migração para org Zapfy
-- Transferência do repositório para `zapfy/chuchu`.
+- Transferência do repositório para `zapfy/gptcode`.
 - Atualização de `go.mod`, README, badges e links do site.
 - Post/Discussion explicando a mudança (OS continua MIT, mantido pela Zapfy).
 
@@ -54,7 +54,7 @@ Saídas:
 
 ## Critérios de Sucesso
 - 100% dos posts recentes padronizados (12-01 a 12-05) — OK.
-- 3 primeiros vídeos publicados (Why Chuchu, Context Engineering, Why Chuchu Isn’t Trying...).
+- 3 primeiros vídeos publicados (Why GPTCode, Context Engineering, Why GPTCode Isn’t Trying...).
 - Tempo total por vídeo ≤ 2h (roteiro→render→publicação) após setup.
 - +10% de engajamento médio nas páginas de docs relacionadas (baseline a ser medido).
 

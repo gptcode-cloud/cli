@@ -171,7 +171,7 @@ func (ms *ModelSelector) loadFeedback() error {
 
 	// Import feedback package to use existing system
 	// For now, we'll load directly from the feedback directory
-	feedbackDir := filepath.Join(home, ".chuchu", "feedback")
+	feedbackDir := filepath.Join(home, ".gptcode", "feedback")
 	entries, err := os.ReadDir(feedbackDir)
 	if err != nil {
 		// Feedback dir doesn't exist yet, that's OK
@@ -267,7 +267,7 @@ func (ms *ModelSelector) loadUsage() error {
 		return err
 	}
 
-	usagePath := filepath.Join(home, ".chuchu", "usage.json")
+	usagePath := filepath.Join(home, ".gptcode", "usage.json")
 	data, err := os.ReadFile(usagePath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -289,7 +289,7 @@ func (ms *ModelSelector) saveUsage() error {
 		return err
 	}
 
-	usagePath := filepath.Join(home, ".chuchu", "usage.json")
+	usagePath := filepath.Join(home, ".gptcode", "usage.json")
 	data, err := json.MarshalIndent(ms.usage, "", "  ")
 	if err != nil {
 		return err

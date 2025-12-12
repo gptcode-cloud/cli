@@ -1,4 +1,4 @@
-# Chuchu Observer: Real-Time Visualization Dashboard
+# GPTCode Observer: Real-Time Visualization Dashboard
 
 **Status:** 🌐 Marketing Demo Complete | ❌ CLI Implementation Pending  
 **Last Updated:** 2025-12-01
@@ -22,7 +22,7 @@
 - Falta de transparência gera desconfiança
 - Oportunidade de diferenciação competitiva
 
-**O que o Chuchu tem de único para visualizar:**
+**O que o GPTCode tem de único para visualizar:**
 1. **Orchestração Maestro** - Execute → Verify → Retry/Rollback → Checkpoint
 2. **Agent Dance** - Router → Analyzer → Planner → Editor → Validator
 3. **Model Selection** - ML Recommender (KAN + XGBoost) com ensemble weights
@@ -35,16 +35,16 @@
 ❌ **Token-level é muito granular** - Pouco valor prático
 ❌ **Attention weights** - Interessante academicamente, mas não útil para usuários
 
-## Proposta: "Chuchu Observer"
+## Proposta: "GPTCode Observer"
 
 ### Conceito Central
-Dashboard web que mostra **execução em tempo real** dos sistemas do Chuchu com foco em:
+Dashboard web que mostra **execução em tempo real** dos sistemas do GPTCode com foco em:
 1. **Orquestração** (high-level flow)
 2. **Decisões de inteligência** (ML predictions)
 3. **Custo e performance** (metrics)
 
 ### Mensagem de Marketing
-> "While other AI assistants are black boxes, Chuchu shows you exactly what's happening. Watch your code changes orchestrated in real-time."
+> "While other AI assistants are black boxes, GPTCode shows you exactly what's happening. Watch your code changes orchestrated in real-time."
 
 ## Arquitetura
 
@@ -57,7 +57,7 @@ Dashboard web que mostra **execução em tempo real** dos sistemas do Chuchu com
 └─────────────────────────────────────────────────────┘
           ↑ WebSocket (real-time events)
 ┌─────────────────────────────────────────────────────┐
-│            Chuchu (Go) + Telemetry                   │
+│            GPTCode (Go) + Telemetry                   │
 │  events.Emitter → WebSocket Server → Dashboard      │
 └─────────────────────────────────────────────────────┘
 ```
@@ -350,7 +350,7 @@ observer-web/src/components/        - ADD CostDashboard
 ### Para Usuários
 
 **1. Debugging**
-- "Por que o Chuchu escolheu esse modelo?"
+- "Por que o GPTCode escolheu esse modelo?"
 - "Por que o step 3 falhou?"
 - "Quanto custou essa execução?"
 
@@ -382,13 +382,13 @@ observer-web/src/components/        - ADD CostDashboard
 - Share no Twitter/LinkedIn
 
 **3. Blog posts**
-- "Under the hood: How Chuchu works"
+- "Under the hood: How GPTCode works"
 - "Transparent AI: What we learned"
 - "Building trust through visibility"
 
 **4. Diferencial vs competidores**
 - Tabela comparativa incluindo "Transparency"
-- Chuchu: ✅ Real-time visibility
+- GPTCode: ✅ Real-time visibility
 - Cursor/Copilot: ❌ Black box
 
 ## Riscos e Mitigações
@@ -506,7 +506,7 @@ observer-web/src/components/        - ADD CostDashboard
 ### Conceito: "Try Before You Install"
 
 **Problema original:**
-- WebSocket real requer instalar Chuchu
+- WebSocket real requer instalar GPTCode
 - Visitante não vê nada sem download
 - Demo separado em servidor é overhead
 
@@ -519,7 +519,7 @@ observer-web/src/components/        - ADD CostDashboard
 ### Arquitetura do Demo
 
 ```
-GitHub Pages (jader-correa.com/chuchu/observer)
+GitHub Pages (jader-correa.com/gptcode/observer)
 ├── index.html                    - Landing + demo
 ├── assets/
 │   ├── js/
@@ -628,7 +628,7 @@ const scenarios = [
 ```
 Watch AI Orchestration in Real-Time
 
-While Cursor and Copilot are black boxes, Chuchu shows you 
+While Cursor and Copilot are black boxes, GPTCode shows you 
 exactly what's happening. See specialized agents collaborate,
 smart model selection, and transparent cost tracking.
 
@@ -638,7 +638,7 @@ Choose a scenario below or try your own:
 **Comparação vs competidores:**
 ```
 ┌──────────────────────────────────────────────────────────┐
-│              Cursor/Copilot      │      Chuchu           │
+│              Cursor/Copilot      │      GPTCode           │
 ├──────────────────────────────────┼───────────────────────┤
 │ Visibility?         ❌ Black box │ ✅ Real-time          │
 │ Model selection?    ❌ Hidden    │ ✅ Transparent        │
@@ -653,7 +653,7 @@ Choose a scenario below or try your own:
 ┌────────────────────────────────────────────────────────┐
 │  Ready to see it on your own code?                    │
 │                                                        │
-│  $ go install github.com/jadercorrea/chuchu@latest    │
+│  $ go install github.com/jadercorrea/gptcode@latest    │
 │  $ chu do --observer "your task"                   │
 │                                                        │
 │  [Download] [Documentation] [GitHub]                  │
@@ -670,7 +670,7 @@ Choose a scenario below or try your own:
 **2. GIF export:**
 - Botão "Export as GIF"
 - Gera GIF da execução
-- Watermark sutil: "chuchu.dev"
+- Watermark sutil: "gptcode.dev"
 - Compartilhar no Twitter
 
 **3. Stats animados:**
@@ -797,7 +797,7 @@ internal/maestro/*.go          - Emit events
 
 ## Conclusão
 
-O Chuchu Observer é uma **oportunidade única** de diferenciação no mercado de AI coding assistants. Nenhum competidor mostra o que acontece internamente em tempo real.
+O GPTCode Observer é uma **oportunidade única** de diferenciação no mercado de AI coding assistants. Nenhum competidor mostra o que acontece internamente em tempo real.
 
 **Por que fazer:**
 1. Diferencial competitivo claro

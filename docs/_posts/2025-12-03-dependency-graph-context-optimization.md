@@ -9,7 +9,7 @@ tags: [features, optimization, context-management, performance]
 
 # Dependency Graph: 5x Token Reduction Through Smart Context
 
-In [Context Engineering]({% post_url 2025-11-14-context-engineering-for-real-codebases %}), we discussed managing context windows. Today, we're diving into **how** Chuchu achieves 5x token reduction through dependency graph analysis.
+In [Context Engineering]({% post_url 2025-11-14-context-engineering-for-real-codebases %}), we discussed managing context windows. Today, we're diving into **how** GPTCode achieves 5x token reduction through dependency graph analysis.
 
 ## The Problem: Context Overload
 
@@ -28,7 +28,7 @@ When you ask an AI coding assistant a question, it needs context. But how much?
 
 ## The Solution: Dependency Graph + PageRank
 
-Chuchu analyzes your codebase structure to provide **only relevant context** to the LLM.
+GPTCode analyzes your codebase structure to provide **only relevant context** to the LLM.
 
 ### How It Works
 
@@ -325,14 +325,14 @@ Better handling of polyglot codebases:
 | **Cost** | Free | Free (local models) |
 | **Best for** | "fix bug in X" | "how does X work?" |
 
-**Chuchu's approach**: Start with graph (fast, structural), add embeddings later for semantic queries.
+**GPTCode's approach**: Start with graph (fast, structural), add embeddings later for semantic queries.
 
 ## Getting Started
 
-### 1. Update Chuchu
+### 1. Update GPTCode
 
 ```bash
-cd ~/chuchu
+cd ~/gptcode
 git pull origin main
 make install
 ```
@@ -346,7 +346,7 @@ CHUCHU_DEBUG=1 chu chat "explain authentication flow"
 
 ### 3. Observe the Magic
 
-Watch as Chuchu:
+Watch as GPTCode:
 - Builds the graph (first time only)
 - Selects 5 relevant files
 - Provides focused, accurate answer
@@ -424,7 +424,7 @@ chu chat "your question about the codebase"
 
 ---
 
-*Have questions about dependency graphs? Join our [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)*
+*Have questions about dependency graphs? Join our [GitHub Discussions](https://github.com/jadercorrea/gptcode/discussions)*
 
 ## See Also
 

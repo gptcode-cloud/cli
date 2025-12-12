@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
-	"chuchu/internal/validation"
+	"gptcode/internal/validation"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

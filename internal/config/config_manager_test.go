@@ -14,9 +14,9 @@ func TestConfigGetSet(t *testing.T) {
 	if err := os.Setenv("HOME", tmpDir); err != nil {
 		t.Fatalf("Failed to set HOME: %v", err)
 	}
-	chuchuDir := filepath.Join(tmpDir, ".chuchu")
-	if err := os.MkdirAll(chuchuDir, 0755); err != nil {
-		t.Fatalf("Failed to create .chuchu dir: %v", err)
+	gptcodeDir := filepath.Join(tmpDir, ".gptcode")
+	if err := os.MkdirAll(gptcodeDir, 0755); err != nil {
+		t.Fatalf("Failed to create .gptcode dir: %v", err)
 	}
 
 	setupYAML := `defaults:
@@ -32,7 +32,7 @@ backend:
         models:
             llama70b: llama-3.3-70b-versatile
 `
-	setupPath := filepath.Join(chuchuDir, "setup.yaml")
+	setupPath := filepath.Join(gptcodeDir, "setup.yaml")
 	if err := os.WriteFile(setupPath, []byte(setupYAML), 0644); err != nil {
 		t.Fatalf("Failed to write test setup.yaml: %v", err)
 	}

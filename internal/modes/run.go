@@ -8,9 +8,9 @@ import (
 	"os"
 	"strings"
 
-	"chuchu/internal/llm"
-	"chuchu/internal/prompt"
-	"chuchu/internal/tools"
+	"gptcode/internal/llm"
+	"gptcode/internal/prompt"
+	"gptcode/internal/tools"
 )
 
 func RunExecute(builder *prompt.Builder, provider llm.Provider, model string, args []string) error {

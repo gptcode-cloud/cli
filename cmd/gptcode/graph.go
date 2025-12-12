@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"chuchu/internal/graph"
+	"gptcode/internal/graph"
 
 	"github.com/spf13/cobra"
 )

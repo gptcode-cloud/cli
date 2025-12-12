@@ -11,10 +11,10 @@ This plan unifies `auto-task-execution.md` and `multi-step-execution.md` into a 
 ### Key Clarifications
 
 **Agent Routing vs. Tool Discovery:**
-- **Agent Routing** (Chuchu) - ML classifier selects specialized agents (Analyzer, Planner, Editor, Validator)
+- **Agent Routing** (GPTCode) - ML classifier selects specialized agents (Analyzer, Planner, Editor, Validator)
 - **Tool Discovery** (Anthropic) - On-demand loading of external API tools (GitHub, Slack, Jira)
 
-**What Chuchu Has:**
+**What GPTCode Has:**
 - ✅ Agent routing (1ms ML classifier)
 - ✅ Agent-specific tool sets (read_file, write_file, apply_patch, etc.)
 - ✅ Tool Use Examples in prompts (2025-12-01)
@@ -244,7 +244,7 @@ Example:
 
 ## Comparison with Anthropic
 
-| Feature | Anthropic | Chuchu (Proposed) |
+| Feature | Anthropic | GPTCode (Proposed) |
 |---------|-----------|-------------------|
 | **Discovery** | Tool Search (50+ API tools) | Agent Routing + Movement Decomposition |
 | **Orchestration** | Programmatic Tool Calling (Python) | Symphony Pattern + Programmatic Mode |
@@ -254,7 +254,7 @@ Example:
 
 **Key Differences:**
 - Anthropic: Single mega-agent + 50+ external tools
-- Chuchu: Specialized agents + movement decomposition
+- GPTCode: Specialized agents + movement decomposition
 
 **Shared Patterns:**
 - ✅ Tool Use Examples → Already adopted

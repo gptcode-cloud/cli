@@ -1,7 +1,7 @@
 # Intelligent Model Selection
 
 ## Overview
-Chuchu uses a multi-dimensional scoring system to automatically select the best LLM for each task based on:
+GPTCode uses a multi-dimensional scoring system to automatically select the best LLM for each task based on:
 
 1. **Availability** - Rate limits & health status
 2. **Cost** - $/1M tokens (prioritizes free models)
@@ -37,7 +37,7 @@ score = 100
 
 ## Usage Tracking
 
-`~/.chuchu/usage.json`:
+`~/.gptcode/usage.json`:
 ```json
 {
   "2025-12-02": {
@@ -53,14 +53,14 @@ When a model hits 90% of daily rate limit, score drops by 50 points.
 
 ## Feedback Learning
 
-Historical success/failure tracked in `~/.chuchu/feedback/`:
+Historical success/failure tracked in `~/.gptcode/feedback/`:
 - Success: +20 score
 - Failure: -40 score
 - ML training after 20-30 tasks
 
 ## Model Catalog
 
-`~/.chuchu/models_catalog.json` contains:
+`~/.gptcode/models_catalog.json` contains:
 ```json
 {
   "openrouter": {

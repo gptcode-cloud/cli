@@ -1,15 +1,15 @@
 ---
 layout: post
-title: "Running Chuchu Completely Offline with Ollama"
+title: "Running GPTCode Completely Offline with Ollama"
 date: 2025-11-17
 author: Jader Correa
-description: "Run Chuchu completely offline with Ollama. Your code never leaves your machine. Zero cost per token, full privacy, no network latency."
+description: "Run GPTCode completely offline with Ollama. Your code never leaves your machine. Zero cost per token, full privacy, no network latency."
 tags: [configuration, ollama, local, privacy, offline]
 ---
 
-# Running Chuchu Completely Offline with Ollama
+# Running GPTCode Completely Offline with Ollama
 
-Want to use Chuchu without sending your code to the cloud? Ollama lets you run powerful LLMs locally on your machine, completely free and private.
+Want to use GPTCode without sending your code to the cloud? Ollama lets you run powerful LLMs locally on your machine, completely free and private.
 
 ## Why Run Local Models?
 
@@ -145,7 +145,7 @@ ollama pull gpt-oss:latest
 ollama pull qwen3-coder:latest
 ```
 
-2. **Update Chuchu's model catalog:**
+2. **Update GPTCode's model catalog:**
 ```bash
 chu models update
 ```
@@ -159,7 +159,7 @@ Select ollama backend
 Configure agent models
 ```
 
-4. **Or edit `~/.chuchu/setup.yaml` directly**
+4. **Or edit `~/.gptcode/setup.yaml` directly**
 
 ## Performance Tips
 
@@ -196,7 +196,7 @@ ollama run qwen3-coder:latest
 
 You can configure multiple backends and switch between them as needed:
 
-**Example setup with both Ollama and Groq** (`~/.chuchu/setup.yaml`):
+**Example setup with both Ollama and Groq** (`~/.gptcode/setup.yaml`):
 ```yaml
 defaults:
   backend: ollama  # Currently active backend
@@ -266,7 +266,7 @@ See our [Hybrid Cloud/Local guide](2025-11-18-hybrid-cloud-local) for detailed s
 
 ## Model Discovery and Installation
 
-Chuchu includes built-in model discovery and installation for Ollama:
+GPTCode includes built-in model discovery and installation for Ollama:
 
 ### Search for Models
 
@@ -305,15 +305,15 @@ chu models install llama3.1:8b
 
 For the full catalog of available models, visit [ollama.com/library](https://ollama.com/library).
 
-Update Chuchu's model catalog periodically:
+Update GPTCode's model catalog periodically:
 ```bash
 chu models update
 ```
 
 ## Community Recommendations
 
-Share your Ollama configuration on [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions) and help others find the best setup for their hardware!
+Share your Ollama configuration on [GitHub Discussions](https://github.com/jadercorrea/gptcode/discussions) and help others find the best setup for their hardware!
 
 ---
 
-*Running into issues? Ask in [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)*
+*Running into issues? Ask in [GitHub Discussions](https://github.com/jadercorrea/gptcode/discussions)*

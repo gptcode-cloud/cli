@@ -5,7 +5,7 @@ description: Intelligent context selection using PageRank and multi-language dep
 
 # Dependency Graph & Context Optimization
 
-Chuchu builds a dependency graph of your codebase to intelligently select the most relevant files for each query.
+GPTCode builds a dependency graph of your codebase to intelligently select the most relevant files for each query.
 
 ---
 
@@ -239,7 +239,7 @@ File: internal/auth/middleware.go (lines 1-30, 95-115)
 The graph is expensive to build (300ms for 500 files), so results are cached:
 
 **Cache key:** MD5 of all file modification times
-**Cache location:** `~/.chuchu/cache/graph_<md5>.json`
+**Cache location:** `~/.gptcode/cache/graph_<md5>.json`
 **Staleness:** 24 hours
 
 ### Cache Lifecycle
@@ -256,7 +256,7 @@ The graph is expensive to build (300ms for 500 files), so results are cached:
 chu graph build
 
 # Clear all caches manually
-rm -rf ~/.chuchu/cache/graph_*.json
+rm -rf ~/.gptcode/cache/graph_*.json
 ```
 
 ---
@@ -458,7 +458,7 @@ chu graph build
 chu graph build
 
 # Clear cache manually
-rm ~/.chuchu/cache/graph_*.json
+rm ~/.gptcode/cache/graph_*.json
 
 # Check file mtimes
 ls -la <file>

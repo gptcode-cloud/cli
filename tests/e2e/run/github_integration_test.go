@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"chuchu/internal/github"
+	"gptcode/internal/github"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

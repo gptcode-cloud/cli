@@ -1,10 +1,10 @@
 #!/bin/bash
 set -e
 
-echo "🐺 Chuchu Installation Script"
+echo "🐺 GPTCode Installation Script"
 echo ""
 
-INSTALL_DIR="${HOME}/.config/nvim/pack/plugins/start/chuchu"
+INSTALL_DIR="${HOME}/.config/nvim/pack/plugins/start/gptcode"
 
 echo "1. Installing Go binary..."
 cd "$(dirname "$0")"
@@ -31,8 +31,8 @@ echo '{"messages":[{"role":"user","content":"test"}]}' | timeout 2 chu chat >/de
 
 echo ""
 echo "4. Checking Neovim plugin..."
-if [ -f "${INSTALL_DIR}/lua/chuchu/init.lua" ]; then
-  USES_PATH=$(grep -c '"chu"' "${INSTALL_DIR}/lua/chuchu/init.lua" || true)
+if [ -f "${INSTALL_DIR}/lua/gptcode/init.lua" ]; then
+  USES_PATH=$(grep -c '"chu"' "${INSTALL_DIR}/lua/gptcode/init.lua" || true)
   if [ "$USES_PATH" -ge 2 ]; then
     echo "   ✓ Plugin uses chu from PATH"
   else
@@ -49,12 +49,12 @@ echo "✅ Installation complete!"
 echo ""
 echo "Next steps:"
 echo "  1. Restart Neovim"
-echo "  2. Run :luafile ${HOME}/workspace/opensource/chuchu/debug_live.lua"
+echo "  2. Run :luafile ${HOME}/workspace/opensource/gptcode/debug_live.lua"
 echo "  3. Open chat with <C-d>"
 echo "  4. Send 'Analyse codebase and add pix payment'"
-echo "  5. Monitor: tail -f /tmp/chuchu_debug.log"
+echo "  5. Monitor: tail -f /tmp/gptcode_debug.log"
 echo ""
 echo "If it shows 'thinking...':"
-echo "  - Check /tmp/chuchu_debug.log for actual binary path"
+echo "  - Check /tmp/gptcode_debug.log for actual binary path"
 echo "  - Verify stdout events are received"
 echo "  - Test CLI directly: echo '{\"messages\":[...]}' | chu chat"

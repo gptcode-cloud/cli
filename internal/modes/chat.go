@@ -12,12 +12,12 @@ import (
 
 	"golang.org/x/term"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/config"
-	"chuchu/internal/graph"
-	"chuchu/internal/llm"
-	"chuchu/internal/output"
-	"chuchu/internal/prompt"
+	"gptcode/internal/agents"
+	"gptcode/internal/config"
+	"gptcode/internal/graph"
+	"gptcode/internal/llm"
+	"gptcode/internal/output"
+	"gptcode/internal/prompt"
 )
 
 type ChatHistory struct {
@@ -132,7 +132,7 @@ func Chat(input string, args []string) {
 		fmt.Fprintln(os.Stderr, "[CHAT] Implement command detected")
 
 		home, _ := os.UserHomeDir()
-		planPath := filepath.Join(home, ".chuchu", "current_plan.txt")
+		planPath := filepath.Join(home, ".gptcode", "current_plan.txt")
 		planContent, err := os.ReadFile(planPath)
 		if err != nil {
 			fmt.Println("No active plan found. Please create a plan first.")

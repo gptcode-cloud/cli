@@ -1,0 +1,143 @@
+package main
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+
+	"github.com/spf13/cobra"
+
+	"chuchu/internal/intelligence/recommender"
+)
+
+var recommendCmd = &cobra.Command{
+	Use:   "recommend [task-description]",
+	Short: "Recommend best model for task using ML ensemble",
+	Long: `Analyzes task features and recommends the optimal model using trained ML models.
+
+Examples:
+  chu recommend "fix typo in README"
+  chu recommend "implement OAuth authentication" --verbose
+  chu recommend "refactor database queries" --backend groq`,
+	Args: cobra.MinimumNArgs(1),
+	RunE: runRecommend,
+}
+
+var (
+	recommendVerbose bool
+	recommendBackend string
+	recommendAgent   string
+	recommendJSON    bool
+)
+
+func init() {
+	recommendCmd.Flags().BoolVarP(&recommendVerbose, "verbose", "v", false, "Show detailed feature extraction")
+	recommendCmd.Flags().StringVarP(&recommendBackend, "backend", "b", "groq", "Backend to filter recommendations")
+	recommendCmd.Flags().StringVarP(&recommendAgent, "agent", "a", "query", "Agent role (router/query/editor/research/review)")
+	recommendCmd.Flags().BoolVar(&recommendJSON, "json", false, "Output as JSON")
+	rootCmd.AddCommand(recommendCmd)
+}
+
+func runRecommend(cmd *cobra.Command, args []string) error {
+	taskDescription := args[0]
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return fmt.Errorf("failed to get working directory: %w", err)
+	}
+
+	if !recommendJSON {
+		fmt.Println("🔍 Analyzing task...")
+		fmt.Println()
+	}
+
+	collector := recommender.NewCollector(wd)
+	features, err := collector.Collect(taskDescription)
+	if err != nil {
+		return fmt.Errorf("failed to collect features: %w", err)
+	}
+
+	if recommendVerbose && !recommendJSON {
+		fmt.Println("📊 Features extracted:")
+		fmt.Printf("  Files: %d\n", features.FileCount)
+		fmt.Printf("  Avg file size: %.0f bytes\n", features.AvgFileSize)
+		fmt.Printf("  Tests: %d\n", features.TestCount)
+		fmt.Printf("  Language: %s\n", features.Language)
+		fmt.Printf("  Task length: %d chars\n", features.TaskDescriptionLength)
+		fmt.Println()
+	}
+
+	mlSelector, err := recommender.NewMLSelector()
+	if err != nil {
+		if !recommendJSON {
+			fmt.Printf("⚠️  ML model not available: %v\n", err)
+			fmt.Println("Falling back to rule-based selection...")
+			fmt.Println()
+		}
+
+		ruleSelector := recommender.NewRuleBasedSelector(
+			"groq/llama-3.3-70b-versatile",
+			"openrouter/gpt-4o",
+		)
+		rec, err := ruleSelector.Select(features)
+		if err != nil {
+			return fmt.Errorf("rule-based selection failed: %w", err)
+		}
+
+		displayRecommendation(rec, "Rule-Based")
+		return nil
+	}
+
+	if !recommendJSON {
+		fmt.Println("🤖 Running ML model...")
+	}
+	rec, err := mlSelector.Select(features)
+	if err != nil {
+		return fmt.Errorf("ML prediction failed: %w", err)
+	}
+
+	displayRecommendation(rec, "ML Ensemble")
+
+	weightsPath := recommender.GetModelPath("ensemble_weights.json")
+	if _, err := os.Stat(weightsPath); err == nil {
+		weights, err := recommender.LoadEnsembleWeights(weightsPath)
+		if err == nil && recommendVerbose && !recommendJSON {
+			fmt.Println("\n📊 Ensemble Configuration:")
+			for i, model := range weights.Models {
+				fmt.Printf("  %s: %.2f\n", model, weights.Weights[i])
+			}
+		}
+	}
+
+	return nil
+}
+
+func displayRecommendation(rec *recommender.ModelRecommendation, method string) {
+	if recommendJSON {
+		type JSONOutput struct {
+			Model      string  `json:"model"`
+			Confidence float64 `json:"confidence"`
+			Reasoning  string  `json:"reasoning"`
+			Method     string  `json:"method"`
+		}
+		output := JSONOutput{
+			Model:      rec.Model,
+			Confidence: rec.Confidence,
+			Reasoning:  rec.Reasoning,
+			Method:     method,
+		}
+		encoder := json.NewEncoder(os.Stdout)
+		encoder.SetIndent("", "  ")
+		_ = encoder.Encode(output)
+		return
+	}
+
+	fmt.Println("✅ Recommendation (" + method + "):")
+	fmt.Println()
+	fmt.Printf("  Model: %s\n", rec.Model)
+	fmt.Printf("  Confidence: %.2f%%\n", rec.Confidence*100)
+	fmt.Println()
+	fmt.Println("  Reasoning:")
+	fmt.Printf("    %s\n", rec.Reasoning)
+	fmt.Println()
+}

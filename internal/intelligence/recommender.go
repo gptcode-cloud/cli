@@ -1,7 +1,7 @@
 package intelligence
 
 import (
-	"chuchu/internal/config"
+	"gptcode/internal/config"
 	"fmt"
 	"os"
 )

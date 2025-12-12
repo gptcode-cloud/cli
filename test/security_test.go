@@ -5,8 +5,8 @@ import (
 	"strings"
 	"testing"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/security"
+	"gptcode/internal/agents"
+	"gptcode/internal/security"
 )
 
 func TestSecurityScanner(t *testing.T) {

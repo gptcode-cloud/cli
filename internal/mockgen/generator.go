@@ -10,7 +10,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"chuchu/internal/llm"
+	"gptcode/internal/llm"
 )
 
 type MockGenerator struct {

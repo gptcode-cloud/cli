@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/langdetect"
-	"chuchu/internal/llm"
+	"gptcode/internal/agents"
+	"gptcode/internal/langdetect"
+	"gptcode/internal/llm"
 )
 
 type FileFinder struct {

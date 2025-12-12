@@ -7,9 +7,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/config"
-	"chuchu/internal/llm"
+	"gptcode/internal/agents"
+	"gptcode/internal/config"
+	"gptcode/internal/llm"
 )
 
 type ReviewOptions struct {

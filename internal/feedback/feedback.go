@@ -38,7 +38,7 @@ type Event struct {
 
 func GetFeedbackDir() string {
 	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".chuchu", "feedback")
+	return filepath.Join(home, ".gptcode", "feedback")
 }
 
 func ensureFeedbackDir() error {

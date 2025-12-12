@@ -17,7 +17,7 @@ type Telemetry struct {
 // NewTelemetry creates a new telemetry instance
 func NewTelemetry() *Telemetry {
 	return &Telemetry{
-		tracer: otel.Tracer("chuchu"),
+		tracer: otel.Tracer("gptcode"),
 	}
 }
 

@@ -1,15 +1,15 @@
-# 🐺 Chuchu
+# 🐺 GPTCode
 
-[![CI](https://github.com/jadercorrea/chuchu/actions/workflows/ci.yml/badge.svg)](https://github.com/jadercorrea/chuchu/actions/workflows/ci.yml)
-[![Go Version](https://img.shields.io/github/go-mod/go-version/jadercorrea/chuchu)](go.mod)
+[![CI](https://github.com/jadercorrea/gptcode/actions/workflows/ci.yml/badge.svg)](https://github.com/jadercorrea/gptcode/actions/workflows/ci.yml)
+[![Go Version](https://img.shields.io/github/go-mod/go-version/jadercorrea/gptcode)](go.mod)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub Issues](https://img.shields.io/github/issues/jadercorrea/chuchu)](https://github.com/jadercorrea/chuchu/issues)
+[![GitHub Issues](https://img.shields.io/github/issues/jadercorrea/gptcode)](https://github.com/jadercorrea/gptcode/issues)
 
-Chuchu (pronounced "shoo-shoo", Brazilian slang for something small and cute) is a command-line AI coding assistant that helps you write better code through Test-Driven Development—without breaking the bank.
+GPTCode (pronounced "shoo-shoo", Brazilian slang for something small and cute) is a command-line AI coding assistant that helps you write better code through Test-Driven Development—without breaking the bank.
 
-## Why Chuchu?
+## Why GPTCode?
 
-**Chuchu isn't trying to beat Cursor or Copilot. It's trying to be different.**
+**GPTCode isn't trying to beat Cursor or Copilot. It's trying to be different.**
 
 - **Transparent**: When it breaks, you can read and fix the code
 - **Hackable**: Don't like something? Change it—it's just Go
@@ -19,7 +19,7 @@ Chuchu (pronounced "shoo-shoo", Brazilian slang for something small and cute) is
 
 **Not better. Different. Yours.**
 
-[Read the full positioning →](https://jadercorrea.github.io/chuchu/blog/2025-12-06-why-chuchu-isnt-trying-to-beat-anyone) | [Original vision →](https://jadercorrea.github.io/chuchu/blog/2025-11-13-why-chuchu)
+[Read the full positioning →](https://jadercorrea.github.io/gptcode/blog/2025-12-06-why-gptcode-isnt-trying-to-beat-anyone) | [Original vision →](https://jadercorrea.github.io/gptcode/blog/2025-11-13-why-gptcode)
 
 ## Features
 
@@ -44,11 +44,11 @@ Chuchu (pronounced "shoo-shoo", Brazilian slang for something small and cute) is
 - 🔎 **Model Discovery** - Search, install, and configure 300+ models
 - 📚 **Web Research** - Built-in web search and documentation lookup
 
-## Three Ways to Work with Chuchu
+## Three Ways to Work with GPTCode
 
 ### 1. 🤖 Autonomous GitHub Issue Resolution (NEW - MVP Complete!) 🎆
 
-Chuchu can now autonomously resolve GitHub issues end-to-end with 100% MVAA coverage:
+GPTCode can now autonomously resolve GitHub issues end-to-end with 100% MVAA coverage:
 
 ```bash
 # Complete autonomous workflow
@@ -60,7 +60,7 @@ chu issue review 42                  # Address review comments
 # Iterate until approved!
 ```
 
-**What Chuchu Does Autonomously:**
+**What GPTCode Does Autonomously:**
 - ✅ Fetches issue and extracts requirements
 - ✅ Finds relevant files (AI-powered)
 - ✅ Implements changes (Symphony orchestration)
@@ -76,7 +76,7 @@ chu issue review 42                  # Address review comments
 
 ### 2. 🤖 Autonomous Copilot (Fastest)
 
-Let chuchu handle everything - analysis, planning, execution, and validation:
+Let gptcode handle everything - analysis, planning, execution, and validation:
 
 ```bash
 chu do "add user authentication"
@@ -146,11 +146,11 @@ chu run "deploy to prod" # Task execution with follow-up
 
 ```bash
 # Install via go
-go install github.com/jadercorrea/chuchu/cmd/chu@latest
+go install github.com/jadercorrea/gptcode/cmd/chu@latest
 
 # Or build from source
-git clone https://github.com/jadercorrea/chuchu
-cd chuchu
+git clone https://github.com/jadercorrea/gptcode
+cd gptcode
 go install ./cmd/chu
 ```
 
@@ -171,14 +171,14 @@ Add to your Neovim config:
 ```lua
 -- lazy.nvim
 {
-  dir = "~/workspace/chuchu/neovim",  -- adjust path to your clone
+  dir = "~/workspace/gptcode/neovim",  -- adjust path to your clone
   config = function()
-    require("chuchu").setup()
+    require("gptcode").setup()
   end,
   keys = {
-    { "<C-d>", "<cmd>ChuchuChat<cr>", desc = "Toggle Chuchu Chat" },
-    { "<C-m>", "<cmd>ChuchuModels<cr>", desc = "Switch Model/Profile" },
-    { "<leader>ms", "<cmd>ChuchuModelSearch<cr>", desc = "Search & Install Models" },
+    { "<C-d>", "<cmd>GPTCodeChat<cr>", desc = "Toggle GPTCode Chat" },
+    { "<C-m>", "<cmd>GPTCodeModels<cr>", desc = "Switch Model/Profile" },
+    { "<leader>ms", "<cmd>GPTCodeModelSearch<cr>", desc = "Search & Install Models" },
   }
 }
 ```
@@ -196,13 +196,13 @@ Add to your Neovim config:
   - Shows pricing, context window, tags, and installation status (✓)
   - Auto-install Ollama models
   - Set as default or use for current session
-- `<leader>ca` - Autonomous Execution (:ChuchuAuto)
+- `<leader>ca` - Autonomous Execution (:GPTCodeAuto)
   - Execute implementation plans with verification
   - Shows progress in real-time notifications
 
 ### ML-Powered Intelligence (Built-in)
 
-Chuchu embeds two lightweight ML models for instant decision-making with zero external dependencies:
+GPTCode embeds two lightweight ML models for instant decision-making with zero external dependencies:
 
 #### 1. Complexity Detection
 Automatically triggers Guided Mode for complex/multistep tasks in `chu chat`.
@@ -351,7 +351,7 @@ chu run "migrate database"
 
 ### Advanced Git Operations (NEW! 🎯)
 
-Chuchu provides AI-powered Git operations for complex workflows:
+GPTCode provides AI-powered Git operations for complex workflows:
 
 ```bash
 # Git Bisect - Find which commit introduced a bug
@@ -425,7 +425,7 @@ chu implement docs/plans/my-implementation.md --auto --lint
 
 **Neovim Integration:**
 ```vim
-:ChuchuAuto        " prompts for plan file and runs: chu implement <file> --auto
+:GPTCodeAuto        " prompts for plan file and runs: chu implement <file> --auto
 " Or keymap: <leader>ca
 ```
 
@@ -503,11 +503,11 @@ chu feedback bad --backend groq --model llama-3.1-8b-instant --agent router
 chu feedback stats
 ```
 
-Chuchu learns from your feedback to recommend better models over time.
+GPTCode learns from your feedback to recommend better models over time.
 
 ## Configuration & Profiles
 
-Chuchu supports multiple backends and profiles optimized for different use cases.
+GPTCode supports multiple backends and profiles optimized for different use cases.
 
 ### Quick Profile Switching
 
@@ -635,11 +635,11 @@ chu profile use groq.myprofile
 
 **Groq is 99% cheaper** than Claude Pro for equivalent usage!
 
-**[Complete Profile Guide](https://jadercorrea.github.io/chuchu/blog/2025-11-15-groq-optimal-configs)**
+**[Complete Profile Guide](https://jadercorrea.github.io/gptcode/blog/2025-11-15-groq-optimal-configs)**
 
 ## Architecture
 
-Chuchu uses specialized agents for different tasks:
+GPTCode uses specialized agents for different tasks:
 
 - **Router**: Fast intent classification (8B model)
 - **Query**: Smart code analysis (70B model)
@@ -654,7 +654,7 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## Releases & Versioning
 
-Chuchu follows [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH).
+GPTCode follows [Semantic Versioning](https://semver.org/) (MAJOR.MINOR.PATCH).
 
 ### Automatic Releases
 
@@ -689,7 +689,7 @@ The website and blog are built with Jekyll and hosted on GitHub Pages.
 
 ## End-to-End Testing
 
-Chuchu includes a comprehensive E2E testing framework using **Go tests** with real chu commands and **local Ollama models** (zero API costs, privacy-preserving).
+GPTCode includes a comprehensive E2E testing framework using **Go tests** with real chu commands and **local Ollama models** (zero API costs, privacy-preserving).
 
 ### Requirements
 
@@ -713,7 +713,7 @@ ollama pull qwen3-coder:latest
 ollama pull gpt-oss:latest
 
 # 3. Create E2E profile (if not exists)
-chu setup  # or manually configure ~/.chuchu/setup.yaml
+chu setup  # or manually configure ~/.gptcode/setup.yaml
 ```
 
 ### Running Tests
@@ -756,7 +756,7 @@ chu test e2e --timeout 600  # 10 minutes per test
 
 ### Test Configuration
 
-**Config file (`~/.chuchu/setup.yaml`):**
+**Config file (`~/.gptcode/setup.yaml`):**
 ```yaml
 e2e:
   default_profile: local      # Profile to use for tests
@@ -881,7 +881,7 @@ chu test e2e <category>
 ```bash
 $ chu test e2e run
 
-🧪 Chuchu E2E Tests
+🧪 GPTCode E2E Tests
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Backend:  ollama
 Profile:  local
@@ -969,14 +969,14 @@ MIT License - see [LICENSE](LICENSE) for details.
 
 ## Links
 
-- **Website**: [jadercorrea.github.io/chuchu](https://jadercorrea.github.io/chuchu)
-- **Blog**: [jadercorrea.github.io/chuchu/blog](https://jadercorrea.github.io/chuchu/blog)
-- **Issues**: [GitHub Issues](https://github.com/jadercorrea/chuchu/issues)
+- **Website**: [jadercorrea.github.io/gptcode](https://jadercorrea.github.io/gptcode)
+- **Blog**: [jadercorrea.github.io/gptcode/blog](https://jadercorrea.github.io/gptcode/blog)
+- **Issues**: [GitHub Issues](https://github.com/jadercorrea/gptcode/issues)
 
 ## Community
 
-- Ask questions in [Issues](https://github.com/jadercorrea/chuchu/issues)
-- Report bugs in [Issues](https://github.com/jadercorrea/chuchu/issues)
+- Ask questions in [Issues](https://github.com/jadercorrea/gptcode/issues)
+- Report bugs in [Issues](https://github.com/jadercorrea/gptcode/issues)
 
 ---
 

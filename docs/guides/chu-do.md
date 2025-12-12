@@ -25,7 +25,7 @@ Unlike traditional fallback systems with hardcoded alternatives, `chu do` uses *
 
 ### How It Learns
 
-1. **Records every execution** to `~/.chuchu/task_execution_history.jsonl`
+1. **Records every execution** to `~/.gptcode/task_execution_history.jsonl`
    - Task description
    - Model/backend used
    - Success or failure
@@ -184,14 +184,14 @@ Attempt 1: groq/model-x → Failed
 Attempt 2: openrouter/model-y → Success ✓
 ```
 
-This requires both backends to be configured in `~/.chuchu/setup.yaml`.
+This requires both backends to be configured in `~/.gptcode/setup.yaml`.
 
 ## Execution History
 
 View your execution history:
 
 ```bash
-cat ~/.chuchu/task_execution_history.jsonl | jq
+cat ~/.gptcode/task_execution_history.jsonl | jq
 ```
 
 Example output:
@@ -283,7 +283,7 @@ backend:
 ### Check History Periodically
 
 ```bash
-cat ~/.chuchu/task_execution_history.jsonl | \
+cat ~/.gptcode/task_execution_history.jsonl | \
   jq -s 'group_by(.backend + "/" + .model) | 
          map({
            model: (.[0].backend + "/" + .[0].model),

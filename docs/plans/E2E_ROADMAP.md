@@ -3,7 +3,7 @@
 **Last Updated:** 2025-11-26  
 **Status:** Phase 1 Complete ✅ | Phase 2-5 Planned
 
-This document tracks E2E testing implementation progress for **Chuchu**.
+This document tracks E2E testing implementation progress for **GPTCode**.
 
 ## Implementation Approach
 

@@ -5,13 +5,13 @@ description: Embedded machine learning for faster routing and smarter task class
 
 # ML-Powered Intelligence
 
-Chuchu embeds lightweight ML models for instant decision-making with zero external dependencies.
+GPTCode embeds lightweight ML models for instant decision-making with zero external dependencies.
 
 ---
 
 ## Overview
 
-Two ML models power Chuchu's intelligence:
+Two ML models power GPTCode's intelligence:
 
 1. **Complexity Classifier** – Automatically triggers Guided Mode for complex tasks
 2. **Intent Classifier** – Routes user requests 500x faster than LLM calls

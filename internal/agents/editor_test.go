@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"chuchu/internal/llm"
+	"gptcode/internal/llm"
 )
 
 // mockProvider simulates LLM responses for testing

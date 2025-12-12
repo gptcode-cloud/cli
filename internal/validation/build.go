@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"chuchu/internal/langdetect"
+	"gptcode/internal/langdetect"
 )
 
 type BuildResult struct {

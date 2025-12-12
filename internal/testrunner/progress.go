@@ -159,7 +159,7 @@ func (pt *ProgressTracker) sendNotification(success bool) {
 		return
 	}
 
-	title := "Chuchu E2E Tests"
+	title := "GPTCode E2E Tests"
 	var message string
 	var sound string
 

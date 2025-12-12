@@ -10,10 +10,10 @@ import (
 	"strings"
 	"time"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/config"
-	"chuchu/internal/llm"
-	"chuchu/internal/output"
+	"gptcode/internal/agents"
+	"gptcode/internal/config"
+	"gptcode/internal/llm"
+	"gptcode/internal/output"
 
 	"golang.org/x/term"
 )
@@ -94,7 +94,7 @@ Keep response under 150 words.`, question)
 	}
 
 	home, _ := os.UserHomeDir()
-	researchDir := filepath.Join(home, ".chuchu", "research")
+	researchDir := filepath.Join(home, ".gptcode", "research")
 	_ = os.MkdirAll(researchDir, 0755)
 
 	fullResearch := fmt.Sprintf(`# Research: %s

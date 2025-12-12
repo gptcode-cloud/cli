@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"chuchu/internal/llm"
-	"chuchu/internal/validation"
+	"gptcode/internal/llm"
+	"gptcode/internal/validation"
 )
 
 type ErrorFixer struct {

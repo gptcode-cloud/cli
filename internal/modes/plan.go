@@ -9,10 +9,10 @@ import (
 	"strings"
 	"time"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/config"
-	"chuchu/internal/llm"
-	"chuchu/internal/output"
+	"gptcode/internal/agents"
+	"gptcode/internal/config"
+	"gptcode/internal/llm"
+	"gptcode/internal/output"
 
 	"golang.org/x/term"
 )
@@ -170,7 +170,7 @@ Create a structured plan with:
 	}
 
 	home, _ := os.UserHomeDir()
-	plansDir := filepath.Join(home, ".chuchu", "plans")
+	plansDir := filepath.Join(home, ".gptcode", "plans")
 	_ = os.MkdirAll(plansDir, 0755)
 
 	if term.IsTerminal(int(os.Stdout.Fd())) {

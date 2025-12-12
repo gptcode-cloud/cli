@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/refactor"
+	"gptcode/internal/agents"
+	"gptcode/internal/refactor"
 )
 
 func TestBreakingChangesDetection(t *testing.T) {

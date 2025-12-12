@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Chuchu
+title: GPTCode
 description: AI coding assistant with specialized agents and validation
 ---
 
@@ -9,7 +9,7 @@ description: AI coding assistant with specialized agents and validation
   <p>Transparent, Autonomous, and Local. <strong>Bring Your Own Keys</strong>. Run with Groq, OpenAI, or locally with Ollama. No subscriptions, full control.</p>
   <div class="hero-cta">
     <a href="#quick-start" class="btn btn-primary">Get Started</a>
-    <a href="https://github.com/jadercorrea/chuchu" class="btn btn-secondary">View on GitHub</a>
+    <a href="https://github.com/jadercorrea/gptcode" class="btn btn-secondary">View on GitHub</a>
   </div>
 </div>
 
@@ -89,19 +89,19 @@ description: AI coding assistant with specialized agents and validation
   
   <div class="quick-start">
     <h3>1. Install CLI</h3>
-    <pre><code>go install github.com/jadercorrea/chuchu/cmd/chu@latest
+    <pre><code>go install github.com/jadercorrea/gptcode/cmd/chu@latest
 chu setup</code></pre>
     
     <h3>2. Add Neovim Plugin</h3>
     <pre><code>-- lazy.nvim
 {
-  dir = "~/workspace/chuchu/neovim",
+  dir = "~/workspace/gptcode/neovim",
   config = function()
-    require("chuchu").setup()
+    require("gptcode").setup()
   end,
   keys = {
-    { "&lt;C-d&gt;", "&lt;cmd&gt;ChuchuChat&lt;cr&gt;", desc = "Toggle Chat" },
-    { "&lt;C-m&gt;", "&lt;cmd&gt;ChuchuModels&lt;cr&gt;", desc = "Profiles" },
+    { "&lt;C-d&gt;", "&lt;cmd&gt;GPTCodeChat&lt;cr&gt;", desc = "Toggle Chat" },
+    { "&lt;C-m&gt;", "&lt;cmd&gt;GPTCodeModels&lt;cr&gt;", desc = "Profiles" },
   }
 }</code></pre>
     
@@ -148,9 +148,9 @@ chu plan "implement rate limiting"</code></pre>
 </div>
 
 <div class="section">
-  <h2 class="section-title">Why Chuchu?</h2>
+  <h2 class="section-title">Why GPTCode?</h2>
   
-  <p>Chuchu isn't trying to beat Cursor or Copilot. It's trying to be different—and yours.</p>
+  <p>GPTCode isn't trying to beat Cursor or Copilot. It's trying to be different—and yours.</p>
   
   <ul>
     <li><strong>Transparent</strong>: When it breaks, you can read and fix the code</li>
@@ -161,8 +161,8 @@ chu plan "implement rate limiting"</code></pre>
   </ul>
   
   <p>
-    <a href="/blog/2025-12-06-why-chuchu-isnt-trying-to-beat-anyone">Read the full positioning →</a>
-    · <a href="/blog/2025-11-13-why-chuchu">Original vision →</a>
+    <a href="/blog/2025-12-06-why-gptcode-isnt-trying-to-beat-anyone">Read the full positioning →</a>
+    · <a href="/blog/2025-11-13-why-gptcode">Original vision →</a>
     · <a href="/blog/2025-12-01-agent-routing-vs-tool-search">Agent routing vs tool search →</a>
     · <a href="/blog/2025-12-02-intelligent-model-selection">Intelligent model selection →</a>
     · <a href="/blog/2025-12-03-dependency-graph-context-optimization">Dependency graph →</a>

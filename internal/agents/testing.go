@@ -3,7 +3,7 @@ package agents
 import (
 	"context"
 
-	"chuchu/internal/llm"
+	"gptcode/internal/llm"
 )
 
 // MockProvider simulates LLM responses for testing

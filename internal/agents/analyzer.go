@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"chuchu/internal/llm"
-	"chuchu/internal/tools"
+	"gptcode/internal/llm"
+	"gptcode/internal/tools"
 )
 
 type AnalyzerAgent struct {

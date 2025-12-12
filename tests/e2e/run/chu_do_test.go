@@ -29,7 +29,7 @@ func TestChuDoCreateFile(t *testing.T) {
 	t.Logf("Running chu do in %s", tmpDir)
 	t.Logf("This may take 2-5 minutes with local Ollama...")
 
-	cmd := exec.Command("chu", "do", "create a file called hello.txt with content 'Hello from Chuchu E2E test'")
+	cmd := exec.Command("chu", "do", "create a file called hello.txt with content 'Hello from GPTCode E2E test'")
 	cmd.Dir = tmpDir
 	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
 
@@ -62,7 +62,7 @@ func TestChuDoCreateFile(t *testing.T) {
 		t.Fatalf("Failed to read created file: %v", err)
 	}
 
-	expectedContent := "Hello from Chuchu E2E test"
+	expectedContent := "Hello from GPTCode E2E test"
 	if !strings.Contains(string(content), expectedContent) {
 		t.Errorf("File content mismatch.\nExpected to contain: %s\nGot: %s", expectedContent, string(content))
 	}

@@ -26,7 +26,7 @@ func TestRecord(t *testing.T) {
 		t.Fatalf("Record() error = %v", err)
 	}
 
-	dir := filepath.Join(tempDir, ".chuchu", "feedback")
+	dir := filepath.Join(tempDir, ".gptcode", "feedback")
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		t.Errorf("Feedback directory not created")
 	}

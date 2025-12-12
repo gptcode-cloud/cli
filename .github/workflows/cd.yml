@@ -46,8 +46,8 @@ jobs:
           GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          # Models will be saved to ~/.chuchu/models_catalog.json
-          mkdir -p ~/.chuchu
+          # Models will be saved to ~/.gptcode/models_catalog.json
+          mkdir -p ~/.gptcode
           ./bin/chu model update --all || echo "Model update completed with warnings"
       
       - name: Export models for web

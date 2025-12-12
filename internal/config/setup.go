@@ -12,10 +12,10 @@ import (
 
 func RunSetup() {
 	home, _ := os.UserHomeDir()
-	target := filepath.Join(home, ".chuchu")
+	target := filepath.Join(home, ".gptcode")
 
 	if err := os.MkdirAll(target, 0o755); err != nil {
-		fmt.Fprintln(os.Stderr, "Chuchu: failed to create ~/.chuchu:", err)
+		fmt.Fprintln(os.Stderr, "GPTCode: failed to create ~/.gptcode:", err)
 		return
 	}
 
@@ -31,18 +31,18 @@ func RunSetup() {
 		reader := bufio.NewReader(os.Stdin)
 		answer, _ := reader.ReadString('\n')
 		if !strings.HasPrefix(strings.ToLower(strings.TrimSpace(answer)), "y") {
-			fmt.Fprintln(os.Stderr, "Chuchu: setup complete → ~/.chuchu")
+			fmt.Fprintln(os.Stderr, "GPTCode: setup complete → ~/.gptcode")
 			return
 		}
 	}
 
 	setup := interactiveSetup()
 	if err := saveSetup(setupPath, setup); err != nil {
-		fmt.Fprintln(os.Stderr, "Chuchu: failed to save setup.yaml:", err)
+		fmt.Fprintln(os.Stderr, "GPTCode: failed to save setup.yaml:", err)
 		return
 	}
 
-	fmt.Fprintln(os.Stderr, "\nChuchu: setup complete → ~/.chuchu")
+	fmt.Fprintln(os.Stderr, "\nGPTCode: setup complete → ~/.gptcode")
 }
 
 func detectTemplateDir() string {
@@ -79,7 +79,7 @@ func interactiveSetup() *Setup {
 		Backend: make(map[string]BackendConfig),
 	}
 
-	fmt.Fprintln(os.Stderr, "\n=== Chuchu Setup ===")
+	fmt.Fprintln(os.Stderr, "\n=== GPTCode Setup ===")
 	fmt.Fprintln(os.Stderr, "\nWhich LLM backends do you want to configure?")
 	fmt.Fprintln(os.Stderr, "1) Local (Ollama)")
 	fmt.Fprintln(os.Stderr, "2) OpenAI-compatible API (OpenAI, OpenRouter, etc)")
@@ -284,7 +284,7 @@ func GetAPIKey(backendName string) string {
 		return ""
 	}
 
-	keysPath := filepath.Join(home, ".chuchu", "keys.yaml")
+	keysPath := filepath.Join(home, ".gptcode", "keys.yaml")
 	data, err := os.ReadFile(keysPath)
 	if err != nil {
 		return ""
@@ -304,7 +304,7 @@ func saveAPIKeyToKeysFile(backendName, apiKey string) error {
 		return err
 	}
 
-	keysPath := filepath.Join(home, ".chuchu", "keys.yaml")
+	keysPath := filepath.Join(home, ".gptcode", "keys.yaml")
 
 	keys := make(map[string]string)
 	if data, err := os.ReadFile(keysPath); err == nil {
@@ -344,7 +344,7 @@ func UpdateAPIKey(backendName string) error {
 		return fmt.Errorf("failed to save API key: %w", err)
 	}
 
-	fmt.Fprintf(os.Stderr, "\n✓ API key saved to ~/.chuchu/keys.yaml\n")
+	fmt.Fprintf(os.Stderr, "\n✓ API key saved to ~/.gptcode/keys.yaml\n")
 	fmt.Fprintf(os.Stderr, "  (with 0600 permissions for security)\n")
 
 	return nil
@@ -397,7 +397,7 @@ func saveAPIKeyToProfile(envVar, apiKey string) error {
 	}
 	defer func() { _ = f.Close() }()
 
-	if _, err := f.WriteString("\n# Chuchu API key\n" + exportLine); err != nil {
+	if _, err := f.WriteString("\n# GPTCode API key\n" + exportLine); err != nil {
 		return err
 	}
 

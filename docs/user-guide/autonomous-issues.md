@@ -1,6 +1,6 @@
 # Autonomous GitHub Issue Resolution
 
-Chuchu can now autonomously resolve GitHub issues from start to finish, including iterating on CI failures and review comments until the PR is approved.
+GPTCode can now autonomously resolve GitHub issues from start to finish, including iterating on CI failures and review comments until the PR is approved.
 
 **Status: MVP Complete (100% MVAA Coverage)**  
 **Supported Languages:** Go, TypeScript, Python, Elixir, Ruby
@@ -120,7 +120,7 @@ chu issue commit 123 [options]
    - Python: safety
 
 **Auto-fix:**
-When tests or linters fail, Chuchu uses LLM to:
+When tests or linters fail, GPTCode uses LLM to:
 1. Analyze the failure
 2. Generate a fix
 3. Apply the fix
@@ -412,7 +412,7 @@ gh auth status
 
 ### Repository Detection
 
-Chuchu auto-detects the repository from your git remote:
+GPTCode auto-detects the repository from your git remote:
 
 ```bash
 git remote get-url origin

@@ -4,7 +4,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"chuchu/internal/langdetect"
+	"gptcode/internal/langdetect"
 )
 
 type Validator struct {

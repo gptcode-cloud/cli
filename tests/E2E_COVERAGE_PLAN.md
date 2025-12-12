@@ -1,6 +1,6 @@
 # E2E Test Coverage Expansion Plan
 
-**Document:** Strategic plan for comprehensive test coverage of Chuchu  
+**Document:** Strategic plan for comprehensive test coverage of GPTCode  
 **Status:** In Development  
 **Last Updated:** 2025-11-25
 
@@ -196,7 +196,7 @@ create_go_project "name"
 ## Phase 3: Local Model Validation
 
 ### Purpose
-Establish that Chuchu works well with free, local models (Ollama) without depending on cloud APIs.
+Establish that GPTCode works well with free, local models (Ollama) without depending on cloud APIs.
 
 ### Key Scenarios
 
@@ -247,10 +247,10 @@ Neovim will be run in headless mode using RPC calls:
 
 ```bash
 # Start Neovim headless with plugin
-nvim --headless +"call rpcrequest(1, 'nvim_exec_lua', 'require(\"chuchu\").setup()', {})" ...
+nvim --headless +"call rpcrequest(1, 'nvim_exec_lua', 'require(\"gptcode\").setup()', {})" ...
 
 # Send RPC calls to test functionality
-nvim_call "ChuchuChat"
+nvim_call "GPTCodeChat"
 nvim_send_keys "test message"
 nvim_get_buffer_content
 ```
@@ -261,7 +261,7 @@ nvim_get_buffer_content
 ```bash
 # Tests:
 1. Start Neovim headless
-2. Trigger :ChuchuChat
+2. Trigger :GPTCodeChat
 3. Send message via RPC
 4. Verify response buffer
 ```

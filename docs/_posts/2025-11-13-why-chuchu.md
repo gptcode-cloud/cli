@@ -1,13 +1,13 @@
 ---
 layout: post
-title: "Why Chuchu? Building an Affordable AI Coding Assistant"
+title: "Why GPTCode? Building an Affordable AI Coding Assistant"
 date: 2025-11-13
 author: Jader Correa
-description: "AI coding assistants cost $20-30/month. Chuchu offers AI assistance with validation for $2-5/month with Groq or $0/month with Ollama. Radically affordable without compromise."
+description: "AI coding assistants cost $20-30/month. GPTCode offers AI assistance with validation for $2-5/month with Groq or $0/month with Ollama. Radically affordable without compromise."
 tags: [introduction, affordability, philosophy, open-source]
 ---
 
-# Why Chuchu? Building an Affordable AI Coding Assistant
+# Why GPTCode? Building an Affordable AI Coding Assistant
 
 ## The Problem
 
@@ -24,9 +24,9 @@ For many developers—especially students, open-source contributors, or those in
 - Your local currency makes it 3-5x more expensive
 - You're working on personal projects with no income
 
-## The Solution: Chuchu
+## The Solution: GPTCode
 
-Chuchu is a **AI coding assistant with specialized agents and validation** designed to be:
+GPTCode is a **AI coding assistant with specialized agents and validation** designed to be:
 
 ### 1. **Radically Affordable**
 
@@ -39,16 +39,16 @@ Use the LLM providers you want:
 
 **Real cost comparison**:
 - Copilot: $20/month = $240/year
-- Chuchu with Groq: **$2-5/month** typical usage = $24-60/year
-- Chuchu with Ollama: **$0/year** (hardware you already own)
+- GPTCode with Groq: **$2-5/month** typical usage = $24-60/year
+- GPTCode with Ollama: **$0/year** (hardware you already own)
 
 ### 2. **Validation ### 2. **TDD-First by Design** Safety First**
 
-Unlike chat-based assistants, Chuchu follows Test-Driven Development:
+Unlike chat-based assistants, GPTCode follows Test-Driven Development:
 
 ```
 You: "Add user authentication"
-Chuchu: 
+GPTCode: 
   1. Writes failing tests
   2. Implements the feature
   3. Ensures tests pass
@@ -83,7 +83,7 @@ Mix and match. Change anytime. No vendor lock-in.
 
 ## Who Is This For?
 
-Chuchu is perfect if you:
+GPTCode is perfect if you:
 
 - Can't afford $20+/month for AI coding tools
 - Want control over your AI spending
@@ -102,13 +102,13 @@ We believe AI coding assistance should be:
 3. **Educational**: Learn best practices while getting work done
 4. **Privacy-Conscious**: Local models = your code stays yours
 
-Chuchu isn't trying to replace paid tools for everyone. If Cursor works for you and the cost is fine, that's great! But for the millions of developers who can't afford subscriptions, or who want more control, Chuchu offers a real alternative.
+GPTCode isn't trying to replace paid tools for everyone. If Cursor works for you and the cost is fine, that's great! But for the millions of developers who can't afford subscriptions, or who want more control, GPTCode offers a real alternative.
 
 ## Get Started
 
 ```bash
 # Install
-go install github.com/jadercorrea/chuchu/cmd/chu@latest
+go install github.com/jadercorrea/gptcode/cmd/chu@latest
 
 # Configure (use free Groq or local Ollama)
 chu setup
@@ -123,7 +123,7 @@ Join us in making AI coding assistance accessible to everyone.
 
 ---
 
-*Have questions? Join our [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)*
+*Have questions? Join our [GitHub Discussions](https://github.com/jadercorrea/gptcode/discussions)*
 
 ## See Also
 

@@ -3,7 +3,7 @@ layout: post
 title: "Agent Routing vs. Tool Search: Two Paths to 85% Context Reduction"
 date: 2025-12-01
 author: Jader Correa
-description: "Anthropic's Tool Search and Chuchu's Agent Routing solve the same problem differently. Here's what we learned."
+description: "Anthropic's Tool Search and GPTCode's Agent Routing solve the same problem differently. Here's what we learned."
 tags: [architecture, ml, agents, context-optimization]
 ---
 
@@ -11,7 +11,7 @@ tags: [architecture, ml, agents, context-optimization]
 
 Anthropic just released [advanced tool use features](https://www.anthropic.com/engineering/advanced-tool-use) that achieve 85% context reduction through on-demand tool discovery.
 
-Chuchu already does this—but with a fundamentally different architecture.
+GPTCode already does this—but with a fundamentally different architecture.
 
 ## The Problem: Token Bloat
 
@@ -21,7 +21,7 @@ Chuchu already does this—but with a fundamentally different architecture.
 - Add more servers → 72,000+ tokens
 - Real production systems: **134,000+ tokens**
 
-**Chuchu's scenario**:
+**GPTCode's scenario**:
 - Large codebase with 500+ files
 - **100,000+ tokens** of potential context
 - Need to identify relevant files for each task
@@ -44,9 +44,9 @@ Instead of loading all 58 tools upfront, Anthropic defers most tools and discove
 
 **Trade-off**: Adds search latency to every task
 
-### Chuchu: Agent Routing + Semantic Filtering
+### GPTCode: Agent Routing + Semantic Filtering
 
-Chuchu doesn't use a tool search. Instead, it routes to **specialized agents**:
+GPTCode doesn't use a tool search. Instead, it routes to **specialized agents**:
 
 ```bash
 chu do "add authentication"
@@ -96,9 +96,9 @@ print(json.dumps(exceeded))  # Just 3 people
 **Impact**: Process 2,000+ expense line items, but only 3 results enter context.  
 **Token savings**: 37% reduction (43,588 → 27,297 tokens on complex tasks)
 
-### Chuchu: Maestro Pipeline
+### GPTCode: Maestro Pipeline
 
-Chuchu's autonomous mode (`chu do`) implements orchestration as an **agent pipeline**:
+GPTCode's autonomous mode (`chu do`) implements orchestration as an **agent pipeline**:
 
 ```
 Analyzer (scans 100 files)
@@ -118,11 +118,11 @@ The **Validation Gate** ensures intermediate bloat never enters the editor:
 - Editor receives: Only those 3 files
 - Validator outputs: `12/12 tests passing`
 
-**Key difference**: Chuchu's orchestration is **structural** (agent handoffs), while Anthropic's is **programmatic** (LLM-written code).
+**Key difference**: GPTCode's orchestration is **structural** (agent handoffs), while Anthropic's is **programmatic** (LLM-written code).
 
 ## Solution #3: Parameter Accuracy
 
-This is where Anthropic's innovation shines—and where Chuchu has room to improve.
+This is where Anthropic's innovation shines—and where GPTCode has room to improve.
 
 ### Anthropic: Tool Use Examples
 
@@ -169,9 +169,9 @@ From these examples, Claude learns:
 
 **Result**: 72% → 90% accuracy on complex parameters
 
-### Chuchu: Validation + Feedback (Current)
+### GPTCode: Validation + Feedback (Current)
 
-Chuchu currently relies on:
+GPTCode currently relies on:
 - **File validation**: Prevents unintended file creation
 - **Success criteria**: Test-based verification
 - **Auto-recovery**: Switches models when validation fails
@@ -239,7 +239,7 @@ func VerifyToken(token string) (*Claims, error) {
 
 Advanced tool use isn't just about features—it's about **system design**.
 
-|  | Anthropic | Chuchu |
+|  | Anthropic | GPTCode |
 |---|---|---|
 | **Philosophy** | Single mega-agent + dynamic discovery | Multi-agent specialization |
 | **Discovery** | Tool Search (on-demand) | Agent Routing (1ms classifier) |
@@ -249,7 +249,7 @@ Advanced tool use isn't just about features—it's about **system design**.
 | **Latency** | +search overhead per task | Minimal (1ms routing) |
 
 Both achieve ~85% context reduction through different paths:
-- **On-demand flexibility** (Anthropic) vs. **Upfront specialization** (Chuchu)
+- **On-demand flexibility** (Anthropic) vs. **Upfront specialization** (GPTCode)
 - **Dynamic tool discovery** vs. **Static agent pipeline**
 
 We're adopting Anthropic's **Tool Use Examples** pattern while keeping our fast, specialized architecture.
@@ -272,10 +272,10 @@ chu do "add user authentication"
 
 ---
 
-*Have questions about agent routing vs tool search? Join our [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)*
+*Have questions about agent routing vs tool search? Join our [GitHub Discussions](https://github.com/jadercorrea/gptcode/discussions)*
 
 ## See Also
 
-- [ML-Powered Intelligence](2025-11-22-ml-powered-intelligence) - Chuchu's ML capabilities
+- [ML-Powered Intelligence](2025-11-22-ml-powered-intelligence) - GPTCode's ML capabilities
 - [Intelligent Auto-Recovery](2025-11-26-intelligent-auto-recovery) - Auto-recovery system
 - [Context Engineering](2025-11-14-context-engineering-for-real-codebases) - Making AI work in real codebases

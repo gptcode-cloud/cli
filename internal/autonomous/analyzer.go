@@ -7,9 +7,9 @@ import (
 	"regexp"
 	"strings"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/llm"
-	"chuchu/internal/ml"
+	"gptcode/internal/agents"
+	"gptcode/internal/llm"
+	"gptcode/internal/ml"
 )
 
 // TaskAnalysis represents the result of analyzing a task

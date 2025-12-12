@@ -3,17 +3,17 @@ layout: post
 title: "Complete Workflow: From Feature Idea to Implementation"
 date: 2025-11-24
 author: Jader Correa
-description: "Master Chuchu's three-phase workflow: Research codebase context, plan implementation steps, and execute interactively or autonomously with built-in verification."
+description: "Master GPTCode's three-phase workflow: Research codebase context, plan implementation steps, and execute interactively or autonomously with built-in verification."
 tags: [guides, workflow, best-practices, tutorial]
 ---
 
 # Complete Workflow: From Feature Idea to Implementation
 
-Learn how to use Chuchu's full workflow to go from a feature idea to working, tested code.
+Learn how to use GPTCode's full workflow to go from a feature idea to working, tested code.
 
 ## The Three-Phase Workflow
 
-Chuchu provides a structured approach to feature development:
+GPTCode provides a structured approach to feature development:
 
 **Phase 1: Research** → Understand your codebase  
 **Phase 2: Plan** → Create detailed implementation steps  
@@ -28,7 +28,7 @@ Traditional AI coding assistants give you code immediately. Sometimes that works
 ❌ No incremental verification  
 ❌ No way to course-correct  
 
-Chuchu's workflow[^1] solves this:
+GPTCode's workflow[^1] solves this:
 
 ✅ Research phase builds context  
 ✅ Planning ensures coherent approach[^2]  
@@ -45,11 +45,11 @@ Let's add a "password reset" feature:
 chu research "How is user authentication currently implemented?"
 ```
 
-Chuchu will:
+GPTCode will:
 - Search your codebase semantically
 - Read and analyze relevant files
 - Document current architecture
-- Save findings to `~/.chuchu/research/`
+- Save findings to `~/.gptcode/research/`
 
 ### 2. Plan
 
@@ -57,18 +57,18 @@ Chuchu will:
 chu plan "Add password reset feature with email verification"
 ```
 
-Chuchu creates a detailed plan:
+GPTCode creates a detailed plan:
 - Phase 1: Database changes (migration, columns)
 - Phase 2: Email service (templates, sending)
 - Phase 3: API endpoints (routes, validation)
 - Phase 4: Tests (unit, integration, e2e)
 
-Plan saved to `~/.chuchu/plans/2025-01-23-password-reset.md`
+Plan saved to `~/.gptcode/plans/2025-01-23-password-reset.md`
 
 ### 3. Implement (Interactive)
 
 ```bash
-chu implement ~/.chuchu/plans/2025-01-23-password-reset.md
+chu implement ~/.gptcode/plans/2025-01-23-password-reset.md
 ```
 
 Walk through each phase:
@@ -88,10 +88,10 @@ Execute this step? [Y/n/q]: Y
 **Or Implement (Autonomous):**
 
 ```bash
-chu implement ~/.chuchu/plans/2025-01-23-password-reset.md --auto
+chu implement ~/.gptcode/plans/2025-01-23-password-reset.md --auto
 ```
 
-Chuchu executes everything:
+GPTCode executes everything:
 - Runs each step
 - Verifies with build + tests
 - Retries on errors
@@ -183,7 +183,7 @@ All three phases work from Neovim:
 > plan: Add password reset feature
 
 " Phase 3: Implement (autonomous)
-:ChuchuAuto
+:GPTCodeAuto
 " Or: <leader>ca
 ```
 
@@ -248,4 +248,4 @@ Implementation itself works for any language (LLM-based), but build/test verific
 
 ---
 
-**Questions or issues?** [Open an issue on GitHub](https://github.com/jadercorrea/chuchu/issues)
+**Questions or issues?** [Open an issue on GitHub](https://github.com/jadercorrea/gptcode/issues)

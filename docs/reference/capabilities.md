@@ -1,18 +1,18 @@
-# Chuchu Capabilities & Limitations
+# GPTCode Capabilities & Limitations
 
 **Last Updated:** December 2025  
 **Current Version:** 0.x (MVP)  
 **Overall Autonomy:** 64/64 scenarios (💯 100% 🎯)
 
-This document describes what Chuchu can and cannot do autonomously. Updated with each major release.
+This document describes what GPTCode can and cannot do autonomously. Updated with each major release.
 
 ---
 
-## What Chuchu Can Do
+## What GPTCode Can Do
 
 ### ✅ GitHub Issue Resolution (100% MVAA)
 
-Chuchu can autonomously resolve simple GitHub issues end-to-end:
+GPTCode can autonomously resolve simple GitHub issues end-to-end:
 
 - Fetch issue details and parse requirements
 - Create feature branch from issue
@@ -49,7 +49,7 @@ chu issue review 42     # Address review comments
 
 ### ✅ Test Execution & Validation (38%)
 
-Chuchu can run and validate code across multiple languages:
+GPTCode can run and validate code across multiple languages:
 
 **Test Runners:**
 - Go: `go test`
@@ -80,7 +80,7 @@ Chuchu can run and validate code across multiple languages:
 
 ### ✅ Error Recovery (80%)
 
-Chuchu can automatically fix common failures:
+GPTCode can automatically fix common failures:
 
 - Syntax errors and compilation failures
 - Test failures (simple cases)
@@ -106,7 +106,7 @@ Chuchu can automatically fix common failures:
 
 ### ✅ Codebase Understanding (60%)
 
-Chuchu can analyze and navigate codebases:
+GPTCode can analyze and navigate codebases:
 
 - Find relevant files for an issue (AI-powered)
 - Identify test files for a given implementation
@@ -117,7 +117,7 @@ Chuchu can analyze and navigate codebases:
 ```
 Issue: "Add password validation with special characters"
 
-Chuchu identifies:
+GPTCode identifies:
 1. [HIGH 0.9] auth/validator.go - Main validation logic
 2. [MED 0.6] auth/validator_test.go - Needs test updates  
 3. [LOW 0.3] config/security.go - May need config
@@ -130,7 +130,7 @@ Chuchu identifies:
 
 ---
 
-## What Chuchu Cannot Do (Yet)
+## What GPTCode Cannot Do (Yet)
 
 ### ✅ Complex Code Modifications (10/12 scenarios)
 
@@ -382,12 +382,12 @@ Skipped tests (t.Skip()) represent features not yet implemented.
 
 ### Future Releases
 
-Track progress at: https://github.com/jadercorrea/chuchu/milestones
+Track progress at: https://github.com/jadercorrea/gptcode/milestones
 
 ---
 
 ## Reporting Issues
 
-Found a limitation not listed here? [Open an issue](https://github.com/jadercorrea/chuchu/issues/new?labels=capability)
+Found a limitation not listed here? [Open an issue](https://github.com/jadercorrea/gptcode/issues/new?labels=capability)
 
-See something marked as "not working" that actually works for you? [Let us know](https://github.com/jadercorrea/chuchu/discussions)!
+See something marked as "not working" that actually works for you? [Let us know](https://github.com/jadercorrea/gptcode/discussions)!

@@ -170,7 +170,7 @@ echo "## 6. Multi-Tool Orchestration"
 echo ""
 
 test_capability "Tools" "curl + jq" \
-    ""$CHU_BIN" do 'use curl to fetch https://api.github.com/repos/jadercorrea/chuchu and use jq to extract the stargazers_count'" \
+    ""$CHU_BIN" do 'use curl to fetch https://api.github.com/repos/jadercorrea/gptcode and use jq to extract the stargazers_count'" \
     ":"
 
 test_capability "Tools" "grep search" \

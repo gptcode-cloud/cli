@@ -8,7 +8,7 @@ import (
 )
 
 func TestDetectLanguage(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "chuchu_lang_test")
+	tmpDir, err := os.MkdirTemp("", "gptcode_lang_test")
 	if err != nil {
 		t.Fatal(err)
 	}

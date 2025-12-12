@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"chuchu/internal/llm"
+	"gptcode/internal/llm"
 )
 
 type PlannerAgent struct {

@@ -24,7 +24,7 @@ func RecordExecution(exec TaskExecution) error {
 		return err
 	}
 
-	historyPath := filepath.Join(home, ".chuchu", "task_execution_history.jsonl")
+	historyPath := filepath.Join(home, ".gptcode", "task_execution_history.jsonl")
 
 	f, err := os.OpenFile(historyPath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
 	if err != nil {
@@ -56,7 +56,7 @@ func GetRecentModelPerformance(taskType string, limit int) ([]ModelSuccess, erro
 		return nil, err
 	}
 
-	historyPath := filepath.Join(home, ".chuchu", "task_execution_history.jsonl")
+	historyPath := filepath.Join(home, ".gptcode", "task_execution_history.jsonl")
 	data, err := os.ReadFile(historyPath)
 	if err != nil {
 		if os.IsNotExist(err) {

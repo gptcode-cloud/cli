@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"chuchu/internal/llm"
+	"gptcode/internal/llm"
 )
 
 type Coordinator struct {

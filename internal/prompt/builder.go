@@ -20,8 +20,8 @@ type Builder struct {
 
 func NewDefaultBuilder(store MemoryStore) *Builder {
 	home, _ := os.UserHomeDir()
-	profile := filepath.Join(home, ".chuchu", "profile.yaml")
-	system := filepath.Join(home, ".chuchu", "system_prompt.md")
+	profile := filepath.Join(home, ".gptcode", "profile.yaml")
+	system := filepath.Join(home, ".gptcode", "system_prompt.md")
 	return &Builder{
 		ProfilePath: profile,
 		SystemPath:  system,
@@ -41,7 +41,7 @@ func (b *Builder) BuildSystemPrompt(opts BuildOptions) string {
 
 ---
 
-# Chuchu Profile (YAML)
+# GPTCode Profile (YAML)
 
 %s
 

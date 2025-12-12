@@ -3,11 +3,11 @@ layout: post
 title: "Optimizing Intelligence: Why We Combined KANs, XGBoost, and Unbiased Sampling"
 date: 2025-11-25
 author: Jader Correa
-description: "Chuchu's intelligence layer combines XGBoost, KAN networks, and unbiased sampling to optimize the speed vs intelligence tradeoff for autonomous coding tasks."
+description: "GPTCode's intelligence layer combines XGBoost, KAN networks, and unbiased sampling to optimize the speed vs intelligence tradeoff for autonomous coding tasks."
 tags: [machine-learning, architecture, ensemble, optimization]
 ---
 
-In our quest to make Chuchu the most intelligent autonomous coding agent, we faced a classic dilemma: **Speed vs. Intelligence**.
+In our quest to make GPTCode the most intelligent autonomous coding agent, we faced a classic dilemma: **Speed vs. Intelligence**.
 
 We solved this by building a **Model Recommender** that dynamically chooses between a "Fast Model" (cheap, quick) and a "Smart Model" (expensive, capable) based on task complexity.
 
@@ -34,7 +34,7 @@ We implemented a sophisticated sampling algorithm (often called "stick-breaking"
 
 Mathematically, we are sampling uniformly from the standard $(N-1)$-simplex. This approach is based on the work by Henzi et al. (2021) on unbiased sampling of summative weights[^1].
 
-### How it Works in Chuchu
+### How it Works in GPTCode
 
 1.  **Generate Hypotheses**: We generate 50+ sets of random, unbiased weights (e.g., `[0.7, 0.3]`, `[0.4, 0.6]`, `[0.1, 0.9]`).
 2.  **Evaluate**: We test each combination against our validation set.
@@ -57,7 +57,7 @@ This isn't just math for math's sake. This approach gives us:
 
 ## Conclusion
 
-By combining the raw performance of **XGBoost**, the explainability of **KANs**, and the mathematical rigor of **Unbiased Sampling**, Chuchu's Intelligence Layer doesn't just guess—it *learns* the optimal strategy for your specific codebase.
+By combining the raw performance of **XGBoost**, the explainability of **KANs**, and the mathematical rigor of **Unbiased Sampling**, GPTCode's Intelligence Layer doesn't just guess—it *learns* the optimal strategy for your specific codebase.
 
 This is how we move from "Artificial Intelligence" to **"Optimized Intelligence"**.
 

@@ -4,12 +4,12 @@ import (
 	"context"
 	"fmt"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/autonomous"
-	"chuchu/internal/config"
-	"chuchu/internal/events"
-	"chuchu/internal/llm"
-	"chuchu/internal/maestro"
+	"gptcode/internal/agents"
+	"gptcode/internal/autonomous"
+	"gptcode/internal/config"
+	"gptcode/internal/events"
+	"gptcode/internal/llm"
+	"gptcode/internal/maestro"
 )
 
 // AutonomousExecutor wraps autonomous execution for use across modes

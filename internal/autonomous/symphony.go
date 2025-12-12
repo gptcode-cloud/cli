@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"chuchu/internal/maestro"
+	"gptcode/internal/maestro"
 )
 
 // Symphony represents a multi-movement task execution
@@ -175,7 +175,7 @@ func (e *Executor) executeMovement(ctx context.Context, movement *Movement) erro
 
 // saveCheckpoint saves symphony state for resume capability
 func (e *Executor) saveCheckpoint(symphony *Symphony) error {
-	checkpointsDir := filepath.Join(os.Getenv("HOME"), ".chuchu", "symphonies")
+	checkpointsDir := filepath.Join(os.Getenv("HOME"), ".gptcode", "symphonies")
 	if err := os.MkdirAll(checkpointsDir, 0755); err != nil {
 		return err
 	}

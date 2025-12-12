@@ -23,7 +23,7 @@ type JSONLMemStore struct {
 
 func NewJSONLMemStore() *JSONLMemStore {
 	home, _ := os.UserHomeDir()
-	path := filepath.Join(home, ".chuchu", "memories.jsonl")
+	path := filepath.Join(home, ".gptcode", "memories.jsonl")
 	return &JSONLMemStore{
 		Path:         path,
 		MaxEntries:   5,

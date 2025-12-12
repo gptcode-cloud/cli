@@ -8,8 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"chuchu/internal/llm"
-	"chuchu/internal/prompt"
+	"gptcode/internal/llm"
+	"gptcode/internal/prompt"
 )
 
 func RunFeatureElixir(builder *prompt.Builder, provider llm.Provider, model string) error {
@@ -20,14 +20,14 @@ func RunFeatureElixir(builder *prompt.Builder, provider llm.Provider, model stri
 
 	proj, err := Detect("")
 	if err != nil {
-		fmt.Fprintln(os.Stderr, "Chuchu: could not detect mix project, using defaults:", err)
+		fmt.Fprintln(os.Stderr, "GPTCode: could not detect mix project, using defaults:", err)
 		proj = &Project{
 			Root:       ".",
 			AppName:    "app",
 			ModuleBase: "App",
 		}
 	} else {
-		fmt.Fprintln(os.Stderr, "Chuchu: detected Mix project at", proj.Root, "app:", proj.AppName, "module:", proj.ModuleBase)
+		fmt.Fprintln(os.Stderr, "GPTCode: detected Mix project at", proj.Root, "app:", proj.AppName, "module:", proj.ModuleBase)
 	}
 
 	slug := SlugForDescription(desc)
@@ -44,7 +44,7 @@ func RunFeatureElixir(builder *prompt.Builder, provider llm.Provider, model stri
 		Hint: hint,
 	})
 
-	user := fmt.Sprintf(`You are Chuchu, a strict TDD-first coding assistant for Elixir.
+	user := fmt.Sprintf(`You are GPTCode, a strict TDD-first coding assistant for Elixir.
 
 We are in a Mix project with:
 
@@ -183,12 +183,12 @@ func writeElixirFilesFromBlocks(root, raw string) {
 func writeFileUnderRoot(root, relPath, body string) {
 	full := filepath.Join(root, relPath)
 	if err := os.MkdirAll(filepath.Dir(full), 0o755); err != nil {
-		fmt.Fprintln(os.Stderr, "Chuchu: failed to mkdir for", full, ":", err)
+		fmt.Fprintln(os.Stderr, "GPTCode: failed to mkdir for", full, ":", err)
 		return
 	}
 	if err := os.WriteFile(full, []byte(body+"\n"), 0o644); err != nil {
-		fmt.Fprintln(os.Stderr, "Chuchu: failed to write", full, ":", err)
+		fmt.Fprintln(os.Stderr, "GPTCode: failed to write", full, ":", err)
 		return
 	}
-	fmt.Fprintln(os.Stderr, "Chuchu: wrote", full)
+	fmt.Fprintln(os.Stderr, "GPTCode: wrote", full)
 }

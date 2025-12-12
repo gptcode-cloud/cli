@@ -7,10 +7,10 @@ import (
 	"os/exec"
 	"strings"
 
-	"chuchu/internal/config"
-	"chuchu/internal/llm"
-	"chuchu/internal/modes"
-	"chuchu/internal/prompt"
+	"gptcode/internal/config"
+	"gptcode/internal/llm"
+	"gptcode/internal/modes"
+	"gptcode/internal/prompt"
 	"github.com/chzyer/readline"
 )
 
@@ -33,7 +33,7 @@ func NewChatREPL(maxTokens, maxMessages int) (*ChatREPL, error) {
 	// Set up history file
 	histFile, err := os.UserHomeDir()
 	if err == nil {
-		histFile = histFile + "/.chuchu_history"
+		histFile = histFile + "/.gptcode_history"
 		rl, err = readline.NewEx(&readline.Config{
 			Prompt:              "> ",
 			HistoryFile:         histFile,
@@ -47,7 +47,7 @@ func NewChatREPL(maxTokens, maxMessages int) (*ChatREPL, error) {
 		}
 	}
 
-	// Load Chuchu configuration
+	// Load GPTCode configuration
 	setup, err := config.LoadSetup()
 	var model string
 	if err != nil {
@@ -112,7 +112,7 @@ func (r *ChatREPL) Run() error {
 		// Non-interactive, don't show prompts
 		return nil
 	}
-	fmt.Println("Chuchu Chat REPL - Type /help for commands")
+	fmt.Println("GPTCode Chat REPL - Type /help for commands")
 	fmt.Println("")
 
 	// Update file context initially

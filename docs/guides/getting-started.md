@@ -1,6 +1,6 @@
 # Getting Started
 
-This guide helps you install Chuchu, configure providers, and start using the core workflows. It also includes a 10‑second quick start for universal feedback capture.
+This guide helps you install GPTCode, configure providers, and start using the core workflows. It also includes a 10‑second quick start for universal feedback capture.
 
 ## Install
 
@@ -13,7 +13,7 @@ go build -o ./bin/chu ./cmd/chu
 
 ## Initial setup
 ```bash
-chu setup             # creates ~/.chuchu/setup.yaml
+chu setup             # creates ~/.gptcode/setup.yaml
 chu key openrouter    # add API key(s) as needed
 chu backend           # check current backend
 chu backend list      # list all backends
@@ -37,7 +37,7 @@ Usage:
 2) Press Ctrl+g to mark the suggestion
 3) Edit (if needed) and press Enter
 
-Chuchu records good/bad outcomes and saves changed files and optional git patch.
+GPTCode records good/bad outcomes and saves changed files and optional git patch.
 
 Check stats:
 ```bash

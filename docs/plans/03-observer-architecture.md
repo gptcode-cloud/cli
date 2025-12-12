@@ -1,4 +1,4 @@
-# Chuchu Observer: Architecture & Vision
+# GPTCode Observer: Architecture & Vision
 
 **Status:** 🌐 Marketing Site Complete | ❌ CLI Not Implemented  
 **Last Updated:** 2025-12-01
@@ -11,7 +11,7 @@
 - ❌ **Real-time WebSocket server** - Not implemented
 - ❌ **Live dashboard** - Not implemented
 
-**Vision:** Transform the Chuchu CLI from a black box into a **didactic observatory** through architectural decoupling and explainability.
+**Vision:** Transform the GPTCode CLI from a black box into a **didactic observatory** through architectural decoupling and explainability.
 
 ## Core Principles
 
@@ -278,4 +278,4 @@ PlannerAgent chosen because:
 
 ---
 
-*This architecture ensures Chuchu Observatory evolves from a flow visualizer to a comprehensive educational platform for understanding AI-assisted development.*
+*This architecture ensures GPTCode Observatory evolves from a flow visualizer to a comprehensive educational platform for understanding AI-assisted development.*

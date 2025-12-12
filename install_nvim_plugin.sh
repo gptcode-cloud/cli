@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "=== Installing Chuchu Neovim Plugin ==="
+echo "=== Installing GPTCode Neovim Plugin ==="
 echo ""
 
 if ! command -v nvim &> /dev/null; then
@@ -21,13 +21,13 @@ if [ ! -d "$NVIM_CONFIG" ]; then
 fi
 
 # Create plugin directory
-PLUGIN_DIR="$NVIM_CONFIG/pack/plugins/start/chuchu"
+PLUGIN_DIR="$NVIM_CONFIG/pack/plugins/start/gptcode"
 echo "1. Creating plugin directory: $PLUGIN_DIR"
 mkdir -p "$PLUGIN_DIR/lua"
 
 # Copy lua files
 echo "2. Copying Lua files..."
-cp -v ./neovim/lua/chuchu/init.lua "$PLUGIN_DIR/lua/chuchu.lua"
+cp -v ./neovim/lua/gptcode/init.lua "$PLUGIN_DIR/lua/gptcode.lua"
 
 # Ensure binary is in place
 if [ ! -f "$HOME/.local/bin/chu" ]; then
@@ -42,7 +42,7 @@ echo ""
 echo "✓ Plugin installed successfully!"
 echo ""
 echo "Next steps:"
-echo "1. Restart Neovim or run: :luafile $PLUGIN_DIR/lua/chuchu.lua"
-echo "2. Test with: :lua require('chuchu').start_code_conversation()"
+echo "1. Restart Neovim or run: :luafile $PLUGIN_DIR/lua/gptcode.lua"
+echo "2. Test with: :lua require('gptcode').start_code_conversation()"
 echo ""
 echo "The plugin is now using: ~/.local/bin/chu"

@@ -1,6 +1,6 @@
-# Advanced Git Operations with Chuchu
+# Advanced Git Operations with GPTCode
 
-Chuchu provides AI-powered Git operations that automate complex workflows and resolve conflicts intelligently.
+GPTCode provides AI-powered Git operations that automate complex workflows and resolve conflicts intelligently.
 
 ## Table of Contents
 
@@ -306,7 +306,7 @@ The LLM analyzes both versions (HEAD and incoming) and:
 
 ## Configuration
 
-All Git operations use your default LLM configuration from `~/.chuchu/setup.yaml`.
+All Git operations use your default LLM configuration from `~/.gptcode/setup.yaml`.
 
 ### Custom Model
 
@@ -460,4 +460,4 @@ A: We recommend:
 
 ## Feedback
 
-Found a bug or have a suggestion? [Open an issue](https://github.com/jadercorrea/chuchu/issues/new)!
+Found a bug or have a suggestion? [Open an issue](https://github.com/jadercorrea/gptcode/issues/new)!

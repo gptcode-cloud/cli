@@ -17,7 +17,7 @@ Plans are prefixed with numbers indicating implementation priority:
 1. **01-user-friendly-commands-and-docs.md** - CLI UX improvements (many tasks already done ✅)
 2. **02-autonomous-execution-unified.md** - Programmatic tool calling pattern
 3. **03-observer-architecture.md** - CLI telemetry/tracing (🌐 marketing complete, ❌ CLI not implemented)
-4. **04-chuchu-observatory-visualization.md** - Real-time dashboard (depends on #3)
+4. **04-gptcode-observatory-visualization.md** - Real-time dashboard (depends on #3)
 5. **05-universal-feedback-collector.md** - Cross-tool feedback capture (Warp AI, Gemini, Claude)
 
 ### Special Documents

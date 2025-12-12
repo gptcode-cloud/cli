@@ -1,8 +1,8 @@
 package modes
 
 import (
-	"chuchu/internal/llm"
-	"chuchu/internal/prompt"
+	"gptcode/internal/llm"
+	"gptcode/internal/prompt"
 	"context"
 	"fmt"
 	"strings"

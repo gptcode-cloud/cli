@@ -9,7 +9,7 @@ import (
 
 func TestProjectMap(t *testing.T) {
 	t.Run("basic structure", func(t *testing.T) {
-		tmpDir, err := os.MkdirTemp("", "chuchu_test")
+		tmpDir, err := os.MkdirTemp("", "gptcode_test")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -40,7 +40,7 @@ func TestProjectMap(t *testing.T) {
 	})
 
 	t.Run("filters ignored directories", func(t *testing.T) {
-		tmpDir, err := os.MkdirTemp("", "chuchu_test_filter")
+		tmpDir, err := os.MkdirTemp("", "gptcode_test_filter")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -80,7 +80,7 @@ func TestProjectMap(t *testing.T) {
 	})
 
 	t.Run("respects max_depth", func(t *testing.T) {
-		tmpDir, err := os.MkdirTemp("", "chuchu_test_depth")
+		tmpDir, err := os.MkdirTemp("", "gptcode_test_depth")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -108,7 +108,7 @@ func TestProjectMap(t *testing.T) {
 }
 
 func TestApplyPatch(t *testing.T) {
-	tmpDir, err := os.MkdirTemp("", "chuchu_patch_test")
+	tmpDir, err := os.MkdirTemp("", "gptcode_patch_test")
 	if err != nil {
 		t.Fatal(err)
 	}

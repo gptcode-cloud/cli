@@ -2,7 +2,7 @@ package validation
 
 import (
 	"bytes"
-	"chuchu/internal/langdetect"
+	"gptcode/internal/langdetect"
 	"fmt"
 	"os/exec"
 	"path/filepath"

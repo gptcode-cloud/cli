@@ -11,9 +11,9 @@ import (
 	"testing"
 	"time"
 
-	"chuchu/internal/changelog"
-	"chuchu/internal/config"
-	"chuchu/internal/llm"
+	"gptcode/internal/changelog"
+	"gptcode/internal/config"
+	"gptcode/internal/llm"
 )
 
 func TestDocumentationUpdates(t *testing.T) {

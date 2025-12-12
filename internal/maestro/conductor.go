@@ -6,10 +6,10 @@ import (
 	"os"
 	"strings"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/config"
-	"chuchu/internal/feedback"
-	"chuchu/internal/llm"
+	"gptcode/internal/agents"
+	"gptcode/internal/config"
+	"gptcode/internal/feedback"
+	"gptcode/internal/llm"
 )
 
 // Conductor is the central coordinator (Maestro) that orchestrates all agents

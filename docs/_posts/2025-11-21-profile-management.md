@@ -7,7 +7,7 @@ description: "Switch between multiple named configurations per backend. Create s
 tags: [features, configuration, profiles, productivity]
 ---
 
-Chuchu now supports **profiles** - multiple named configurations per backend. This lets you quickly switch between different model setups without editing configuration files.
+GPTCode now supports **profiles** - multiple named configurations per backend. This lets you quickly switch between different model setups without editing configuration files.
 
 ## Why Profiles?
 
@@ -18,7 +18,7 @@ Different tasks need different model configurations:
 - **Free profile**: Only free-tier models for experimentation
 - **Production profile**: Reliable, battle-tested models
 
-Instead of manually editing `~/.chuchu/setup.yaml`, create and switch between profiles.
+Instead of manually editing `~/.gptcode/setup.yaml`, create and switch between profiles.
 
 ## Quick Start
 
@@ -93,7 +93,7 @@ chu profiles set-agent groq speed research llama-3.1-8b-instant
 
 ## Profile Structure in setup.yaml
 
-Profiles are stored in your `~/.chuchu/setup.yaml`:
+Profiles are stored in your `~/.gptcode/setup.yaml`:
 
 ```yaml
 defaults:
@@ -132,7 +132,7 @@ In Neovim, press `Ctrl+M` to open the model selector:
 3. The chat header updates to show active profile
 
 ```
-🐺 Chuchu
+🐺 GPTCode
 Backend: Groq / speed
   router: llama-3.1-8b-instant
   query: llama-3.1-8b-instant

@@ -1,12 +1,12 @@
 ---
 layout: default
 title: Prompts
-description: System prompts, workflows, and best practices for Chuchu agents
+description: System prompts, workflows, and best practices for GPTCode agents
 ---
 
 # Prompts & Workflows
 
-Chuchu uses carefully crafted system prompts for each agent and workflow. Understanding these helps you get better results.
+GPTCode uses carefully crafted system prompts for each agent and workflow. Understanding these helps you get better results.
 
 ## Quick Navigation
 
@@ -389,13 +389,13 @@ chu plan "implement JWT authentication using github.com/golang-jwt"
 ## Customizing Prompts
 
 ### System Prompts Location
-- Research: `~/.chuchu/prompts/research.md`
-- Plan: `~/.chuchu/prompts/plan.md`
-- Agent prompts: Configured per-profile in `~/.chuchu/profiles/*.yaml`
+- Research: `~/.gptcode/prompts/research.md`
+- Plan: `~/.gptcode/prompts/plan.md`
+- Agent prompts: Configured per-profile in `~/.gptcode/profiles/*.yaml`
 
 ### Override Example
 ```yaml
-# ~/.chuchu/profiles/my-profile.yaml
+# ~/.gptcode/profiles/my-profile.yaml
 backend:
   groq:
     agent_models:

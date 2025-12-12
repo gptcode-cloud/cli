@@ -35,7 +35,7 @@ type Emitter struct {
 
 func NewEmitter(w io.Writer) *Emitter {
 	home, _ := os.UserHomeDir()
-	eventLog := filepath.Join(home, ".chuchu", "events.jsonl")
+	eventLog := filepath.Join(home, ".gptcode", "events.jsonl")
 	_ = os.MkdirAll(filepath.Dir(eventLog), 0755)
 
 	if os.Getenv("CHUCHU_NVIM_MODE") != "1" {

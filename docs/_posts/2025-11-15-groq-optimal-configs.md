@@ -224,7 +224,7 @@ chu profile
 
 ### Option 2: Configure Manually
 
-Edit `~/.chuchu/setup.yaml`:
+Edit `~/.gptcode/setup.yaml`:
 
 ```yaml
 defaults:
@@ -383,4 +383,4 @@ chu profile show groq.budget   # Show specific profile details
 
 ---
 
-*Questions or better configurations? Share on [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)!*
+*Questions or better configurations? Share on [GitHub Discussions](https://github.com/jadercorrea/gptcode/discussions)!*

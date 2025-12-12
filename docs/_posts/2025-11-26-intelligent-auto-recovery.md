@@ -58,7 +58,7 @@ No user intervention. No config editing. The system:
 
 ### 1. Execution History
 
-Every task execution is recorded to `~/.chuchu/task_execution_history.jsonl`:
+Every task execution is recorded to `~/.gptcode/task_execution_history.jsonl`:
 
 ```json
 {
@@ -311,10 +311,10 @@ Default is 3 attempts.
 
 ```bash
 # Raw history
-cat ~/.chuchu/task_execution_history.jsonl
+cat ~/.gptcode/task_execution_history.jsonl
 
 # Analyze success rates
-cat ~/.chuchu/task_execution_history.jsonl | \
+cat ~/.gptcode/task_execution_history.jsonl | \
   jq -s 'group_by(.backend + "/" + .model) | 
          map({
            model: (.[0].backend + "/" + .[0].model),
@@ -453,9 +453,9 @@ See [Intelligence Layers notebook](../notebooks/intelligence-layers.md) for the 
 
 ## Getting Started
 
-### 1. Update Chuchu
+### 1. Update GPTCode
 ```bash
-cd ~/chuchu
+cd ~/gptcode
 git pull origin main
 go build -o bin/chu cmd/chu/*.go
 ```
@@ -476,7 +476,7 @@ Run a few more tasks and observe confidence scores increasing.
 
 ### 5. Check Your Stats
 ```bash
-cat ~/.chuchu/task_execution_history.jsonl | jq
+cat ~/.gptcode/task_execution_history.jsonl | jq
 ```
 
 ## Best Practices
@@ -522,7 +522,7 @@ We'd love to hear:
 - Which model combinations work best?
 - What confidence threshold feels right for auto-retry?
 
-Open an issue or discussion on [GitHub](https://github.com/jadercorrea/chuchu).
+Open an issue or discussion on [GitHub](https://github.com/jadercorrea/gptcode).
 
 ---
 

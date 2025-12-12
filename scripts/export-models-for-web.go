@@ -99,7 +99,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	inputPath := filepath.Join(home, ".chuchu", "models_catalog.json")
+	inputPath := filepath.Join(home, ".gptcode", "models_catalog.json")
 	data, err := os.ReadFile(inputPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Failed to read %s: %v\n", inputPath, err)

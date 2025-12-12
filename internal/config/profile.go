@@ -65,7 +65,7 @@ func configDir() string {
 	if err != nil {
 		return "."
 	}
-	return filepath.Join(home, ".chuchu")
+	return filepath.Join(home, ".gptcode")
 }
 
 func LoadProfile() (*Profile, error) {

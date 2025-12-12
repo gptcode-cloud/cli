@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"chuchu/internal/llm"
+	"gptcode/internal/llm"
 )
 
 type MigrationGenerator struct {

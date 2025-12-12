@@ -13,7 +13,7 @@ import (
 	"strconv"
 	"strings"
 
-	"chuchu/internal/llm"
+	"gptcode/internal/llm"
 )
 
 type CoverageAnalyzer struct {

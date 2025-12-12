@@ -90,7 +90,7 @@ chu profiles set-agent openrouter free research x-ai/grok-4.1-fast:free
 
 ## Discovering Models
 
-Use Chuchu's model search to find available models:
+Use GPTCode's model search to find available models:
 ```bash
 # Search by provider
 chu models search groq llama

@@ -21,7 +21,7 @@ show_current_profile() {
 setup_test_dir() {
     local test_name="$1"
     local safe_name=$(echo "$test_name" | tr ' ' '-' | tr '[:upper:]' '[:lower:]')
-    TEST_DIR=$(mktemp -d "/tmp/chuchu-e2e-${safe_name}-XXXXXX")
+    TEST_DIR=$(mktemp -d "/tmp/gptcode-e2e-${safe_name}-XXXXXX")
     echo "📁 Test directory: $TEST_DIR"
     cd "$TEST_DIR"
 }

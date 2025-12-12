@@ -56,7 +56,7 @@ echo "Step 5: Verify no REPL banner in single-shot"
 echo "---------------------------------------------"
 run_chu_command "run" "pwd" "--raw"
 assert_exit_code 0
-assert_not_contains "$OUTPUT" "Chuchu Run REPL"
+assert_not_contains "$OUTPUT" "GPTCode Run REPL"
 
 cleanup_test_dir
 

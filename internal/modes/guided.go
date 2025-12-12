@@ -9,11 +9,11 @@ import (
 	"strings"
 	"time"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/config"
-	"chuchu/internal/events"
-	"chuchu/internal/llm"
-	"chuchu/internal/ml"
+	"gptcode/internal/agents"
+	"gptcode/internal/config"
+	"gptcode/internal/events"
+	"gptcode/internal/llm"
+	"gptcode/internal/ml"
 )
 
 type GuidedMode struct {
@@ -277,7 +277,7 @@ Execute the plan directly and minimally.`, plan)
 
 func (g *GuidedMode) saveDraft(content string) (string, error) {
 	home, _ := os.UserHomeDir()
-	dir := fmt.Sprintf("%s/.chuchu/plans", home)
+	dir := fmt.Sprintf("%s/.gptcode/plans", home)
 	_ = os.MkdirAll(dir, 0755)
 
 	path := fmt.Sprintf("%s/draft.md", dir)
@@ -286,7 +286,7 @@ func (g *GuidedMode) saveDraft(content string) (string, error) {
 
 func (g *GuidedMode) savePlan(content string) (string, error) {
 	home, _ := os.UserHomeDir()
-	dir := fmt.Sprintf("%s/.chuchu/plans", home)
+	dir := fmt.Sprintf("%s/.gptcode/plans", home)
 	_ = os.MkdirAll(dir, 0755)
 
 	timestamp := time.Now().Format("2006-01-02-150405")
@@ -296,7 +296,7 @@ func (g *GuidedMode) savePlan(content string) (string, error) {
 		return "", err
 	}
 
-	currentPath := fmt.Sprintf("%s/.chuchu/current_plan.txt", home)
+	currentPath := fmt.Sprintf("%s/.gptcode/current_plan.txt", home)
 	_ = os.WriteFile(currentPath, []byte(content), 0644)
 
 	return path, nil

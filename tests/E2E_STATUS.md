@@ -114,7 +114,7 @@ Not yet created:
 
 ### Full Suite
 ```bash
-cd /Users/jadercorrea/workspace/opensource/chuchu
+cd /Users/jadercorrea/workspace/opensource/gptcode
 ./tests/e2e.sh
 ```
 

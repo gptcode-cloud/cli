@@ -11,10 +11,10 @@ import (
 	"testing"
 	"time"
 
-	"chuchu/internal/config"
-	"chuchu/internal/llm"
-	"chuchu/internal/mockgen"
-	"chuchu/internal/testgen"
+	"gptcode/internal/config"
+	"gptcode/internal/llm"
+	"gptcode/internal/mockgen"
+	"gptcode/internal/testgen"
 )
 
 func TestTestGeneration(t *testing.T) {

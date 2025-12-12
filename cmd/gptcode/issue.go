@@ -11,15 +11,15 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"chuchu/internal/ci"
-	"chuchu/internal/codebase"
-	"chuchu/internal/config"
-	"chuchu/internal/github"
-	"chuchu/internal/langdetect"
-	"chuchu/internal/llm"
-	"chuchu/internal/modes"
-	"chuchu/internal/recovery"
-	"chuchu/internal/validation"
+	"gptcode/internal/ci"
+	"gptcode/internal/codebase"
+	"gptcode/internal/config"
+	"gptcode/internal/github"
+	"gptcode/internal/langdetect"
+	"gptcode/internal/llm"
+	"gptcode/internal/modes"
+	"gptcode/internal/recovery"
+	"gptcode/internal/validation"
 )
 
 var issueCmd = &cobra.Command{

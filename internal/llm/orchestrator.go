@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"chuchu/internal/tools"
+	"gptcode/internal/tools"
 )
 
 type OrchestratorProvider struct {

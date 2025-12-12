@@ -9,10 +9,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"chuchu/internal/config"
-	"chuchu/internal/intelligence"
-	"chuchu/internal/llm"
-	"chuchu/internal/modes"
+	"gptcode/internal/config"
+	"gptcode/internal/intelligence"
+	"gptcode/internal/llm"
+	"gptcode/internal/modes"
 )
 
 var doCmd = &cobra.Command{

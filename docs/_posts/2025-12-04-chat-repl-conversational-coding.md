@@ -34,7 +34,7 @@ Each invocation starts fresh. No memory, no context, no follow-up.
 
 ## The Solution: Chat REPL
 
-Chuchu's `chu chat` is a **persistent REPL** (Read-Eval-Print Loop) with:
+GPTCode's `chu chat` is a **persistent REPL** (Read-Eval-Print Loop) with:
 - Conversation history
 - File context awareness
 - Token management
@@ -46,21 +46,21 @@ Chuchu's `chu chat` is a **persistent REPL** (Read-Eval-Print Loop) with:
 $ chu chat
 
 > explain the authentication flow
-[Chuchu reads auth.go, middleware.go, session.go]
+[GPTCode reads auth.go, middleware.go, session.go]
 The authentication flow works as follows:
 1. User submits credentials to /login
 2. Middleware validates JWT token
 3. Session stored in Redis...
 
 > how is the JWT token generated?
-[Chuchu remembers context, focuses on token logic]
+[GPTCode remembers context, focuses on token logic]
 The JWT token is generated in auth/token.go:
 - Uses HMAC-SHA256 signing
 - Includes user_id, email, exp claims
 - Token expires in 24 hours...
 
 > add refresh token support
-[Chuchu knows you're extending the JWT system]
+[GPTCode knows you're extending the JWT system]
 I'll add refresh token functionality:
 1. Create refresh_token table
 2. Generate long-lived refresh token (30 days)
@@ -68,7 +68,7 @@ I'll add refresh token functionality:
 4. Update login to return both tokens...
 ```
 
-**Key difference**: Chuchu remembers the conversation. Question 2 builds on Question 1. Question 3 knows we're working on auth + JWT.
+**Key difference**: GPTCode remembers the conversation. Question 2 builds on Question 1. Question 3 knows we're working on auth + JWT.
 
 ## Features
 
@@ -103,7 +103,7 @@ Automatically includes relevant files based on:
 > fix bug in auth/handler.go
 ```
 
-Chuchu sees:
+GPTCode sees:
 - `auth/handler.go` (explicitly mentioned)
 - `auth/middleware.go` (dependency)
 - `models/user.go` (used by handler)
@@ -155,7 +155,7 @@ $ chu chat
 Conversation loaded from auth-discussion.json
 
 > continue with the refresh token implementation
-[Chuchu has full context from previous session]
+[GPTCode has full context from previous session]
 ```
 
 ## Real-World Workflow
@@ -166,7 +166,7 @@ Conversation loaded from auth-discussion.json
 $ chu chat
 
 > show me the current user registration flow
-[Chuchu reads user.go, handler.go, validates.go]
+[GPTCode reads user.go, handler.go, validates.go]
 Current registration:
 1. POST /register with email, password
 2. Validate email format
@@ -463,7 +463,7 @@ Based on readline library:
 - `Ctrl+K` - Kill to end
 - `Ctrl+U` - Kill to start
 
-History saved to `~/.chuchu_history`.
+History saved to `~/.gptcode_history`.
 
 ## Error Handling
 
@@ -507,7 +507,7 @@ $ chu chat --voice
 
 ```bash
 > refactor auth module
-[Chuchu: I'll update 4 files, continue? y/n]
+[GPTCode: I'll update 4 files, continue? y/n]
 ```
 
 ### 3. Interactive Diff Preview
@@ -619,7 +619,7 @@ chu chat
 
 ---
 
-*Have questions about Chat REPL? Join our [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)*
+*Have questions about Chat REPL? Join our [GitHub Discussions](https://github.com/jadercorrea/gptcode/discussions)*
 
 ## See Also
 

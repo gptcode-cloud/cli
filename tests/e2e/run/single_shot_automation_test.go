@@ -72,7 +72,7 @@ func TestSingleShotAutomation(t *testing.T) {
 	t.Run("Verify no REPL banner in single-shot", func(t *testing.T) {
 		output := runChuRun(t, tmpDir, "pwd", "--raw", 1*time.Minute)
 
-		if strings.Contains(output, "Chuchu Run REPL") {
+		if strings.Contains(output, "GPTCode Run REPL") {
 			t.Errorf("Expected no REPL banner in single-shot mode, got: %s", output)
 		}
 

@@ -1,8 +1,8 @@
 package catalog
 
 import (
-	"chuchu/internal/feedback"
-	"chuchu/internal/ollama"
+	"gptcode/internal/feedback"
+	"gptcode/internal/ollama"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -13,7 +13,7 @@ import (
 
 func GetCatalogPath() string {
 	home, _ := os.UserHomeDir()
-	return filepath.Join(home, ".chuchu", "models_catalog.json")
+	return filepath.Join(home, ".gptcode", "models_catalog.json")
 }
 
 func Load() (*OutputJSON, error) {

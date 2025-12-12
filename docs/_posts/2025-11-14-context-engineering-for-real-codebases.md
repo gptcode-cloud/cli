@@ -9,7 +9,7 @@ tags: [context-management, architecture, performance, best-practices]
 
 # Context Engineering: Making AI Work in Real Codebases
 
-In the [previous post]({% post_url 2025-11-13-why-chuchu %}), we talked about **why** Chuchu exists—making AI coding assistance affordable. Now let's talk about **how** to actually make it work in production codebases.
+In the [previous post]({% post_url 2025-11-13-why-gptcode %}), we talked about **why** GPTCode exists—making AI coding assistance affordable. Now let's talk about **how** to actually make it work in production codebases.
 
 ## The Real Problem
 
@@ -155,9 +155,9 @@ Execute the plan phase by phase:
 
 Output: Working, tested code.
 
-## Why This Works in Chuchu
+## Why This Works in GPTCode
 
-Chuchu's multi-agent architecture is designed around this principle:
+GPTCode's multi-agent architecture is designed around this principle:
 
 **Router Agent** (8B model)
 - Fast intent classification (~840 TPS)
@@ -214,7 +214,7 @@ Research/Plan/Implement artifacts solve this:
 - Research documents explain the "why"
 - You can quickly learn unfamiliar parts of the codebase
 
-## Practical Tips for Chuchu
+## Practical Tips for GPTCode
 
 ### Start With Focused Commands
 ```bash
@@ -227,7 +227,7 @@ chu plan "add password reset via email"
 # Review the plan before implementing
 
 # Implement phase - execute the plan
-chu implement ~/.chuchu/plans/2024-11-15-password-reset.md
+chu implement ~/.gptcode/plans/2024-11-15-password-reset.md
 # Note: Implementation reads the plan and executes phase by phase
 ```
 
@@ -235,7 +235,7 @@ chu implement ~/.chuchu/plans/2024-11-15-password-reset.md
 
 ### Use Different Models for Different Tasks
 
-Chuchu lets you assign specialized models to each agent role:
+GPTCode lets you assign specialized models to each agent role:
 
 ```yaml
 backend:
@@ -263,7 +263,7 @@ If you notice responses getting worse or repetitive:
 2. **Exit current session**: Start fresh
 3. **Resume with context**: Load the compact summary
 
-Chuchu's command-based workflow naturally encourages this:
+GPTCode's command-based workflow naturally encourages this:
 - `chu research` → outputs findings
 - `chu plan` → reads findings, outputs plan  
 - `chu implement` → reads plan, outputs code
@@ -301,7 +301,7 @@ There's no magic prompt that solves everything. But proper context engineering m
 
 ## What Works
 
-With this approach, Chuchu can:
+With this approach, GPTCode can:
 - Work in brownfield codebases (not just toys)
 - Solve complex problems (not just CRUD)
 - Produce quality code (not slop)
@@ -328,4 +328,4 @@ But the foundation is always the same: **manage your context window like your pr
 
 ---
 
-*Have questions about context engineering? Join the discussion in [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)*
+*Have questions about context engineering? Join the discussion in [GitHub Discussions](https://github.com/jadercorrea/gptcode/discussions)*

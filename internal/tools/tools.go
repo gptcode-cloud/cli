@@ -108,7 +108,7 @@ func GetAvailableTools() []map[string]interface{} {
 			"type": "function",
 			"function": map[string]interface{}{
 				"name":        "read_guideline",
-				"description": "Read detailed coding guidelines from ~/.chuchu/guidelines/ directory. Use when you need language-specific guidance, naming conventions, or TDD workflow details.",
+				"description": "Read detailed coding guidelines from ~/.gptcode/guidelines/ directory. Use when you need language-specific guidance, naming conventions, or TDD workflow details.",
 				"parameters": map[string]interface{}{
 					"type": "object",
 					"properties": map[string]interface{}{
@@ -388,7 +388,7 @@ func readGuideline(call ToolCall) ToolResult {
 		return ToolResult{Tool: "read_guideline", Error: fmt.Sprintf("could not get home dir: %v", err)}
 	}
 
-	guidelinePath := filepath.Join(home, ".chuchu", "guidelines", guideline+".md")
+	guidelinePath := filepath.Join(home, ".gptcode", "guidelines", guideline+".md")
 	content, err := os.ReadFile(guidelinePath)
 	if err != nil {
 		return ToolResult{Tool: "read_guideline", Error: fmt.Sprintf("could not read guideline: %v", err)}

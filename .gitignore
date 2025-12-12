@@ -34,14 +34,14 @@ bin/
 *.swp
 *.swo
 *~
-chuchu.*
+gptcode.*
 
 # OS
 .DS_Store
 Thumbs.db
 
 # User config (should stay local)
-.chuchu/
+.gptcode/
 
 # Temporary planning documents (evolving practices)
 # docs/plans/

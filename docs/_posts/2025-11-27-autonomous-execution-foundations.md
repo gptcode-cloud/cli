@@ -9,7 +9,7 @@ tags: [features, architecture, autonomous, validation, telemetry]
 
 # Preparing for Autonomous Execution: File Validation, Telemetry & Intelligence
 
-Today we're announcing a set of foundational improvements that bring chuchu closer to **autonomous execution**—the ability to run implementation tasks automatically when repository issues are created, with built-in validation, telemetry, and intelligent model selection.
+Today we're announcing a set of foundational improvements that bring gptcode closer to **autonomous execution**—the ability to run implementation tasks automatically when repository issues are created, with built-in validation, telemetry, and intelligent model selection.
 
 ## The Vision
 
@@ -20,7 +20,7 @@ Title: Add user authentication
 Description: Implement JWT-based authentication with refresh tokens
 ```
 
-And having chuchu:
+And having gptcode:
 1. Automatically detect the new issue
 2. Create an implementation plan
 3. Execute the plan with file validation
@@ -312,7 +312,7 @@ on:
     types: [opened]
     
 jobs:
-  chuchu-auto:
+  gptcode-auto:
     runs-on: ubuntu-latest
     steps:
       - run: chu auto --from-issue ${{ github.event.issue.number }}
@@ -362,7 +362,7 @@ chu verify plan.md
 Create a plan with specific files:
 ```bash
 chu plan "add logout endpoint"
-chu implement ~/.chuchu/plans/2025-11-27-logout.md
+chu implement ~/.gptcode/plans/2025-11-27-logout.md
 ```
 
 The editor will only modify files mentioned in the plan.
@@ -379,7 +379,7 @@ Look for step events in stderr.
 ### 3. Explore the Catalog
 
 ```go
-import "chuchu/internal/intelligence"
+import "gptcode/internal/intelligence"
 
 catalog := intelligence.NewModelCatalog()
 for key, info := range catalog.Models {
@@ -403,7 +403,7 @@ We're building autonomous execution **with** the community. We'd love to hear:
 - Should we prioritize GitHub integration or local improvements first?
 - What telemetry data would be most valuable?
 
-Join the discussion on [GitHub](https://github.com/jadercorrea/chuchu/discussions).
+Join the discussion on [GitHub](https://github.com/jadercorrea/gptcode/discussions).
 
 ---
 

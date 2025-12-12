@@ -3,7 +3,7 @@ layout: post
 title: "ML-Powered Intelligence: 500x Faster, 92% Cheaper"
 date: 2025-11-22
 author: Jader Correa
-description: "Embedded ML models in Chuchu enable instant intent classification and complexity detection with zero API costs. 92% cheaper than commercial copilots."
+description: "Embedded ML models in GPTCode enable instant intent classification and complexity detection with zero API costs. 92% cheaper than commercial copilots."
 tags: [machine-learning, performance, cost-optimization]
 ---
 
@@ -11,9 +11,9 @@ tags: [machine-learning, performance, cost-optimization]
 
 *November 22, 2025*
 
-Today we're announcing embedded machine learning in Chuchu. Two lightweight ML models now power instant decision-making with zero external dependencies and zero API costs.
+Today we're announcing embedded machine learning in GPTCode. Two lightweight ML models now power instant decision-making with zero external dependencies and zero API costs.
 
-**The bigger picture**: Commercial AI copilots charge $20-30/month per user or **$200 per 50K requests** ($4,000/1M requests). Chuchu with Groq costs **~$316/1M requests** (92% cheaper) or **$0 with Ollama**. ML routing is one piece of how we achieve this.
+**The bigger picture**: Commercial AI copilots charge $20-30/month per user or **$200 per 50K requests** ($4,000/1M requests). GPTCode with Groq costs **~$316/1M requests** (92% cheaper) or **$0 with Ollama**. ML routing is one piece of how we achieve this.
 
 ## The Problem with LLM-Only Routing
 
@@ -28,7 +28,7 @@ For simple decisions like "is this a query or an edit?", calling a 70B parameter
 
 ## The Solution: Hybrid ML + LLM
 
-Chuchu now embeds two ML models that run locally in pure Go:
+GPTCode now embeds two ML models that run locally in pure Go:
 
 ### 1. Intent Classifier
 
@@ -155,7 +155,7 @@ chu ml train complexity
 
 Training data is in `ml/{model}/data/training_data.csv` - add your own examples and retrain to customize the models for your workflow.
 
-## Total Cost: Chuchu vs Commercial Copilos
+## Total Cost: GPTCode vs Commercial Copilos
 
 Let's compare **total costs** (routing + actual work) for 1M coding requests:
 
@@ -166,7 +166,7 @@ Let's compare **total costs** (routing + actual work) for 1M coding requests:
 - Or: **$200 per 50K requests** for API access
 - **1M requests = $4,000**
 
-### Chuchu with Groq (Recommended Budget Setup)
+### GPTCode with Groq (Recommended Budget Setup)
 
 **Configuration:**
 - Router: llama-3.1-8b-instant (ML handles 80%, LLM 20%)
@@ -197,7 +197,7 @@ Research agent (200K requests):
 
 **Savings: $3,684 (92% cheaper)**
 
-### Chuchu with Ollama (Zero Cost)
+### GPTCode with Ollama (Zero Cost)
 
 **Configuration:**
 - All agents: qwen2.5-coder:32b (local)
@@ -212,8 +212,8 @@ Electricity: ~$5-10/month for 24/7 usage
 ML routing saves **$5 on routing** per 1M requests, but that's not the story.
 
 The story is:
-- **Chuchu with Groq: $316/1M requests** (92% cheaper than commercial)
-- **Chuchu with Ollama: $0/1M requests** (100% cheaper)
+- **GPTCode with Groq: $316/1M requests** (92% cheaper than commercial)
+- **GPTCode with Ollama: $0/1M requests** (100% cheaper)
 - **Commercial copilos: $4,000/1M requests**
 
 > ML routing is just one piece. The real savings come from using affordable/free models with multi-agent architecture.
@@ -309,7 +309,7 @@ For performance benchmarks and ROI analysis, check the full metrics in the docs.
 
 ## Try It Now
 
-The ML models are embedded in Chuchu by default - no setup required. They "just work."
+The ML models are embedded in GPTCode by default - no setup required. They "just work."
 
 Want to see them in action?
 
@@ -357,7 +357,7 @@ But the foundation is here today: fast, cheap, accurate routing powered by embed
 
 ---
 
-*Have questions about the ML system? Check out the [full documentation](../ml-features) or ask in [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)!*
+*Have questions about the ML system? Check out the [full documentation](../ml-features) or ask in [GitHub Discussions](https://github.com/jadercorrea/gptcode/discussions)!*
 
 ## References
 

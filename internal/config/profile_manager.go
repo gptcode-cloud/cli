@@ -14,7 +14,7 @@ func getSetupPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(home, ".chuchu", "setup.yaml"), nil
+	return filepath.Join(home, ".gptcode", "setup.yaml"), nil
 }
 
 type BackendProfile struct {

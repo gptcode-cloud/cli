@@ -4,8 +4,8 @@ import (
 	"context"
 	"testing"
 
-	"chuchu/internal/agents"
-	"chuchu/internal/llm"
+	"gptcode/internal/agents"
+	"gptcode/internal/llm"
 )
 
 // Integration test for full Symphony execution

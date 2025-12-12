@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"chuchu/internal/config"
-	"chuchu/internal/llm"
+	"gptcode/internal/config"
+	"gptcode/internal/llm"
 	"github.com/spf13/cobra"
 )
 

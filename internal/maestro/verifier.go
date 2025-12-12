@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"chuchu/internal/langdetect"
+	"gptcode/internal/langdetect"
 )
 
 type VerificationResult struct {

@@ -21,7 +21,7 @@ type Cache struct {
 
 func NewCache() *Cache {
 	home, _ := os.UserHomeDir()
-	cacheDir := filepath.Join(home, ".chuchu", "cache")
+	cacheDir := filepath.Join(home, ".gptcode", "cache")
 	_ = os.MkdirAll(cacheDir, 0755)
 	return &Cache{cacheDir: cacheDir}
 }

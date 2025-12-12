@@ -1,6 +1,6 @@
-# Contributing to Chuchu
+# Contributing to GPTCode
 
-Thank you for considering contributing to Chuchu! This document provides guidelines and information for contributors.
+Thank you for considering contributing to GPTCode! This document provides guidelines and information for contributors.
 
 ## Code of Conduct
 
@@ -11,21 +11,21 @@ Please be respectful, inclusive, and constructive in all interactions. We're bui
 ### Reporting Bugs
 
 Before creating a bug report:
-1. Check [existing issues](https://github.com/jadercorrea/chuchu/issues)
-2. Use the latest version of Chuchu
+1. Check [existing issues](https://github.com/jadercorrea/gptcode/issues)
+2. Use the latest version of GPTCode
 
 When reporting:
 - Use a clear, descriptive title
 - Describe exact steps to reproduce
 - Include your OS, Go version, Neovim version
-- Include relevant config files (`~/.chuchu/setup.yaml`)
+- Include relevant config files (`~/.gptcode/setup.yaml`)
 - Paste error messages and logs
 
 ### Suggesting Features
 
 We love feature ideas! Before suggesting:
-1. Check [Discussions](https://github.com/jadercorrea/chuchu/discussions) for similar ideas
-2. Consider if it aligns with Chuchu's goals (affordable, TDD-first, terminal-native)
+1. Check [Discussions](https://github.com/jadercorrea/gptcode/discussions) for similar ideas
+2. Consider if it aligns with GPTCode's goals (affordable, TDD-first, terminal-native)
 
 When suggesting:
 - Use a clear, descriptive title
@@ -37,8 +37,8 @@ When suggesting:
 
 1. **Fork and clone**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/chuchu
-   cd chuchu
+   git clone https://github.com/YOUR_USERNAME/gptcode
+   cd gptcode
    ```
 
 2. **Create a branch**
@@ -82,7 +82,7 @@ When suggesting:
 ### Project Structure
 
 ```
-chuchu/
+gptcode/
 ├── cmd/chu/              # CLI entry point
 ├── internal/
 │   ├── config/           # Configuration loading
@@ -92,7 +92,7 @@ chuchu/
 │   ├── agents/           # Router, Query, Editor, Research agents
 │   └── tools/            # Tool implementations (read_file, etc)
 ├── neovim/               # Neovim plugin (Lua)
-│   └── lua/chuchu/
+│   └── lua/gptcode/
 └── docs/                 # Documentation and blog
 ```
 
@@ -184,7 +184,7 @@ fix stuff
 
 ## Questions?
 
-- Ask in [Discussions](https://github.com/jadercorrea/chuchu/discussions)
+- Ask in [Discussions](https://github.com/jadercorrea/gptcode/discussions)
 - Tag issues with `question` label
 - Reach out to maintainers
 

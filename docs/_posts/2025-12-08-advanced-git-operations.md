@@ -3,13 +3,13 @@ layout: post
 title: "Advanced Git Operations: Achieving 100% Autonomy with AI-Powered Git"
 date: 2025-12-08
 author: Jader Correa
-description: "Chuchu now handles advanced Git operations autonomously: bisect for bug hunting, cherry-pick and rebase with conflict resolution, squash with AI-generated messages, reword for commit improvements, and intelligent merge conflict resolution."
+description: "GPTCode now handles advanced Git operations autonomously: bisect for bug hunting, cherry-pick and rebase with conflict resolution, squash with AI-generated messages, reword for commit improvements, and intelligent merge conflict resolution."
 tags: [features, git, autonomy, milestone, conflict-resolution]
 ---
 
 # Advanced Git Operations: Achieving 100% Autonomy with AI-Powered Git
 
-Today marks a significant milestone: **chuchu achieves 100% autonomy (64/64 scenarios)** by mastering the most challenging Git operations that previously required human intervention.
+Today marks a significant milestone: **gptcode achieves 100% autonomy (64/64 scenarios)** by mastering the most challenging Git operations that previously required human intervention.
 
 ## The Challenge: Git's Complex Operations
 
@@ -302,7 +302,7 @@ ALTER TABLE users ALTER COLUMN email SET NOT NULL;
 All Git operations respect your LLM provider settings:
 
 ```yaml
-# ~/.chuchu/config.yaml
+# ~/.gptcode/config.yaml
 mode: cloud  # or local
 
 # Git operations use the same intelligent model selection
@@ -315,7 +315,7 @@ mode: cloud  # or local
 
 ## Real-World Impact: 100% Autonomy
 
-With these Git operations, chuchu now handles **all 64 autonomy scenarios**:
+With these Git operations, gptcode now handles **all 64 autonomy scenarios**:
 
 | Capability | Scenarios | Status |
 |-----------|-----------|--------|
@@ -492,14 +492,14 @@ chu upgrade
 
 Or install for the first time:
 ```bash
-go install github.com/chuchu-ai/chuchu@latest
+go install github.com/gptcode-ai/gptcode@latest
 ```
 
 Full documentation: [Git Operations Guide](/docs/guides/git-operations.html)
 
 ## Summary
 
-With advanced Git operations, chuchu achieves **100% autonomy across 64 real-world scenarios**:
+With advanced Git operations, gptcode achieves **100% autonomy across 64 real-world scenarios**:
 
 ✅ Automated bug hunting with `git bisect`  
 ✅ Intelligent conflict resolution for merge/rebase/cherry-pick  
@@ -514,4 +514,4 @@ The AI coding assistant that was already helping you write code can now handle t
 
 ---
 
-*Questions or feedback? Open an issue on [GitHub](https://github.com/chuchu-ai/chuchu) or join our [Discord](https://discord.gg/chuchu).*
+*Questions or feedback? Open an issue on [GitHub](https://github.com/gptcode-ai/gptcode) or join our [Discord](https://discord.gg/gptcode).*

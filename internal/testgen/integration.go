@@ -10,8 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"chuchu/internal/langdetect"
-	"chuchu/internal/llm"
+	"gptcode/internal/langdetect"
+	"gptcode/internal/llm"
 )
 
 type IntegrationTestGenerator struct {

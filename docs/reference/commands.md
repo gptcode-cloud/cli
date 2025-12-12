@@ -1,6 +1,6 @@
 ---
 title: Commands Reference
-description: Complete reference for all Chuchu CLI commands
+description: Complete reference for all GPTCode CLI commands
 ---
 
 # Commands Reference
@@ -142,16 +142,16 @@ chu do "optimize database queries" --interactive
 
 ### `chu setup`
 
-Initialize Chuchu configuration at `~/.chuchu`.
+Initialize GPTCode configuration at `~/.gptcode`.
 
 ```bash
 chu setup
 ```
 
 Creates:
-- `~/.chuchu/profile.yaml` – backend and model configuration
-- `~/.chuchu/system_prompt.md` – base system prompt
-- `~/.chuchu/memories.jsonl` – memory store for examples
+- `~/.gptcode/profile.yaml` – backend and model configuration
+- `~/.gptcode/system_prompt.md` – base system prompt
+- `~/.gptcode/memories.jsonl` – memory store for examples
 
 ### `chu key [backend]`
 
@@ -234,14 +234,14 @@ Generates:
 - Problem statement
 - Current state analysis
 - Proposed changes with phases
-- Saved to `~/.chuchu/plans/`
+- Saved to `~/.gptcode/plans/`
 
 ### `chu implement <plan_file>`
 
 Execute an approved plan phase-by-phase with verification.
 
 ```bash
-chu implement ~/.chuchu/plans/2025-01-15-add-auth.md
+chu implement ~/.gptcode/plans/2025-01-15-add-auth.md
 ```
 
 Each phase:
@@ -750,10 +750,10 @@ Shows:
 
 ## Configuration
 
-All configuration lives in `~/.chuchu/`:
+All configuration lives in `~/.gptcode/`:
 
 ```
-~/.chuchu/
+~/.gptcode/
 ├── profile.yaml          # Backend and model settings
 ├── system_prompt.md      # Base system prompt
 ├── memories.jsonl        # Example memory store

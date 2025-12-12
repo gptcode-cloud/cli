@@ -235,7 +235,7 @@ func TestGraphBuilderAndOptimizer(t *testing.T) {
 	defer os.RemoveAll(tmpDir)
 
 	// Create go.mod for proper import resolution
-	goMod := `module chuchu
+	goMod := `module gptcode
 go 1.22
 `
 	os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(goMod), 0644)
@@ -249,13 +249,13 @@ go 1.22
 		"main.go": `package main
 import (
 	"fmt"
-	"chuchu/utils"
+	"gptcode/utils"
 )
 func main() { utils.Help() }`,
 		"utils/helper.go": `package utils
 func Help() {}`,
 		"auth/login.go": `package auth
-import "chuchu/utils"
+import "gptcode/utils"
 func Login() { utils.Help() }`,
 	}
 

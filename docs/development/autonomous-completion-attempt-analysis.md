@@ -203,12 +203,12 @@ Em vez de reimplementar:
 - **Git operations:** `gh` CLI, `git` commands
 - **Docs:** `godoc`, `swag` para APIs
 
-Chuchu orquestra ferramentas existentes via LLM.
+GPTCode orquestra ferramentas existentes via LLM.
 
 ### Opção C: Modo híbrido
 - LLM para planejamento e decisões
 - Ferramentas especializadas para execução
-- Chuchu como orquestrador inteligente
+- GPTCode como orquestrador inteligente
 
 **Exemplo:** Test Generation
 ```

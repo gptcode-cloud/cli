@@ -11,7 +11,7 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"chuchu/internal/config"
+	"gptcode/internal/config"
 )
 
 var modeCmd = &cobra.Command{
@@ -80,7 +80,7 @@ Examples:
 			return err
 		}
 
-		usagePath := filepath.Join(home, ".chuchu", "usage.json")
+		usagePath := filepath.Join(home, ".gptcode", "usage.json")
 		data, err := os.ReadFile(usagePath)
 		if err != nil {
 			if os.IsNotExist(err) {

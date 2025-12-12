@@ -7,9 +7,9 @@ import (
 	"os"
 	"strings"
 
-	"chuchu/internal/config"
-	"chuchu/internal/llm"
-	"chuchu/internal/maestro"
+	"gptcode/internal/config"
+	"gptcode/internal/llm"
+	"gptcode/internal/maestro"
 
 	"github.com/spf13/cobra"
 )

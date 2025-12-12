@@ -6,8 +6,8 @@ import (
 	"os"
 	"strings"
 
-	"chuchu/internal/llm"
-	"chuchu/internal/tools"
+	"gptcode/internal/llm"
+	"gptcode/internal/tools"
 )
 
 type ReviewerAgent struct {

@@ -9,7 +9,7 @@ tags: [dx, feedback, learning]
 
 # Learn from Any CLI: Two‑Keystroke Feedback (Ctrl+g)
 
-With two keystrokes you turn everyday corrections into continuous learning for Chuchu.
+With two keystrokes you turn everyday corrections into continuous learning for GPTCode.
 
 ## How it works
 - Press **Ctrl+g** to mark the suggestion on the terminal line
@@ -53,7 +53,7 @@ No API integration required. Let users press **Ctrl+g** before running.
 ## Advanced
 - Manual/programmatic submissions: `chu feedback submit --json -`
 - Attach files: `--files path --files another`
-- Capture patch: `--capture-diff` (saved under `~/.chuchu/diffs/*.patch`)
+- Capture patch: `--capture-diff` (saved under `~/.gptcode/diffs/*.patch`)
 
 ## References
 - Guia: [Universal Feedback Capture](../guides/feedback)

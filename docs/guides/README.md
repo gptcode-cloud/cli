@@ -1,4 +1,4 @@
-# Chuchu Documentation Structure
+# GPTCode Documentation Structure
 
 ## Organization
 
@@ -9,7 +9,7 @@ Time-stamped articles with opinions, announcements, and tutorials in context.
 - Dated content (YYYY-MM-DD prefix)
 - Reflects state at time of writing
 - May include opinions, comparisons, and motivations
-- Examples: "Why Chuchu", "Groq Optimal Configs"
+- Examples: "Why GPTCode", "Groq Optimal Configs"
 
 **Purpose:** Tell the story, provide context, share experiences
 

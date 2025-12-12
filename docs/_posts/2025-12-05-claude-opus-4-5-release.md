@@ -3,7 +3,7 @@ layout: post
 title: "Claude Opus 4.5: 80.9% SWEBench Verified, 66% OSWorld, 50% Fewer Tokens Than Sonnet"
 date: 2025-12-05
 author: Jader Correa
-description: "Anthropic released Claude Opus 4.5 with 80.9% SWEBench Verified, 66% OSWorld, and 50% fewer tokens than Sonnet. Here's what it means for Chuchu users."
+description: "Anthropic released Claude Opus 4.5 with 80.9% SWEBench Verified, 66% OSWorld, and 50% fewer tokens than Sonnet. Here's what it means for GPTCode users."
 tags: [news, models, anthropic, benchmarks]
 ---
 
@@ -11,7 +11,7 @@ tags: [news, models, anthropic, benchmarks]
 
 Anthropic just dropped Claude Opus 4.5, and the numbers are impressive: 80.9% on [SWEBench Verified](https://www.swebench.com/), 66% on [OSWorld](https://os-world.org/), and a 15% gain over Sonnet on [TerminalBench](https://terminalbench.com/). This comes days after OpenAI's GPT-5.1 and Google's Gemini 3 releases.
 
-For Chuchu users, this means another powerful option in our [model-agnostic architecture]({% post_url 2025-12-02-intelligent-model-selection %}). Let's break down what matters.
+For GPTCode users, this means another powerful option in our [model-agnostic architecture]({% post_url 2025-12-02-intelligent-model-selection %}). Let's break down what matters.
 
 ## Problem (with metrics)
 
@@ -132,10 +132,10 @@ Real-world refactor (Simon Willis case): Same velocity as Sonnet post-preview (4
 
 ---
 
-*Have questions about Claude Opus 4.5 or model selection? Join our [GitHub Discussions](https://github.com/jadercorrea/chuchu/discussions)*
+*Have questions about Claude Opus 4.5 or model selection? Join our [GitHub Discussions](https://github.com/jadercorrea/gptcode/discussions)*
 
 ## See Also
 
-- [Intelligent Model Selection](2025-12-02-intelligent-model-selection) - How Chuchu chooses models
+- [Intelligent Model Selection](2025-12-02-intelligent-model-selection) - How GPTCode chooses models
 - [OpenRouter Multi-Provider](2025-11-16-openrouter-multi-provider) - Access to 200+ models
-- [Why Chuchu?](2025-11-13-why-chuchu) - Model flexibility and affordability
+- [Why GPTCode?](2025-11-13-why-gptcode) - Model flexibility and affordability

@@ -1,10 +1,10 @@
 # Complete Workflow Guide: From Idea to Implementation
 
-This guide shows you how to use Chuchu's complete workflow: **research → plan → implement**.
+This guide shows you how to use GPTCode's complete workflow: **research → plan → implement**.
 
 ## Overview
 
-Chuchu helps you implement features through a structured, AI-assisted process:
+GPTCode helps you implement features through a structured, AI-assisted process:
 
 1. **Research** - Understand your codebase and gather context
 2. **Plan** - Create a detailed implementation plan
@@ -31,11 +31,11 @@ chu research "How does user authentication work in this codebase?"
 - Semantic search finds relevant files
 - Reads and analyzes code structure
 - Can search web for best practices
-- Creates a research document in `~/.chuchu/research/`
+- Creates a research document in `~/.gptcode/research/`
 
 **Output:**
 ```
-Research saved to: ~/.chuchu/research/2025-01-23-authentication-research.md
+Research saved to: ~/.gptcode/research/2025-01-23-authentication-research.md
 
 Key findings:
 - Authentication uses JWT tokens
@@ -66,11 +66,11 @@ chu plan "Add OAuth2 support to authentication"
 - Analyzes current codebase
 - Creates step-by-step implementation plan
 - Breaks down into phases with clear goals
-- Saves to `~/.chuchu/plans/`
+- Saves to `~/.gptcode/plans/`
 
 **Output:**
 ```
-Plan saved to: ~/.chuchu/plans/2025-01-23-oauth2-support.md
+Plan saved to: ~/.gptcode/plans/2025-01-23-oauth2-support.md
 
 Plan overview:
 1. Add OAuth2 library dependency
@@ -95,7 +95,7 @@ Execute your plan - choose between interactive or autonomous mode.
 
 **Usage:**
 ```bash
-chu implement ~/.chuchu/plans/2025-01-23-oauth2-support.md
+chu implement ~/.gptcode/plans/2025-01-23-oauth2-support.md
 ```
 
 **What happens:**
@@ -142,7 +142,7 @@ Continue anyway? [y/N]: n
 
 **Usage:**
 ```bash
-chu implement ~/.chuchu/plans/2025-01-23-oauth2-support.md --auto
+chu implement ~/.gptcode/plans/2025-01-23-oauth2-support.md --auto
 ```
 
 **What happens:**
@@ -204,7 +204,7 @@ Review the generated research document to understand:
 chu plan "Add password reset feature with email verification"
 ```
 
-Review the generated plan at `~/.chuchu/plans/2025-01-23-password-reset.md`:
+Review the generated plan at `~/.gptcode/plans/2025-01-23-password-reset.md`:
 
 ```markdown
 # Password Reset Feature Plan
@@ -232,7 +232,7 @@ Review the generated plan at `~/.chuchu/plans/2025-01-23-password-reset.md`:
 ### 3. Implement interactively (first time)
 
 ```bash
-chu implement ~/.chuchu/plans/2025-01-23-password-reset.md
+chu implement ~/.gptcode/plans/2025-01-23-password-reset.md
 ```
 
 Walk through each phase, reviewing and confirming:
@@ -245,10 +245,10 @@ Walk through each phase, reviewing and confirming:
 After reviewing and adjusting the plan:
 
 ```bash
-chu implement ~/.chuchu/plans/2025-01-23-password-reset.md --auto --lint
+chu implement ~/.gptcode/plans/2025-01-23-password-reset.md --auto --lint
 ```
 
-Let Chuchu:
+Let GPTCode:
 - Execute all phases
 - Verify each step
 - Handle errors automatically
@@ -287,7 +287,7 @@ All modes work from Neovim:
 > plan: Add password reset feature
 
 " Implement autonomously
-:ChuchuAuto
+:GPTCodeAuto
 " Or: <leader>ca
 " Prompts for plan file, runs: chu implement <file> --auto
 ```
@@ -362,6 +362,6 @@ Implementation works for any language (uses LLM), but verification is language-s
 5. Review results and iterate
 
 **See also:**
-- [Model Configuration Guide](https://jadercorrea.github.io/chuchu/blog/2025-11-18-groq-optimal-configs)
-- [Cost Optimization Tips](https://jadercorrea.github.io/chuchu/blog/2024-11-22-cost-tracking-optimization)
+- [Model Configuration Guide](https://jadercorrea.github.io/gptcode/blog/2025-11-18-groq-optimal-configs)
+- [Cost Optimization Tips](https://jadercorrea.github.io/gptcode/blog/2024-11-22-cost-tracking-optimization)
 - [Examples: docs/examples/](../examples/)

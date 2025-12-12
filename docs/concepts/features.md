@@ -1,7 +1,7 @@
 ---
 layout: default
 title: Features
-description: Complete feature set of Chuchu AI coding assistant
+description: Complete feature set of GPTCode AI coding assistant
 ---
 
 # Features

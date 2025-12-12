@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
-# Chuchu E2E Test Suite
+# GPTCode E2E Test Suite
 #
-# Runs realistic scenarios testing Chuchu commands in real-world use cases.
+# Runs realistic scenarios testing GPTCode commands in real-world use cases.
 # Each scenario represents actual user workflows (DevOps, CI/CD, development).
 
 set -euo pipefail
@@ -12,7 +12,7 @@ E2E_DIR="$SCRIPT_DIR/e2e"
 
 source "$E2E_DIR/lib/helpers.sh"
 
-echo " Chuchu E2E Test Suite"
+echo " GPTCode E2E Test Suite"
 echo "============================"
 echo ""
 

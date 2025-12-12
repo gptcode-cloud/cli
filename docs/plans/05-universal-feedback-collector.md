@@ -1,15 +1,15 @@
 # Universal Feedback Collector
 
 **Priority**: 5 (Nice to have)  
-**Status**: Partially implemented (Chuchu-only feedback exists)  
-**Goal**: Capture feedback from ANY CLI (Gemini, Warp, Claude, etc.), not just Chuchu
+**Status**: Partially implemented (GPTCode-only feedback exists)  
+**Goal**: Capture feedback from ANY CLI (Gemini, Warp, Claude, etc.), not just GPTCode
 
 ## Current State
 
 ✅ **What exists:**
-- `chu feedback submit` - Submit feedback to Chuchu
+- `chu feedback submit` - Submit feedback to GPTCode
 - `chu feedback hook install` - Shell hooks for Ctrl+g → mark suggestion
-- Feedback collection works for Chuchu's own outputs
+- Feedback collection works for GPTCode's own outputs
 - ML training pipeline consumes feedback
 
 ❌ **What's missing:**
@@ -28,7 +28,7 @@ Users interact with MANY AI coding assistants:
 
 **Current limitation**: Feedback only works for `chu` commands. If user gets bad suggestion from Warp AI or Gemini, that learning is lost.
 
-**Vision**: Capture corrections from ANY AI tool → Feed into Chuchu's ML training
+**Vision**: Capture corrections from ANY AI tool → Feed into GPTCode's ML training
 
 ## Proposed Solution
 
@@ -49,7 +49,7 @@ $ warp-ai "install docker"
 > sudo apt install docker  # Wrong for macOS
 <Ctrl+g>  # Marks this
 $ brew install docker  # Corrected
-# ✅ Feedback captured to Chuchu
+# ✅ Feedback captured to GPTCode
 ```
 
 **Implementation:**
@@ -123,8 +123,8 @@ function universal_feedback_mark() {
   # Detect source CLI from command history
   local source_cli=$(detect_source_from_history)  # warp-ai, gemini, etc.
   
-  echo "$current_line" > ~/.chuchu/feedback/pending_wrong
-  echo "$source_cli" > ~/.chuchu/feedback/pending_source
+  echo "$current_line" > ~/.gptcode/feedback/pending_wrong
+  echo "$source_cli" > ~/.gptcode/feedback/pending_source
 }
 
 bind \cg universal_feedback_mark  # Ctrl+g
@@ -152,7 +152,7 @@ chu feedback config --universal=false
 
 **Data handling:**
 - Only command text + corrections (no secrets)
-- Local storage first (`~/.chuchu/feedback/`)
+- Local storage first (`~/.gptcode/feedback/`)
 - User reviews before submission (optional)
 - Clear privacy policy
 
@@ -192,7 +192,7 @@ chu feedback config --universal=false
 
 ## Benefits
 
-1. **More training data**: Learn from ALL AI interactions, not just Chuchu
+1. **More training data**: Learn from ALL AI interactions, not just GPTCode
 2. **Competitive intelligence**: See where others fail
 3. **Faster improvement**: More corrections = better models
 4. **Unique feature**: No other AI tool does this
@@ -202,16 +202,16 @@ chu feedback config --universal=false
 - **Privacy concerns**: Must be transparent about data collection
 - **Complexity**: Detecting external CLIs is heuristic-based
 - **Browser security**: Extensions need careful review
-- **Marginal value**: Most corrections might be Chuchu-specific anyway
+- **Marginal value**: Most corrections might be GPTCode-specific anyway
 
 ## Priority Rationale
 
 **Why Priority 5 (Nice to have)?**
-- Current feedback system works well for Chuchu
-- Most users primarily use Chuchu (not other tools)
+- Current feedback system works well for GPTCode
+- Most users primarily use GPTCode (not other tools)
 - Implementation complexity high (shell detection, browser extensions)
 - Privacy/security considerations significant
-- Better to focus on improving Chuchu quality first
+- Better to focus on improving GPTCode quality first
 
 **When to prioritize:**
 - After user-friendly commands (P1)

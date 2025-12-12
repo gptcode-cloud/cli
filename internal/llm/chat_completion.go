@@ -3,7 +3,7 @@ package llm
 import (
 	"bufio"
 	"bytes"
-	"chuchu/internal/config"
+	"gptcode/internal/config"
 	"context"
 	"encoding/json"
 	"errors"

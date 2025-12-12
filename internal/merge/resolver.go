@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"chuchu/internal/llm"
+	"gptcode/internal/llm"
 )
 
 type ConflictFile struct {
