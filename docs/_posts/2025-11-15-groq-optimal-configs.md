@@ -34,7 +34,7 @@ This means **output price is 5x more important** than input price for editors.
 
 ## Budget Profile: Cost-Effective Configuration
 
-Use: `chu profile use groq.budget`
+Use: `gptcode profile use groq.budget`
 
 ```yaml
 backend:
@@ -84,7 +84,7 @@ backend:
 
 ## Performance Profile: Quality-First Configuration
 
-Use: `chu profile use groq.performance`
+Use: `gptcode profile use groq.performance`
 
 ```yaml
 backend:
@@ -213,13 +213,13 @@ Real pricing from Groq API (verified Nov 2025):
 
 ```bash
 # Budget profile ($2-5/month)
-chu profile use groq.budget
+gptcode profile use groq.budget
 
 # Performance profile ($10-20/month)
-chu profile use groq.performance
+gptcode profile use groq.performance
 
 # Verify current profile
-chu profile
+gptcode profile
 ```
 
 ### Option 2: Configure Manually
@@ -313,8 +313,8 @@ chu model list groq
 
 ### Check Current Configuration
 ```bash
-chu profile                    # Show current backend and profile
-chu profile show groq.budget   # Show specific profile details
+gptcode profile                    # Show current backend and profile
+gptcode profile show groq.budget   # Show specific profile details
 ```
 
 ### Monitor Usage

@@ -1,6 +1,6 @@
 # Simple Plan Example
 
-This is a minimal plan to demonstrate `chu implement` with interactive and autonomous modes.
+This is a minimal plan to demonstrate `gptcode implement` with interactive and autonomous modes.
 
 ## Add utility function
 
@@ -30,7 +30,7 @@ Create tests for the Add function.
 
 **Interactive mode (default):**
 ```bash
-chu implement docs/examples/simple-plan.md
+gptcode implement docs/examples/simple-plan.md
 ```
 - Prompts before each step
 - Shows step content
@@ -39,7 +39,7 @@ chu implement docs/examples/simple-plan.md
 
 **Autonomous mode:**
 ```bash
-chu implement docs/examples/simple-plan.md --auto
+gptcode implement docs/examples/simple-plan.md --auto
 ```
 - Executes all steps automatically
 - Verifies with build + tests after each step
@@ -49,10 +49,10 @@ chu implement docs/examples/simple-plan.md --auto
 
 **With lint:**
 ```bash
-chu implement docs/examples/simple-plan.md --auto --lint
+gptcode implement docs/examples/simple-plan.md --auto --lint
 ```
 
 **Resume from checkpoint:**
 ```bash
-chu implement docs/examples/simple-plan.md --auto --resume
+gptcode implement docs/examples/simple-plan.md --auto --resume
 ```

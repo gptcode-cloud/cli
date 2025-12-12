@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 ### Workflow
 ```bash
-chu research "how does authentication work"
+gptcode research "how does authentication work"
 ```
 
 1. **Context gathering**: Reads mentioned files fully
@@ -150,7 +150,7 @@ Authentication is handled in internal/auth/:
 
 ### Workflow
 ```bash
-chu plan "add JWT authentication"
+gptcode plan "add JWT authentication"
 ```
 
 1. **Initial research**: Gathers context about current state
@@ -313,16 +313,16 @@ compare bcrypt vs argon2 for passwords
 **Example:**
 ```bash
 # Understanding (Query)
-chu chat "how does the current auth work"
+gptcode chat "how does the current auth work"
 
 # Research external approaches (Research)
-chu research "JWT best practices"
+gptcode research "JWT best practices"
 
 # Planning (Plan)
-chu plan "add JWT authentication"
+gptcode plan "add JWT authentication"
 
 # Implementation (Editor)
-chu implement plan.md
+gptcode implement plan.md
 ```
 
 ### Iterative Refinement
@@ -330,13 +330,13 @@ chu implement plan.md
 Start broad, then narrow:
 ```bash
 # 1. High-level understanding
-chu research "authentication system"
+gptcode research "authentication system"
 
 # 2. Specific area
-chu chat "show me the token validation logic"
+gptcode chat "show me the token validation logic"
 
 # 3. Targeted change
-chu chat "add refresh token support to the existing JWT validation"
+gptcode chat "add refresh token support to the existing JWT validation"
 ```
 
 ---
@@ -348,13 +348,13 @@ chu chat "add refresh token support to the existing JWT validation"
 For new features:
 ```bash
 # 1. Understand current state
-chu research "current user management system"
+gptcode research "current user management system"
 
 # 2. Create detailed plan
-chu plan "add role-based permissions"
+gptcode plan "add role-based permissions"
 
 # 3. Execute plan
-chu implement permissions-plan.md
+gptcode implement permissions-plan.md
 ```
 
 ### Pattern: Query → Edit → Verify
@@ -362,13 +362,13 @@ chu implement permissions-plan.md
 For bug fixes:
 ```bash
 # 1. Find the bug
-chu chat "trace the login flow to find where session expires"
+gptcode chat "trace the login flow to find where session expires"
 
 # 2. Fix it
-chu chat "fix session expiry in auth/session.go"
+gptcode chat "fix session expiry in auth/session.go"
 
 # 3. Verify
-chu chat "write tests for session expiry edge cases"
+gptcode chat "write tests for session expiry edge cases"
 ```
 
 ### Pattern: Research → Compare → Decide
@@ -376,13 +376,13 @@ chu chat "write tests for session expiry edge cases"
 For architectural decisions:
 ```bash
 # 1. Research options
-chu research "authentication libraries in Go"
+gptcode research "authentication libraries in Go"
 
 # 2. Compare approaches
-chu research "JWT vs session-based auth pros/cons"
+gptcode research "JWT vs session-based auth pros/cons"
 
 # 3. Make informed decision
-chu plan "implement JWT authentication using github.com/golang-jwt"
+gptcode plan "implement JWT authentication using github.com/golang-jwt"
 ```
 
 ---
@@ -425,8 +425,8 @@ backend:
 
 ### Wrong agent selected
 - ML classifier has 89% accuracy, uses LLM fallback
-- Adjust threshold: `chu config set defaults.ml_intent_threshold 0.8`
-- Or specify explicitly: `chu chat --agent query "your question"`
+- Adjust threshold: `gptcode config set defaults.ml_intent_threshold 0.8`
+- Or specify explicitly: `gptcode chat --agent query "your question"`
 
 ---
 

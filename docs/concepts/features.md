@@ -8,7 +8,7 @@ description: Complete feature set of GPTCode AI coding assistant
 
 ## Agent-Based Architecture
 
-### Autonomous Execution with `chu do`
+### Autonomous Execution with `gptcode do`
 
 The flagship command that orchestrates 4 specialized agents working in sequence:
 
@@ -19,9 +19,9 @@ The flagship command that orchestrates 4 specialized agents working in sequence:
 
 **Usage:**
 ```bash
-chu do "add JWT authentication"
-chu do "fix bug in payment processing" --supervised
-chu do "refactor error handling" --interactive
+gptcode do "add JWT authentication"
+gptcode do "fix bug in payment processing" --supervised
+gptcode do "refactor error handling" --interactive
 ```
 
 **Flags:**
@@ -77,8 +77,8 @@ Routes requests in 1ms instead of 500ms LLM calls. Classifies user intent (query
 
 **Configuration:**
 ```bash
-chu config get defaults.ml_intent_threshold  # default: 0.7
-chu config set defaults.ml_intent_threshold 0.8
+gptcode config get defaults.ml_intent_threshold  # default: 0.7
+gptcode config set defaults.ml_intent_threshold 0.8
 ```
 
 ### Complexity Detection
@@ -86,16 +86,16 @@ Automatically triggers Guided Mode (research → plan → implement) for complex
 
 **Configuration:**
 ```bash
-chu config get defaults.ml_complex_threshold  # default: 0.55
-chu config set defaults.ml_complex_threshold 0.6
+gptcode config get defaults.ml_complex_threshold  # default: 0.55
+gptcode config set defaults.ml_complex_threshold 0.6
 ```
 
 **CLI Commands:**
 ```bash
-chu ml list                    # List available models
-chu ml test intent "query"     # Test intent classification
-chu ml eval intent             # Evaluate accuracy
-chu ml train intent            # Retrain model (requires Python)
+gptcode ml list                    # List available models
+gptcode ml test intent "query"     # Test intent classification
+gptcode ml eval intent             # Evaluate accuracy
+gptcode ml train intent            # Retrain model (requires Python)
 ```
 
 [Read more about ML features →](/ml-features)
@@ -125,7 +125,7 @@ Go, Python, JavaScript/TypeScript, Ruby, Rust
 
 **Debug mode:**
 ```bash
-CHUCHU_DEBUG=1 chu chat "your query"
+CHUCHU_DEBUG=1 gptcode chat "your query"
 # [GRAPH] Built graph: 142 nodes, 287 edges
 # [GRAPH] Selected 5 files:
 # [GRAPH]   1. internal/agents/router.go (score: 0.842)
@@ -188,8 +188,8 @@ Switch between model configurations instantly:
 
 **CLI:**
 ```bash
-chu backend list           # List configured backends
-chu backend use groq       # Switch to Groq backend
+gptcode backend list           # List configured backends
+gptcode backend use groq       # Switch to Groq backend
 ```
 
 ---
@@ -204,8 +204,8 @@ chu backend use groq       # Switch to Groq backend
 
 ### Commands
 ```bash
-chu tdd                    # Interactive TDD mode
-chu feature "description"  # Generate tests + implementation
+gptcode tdd                    # Interactive TDD mode
+gptcode feature "description"  # Generate tests + implementation
 ```
 
 ### Workflow
@@ -324,7 +324,7 @@ backend:
 Comprehensive codebase research with parallel sub-agents:
 
 ```bash
-chu research "how does authentication work"
+gptcode research "how does authentication work"
 ```
 
 - Spawns specialized research agents
@@ -338,7 +338,7 @@ chu research "how does authentication work"
 Interactive plan creation with iteration:
 
 ```bash
-chu plan "add JWT authentication"
+gptcode plan "add JWT authentication"
 ```
 
 - Guided question/answer flow
@@ -352,7 +352,7 @@ chu plan "add JWT authentication"
 Execute plans with verification:
 
 ```bash
-chu implement plan.md
+gptcode implement plan.md
 ```
 
 - Step-by-step execution

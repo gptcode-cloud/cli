@@ -9,19 +9,19 @@ GPTCode can now autonomously resolve GitHub issues from start to finish, includi
 
 ```bash
 # 1. Fix an issue
-chu issue fix 123
+gptcode issue fix 123
 
 # 2. Validate and commit
-chu issue commit 123 --auto-fix --check-coverage --security-scan
+gptcode issue commit 123 --auto-fix --check-coverage --security-scan
 
 # 3. Create pull request
-chu issue push 123
+gptcode issue push 123
 
 # 4. Handle CI failures (if any)
-chu issue ci 42
+gptcode issue ci 42
 
 # 5. Address review comments
-chu issue review 42
+gptcode issue review 42
 
 # 6. Repeat steps 4-5 until approved!
 ```
@@ -31,7 +31,7 @@ chu issue review 42
 ### Step 1: Fix Issue
 
 ```bash
-chu issue fix 123 [--repo owner/repo] [--autonomous] [--find-files]
+gptcode issue fix 123 [--repo owner/repo] [--autonomous] [--find-files]
 ```
 
 **What it does:**
@@ -74,14 +74,14 @@ Relevant files identified:
 [OK] Implementation complete
 
 Next steps:
-   chu issue commit 123
-   chu issue push 123
+   gptcode issue commit 123
+   gptcode issue push 123
 ```
 
 ### Step 2: Commit with Validation
 
 ```bash
-chu issue commit 123 [options]
+gptcode issue commit 123 [options]
 ```
 
 **What it does:**
@@ -153,13 +153,13 @@ When tests or linters fail, GPTCode uses LLM to:
 
 ✨ All validation passed!
 Next steps:
-  chu issue push 123
+  gptcode issue push 123
 ```
 
 ### Step 3: Push and Create PR
 
 ```bash
-chu issue push 123 [--repo owner/repo] [--draft]
+gptcode issue push 123 [--repo owner/repo] [--draft]
 ```
 
 **What it does:**
@@ -186,7 +186,7 @@ chu issue push 123 [--repo owner/repo] [--draft]
 ### Step 4: Handle CI Failures
 
 ```bash
-chu issue ci 42 [--repo owner/repo]
+gptcode issue ci 42 [--repo owner/repo]
 ```
 
 **What it does:**
@@ -245,7 +245,7 @@ Add special character check in validator
 ### Step 5: Address Review Comments
 
 ```bash
-chu issue review 42 [--repo owner/repo]
+gptcode issue review 42 [--repo owner/repo]
 ```
 
 **What it does:**
@@ -298,10 +298,10 @@ Repeat steps 4-5 as needed:
 
 ```bash
 # Check if new CI failures appeared
-chu issue ci 42
+gptcode issue ci 42
 
 # Check if new review comments appeared
-chu issue review 42
+gptcode issue review 42
 
 # Repeat until PR is approved and merged!
 ```
@@ -311,26 +311,26 @@ chu issue review 42
 ### Custom Commit Messages
 
 ```bash
-chu issue commit 123 --message "feat: Add password validation with special char requirement"
+gptcode issue commit 123 --message "feat: Add password validation with special char requirement"
 ```
 
 ### Strict Coverage Requirements
 
 ```bash
-chu issue commit 123 --check-coverage --min-coverage 90
+gptcode issue commit 123 --check-coverage --min-coverage 90
 ```
 
 ### Security-First Validation
 
 ```bash
-chu issue commit 123 --security-scan --skip-tests
+gptcode issue commit 123 --security-scan --skip-tests
 ```
 
 ### Manual Steps Only
 
 ```bash
-chu issue fix 123 --autonomous=false    # Show what needs to be done
-chu issue commit 123 --skip-tests --skip-lint  # Only commit
+gptcode issue fix 123 --autonomous=false    # Show what needs to be done
+gptcode issue commit 123 --skip-tests --skip-lint  # Only commit
 ```
 
 ## Architecture
@@ -422,7 +422,7 @@ git remote get-url origin
 Or specify explicitly:
 
 ```bash
-chu issue fix 123 --repo owner/repo
+gptcode issue fix 123 --repo owner/repo
 ```
 
 ## Limitations
@@ -465,7 +465,7 @@ git remote -v
 git remote add origin https://github.com/owner/repo.git
 
 # Or specify explicitly
-chu issue fix 123 --repo owner/repo
+gptcode issue fix 123 --repo owner/repo
 ```
 
 ### "gh: command not found"
@@ -498,7 +498,7 @@ gh pr checks 42
 
 # Wait for CI to complete
 # Then run:
-chu issue ci 42
+gptcode issue ci 42
 ```
 
 ### Review Comments Not Found
@@ -529,7 +529,7 @@ After achieving 100% MVAA:
 ## Changelog
 
 **2025-12-06** - MVP Complete (100% MVAA)
-- Added `chu issue ci` for CI failure handling
-- Added `chu issue review` for review comment handling
+- Added `gptcode issue ci` for CI failure handling
+- Added `gptcode issue review` for review comment handling
 - Achieved 100% MVAA Critical Path coverage
 - Overall autonomy: 59% (38/64 scenarios)

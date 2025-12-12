@@ -44,14 +44,14 @@ chu feedback hook install --shell=fish --with-diff
 python3 ml/intent/scripts/process_feedback.py
 
 # Retrain the intent model (feedback weighted)
-chu ml train intent
+gptcode ml train intent
 ```
 
 ## For UIs/CLIs
 No API integration required. Let users press **Ctrl+g** before running.
 
 ## Advanced
-- Manual/programmatic submissions: `chu feedback submit --json -`
+- Manual/programmatic submissions: `gptcode feedback submit --json -`
 - Attach files: `--files path --files another`
 - Capture patch: `--capture-diff` (saved under `~/.gptcode/diffs/*.patch`)
 

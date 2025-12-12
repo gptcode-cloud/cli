@@ -61,14 +61,14 @@ If a conversation gets too long, the context can get "polluted" with old informa
 
 **In Neovim**: Close the chat buffer with `Ctrl+D` and reopen with `<leader>cc` to start a new session.
 
-**CLI**: Exit the current `chu chat` session (Ctrl+D) and start a new one.
+**CLI**: Exit the current `gptcode chat` session (Ctrl+D) and start a new one.
 
 **Better approach**: Use command-based workflow to avoid long sessions:
 ```bash
 # Instead of long chat sessions, use focused commands:
-chu research "how does the auth system work"
-chu plan "add OAuth support"
-chu implement plan.md
+gptcode research "how does the auth system work"
+gptcode plan "add OAuth support"
+gptcode implement plan.md
 ```
 
 Each command starts with fresh context, preventing pollution.

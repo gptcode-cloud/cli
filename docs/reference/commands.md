@@ -93,14 +93,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 ---
 
-## `chu do` - Autonomous Execution
+## `gptcode do` - Autonomous Execution
 
 **The flagship copilot command.** Orchestrates 4 specialized agents to autonomously complete tasks with validation and auto-retry.
 
 ### How It Works
 
 ```bash
-chu do "add JWT authentication"
+gptcode do "add JWT authentication"
 ```
 
 **Agent Flow:**
@@ -113,10 +113,10 @@ chu do "add JWT authentication"
 ### Examples
 
 ```bash
-chu do "fix authentication bug in login handler"
-chu do "refactor error handling to use custom types"
-chu do "add rate limiting to API endpoints" --supervised
-chu do "optimize database queries" --interactive
+gptcode do "fix authentication bug in login handler"
+gptcode do "refactor error handling to use custom types"
+gptcode do "add rate limiting to API endpoints" --supervised
+gptcode do "optimize database queries" --interactive
 ```
 
 ### Flags
@@ -141,12 +141,12 @@ chu do "optimize database queries" --interactive
 
 ## Setup Commands
 
-### `chu setup`
+### `gptcode setup`
 
 Initialize GPTCode configuration at `~/.gptcode`.
 
 ```bash
-chu setup
+gptcode setup
 ```
 
 Creates:
@@ -154,35 +154,35 @@ Creates:
 - `~/.gptcode/system_prompt.md` – base system prompt
 - `~/.gptcode/memories.jsonl` – memory store for examples
 
-### `chu key [backend]`
+### `gptcode key [backend]`
 
 Add or update API key for a backend provider.
 
 ```bash
-chu key openrouter
-chu key groq
+gptcode key openrouter
+gptcode key groq
 ```
 
-### `chu models update`
+### `gptcode models update`
 
 Update model catalog from available providers (OpenRouter, Groq, OpenAI, etc.).
 
 ```bash
-chu models update
+gptcode models update
 ```
 
 ---
 
 ## Interactive Modes
 
-### `chu chat`
+### `gptcode chat`
 
 Code-focused conversation mode. Routes queries to appropriate agents based on intent.
 
 ```bash
-chu chat
-chu chat "explain how authentication works"
-echo "list go files" | chu chat
+gptcode chat
+gptcode chat "explain how authentication works"
+echo "list go files" | gptcode chat
 ```
 
 **Agent routing:**
@@ -192,13 +192,13 @@ echo "list go files" | chu chat
 - `test` – run tests or commands
 - `review` – code review and critique
 
-### `chu tdd`
+### `gptcode tdd`
 
 Incremental TDD mode. Generates tests first, then implementation.
 
 ```bash
-chu tdd
-chu tdd "slugify function with unicode support"
+gptcode tdd
+gptcode tdd "slugify function with unicode support"
 ```
 
 Workflow:
@@ -211,24 +211,24 @@ Workflow:
 
 ## Workflow Commands (Research → Plan → Implement)
 
-### `chu research [question]`
+### `gptcode research [question]`
 
 Document codebase and understand architecture.
 
 ```bash
-chu research "How does authentication work?"
-chu research "Explain the payment flow"
+gptcode research "How does authentication work?"
+gptcode research "Explain the payment flow"
 ```
 
 Creates a research document with findings and analysis.
 
-### `chu plan [task]`
+### `gptcode plan [task]`
 
 Create detailed implementation plan with phases.
 
 ```bash
-chu plan "Add user authentication"
-chu plan "Implement webhook system"
+gptcode plan "Add user authentication"
+gptcode plan "Implement webhook system"
 ```
 
 Generates:
@@ -237,12 +237,12 @@ Generates:
 - Proposed changes with phases
 - Saved to `~/.gptcode/plans/`
 
-### `chu implement <plan_file>`
+### `gptcode implement <plan_file>`
 
 Execute an approved plan phase-by-phase with verification.
 
 ```bash
-chu implement ~/.gptcode/plans/2025-01-15-add-auth.md
+gptcode implement ~/.gptcode/plans/2025-01-15-add-auth.md
 ```
 
 Each phase:
@@ -254,15 +254,15 @@ Each phase:
 
 ## Code Quality
 
-### `chu review [target]`
+### `gptcode review [target]`
 
 **NEW**: Review code for bugs, security issues, and improvements against coding standards.
 
 ```bash
-chu review main.go
-chu review ./src
-chu review .
-chu review internal/agents/ --focus security
+gptcode review main.go
+gptcode review ./src
+gptcode review .
+gptcode review internal/agents/ --focus security
 ```
 
 **Options:**
@@ -282,21 +282,21 @@ chu review internal/agents/ --focus security
 
 **Examples:**
 ```bash
-chu review main.go --focus "error handling"
-chu review . --focus performance
-chu review src/auth --focus security
+gptcode review main.go --focus "error handling"
+gptcode review . --focus performance
+gptcode review src/auth --focus security
 ```
 
 ---
 
 ## Feature Generation
 
-### `chu feature [description]`
+### `gptcode feature [description]`
 
 Generate tests + implementation with auto-detected language.
 
 ```bash
-chu feature "slugify with unicode support and max length"
+gptcode feature "slugify with unicode support and max length"
 ```
 
 **Supported languages:**
@@ -311,20 +311,20 @@ chu feature "slugify with unicode support and max length"
 
 ## Execution Mode
 
-### `chu run [task]`
+### `gptcode run [task]`
 
 Execute tasks with follow-up support. Two modes available:
 
 **1. AI-assisted mode (default when no args provided):**
 ```bash
-chu run                                    # Start interactive session
-chu run "deploy to staging" --once         # Single AI execution
+gptcode run                                    # Start interactive session
+gptcode run "deploy to staging" --once         # Single AI execution
 ```
 
 **2. Direct REPL mode with command history:**
 ```bash
-chu run --raw                              # Interactive command execution
-chu run "docker ps" --raw                  # Execute command and exit
+gptcode run --raw                              # Interactive command execution
+gptcode run "docker ps" --raw                  # Execute command and exit
 ```
 
 #### AI-Assisted Mode
@@ -336,7 +336,7 @@ Provides intelligent command suggestions and execution:
 - Context preservation across commands
 
 ```bash
-chu run
+gptcode run
 > deploy to staging
 [AI executes fly deploy command]
 > check if it's running
@@ -349,7 +349,7 @@ chu run
 
 Direct shell command execution with enhanced features:
 ```bash
-chu run --raw
+gptcode run --raw
 > ls -la
 > cat $1                    # Reference previous command
 > /history                  # Show command history
@@ -375,18 +375,18 @@ chu run --raw
 
 ```bash
 # AI-assisted operational tasks
-chu run "check postgres status"
-chu run "make GET request to api.github.com/users/octocat"
+gptcode run "check postgres status"
+gptcode run "make GET request to api.github.com/users/octocat"
 
 # Direct command REPL for DevOps
-chu run --raw
+gptcode run --raw
 > docker ps
 > docker logs $1            # Reference container from previous output
 > /cd /var/log
 > tail -f app.log
 
 # Single-shot with piped input
-echo "deploy to production" | chu run --once
+echo "deploy to production" | gptcode run --once
 ```
 
 #### Flags
@@ -400,12 +400,12 @@ Perfect for operational tasks, DevOps workflows, and command execution with hist
 
 ## Machine Learning Commands
 
-### `chu ml list`
+### `gptcode ml list`
 
 List available ML models.
 
 ```bash
-chu ml list
+gptcode ml list
 ```
 
 Shows:
@@ -414,13 +414,13 @@ Shows:
 - Location
 - Status (trained/not trained)
 
-### `chu ml train <model>`
+### `gptcode ml train <model>`
 
 Train an ML model using Python.
 
 ```bash
-chu ml train complexity
-chu ml train intent
+gptcode ml train complexity
+gptcode ml train intent
 ```
 
 **Available models:**
@@ -431,24 +431,24 @@ chu ml train intent
 - Python 3.8+
 - Will create venv and install dependencies automatically
 
-### `chu ml test <model> [query]`
+### `gptcode ml test <model> [query]`
 
 Test a trained model with a query.
 
 ```bash
-chu ml test complexity "implement oauth"
-chu ml test intent "explain this code"
+gptcode ml test complexity "implement oauth"
+gptcode ml test intent "explain this code"
 ```
 
 Shows prediction and probabilities for all classes.
 
-### `chu ml eval <model> [-f file]`
+### `gptcode ml eval <model> [-f file]`
 
 Evaluate model performance on test dataset.
 
 ```bash
-chu ml eval complexity
-chu ml eval intent -f ml/intent/data/eval.csv
+gptcode ml eval complexity
+gptcode ml eval intent -f ml/intent/data/eval.csv
 ```
 
 Shows:
@@ -457,14 +457,14 @@ Shows:
 - Confusion matrix
 - Low-confidence predictions
 
-### `chu ml predict [model] <text>`
+### `gptcode ml predict [model] <text>`
 
 Make prediction using embedded Go model (no Python runtime).
 
 ```bash
-chu ml predict "implement auth"               # uses complexity (default)
-chu ml predict complexity "fix typo"          # explicit model
-chu ml predict intent "explain this code"     # intent classification
+gptcode ml predict "implement auth"               # uses complexity (default)
+gptcode ml predict complexity "fix typo"          # explicit model
+gptcode ml predict intent "explain this code"     # intent classification
 ```
 
 **Fast path:**
@@ -482,10 +482,10 @@ Controls when Guided Mode is automatically activated.
 
 ```bash
 # View current threshold (default: 0.55)
-chu config get defaults.ml_complex_threshold
+gptcode config get defaults.ml_complex_threshold
 
 # Set threshold (0.0-1.0)
-chu config set defaults.ml_complex_threshold 0.6
+gptcode config set defaults.ml_complex_threshold 0.6
 ```
 
 Higher threshold = less sensitive (fewer Guided Mode triggers)
@@ -496,10 +496,10 @@ Controls when ML router is used instead of LLM.
 
 ```bash
 # View current threshold (default: 0.7)
-chu config get defaults.ml_intent_threshold
+gptcode config get defaults.ml_intent_threshold
 
 # Set threshold (0.0-1.0)
-chu config set defaults.ml_intent_threshold 0.8
+gptcode config set defaults.ml_intent_threshold 0.8
 ```
 
 Higher threshold = more LLM fallbacks (more accurate but slower/expensive)
@@ -508,12 +508,12 @@ Higher threshold = more LLM fallbacks (more accurate but slower/expensive)
 
 ## Dependency Graph Commands
 
-### `chu graph build`
+### `gptcode graph build`
 
 Force rebuild dependency graph, ignoring cache.
 
 ```bash
-chu graph build
+gptcode graph build
 ```
 
 Shows:
@@ -526,14 +526,14 @@ Shows:
 - After adding/removing many files
 - If cache seems stale
 
-### `chu graph query <terms>`
+### `gptcode graph query <terms>`
 
 Find relevant files for a query term using PageRank.
 
 ```bash
-chu graph query "authentication"
-chu graph query "database connection"
-chu graph query "api routes"
+gptcode graph query "authentication"
+gptcode graph query "database connection"
+gptcode graph query "api routes"
 ```
 
 Shows:
@@ -557,10 +557,10 @@ Control how many files are added to context in chat mode.
 
 ```bash
 # View current setting (default: 5)
-chu config get defaults.graph_max_files
+gptcode config get defaults.graph_max_files
 
 # Set max files (1-20)
-chu config set defaults.graph_max_files 8
+gptcode config set defaults.graph_max_files 8
 ```
 
 **Recommendations:**
@@ -572,7 +572,7 @@ chu config set defaults.graph_max_files 8
 
 ```bash
 export CHUCHU_DEBUG=1
-chu chat "your query"  # Shows graph stats
+gptcode chat "your query"  # Shows graph stats
 ```
 
 Shows:
@@ -600,12 +600,12 @@ Shows:
 
 ## Backend Management
 
-### `chu backend`
+### `gptcode backend`
 
 Show current backend.
 
 ```bash
-chu backend
+gptcode backend
 ```
 
 Shows:
@@ -614,20 +614,20 @@ Shows:
 - Base URL
 - Default model
 
-### `chu backend list`
+### `gptcode backend list`
 
 List all configured backends.
 
 ```bash
-chu backend list
+gptcode backend list
 ```
 
-### `chu backend show [name]`
+### `gptcode backend show [name]`
 
 Show backend configuration. Shows current if no name provided.
 
 ```bash
-chu backend show groq
+gptcode backend show groq
 ```
 
 Shows:
@@ -635,79 +635,79 @@ Shows:
 - Default model
 - All configured models
 
-### `chu backend use <name>`
+### `gptcode backend use <name>`
 
 Switch to a backend.
 
 ```bash
-chu backend use groq
-chu backend use openrouter
-chu backend use ollama
+gptcode backend use groq
+gptcode backend use openrouter
+gptcode backend use ollama
 ```
 
-### `chu backend create`
+### `gptcode backend create`
 
 Create a new backend.
 
 ```bash
-chu backend create mygroq openai https://api.groq.com/openai/v1
-chu key mygroq  # Set API key
-chu config set backend.mygroq.default_model llama-3.3-70b-versatile
-chu backend use mygroq
+gptcode backend create mygroq openai https://api.groq.com/openai/v1
+gptcode key mygroq  # Set API key
+gptcode config set backend.mygroq.default_model llama-3.3-70b-versatile
+gptcode backend use mygroq
 ```
 
-### `chu backend delete`
+### `gptcode backend delete`
 
 Delete a backend.
 
 ```bash
-chu backend delete mygroq
+gptcode backend delete mygroq
 ```
 
 ---
 
 ## Profile Management
 
-### `chu profile`
+### `gptcode profile`
 
 Show current profile.
 
 ```bash
-chu profile
+gptcode profile
 ```
 
 Shows:
 - Backend and profile name
 - Agent models (router, query, editor, research)
 
-### `chu profile list [backend]`
+### `gptcode profile list [backend]`
 
 List all profiles. Optionally filter by backend.
 
 ```bash
-chu profile list              # All profiles
-chu profile list groq        # Only groq profiles
+gptcode profile list              # All profiles
+gptcode profile list groq        # Only groq profiles
 ```
 
 Shows profiles in `backend.profile` format.
 
-### `chu profile show [backend.profile]`
+### `gptcode profile show [backend.profile]`
 
 Show profile configuration. Shows current if not specified.
 
 ```bash
-chu profile show groq.speed
-chu profile show              # Current profile
+gptcode profile show groq.speed
+gptcode profile show              # Current profile
 ```
 
-### `chu profile use <backend>.<profile>`
+### `gptcode profile use <backend>.<profile>`
 
 Switch to a backend and profile in one command.
 
 ```bash
-chu profile use groq.speed
-chu profile use openrouter.free
-chu profile use ollama.local
+gptcode profile use groq.speed
+gptcode profile use openrouter.free
+gptcode profile use ollama.local
 ```
 
 **Benefits:**
@@ -717,17 +717,17 @@ chu profile use ollama.local
 
 ### Advanced Profile Commands
 
-For creating and configuring profiles, use `chu profiles` (plural):
+For creating and configuring profiles, use `gptcode profiles` (plural):
 
 ```bash
 # Create new profile
-chu profiles create groq speed
+gptcode profiles create groq speed
 
 # Configure agents
-chu profiles set-agent groq speed router llama-3.1-8b-instant
-chu profiles set-agent groq speed query llama-3.1-8b-instant
-chu profiles set-agent groq speed editor llama-3.1-8b-instant
-chu profiles set-agent groq speed research llama-3.1-8b-instant
+gptcode profiles set-agent groq speed router llama-3.1-8b-instant
+gptcode profiles set-agent groq speed query llama-3.1-8b-instant
+gptcode profiles set-agent groq speed editor llama-3.1-8b-instant
+gptcode profiles set-agent groq speed research llama-3.1-8b-instant
 ```
 
 ---
@@ -739,7 +739,7 @@ chu profiles set-agent groq speed research llama-3.1-8b-instant
 Enable debug output to stderr.
 
 ```bash
-CHUCHU_DEBUG=1 chu chat
+CHUCHU_DEBUG=1 gptcode chat
 ```
 
 Shows:
@@ -789,19 +789,19 @@ For advanced users who need direct access to configuration values:
 
 ```bash
 # Get configuration value
-chu config get defaults.backend
-chu config get defaults.profile
-chu config get backend.groq.default_model
+gptcode config get defaults.backend
+gptcode config get defaults.profile
+gptcode config get backend.groq.default_model
 
 # Set configuration value
-chu config set defaults.backend groq
-chu config set defaults.profile speed
-chu config set backend.groq.default_model llama-3.3-70b-versatile
+gptcode config set defaults.backend groq
+gptcode config set defaults.profile speed
+gptcode config set backend.groq.default_model llama-3.3-70b-versatile
 ```
 
 **Note:** For most use cases, prefer the user-friendly commands:
-- `chu backend use` instead of `chu config set defaults.backend`
-- `chu profile use` instead of `chu config set defaults.profile`
+- `gptcode backend use` instead of `gptcode config set defaults.backend`
+- `gptcode profile use` instead of `gptcode config set defaults.profile`
 
 ---
 

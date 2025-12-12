@@ -25,7 +25,7 @@ Instead of manually editing `~/.gptcode/setup.yaml`, create and switch between p
 ### Show Current Profile
 
 ```bash
-chu profile
+gptcode profile
 # Current: groq/default
 #   router: llama-3.1-8b-instant
 #   query: llama-3.3-70b-versatile
@@ -36,14 +36,14 @@ chu profile
 ### List Available Profiles
 
 ```bash
-chu profile list
+gptcode profile list
 # groq.default (current)
 # groq.speed
 # groq.quality
 # openrouter.default
 # openrouter.free
 
-chu profile list groq
+gptcode profile list groq
 # groq.default (current)
 # groq.speed
 # groq.quality
@@ -52,7 +52,7 @@ chu profile list groq
 ### Show Profile Configuration
 
 ```bash
-chu profile show groq.speed
+gptcode profile show groq.speed
 # groq/speed
 #   router: llama-3.1-8b-instant
 #   query: llama-3.1-8b-instant
@@ -63,30 +63,30 @@ chu profile show groq.speed
 ### Switch Profile
 
 ```bash
-chu profile use groq.speed
+gptcode profile use groq.speed
 # ✓ Switched to groq/speed
 ```
 
 ### Create New Profile
 
 ```bash
-chu profiles create groq speed
+gptcode profiles create groq speed
 # ✓ Created profile: groq/speed
 # 
 # Configure agent models using:
-#   chu profiles set-agent groq speed router <model>
-#   chu profiles set-agent groq speed query <model>
-#   chu profiles set-agent groq speed editor <model>
-#   chu profiles set-agent groq speed research <model>
+#   gptcode profiles set-agent groq speed router <model>
+#   gptcode profiles set-agent groq speed query <model>
+#   gptcode profiles set-agent groq speed editor <model>
+#   gptcode profiles set-agent groq speed research <model>
 ```
 
 ### Configure Agent Models
 
 ```bash
-chu profiles set-agent groq speed router llama-3.1-8b-instant
-chu profiles set-agent groq speed query llama-3.1-8b-instant
-chu profiles set-agent groq speed editor llama-3.1-8b-instant
-chu profiles set-agent groq speed research llama-3.1-8b-instant
+gptcode profiles set-agent groq speed router llama-3.1-8b-instant
+gptcode profiles set-agent groq speed query llama-3.1-8b-instant
+gptcode profiles set-agent groq speed editor llama-3.1-8b-instant
+gptcode profiles set-agent groq speed research llama-3.1-8b-instant
 # ✓ Set groq/speed router = llama-3.1-8b-instant
 # ...
 ```
@@ -145,18 +145,18 @@ Backend: Groq / speed
 Create a profile using only free-tier OpenRouter models:
 
 ```bash
-chu profiles create openrouter free
+gptcode profiles create openrouter free
 
-chu profiles set-agent openrouter free router \
+gptcode profiles set-agent openrouter free router \
   google/gemini-2.0-flash-exp:free
 
-chu profiles set-agent openrouter free query \
+gptcode profiles set-agent openrouter free query \
   google/gemini-2.0-flash-exp:free
 
-chu profiles set-agent openrouter free editor \
+gptcode profiles set-agent openrouter free editor \
   moonshotai/kimi-k2:free
 
-chu profiles set-agent openrouter free research \
+gptcode profiles set-agent openrouter free research \
   google/gemini-2.0-flash-exp:free
 ```
 
@@ -178,11 +178,11 @@ Each profile configures four agent types:
 Use fast, cheap models for rapid iteration:
 
 ```bash
-chu profiles create groq speed
-chu profiles set-agent groq speed router llama-3.1-8b-instant
-chu profiles set-agent groq speed query llama-3.1-8b-instant
-chu profiles set-agent groq speed editor llama-3.1-8b-instant
-chu profiles set-agent groq speed research llama-3.1-8b-instant
+gptcode profiles create groq speed
+gptcode profiles set-agent groq speed router llama-3.1-8b-instant
+gptcode profiles set-agent groq speed query llama-3.1-8b-instant
+gptcode profiles set-agent groq speed editor llama-3.1-8b-instant
+gptcode profiles set-agent groq speed research llama-3.1-8b-instant
 ```
 
 ### Quality Profile
@@ -190,11 +190,11 @@ chu profiles set-agent groq speed research llama-3.1-8b-instant
 Use best available models for complex tasks:
 
 ```bash
-chu profiles create groq quality
-chu profiles set-agent groq quality router llama-3.1-8b-instant  # routing is simple
-chu profiles set-agent groq quality query llama-3.3-70b-versatile
-chu profiles set-agent groq quality editor llama-3.3-70b-versatile
-chu profiles set-agent groq quality research groq/compound
+gptcode profiles create groq quality
+gptcode profiles set-agent groq quality router llama-3.1-8b-instant  # routing is simple
+gptcode profiles set-agent groq quality query llama-3.3-70b-versatile
+gptcode profiles set-agent groq quality editor llama-3.3-70b-versatile
+gptcode profiles set-agent groq quality research groq/compound
 ```
 
 ### Specialized Profiles
@@ -203,12 +203,12 @@ Create profiles for specific use cases:
 
 ```bash
 # Code-heavy tasks
-chu profiles create groq coding
-chu profiles set-agent groq coding editor deepseek-v3
+gptcode profiles create groq coding
+gptcode profiles set-agent groq coding editor deepseek-v3
 
 # Research-heavy tasks
-chu profiles create groq docs
-chu profiles set-agent groq docs research groq/compound
+gptcode profiles create groq docs
+gptcode profiles set-agent groq docs research groq/compound
 ```
 
 ## Migration from Old Config
@@ -225,7 +225,7 @@ backend:
 
 Works as:
 ```bash
-chu profile show groq.default
+gptcode profile show groq.default
 # Shows the models from agent_models
 ```
 
@@ -234,10 +234,10 @@ chu profile show groq.default
 ### Profile Not Found
 
 ```bash
-chu profile list groq
+gptcode profile list groq
 # Check if profile exists
 
-chu profiles create groq myprofile
+gptcode profiles create groq myprofile
 # Create if missing (use plural 'profiles' for creation)
 ```
 
@@ -246,10 +246,10 @@ chu profiles create groq myprofile
 Verify profile configuration:
 
 ```bash
-chu profile show groq.myprofile
+gptcode profile show groq.myprofile
 # Check each agent's model
 
-chu profiles set-agent groq myprofile router correct-model
+gptcode profiles set-agent groq myprofile router correct-model
 # Fix individual agents (use plural 'profiles' for configuration)
 ```
 
@@ -272,9 +272,9 @@ The profile system replaces fragile space-counting logic with Go's `yaml.v3` lib
 
 Planned features:
 
-- `chu profiles copy <src> <dst>` - Clone existing profile
-- `chu profiles delete <backend> <profile>` - Remove profile
-- `chu profiles export/import` - Share profiles between machines
+- `gptcode profiles copy <src> <dst>` - Clone existing profile
+- `gptcode profiles delete <backend> <profile>` - Remove profile
+- `gptcode profiles export/import` - Share profiles between machines
 - Profile templates for common use cases
 
 ## Related Posts

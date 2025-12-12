@@ -141,7 +141,7 @@ stats := tracker.GetStats()
 - Observe autonomous execution in real-time
 - Track API costs per backend/model
 - Debug failures with structured events
-- Foundation for `chu usage` command
+- Foundation for `gptcode usage` command
 
 ---
 
@@ -265,7 +265,7 @@ PASS
 
 ## Impact on Existing Workflows
 
-### Guided Mode (`chu guided`)
+### Guided Mode (`gptcode guided`)
 
 **Before:**
 ```bash
@@ -361,8 +361,8 @@ chu verify plan.md
 
 Create a plan with specific files:
 ```bash
-chu plan "add logout endpoint"
-chu implement ~/.gptcode/plans/2025-11-27-logout.md
+gptcode plan "add logout endpoint"
+gptcode implement ~/.gptcode/plans/2025-11-27-logout.md
 ```
 
 The editor will only modify files mentioned in the plan.

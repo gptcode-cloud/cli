@@ -98,7 +98,7 @@ t=3.5s  EditorAgent ─────────┘
       "duration_ms": 150,
       "cost": 0,
       "inputs": {
-        "command": "chu do 'add login'",
+        "command": "gptcode do 'add login'",
         "context": {...}
       },
       "outputs": {

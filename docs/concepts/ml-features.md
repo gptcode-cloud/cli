@@ -35,13 +35,13 @@ Analyzes task descriptions and classifies them as:
 
 ### Auto-Activation
 
-When you run `chu chat`, the complexity classifier decides if Guided Mode should activate:
+When you run `gptcode chat`, the complexity classifier decides if Guided Mode should activate:
 
 ```bash
-chu chat "fix typo in readme"
+gptcode chat "fix typo in readme"
 # → Simple task, stays in chat mode
 
-chu chat "implement oauth2 with jwt"
+gptcode chat "implement oauth2 with jwt"
 # → Complex task, automatically switches to Guided Mode
 ```
 
@@ -49,13 +49,13 @@ chu chat "implement oauth2 with jwt"
 
 ```bash
 # View current threshold (default: 0.55)
-chu config get defaults.ml_complex_threshold
+gptcode config get defaults.ml_complex_threshold
 
 # Increase threshold (fewer Guided Mode triggers)
-chu config set defaults.ml_complex_threshold 0.7
+gptcode config set defaults.ml_complex_threshold 0.7
 
 # Decrease threshold (more Guided Mode triggers)
-chu config set defaults.ml_complex_threshold 0.4
+gptcode config set defaults.ml_complex_threshold 0.4
 ```
 
 **Threshold Guide:**
@@ -118,13 +118,13 @@ if confidence >= threshold {
 
 ```bash
 # View current threshold (default: 0.7)
-chu config get defaults.ml_intent_threshold
+gptcode config get defaults.ml_intent_threshold
 
 # Higher = more LLM fallbacks (slower but safer)
-chu config set defaults.ml_intent_threshold 0.85
+gptcode config set defaults.ml_intent_threshold 0.85
 
 # Lower = more ML predictions (faster but riskier)
-chu config set defaults.ml_intent_threshold 0.6
+gptcode config set defaults.ml_intent_threshold 0.6
 ```
 
 **Threshold Guide:**
@@ -154,7 +154,7 @@ message,label
 ### List Models
 
 ```bash
-chu ml list
+gptcode ml list
 ```
 
 Shows available models and their status.
@@ -163,10 +163,10 @@ Shows available models and their status.
 
 ```bash
 # Train complexity classifier
-chu ml train complexity
+gptcode ml train complexity
 
 # Train intent classifier
-chu ml train intent
+gptcode ml train intent
 ```
 
 Automatically:
@@ -179,23 +179,23 @@ Automatically:
 
 ```bash
 # Interactive testing
-chu ml test complexity
-chu ml test intent
+gptcode ml test complexity
+gptcode ml test intent
 
 # Single prediction
-chu ml test complexity "implement oauth"
-chu ml test intent "explain this code"
+gptcode ml test complexity "implement oauth"
+gptcode ml test intent "explain this code"
 ```
 
 ### Evaluate Models
 
 ```bash
 # Use default eval.csv
-chu ml eval complexity
-chu ml eval intent
+gptcode ml eval complexity
+gptcode ml eval intent
 
 # Use custom dataset
-chu ml eval intent -f my_eval.csv
+gptcode ml eval intent -f my_eval.csv
 ```
 
 Shows:
@@ -208,11 +208,11 @@ Shows:
 
 ```bash
 # Default: complexity
-chu ml predict "implement oauth"
+gptcode ml predict "implement oauth"
 
 # Explicit model
-chu ml predict complexity "fix typo"
-chu ml predict intent "explain this code"
+gptcode ml predict complexity "fix typo"
+gptcode ml predict intent "explain this code"
 ```
 
 Uses embedded Go model – no Python required.
@@ -292,7 +292,7 @@ message,label
 
 Then retrain:
 ```bash
-chu ml train {model}
+gptcode ml train {model}
 ```
 
 ### Adjust Hyperparameters
@@ -367,8 +367,8 @@ For 1000 requests/day:
 
 ```bash
 # Train the model first
-chu ml train complexity
-chu ml train intent
+gptcode ml train complexity
+gptcode ml train intent
 ```
 
 ### Python dependencies

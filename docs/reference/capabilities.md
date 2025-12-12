@@ -39,11 +39,11 @@ GPTCode can autonomously resolve simple GitHub issues end-to-end:
 
 **Commands:**
 ```bash
-chu issue fix 123       # Fetch and implement
-chu issue commit 123    # Validate and commit  
-chu issue push 123      # Create PR
-chu issue ci 42         # Handle CI failures
-chu issue review 42     # Address review comments
+gptcode issue fix 123       # Fetch and implement
+gptcode issue commit 123    # Validate and commit  
+gptcode issue push 123      # Create PR
+gptcode issue ci 42         # Handle CI failures
+gptcode issue review 42     # Address review comments
 ```
 
 **Limitations:**
@@ -142,16 +142,16 @@ GPTCode identifies:
 
 **Implemented:**
 
-- ✅ Database migrations (`chu gen migration <name>`)
-- ✅ API changes coordination (`chu refactor api`)
-- ✅ Multi-file refactoring (`chu refactor signature <func> <new-sig>`)
-- ✅ Breaking changes coordination (`chu refactor breaking`)
-- ✅ Security vulnerability fixes (`chu security scan --fix`)
-- ✅ Configuration management (`chu cfg update KEY VALUE`)
-- ✅ Performance profiling (`chu perf profile`, `chu perf bench`)
-- ✅ Type system refactoring (`chu refactor type <name> <def>`)
-- ✅ Backward compatibility (`chu refactor compat <old> <new> <ver>`)
-- ✅ Zero-downtime schema evolution (`chu evolve generate <desc>`)
+- ✅ Database migrations (`gptcode gen migration <name>`)
+- ✅ API changes coordination (`gptcode refactor api`)
+- ✅ Multi-file refactoring (`gptcode refactor signature <func> <new-sig>`)
+- ✅ Breaking changes coordination (`gptcode refactor breaking`)
+- ✅ Security vulnerability fixes (`gptcode security scan --fix`)
+- ✅ Configuration management (`gptcode cfg update KEY VALUE`)
+- ✅ Performance profiling (`gptcode perf profile`, `gptcode perf bench`)
+- ✅ Type system refactoring (`gptcode refactor type <name> <def>`)
+- ✅ Backward compatibility (`gptcode refactor compat <old> <new> <ver>`)
+- ✅ Zero-downtime schema evolution (`gptcode evolve generate <desc>`)
 
 **Not yet implemented:**
 
@@ -160,35 +160,35 @@ GPTCode identifies:
 
 **Examples:**
 ```bash
-chu gen migration "add user email"
+gptcode gen migration "add user email"
 # Detects model changes
 # Generates SQL with up/down migrations
 
-chu refactor api
+gptcode refactor api
 # Scans routes in handlers/controllers
 # Generates/updates handler functions
 # Creates/updates corresponding tests
 
-chu refactor signature processData "(ctx context.Context, data []byte) error"
+gptcode refactor signature processData "(ctx context.Context, data []byte) error"
 # Finds function definition
 # Updates all call sites across files
 # Preserves functionality
 
-chu refactor breaking
+gptcode refactor breaking
 # Detects breaking changes via git diff
 # Finds all consumers (functions/types)
 # Generates migration plan
 # Updates consuming code automatically
 
-chu security scan
+gptcode security scan
 # Scans vulnerabilities (govulncheck, npm audit, safety, bundle audit)
 # Reports severity and CVEs
 
-chu security scan --fix
+gptcode security scan --fix
 # Auto-updates dependencies
 # LLM fixes code if needed
 
-chu evolve generate "add email column to users"
+gptcode evolve generate "add email column to users"
 # Generates multi-phase migration strategy
 # Phase 1: Add nullable column
 # Phase 2: Backfill data
@@ -212,17 +212,17 @@ chu evolve generate "add email column to users"
 
 **Implemented:**
 
-- ✅ Generate unit tests for new code (`chu gen test <file>`)
-- ✅ Generate integration tests (`chu gen integration <pkg>`)
+- ✅ Generate unit tests for new code (`gptcode gen test <file>`)
+- ✅ Generate integration tests (`gptcode gen integration <pkg>`)
 - ✅ Validate generated tests (compile + run)
 - ✅ Multi-language support (Go, TypeScript, Python, Ruby)
-- ✅ Generate mock objects (`chu gen mock <file>`)
-- ✅ Identify coverage gaps (`chu coverage`)
-- ✅ Generate snapshot tests (`chu gen snapshot <file>`)
+- ✅ Generate mock objects (`gptcode gen mock <file>`)
+- ✅ Identify coverage gaps (`gptcode coverage`)
+- ✅ Generate snapshot tests (`gptcode gen snapshot <file>`)
 
 **Example:**
 ```bash
-chu gen test pkg/calculator/calculator.go
+gptcode gen test pkg/calculator/calculator.go
 # Generates: pkg/calculator/calculator_test.go
 # Validates: Compiles and runs
 ```
@@ -238,9 +238,9 @@ chu gen test pkg/calculator/calculator.go
 
 **Implemented:**
 
-- ✅ Standalone conflict resolver (`chu merge resolve`)
-- ✅ Resolve conflicts during cherry-pick (`chu git cherry-pick <commit>`)
-- ✅ Resolve conflicts during rebase (`chu git rebase <branch>`)
+- ✅ Standalone conflict resolver (`gptcode merge resolve`)
+- ✅ Resolve conflicts during cherry-pick (`gptcode git cherry-pick <commit>`)
+- ✅ Resolve conflicts during rebase (`gptcode git rebase <branch>`)
 
 **Not yet implemented:**
 
@@ -249,7 +249,7 @@ chu gen test pkg/calculator/calculator.go
 
 **Examples:**
 ```bash
-chu merge resolve
+gptcode merge resolve
 # Detects all conflicted files
 # Uses LLM to resolve each conflict
 # Validates resolution (no conflict markers)
@@ -264,32 +264,32 @@ chu merge resolve
 
 **Implemented:**
 
-- ✅ Git bisect for bug hunting (`chu git bisect <good> <bad>`)
-- ✅ Cherry-picking commits (`chu git cherry-pick <commits...>`)
-- ✅ Branch rebasing (`chu git rebase [branch]`)
-- ✅ Squash commits (`chu git squash <base-commit>`)
-- ✅ Reword commit messages (`chu git reword <commit>`)
+- ✅ Git bisect for bug hunting (`gptcode git bisect <good> <bad>`)
+- ✅ Cherry-picking commits (`gptcode git cherry-pick <commits...>`)
+- ✅ Branch rebasing (`gptcode git rebase [branch]`)
+- ✅ Squash commits (`gptcode git squash <base-commit>`)
+- ✅ Reword commit messages (`gptcode git reword <commit>`)
 
 **Examples:**
 ```bash
-chu git bisect v1.0.0 HEAD
+gptcode git bisect v1.0.0 HEAD
 # Automatically runs tests on each commit
 # Finds which commit introduced the bug
 # Provides LLM analysis of the breaking commit
 
-chu git cherry-pick abc123 def456
+gptcode git cherry-pick abc123 def456
 # Applies commits with automatic conflict resolution
 # Uses LLM to resolve conflicts intelligently
 
-chu git rebase main
+gptcode git rebase main
 # Rebases with AI-powered conflict resolution
 # Continues automatically after resolving
 
-chu git squash HEAD~3
+gptcode git squash HEAD~3
 # Squashes last 3 commits into one
 # Generates intelligent commit message via LLM
 
-chu git reword HEAD
+gptcode git reword HEAD
 # Suggests improved commit message
 # Follows best practices (subject + body)
 ```
@@ -306,15 +306,15 @@ chu git reword HEAD
 
 **Implemented:**
 
-- ✅ Generate CHANGELOG entries (`chu gen changelog`)
-- ✅ Update README files (`chu docs update`)
-- ✅ Generate API documentation (`chu docs api`)
+- ✅ Generate CHANGELOG entries (`gptcode gen changelog`)
+- ✅ Update README files (`gptcode docs update`)
+- ✅ Generate API documentation (`gptcode docs api`)
 
 **Examples:**
 ```bash
-chu gen changelog           # All commits since last tag
-chu docs update             # Analyze and preview README updates
-chu docs update --apply     # Apply updates automatically
+gptcode gen changelog           # All commits since last tag
+gptcode docs update             # Analyze and preview README updates
+gptcode docs update --apply     # Apply updates automatically
 ```
 
 **Limitations:**
@@ -322,7 +322,7 @@ chu docs update --apply     # Apply updates automatically
 - API docs require schema/spec parsing
 - Uses conventional commits format for CHANGELOG
 
-**Workaround:** Use `chu chat` mode to draft API documentation.
+**Workaround:** Use `gptcode chat` mode to draft API documentation.
 
 ---
 

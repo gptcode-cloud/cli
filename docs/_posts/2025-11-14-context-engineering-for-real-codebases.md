@@ -219,15 +219,15 @@ Research/Plan/Implement artifacts solve this:
 ### Start With Focused Commands
 ```bash
 # Research phase - understand the codebase
-chu research "how does user auth work in this codebase"
+gptcode research "how does user auth work in this codebase"
 # Read the output, steer if needed
 
 # Plan phase - create structured plan
-chu plan "add password reset via email"
+gptcode plan "add password reset via email"
 # Review the plan before implementing
 
 # Implement phase - execute the plan
-chu implement ~/.gptcode/plans/2024-11-15-password-reset.md
+gptcode implement ~/.gptcode/plans/2024-11-15-password-reset.md
 # Note: Implementation reads the plan and executes phase by phase
 ```
 
@@ -264,9 +264,9 @@ If you notice responses getting worse or repetitive:
 3. **Resume with context**: Load the compact summary
 
 GPTCode's command-based workflow naturally encourages this:
-- `chu research` → outputs findings
-- `chu plan` → reads findings, outputs plan  
-- `chu implement` → reads plan, outputs code
+- `gptcode research` → outputs findings
+- `gptcode plan` → reads findings, outputs plan  
+- `gptcode implement` → reads plan, outputs code
 
 Each step is **independently verifiable** and **resumable**.
 
@@ -276,14 +276,14 @@ Don't try to do everything in one go:
 
 ```bash
 # Step 1: Understand what needs to change
-chu research "payment processing flow"
+gptcode research "payment processing flow"
 
 # Step 2: Create detailed plan
-chu plan "add Stripe webhook handling"
+gptcode plan "add Stripe webhook handling"
 # Review plan - does it make sense?
 
 # Step 3: Implement incrementally
-chu implement plan.md
+gptcode implement plan.md
 # Review changes - does code match plan?
 ```
 

@@ -18,7 +18,7 @@ description: AI coding assistant with specialized agents and validation
 <div class="features">
   <a href="/features#agent-based-architecture" class="feature-card">
     <h3>Autonomous Execution</h3>
-    <p><code>chu do "task"</code> orchestrates 4 specialized agents: Analyzer → Planner → Editor → Validator. Auto-retry with model switching when validation fails.</p>
+    <p><code>gptcode do "task"</code> orchestrates 4 specialized agents: Analyzer → Planner → Editor → Validator. Auto-retry with model switching when validation fails.</p>
   </a>
   
   <a href="/features#file-validation" class="feature-card">
@@ -38,12 +38,12 @@ description: AI coding assistant with specialized agents and validation
   
   <a href="/commands#interactive-modes" class="feature-card">
     <h3>Interactive Modes</h3>
-    <p><code>chu chat</code> for conversations. <code>chu run</code> for tasks with follow-up. Context-aware from CLI or Neovim plugin.</p>
+    <p><code>gptcode chat</code> for conversations. <code>gptcode run</code> for tasks with follow-up. Context-aware from CLI or Neovim plugin.</p>
   </a>
   
   <a href="/commands#workflow-commands-research--plan--implement" class="feature-card">
     <h3>Manual Workflow</h3>
-    <p>Break down complex tasks: <code>chu research</code> → <code>chu plan</code> → <code>chu implement</code>. Full control when you need it.</p>
+    <p>Break down complex tasks: <code>gptcode research</code> → <code>gptcode plan</code> → <code>gptcode implement</code>. Full control when you need it.</p>
   </a>
 </div>
 
@@ -56,25 +56,25 @@ description: AI coding assistant with specialized agents and validation
     <div class="workflow-step">
       <h3>Analyzer</h3>
       <p>Scans the codebase, builds dependency graph and selects only the relevant files</p>
-      <pre><code>chu do "add authentication"</code></pre>
+      <pre><code>gptcode do "add authentication"</code></pre>
     </div>
     
     <div class="workflow-step">
       <h3>Planner</h3>
       <p>Creates a concrete plan with success criteria and allowed file list</p>
-      <pre><code>chu do "add authentication"</code></pre>
+      <pre><code>gptcode do "add authentication"</code></pre>
     </div>
     
     <div class="workflow-step">
       <h3>Editor</h3>
       <p>Applies changes incrementally with file validation and auto-recovery</p>
-      <pre><code>chu do "add authentication"</code></pre>
+      <pre><code>gptcode do "add authentication"</code></pre>
     </div>
     
     <div class="workflow-step">
       <h3>Validator</h3>
       <p>Runs tests and checks success criteria before finishing</p>
-      <pre><code>chu do "add authentication"</code></pre>
+      <pre><code>gptcode do "add authentication"</code></pre>
     </div>
   </div>
   
@@ -90,7 +90,7 @@ description: AI coding assistant with specialized agents and validation
   <div class="quick-start">
     <h3>1. Install CLI</h3>
     <pre><code>go install github.com/jadercorrea/gptcode/cmd/chu@latest
-chu setup</code></pre>
+gptcode setup</code></pre>
     
     <h3>2. Add Neovim Plugin</h3>
     <pre><code>-- lazy.nvim
@@ -106,9 +106,9 @@ chu setup</code></pre>
 }</code></pre>
     
     <h3>3. Start Coding</h3>
-    <pre><code>chu chat "add user authentication with JWT"
-chu research "best practices for error handling"
-chu plan "implement rate limiting"</code></pre>
+    <pre><code>gptcode chat "add user authentication with JWT"
+gptcode research "best practices for error handling"
+gptcode plan "implement rate limiting"</code></pre>
   </div>
 </div>
 
@@ -117,16 +117,16 @@ chu plan "implement rate limiting"</code></pre>
   
   <h3>Three Ways to Work</h3>
   <ul>
-    <li><strong>Autonomous Copilot</strong>: <code>chu do "task"</code> handles everything—analysis, planning, execution, validation</li>
-    <li><strong>Interactive Chat</strong>: <code>chu chat</code> for conversations with context awareness and follow-ups</li>
-    <li><strong>Structured Workflow</strong>: <code>chu research</code> → <code>chu plan</code> → <code>chu implement</code> for full control</li>
+    <li><strong>Autonomous Copilot</strong>: <code>gptcode do "task"</code> handles everything—analysis, planning, execution, validation</li>
+    <li><strong>Interactive Chat</strong>: <code>gptcode chat</code> for conversations with context awareness and follow-ups</li>
+    <li><strong>Structured Workflow</strong>: <code>gptcode research</code> → <code>gptcode plan</code> → <code>gptcode implement</code> for full control</li>
   </ul>
   
   <h3>Special Modes</h3>
   <ul>
-    <li><strong>TDD Mode</strong>: <code>chu tdd</code> for test-driven development workflow</li>
-    <li><strong>Code Review</strong>: <code>chu review</code> for automated bug detection and security analysis</li>
-    <li><strong>Task Execution</strong>: <code>chu run</code> for tasks with follow-up conversations</li>
+    <li><strong>TDD Mode</strong>: <code>gptcode tdd</code> for test-driven development workflow</li>
+    <li><strong>Code Review</strong>: <code>gptcode review</code> for automated bug detection and security analysis</li>
+    <li><strong>Task Execution</strong>: <code>gptcode run</code> for tasks with follow-up conversations</li>
     <li><strong>Web Research</strong>: Built-in search and documentation lookup</li>
   </ul>
   

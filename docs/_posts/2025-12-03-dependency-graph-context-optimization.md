@@ -57,7 +57,7 @@ GPTCode analyzes your codebase structure to provide **only relevant context** to
 
 ### Example: Authentication Bug
 
-**Your query**: `chu chat "fix bug in authentication"`
+**Your query**: `gptcode chat "fix bug in authentication"`
 
 **Without graph** (naive):
 - Sends: All 142 files (100,000 tokens)
@@ -153,10 +153,10 @@ More languages coming soon (Java, C++, etc.)
 
 ### Automatic (Default)
 
-Graph analysis works transparently in `chu chat`:
+Graph analysis works transparently in `gptcode chat`:
 
 ```bash
-chu chat "explain how routing works"
+gptcode chat "explain how routing works"
 ```
 
 The system:
@@ -170,7 +170,7 @@ The system:
 See what the graph is doing:
 
 ```bash
-CHUCHU_DEBUG=1 chu chat "your query"
+CHUCHU_DEBUG=1 gptcode chat "your query"
 ```
 
 Output:
@@ -191,13 +191,13 @@ Control how many files to include:
 
 ```bash
 # View current setting
-chu config get defaults.graph_max_files
+gptcode config get defaults.graph_max_files
 
 # Change to 3 files (more focused)
-chu config set defaults.graph_max_files 3
+gptcode config set defaults.graph_max_files 3
 
 # Change to 10 files (broader context)
-chu config set defaults.graph_max_files 10
+gptcode config set defaults.graph_max_files 10
 ```
 
 **Recommendation**: Start with 5 (default), adjust based on codebase size.
@@ -205,7 +205,7 @@ chu config set defaults.graph_max_files 10
 ### Disable (if needed)
 
 ```bash
-CHUCHU_GRAPH=false chu chat "query"
+CHUCHU_GRAPH=false gptcode chat "query"
 ```
 
 ## Technical Details
@@ -341,7 +341,7 @@ make install
 
 ```bash
 # Enable debug to see graph in action
-CHUCHU_DEBUG=1 chu chat "explain authentication flow"
+CHUCHU_DEBUG=1 gptcode chat "explain authentication flow"
 ```
 
 ### 3. Observe the Magic
@@ -355,13 +355,13 @@ Watch as GPTCode:
 
 Try the same query with graph disabled:
 ```bash
-CHUCHU_GRAPH=false chu chat "explain authentication flow"
+CHUCHU_GRAPH=false gptcode chat "explain authentication flow"
 ```
 
 Notice:
 - Slower response
 - Less focused answer
-- Higher token usage (check with `chu stats`)
+- Higher token usage (check with `gptcode stats`)
 
 ## Best Practices
 
@@ -413,7 +413,7 @@ Dependency graph delivers:
 
 Try it today:
 ```bash
-chu chat "your question about the codebase"
+gptcode chat "your question about the codebase"
 ```
 
 ---

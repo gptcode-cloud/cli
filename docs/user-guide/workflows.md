@@ -24,7 +24,7 @@ Use research mode to explore your codebase and understand the context before mak
 ### Example
 
 ```bash
-chu research "How does user authentication work in this codebase?"
+gptcode research "How does user authentication work in this codebase?"
 ```
 
 **What happens:**
@@ -58,7 +58,7 @@ Create a detailed implementation plan based on your research.
 ### Example
 
 ```bash
-chu plan "Add OAuth2 support to authentication"
+gptcode plan "Add OAuth2 support to authentication"
 ```
 
 **What happens:**
@@ -95,7 +95,7 @@ Execute your plan - choose between interactive or autonomous mode.
 
 **Usage:**
 ```bash
-chu implement ~/.gptcode/plans/2025-01-23-oauth2-support.md
+gptcode implement ~/.gptcode/plans/2025-01-23-oauth2-support.md
 ```
 
 **What happens:**
@@ -142,7 +142,7 @@ Continue anyway? [y/N]: n
 
 **Usage:**
 ```bash
-chu implement ~/.gptcode/plans/2025-01-23-oauth2-support.md --auto
+gptcode implement ~/.gptcode/plans/2025-01-23-oauth2-support.md --auto
 ```
 
 **What happens:**
@@ -155,13 +155,13 @@ chu implement ~/.gptcode/plans/2025-01-23-oauth2-support.md --auto
 **With options:**
 ```bash
 # Enable lint verification
-chu implement plan.md --auto --lint
+gptcode implement plan.md --auto --lint
 
 # Custom retry limit
-chu implement plan.md --auto --max-retries 5
+gptcode implement plan.md --auto --max-retries 5
 
 # Resume from checkpoint
-chu implement plan.md --auto --resume
+gptcode implement plan.md --auto --resume
 ```
 
 **Output:**
@@ -190,7 +190,7 @@ Let's walk through adding a "password reset" feature:
 ### 1. Research the codebase
 
 ```bash
-chu research "How is user authentication currently implemented?"
+gptcode research "How is user authentication currently implemented?"
 ```
 
 Review the generated research document to understand:
@@ -201,7 +201,7 @@ Review the generated research document to understand:
 ### 2. Create a plan
 
 ```bash
-chu plan "Add password reset feature with email verification"
+gptcode plan "Add password reset feature with email verification"
 ```
 
 Review the generated plan at `~/.gptcode/plans/2025-01-23-password-reset.md`:
@@ -232,7 +232,7 @@ Review the generated plan at `~/.gptcode/plans/2025-01-23-password-reset.md`:
 ### 3. Implement interactively (first time)
 
 ```bash
-chu implement ~/.gptcode/plans/2025-01-23-password-reset.md
+gptcode implement ~/.gptcode/plans/2025-01-23-password-reset.md
 ```
 
 Walk through each phase, reviewing and confirming:
@@ -245,7 +245,7 @@ Walk through each phase, reviewing and confirming:
 After reviewing and adjusting the plan:
 
 ```bash
-chu implement ~/.gptcode/plans/2025-01-23-password-reset.md --auto --lint
+gptcode implement ~/.gptcode/plans/2025-01-23-password-reset.md --auto --lint
 ```
 
 Let GPTCode:
@@ -289,7 +289,7 @@ All modes work from Neovim:
 " Implement autonomously
 :GPTCodeAuto
 " Or: <leader>ca
-" Prompts for plan file, runs: chu implement <file> --auto
+" Prompts for plan file, runs: gptcode implement <file> --auto
 ```
 
 ## FAQ

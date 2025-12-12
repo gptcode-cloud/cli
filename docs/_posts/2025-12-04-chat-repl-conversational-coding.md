@@ -34,7 +34,7 @@ Each invocation starts fresh. No memory, no context, no follow-up.
 
 ## The Solution: Chat REPL
 
-GPTCode's `chu chat` is a **persistent REPL** (Read-Eval-Print Loop) with:
+GPTCode's `gptcode chat` is a **persistent REPL** (Read-Eval-Print Loop) with:
 - Conversation history
 - File context awareness
 - Token management
@@ -43,7 +43,7 @@ GPTCode's `chu chat` is a **persistent REPL** (Read-Eval-Print Loop) with:
 ### Basic Usage
 
 ```bash
-$ chu chat
+$ gptcode chat
 
 > explain the authentication flow
 [GPTCode reads auth.go, middleware.go, session.go]
@@ -150,7 +150,7 @@ Continue later where you left off:
 Conversation saved to auth-discussion.json
 
 # Later, different terminal session
-$ chu chat
+$ gptcode chat
 > /load auth-discussion.json
 Conversation loaded from auth-discussion.json
 
@@ -163,7 +163,7 @@ Conversation loaded from auth-discussion.json
 ### Scenario: Adding Feature to Existing Code
 
 ```bash
-$ chu chat
+$ gptcode chat
 
 > show me the current user registration flow
 [GPTCode reads user.go, handler.go, validates.go]
@@ -219,7 +219,7 @@ Conversation saved.
 Start with a question immediately:
 
 ```bash
-$ chu chat "explain the database schema"
+$ gptcode chat "explain the database schema"
 [Processes question and stays open]
 The database has 5 main tables:
 ...
@@ -230,7 +230,7 @@ The database has 5 main tables:
 
 **Non-interactive mode** (for CI/scripts):
 ```bash
-$ chu chat "generate migration for new column" | tee migration.sql
+$ gptcode chat "generate migration for new column" | tee migration.sql
 [Processes and exits]
 ```
 
@@ -390,10 +390,10 @@ Routes messages to right agent:
 
 ```bash
 # Max tokens (default: 8000)
-chu config set defaults.chat_max_tokens 16000
+gptcode config set defaults.chat_max_tokens 16000
 
 # Max messages (default: 50)
-chu config set defaults.chat_max_messages 100
+gptcode config set defaults.chat_max_messages 100
 ```
 
 **Higher limits** = more context, but slower and more expensive
@@ -404,7 +404,7 @@ chu config set defaults.chat_max_messages 100
 Uses default profile models, but can override:
 
 ```bash
-chu chat --model gpt-4
+gptcode chat --model gpt-4
 ```
 
 ## Best Practices
@@ -413,10 +413,10 @@ chu chat --model gpt-4
 
 ```bash
 # Good
-chu chat "I'm working on the auth module, explain the JWT flow"
+gptcode chat "I'm working on the auth module, explain the JWT flow"
 
 # Less good
-chu chat "explain"
+gptcode chat "explain"
 ```
 
 Better context → better responses.
@@ -448,7 +448,7 @@ If at 80%+ tokens, consider `/clear` or `/save` and start fresh.
 ### 5. Use Initial Message for CI
 
 ```bash
-chu chat "check if PR follows coding standards" < pr_diff.txt
+gptcode chat "check if PR follows coding standards" < pr_diff.txt
 ```
 
 ## Keyboard Shortcuts
@@ -499,7 +499,7 @@ Transparent, automatic management.
 ### 1. Voice Input
 
 ```bash
-$ chu chat --voice
+$ gptcode chat --voice
 > [speak] "explain authentication"
 ```
 
@@ -538,7 +538,7 @@ Session URL: chu.dev/s/abc123
 ### 1. Start Chat
 
 ```bash
-chu chat
+gptcode chat
 ```
 
 ### 2. Ask Questions
@@ -614,7 +614,7 @@ Chat REPL delivers:
 
 Try it today:
 ```bash
-chu chat
+gptcode chat
 ```
 
 ---

@@ -29,13 +29,13 @@ This plan unifies `auto-task-execution.md` and `multi-step-execution.md` into a 
 ## Problem Statement
 
 Current limitations:
-1. **Vague tasks fail**: `chu do "read docs/_posts/X.md and create features page"`
+1. **Vague tasks fail**: `gptcode do "read docs/_posts/X.md and create features page"`
 2. **Complex multi-step tasks hit max iterations**: Editor reaches limit without completing
 3. **No decomposition**: Can't break "reorganize docs" into phases
 4. **Limited context management**: Loads all files upfront, hits token limits
 
 **Current Capabilities (2025-12-01):**
-- ✅ `chu implement plan.md --auto` - executes plans with retry
+- ✅ `gptcode implement plan.md --auto` - executes plans with retry
 - ✅ ML recommender - selects optimal models per agent
 - ✅ Verification system - build + test + lint
 - ✅ Error recovery with model switching
@@ -234,7 +234,7 @@ Example:
 - [ ] Movement-scoped context loading
 
 ### Phase 5: CLI + Integration (1 week)
-- [ ] `chu do` command
+- [ ] `gptcode do` command
 - [ ] `--dry-run`, `--programmatic`, `--resume` flags
 - [ ] Integration with ML recommender
 

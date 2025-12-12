@@ -111,7 +111,7 @@ GPTCode isn't trying to replace paid tools for everyone. If Cursor works for you
 go install github.com/jadercorrea/gptcode/cmd/chu@latest
 
 # Configure (use free Groq or local Ollama)
-chu setup
+gptcode setup
 
 # Start coding
 nvim

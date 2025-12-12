@@ -102,7 +102,7 @@ chu testgen coverage [--fill]
 
 **Problema:**
 - Comandos não conectados ao fluxo principal
-- Não integra com `chu issue fix`
+- Não integra com `gptcode issue fix`
 - Uso standalone apenas
 
 ### 6. Modificações em Testes E2E
@@ -115,7 +115,7 @@ Tentou preencher testes skeleton mas:
 
 ### 1. Falta de integração
 Código criado mas não conectado:
-- Não integra com `chu issue fix`
+- Não integra com `gptcode issue fix`
 - Comandos standalone sem uso no workflow
 - Módulos isolados
 
@@ -171,15 +171,15 @@ Fazer **uma feature por vez**, totalmente integrada:
 #### 1. Test Generation (mais fácil)
 - [ ] Criar `internal/testgen` limpo e completo
 - [ ] Adicionar validação: código gerado deve compilar
-- [ ] Integrar com `chu issue commit` via flag `--gen-tests`
+- [ ] Integrar com `gptcode issue commit` via flag `--gen-tests`
 - [ ] E2E real: gerar teste, compilar, rodar
 - [ ] Atualizar capabilities.md (3/8 → 4/8)
 - [ ] Ship + iterate
 
 #### 2. Documentation (médio)
 - [ ] Criar `internal/docs`
-- [ ] Adicionar `chu docs update-readme`
-- [ ] Integrar com `chu issue push` (update docs antes de PR)
+- [ ] Adicionar `gptcode docs update-readme`
+- [ ] Integrar com `gptcode issue push` (update docs antes de PR)
 - [ ] E2E: modificar código, gerar docs, verificar
 - [ ] Ship + iterate
 
@@ -187,7 +187,7 @@ Fazer **uma feature por vez**, totalmente integrada:
 - [ ] Criar `internal/git` com safeguards
 - [ ] Dry-run obrigatório
 - [ ] User confirmation antes de operações perigosas
-- [ ] Integrar com `chu issue` workflows
+- [ ] Integrar com `gptcode issue` workflows
 
 #### 4. Refactoring (muito complexo)
 - [ ] Pesquisar gopls/LSP integration

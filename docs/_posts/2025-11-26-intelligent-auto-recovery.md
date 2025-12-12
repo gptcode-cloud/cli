@@ -1,15 +1,15 @@
 ---
 layout: post
-title: "Intelligent Efficiency: chu do Finds The Optimal Path"
+title: "Intelligent Efficiency: gptcode do Finds The Optimal Path"
 date: 2025-11-26
 author: Jader Correa
-description: "chu do uses intelligent auto-recovery to find the optimal model path. Evaluates cost, speed, reliability across backends with real-time learning from execution history."
+description: "gptcode do uses intelligent auto-recovery to find the optimal model path. Evaluates cost, speed, reliability across backends with real-time learning from execution history."
 tags: [features, ml, auto-recovery, intelligence, optimization]
 ---
 
-# Intelligent Efficiency: `chu do` Finds The Optimal Path
+# Intelligent Efficiency: `gptcode do` Finds The Optimal Path
 
-Today we're releasing `chu do`—an autonomous execution system that doesn't just recover from failures, it actively **optimizes for efficiency**. The system evaluates cost, speed, reliability, and availability to find the best route to complete your task.
+Today we're releasing `gptcode do`—an autonomous execution system that doesn't just recover from failures, it actively **optimizes for efficiency**. The system evaluates cost, speed, reliability, and availability to find the best route to complete your task.
 
 ## The Problem
 
@@ -26,7 +26,7 @@ You want to complete a task. The system could use:
 ## Enter: Intelligent Efficiency
 
 ```bash
-$ chu do "create a hello.txt file with Hello World" --verbose
+$ gptcode do "create a hello.txt file with Hello World" --verbose
 
 Backend: groq
 Editor Model: moonshotai/kimi-k2-instruct-0905
@@ -180,7 +180,7 @@ Let's trace a real execution:
 ### First Time (Cold Start)
 
 ```bash
-$ chu do "create config.yaml" --verbose
+$ gptcode do "create config.yaml" --verbose
 
 # Attempt 1 with default model
 Backend: groq
@@ -201,7 +201,7 @@ Model: moonshotai/kimi-k2-instruct-0905
 ### Second Time
 
 ```bash
-$ chu do "create database.yaml" --verbose
+$ gptcode do "create database.yaml" --verbose
 
 # Still tries default first (respects user config)
 ❌ Failed: tool not available
@@ -218,7 +218,7 @@ $ chu do "create database.yaml" --verbose
 ### Third Time
 
 ```bash
-$ chu do "create api.yaml" --verbose
+$ gptcode do "create api.yaml" --verbose
 
 ❌ Failed: tool not available
 
@@ -232,7 +232,7 @@ $ chu do "create api.yaml" --verbose
 ### Fourth Time (Confidence Kicks In)
 
 ```bash
-$ chu do "create server.yaml" --verbose
+$ gptcode do "create server.yaml" --verbose
 
 ❌ Failed: tool not available
 
@@ -264,7 +264,7 @@ The intelligence system learns **your specific patterns**, not universal default
 
 ### 3. Improves With Usage
 
-The more you use `chu do`, the smarter it gets. No manual tuning required.
+The more you use `gptcode do`, the smarter it gets. No manual tuning required.
 
 ### 4. Transparent Decision-Making
 
@@ -279,12 +279,12 @@ You always know **why** the system chose a particular model.
 
 ### Basic
 ```bash
-chu do "create a file"
+gptcode do "create a file"
 ```
 
 ### With Verbose (Recommended Initially)
 ```bash
-chu do "create a file" --verbose
+gptcode do "create a file" --verbose
 ```
 
 Shows:
@@ -295,14 +295,14 @@ Shows:
 
 ### Dry Run (Analysis Only)
 ```bash
-chu do "complex refactoring" --dry-run
+gptcode do "complex refactoring" --dry-run
 ```
 
 Analyzes the task without executing.
 
 ### Control Retries
 ```bash
-chu do "task" --max-attempts 5
+gptcode do "task" --max-attempts 5
 ```
 
 Default is 3 attempts.
@@ -440,9 +440,9 @@ See [Intelligence Layers notebook](../notebooks/intelligence-layers.md) for the 
 
 [^2]: Liu, Z., Ma, P., Wang, Y., Matusik, W., & Tegmark, M. (2024). KAN 2.0: Kolmogorov-Arnold Networks Meet Science. arXiv:2408.10205 [cs.LG]. [https://arxiv.org/abs/2408.10205](https://arxiv.org/abs/2408.10205)
 
-## Comparison: chu do vs chu guided
+## Comparison: gptcode do vs chu guided
 
-| Feature | chu do | chu guided |
+| Feature | gptcode do | chu guided |
 |---------|--------|------------|
 | User approval | None | Required |
 | Auto-recovery | ✓ With learning | ✗ Manual fix |
@@ -462,13 +462,13 @@ go build -o bin/chu cmd/chu/*.go
 
 ### 2. Configure Multiple Backends
 ```bash
-chu setup
+gptcode setup
 # Add at least 2 backends (e.g., groq + openrouter)
 ```
 
 ### 3. Try It Out
 ```bash
-chu do "create a test.txt file with Hello" --verbose
+gptcode do "create a test.txt file with Hello" --verbose
 ```
 
 ### 4. Watch It Learn
@@ -486,7 +486,7 @@ Don't intervene manually during retries. The system needs real failure/success d
 
 ### Use Verbose Mode Initially
 ```bash
-chu do "task" --verbose
+gptcode do "task" --verbose
 ```
 
 Helps you understand:

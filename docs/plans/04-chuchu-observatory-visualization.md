@@ -283,7 +283,7 @@ observer-web/                       - NEW (React app)
 ```
 
 **Success criteria:**
-- `chu do --observer` abre dashboard em browser
+- `gptcode do --observer` abre dashboard em browser
 - Maestro flow aparece em tempo real
 - Steps animam quando executam
 - Zero overhead quando flag não está ativa
@@ -477,7 +477,7 @@ observer-web/src/components/        - ADD CostDashboard
 
 ### Curto prazo (Próximas 2 semanas)
 1. Implementar Maestro Flow Visualizer
-2. Integrar com `chu do`
+2. Integrar com `gptcode do`
 3. Deploy local funcional
 4. Feedback de beta testers
 
@@ -563,7 +563,7 @@ const scenarios = [
   {
     id: "auth",
     title: "🔐 Add Authentication",
-    command: "chu do 'add authentication'",
+    command: "gptcode do 'add authentication'",
     stats: "4 steps • $0.004 • 6.5s",
     steps: [
       { agent: "analyzer", duration: 1200, output: "Found 42 Go files..." },
@@ -575,7 +575,7 @@ const scenarios = [
   {
     id: "bug-fix",
     title: "Fix Payment Bug",
-    command: "chu do 'fix nil pointer in payment'",
+    command: "gptcode do 'fix nil pointer in payment'",
     stats: "6 steps • $0.007 • 9.2s",
     steps: [
       { agent: "analyzer", duration: 800 },
@@ -654,7 +654,7 @@ Choose a scenario below or try your own:
 │  Ready to see it on your own code?                    │
 │                                                        │
 │  $ go install github.com/jadercorrea/gptcode@latest    │
-│  $ chu do --observer "your task"                   │
+│  $ gptcode do --observer "your task"                   │
 │                                                        │
 │  [Download] [Documentation] [GitHub]                  │
 └────────────────────────────────────────────────────────┘

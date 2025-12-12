@@ -42,7 +42,7 @@ Let's add a "password reset" feature:
 ### 1. Research
 
 ```bash
-chu research "How is user authentication currently implemented?"
+gptcode research "How is user authentication currently implemented?"
 ```
 
 GPTCode will:
@@ -54,7 +54,7 @@ GPTCode will:
 ### 2. Plan
 
 ```bash
-chu plan "Add password reset feature with email verification"
+gptcode plan "Add password reset feature with email verification"
 ```
 
 GPTCode creates a detailed plan:
@@ -68,7 +68,7 @@ Plan saved to `~/.gptcode/plans/2025-01-23-password-reset.md`
 ### 3. Implement (Interactive)
 
 ```bash
-chu implement ~/.gptcode/plans/2025-01-23-password-reset.md
+gptcode implement ~/.gptcode/plans/2025-01-23-password-reset.md
 ```
 
 Walk through each phase:
@@ -88,7 +88,7 @@ Execute this step? [Y/n/q]: Y
 **Or Implement (Autonomous):**
 
 ```bash
-chu implement ~/.gptcode/plans/2025-01-23-password-reset.md --auto
+gptcode implement ~/.gptcode/plans/2025-01-23-password-reset.md --auto
 ```
 
 GPTCode executes everything:
@@ -225,9 +225,9 @@ Implementation itself works for any language (LLM-based), but build/test verific
 ## Try It Yourself
 
 1. Pick a small feature to implement
-2. Start with: `chu research "How does X work?"`
-3. Create plan: `chu plan "Add Y feature"`
-4. Implement interactively: `chu implement <plan>`
+2. Start with: `gptcode research "How does X work?"`
+3. Create plan: `gptcode plan "Add Y feature"`
+4. Implement interactively: `gptcode implement <plan>`
 5. Review results, iterate if needed
 6. Next time: use `--auto` for speed
 

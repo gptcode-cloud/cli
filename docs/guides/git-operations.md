@@ -18,13 +18,13 @@ Automatically find which commit introduced a bug using binary search.
 ### Basic Usage
 
 ```bash
-chu git bisect <good-commit> <bad-commit>
+gptcode git bisect <good-commit> <bad-commit>
 ```
 
 ### Example
 
 ```bash
-chu git bisect v1.0.0 HEAD
+gptcode git bisect v1.0.0 HEAD
 ```
 
 **What it does:**
@@ -67,17 +67,17 @@ Apply commits from one branch to another with intelligent conflict resolution.
 ### Basic Usage
 
 ```bash
-chu git cherry-pick <commit> [<commit>...]
+gptcode git cherry-pick <commit> [<commit>...]
 ```
 
 ### Example
 
 ```bash
 # Cherry-pick a single commit
-chu git cherry-pick abc123
+gptcode git cherry-pick abc123
 
 # Cherry-pick multiple commits
-chu git cherry-pick abc123 def456 ghi789
+gptcode git cherry-pick abc123 def456 ghi789
 ```
 
 **What it does:**
@@ -111,17 +111,17 @@ Rebase with AI-powered conflict resolution.
 ### Basic Usage
 
 ```bash
-chu git rebase [branch]
+gptcode git rebase [branch]
 ```
 
 ### Example
 
 ```bash
 # Rebase onto main
-chu git rebase main
+gptcode git rebase main
 
 # Interactive rebase
-chu git rebase --interactive HEAD~5
+gptcode git rebase --interactive HEAD~5
 ```
 
 **What it does:**
@@ -150,17 +150,17 @@ Combine multiple commits into one with an AI-generated commit message.
 ### Basic Usage
 
 ```bash
-chu git squash <base-commit>
+gptcode git squash <base-commit>
 ```
 
 ### Example
 
 ```bash
 # Squash last 3 commits
-chu git squash HEAD~3
+gptcode git squash HEAD~3
 
 # Squash all commits since a specific commit
-chu git squash abc123
+gptcode git squash abc123
 ```
 
 **What it does:**
@@ -204,17 +204,17 @@ Get AI-powered suggestions to improve commit messages.
 ### Basic Usage
 
 ```bash
-chu git reword <commit>
+gptcode git reword <commit>
 ```
 
 ### Example
 
 ```bash
 # Improve the last commit message
-chu git reword HEAD
+gptcode git reword HEAD
 
 # Improve a specific commit
-chu git reword abc123
+gptcode git reword abc123
 ```
 
 **What it does:**
@@ -250,7 +250,7 @@ Automatically resolve all merge conflicts using AI.
 ### Basic Usage
 
 ```bash
-chu merge resolve
+gptcode merge resolve
 ```
 
 ### Example
@@ -260,7 +260,7 @@ chu merge resolve
 git merge feature-branch
 # CONFLICT (content): Merge conflict in src/main.go
 
-chu merge resolve
+gptcode merge resolve
 ```
 
 **What it does:**
@@ -313,7 +313,7 @@ All Git operations use your default LLM configuration from `~/.gptcode/setup.yam
 You can specify a different model for Git operations:
 
 ```bash
-chu git squash HEAD~3 --model claude-3-5-sonnet-20241022
+gptcode git squash HEAD~3 --model claude-3-5-sonnet-20241022
 ```
 
 ### Supported Models
@@ -392,10 +392,10 @@ git checkout -b feature-auth
 # ... make multiple commits ...
 
 # Squash into one clean commit
-chu git squash main
+gptcode git squash main
 
 # Rebase onto main with conflict resolution
-chu git rebase main
+gptcode git rebase main
 
 # Create PR
 git push origin feature-auth
@@ -405,23 +405,23 @@ git push origin feature-auth
 
 ```bash
 # Find the breaking commit
-chu git bisect v1.0.0 HEAD
+gptcode git bisect v1.0.0 HEAD
 
 # Cherry-pick the fix to release branch
 git checkout release-1.0
-chu git cherry-pick <fix-commit>
+gptcode git cherry-pick <fix-commit>
 ```
 
 ### Cleaning Up History
 
 ```bash
 # Improve recent commit messages
-chu git reword HEAD~2
-chu git reword HEAD~1
-chu git reword HEAD
+gptcode git reword HEAD~2
+gptcode git reword HEAD~1
+gptcode git reword HEAD
 
 # Squash related changes
-chu git squash HEAD~5
+gptcode git squash HEAD~5
 ```
 
 ---
@@ -451,10 +451,10 @@ A: We recommend:
 
 ## Related Commands
 
-- `chu coverage` - Analyze test coverage
-- `chu review` - Code review with AI
-- `chu gen changelog` - Generate CHANGELOG from commits
-- `chu docs update` - Update README based on changes
+- `gptcode coverage` - Analyze test coverage
+- `gptcode review` - Code review with AI
+- `gptcode gen changelog` - Generate CHANGELOG from commits
+- `gptcode docs update` - Update README based on changes
 
 ---
 

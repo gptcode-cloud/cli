@@ -38,7 +38,7 @@ These operations traditionally require:
 **The Solution:** AI-powered binary search through Git history:
 
 ```bash
-chu git bisect --bad HEAD --good v1.2.0 --test "go test ./internal/auth"
+gptcode git bisect --bad HEAD --good v1.2.0 --test "go test ./internal/auth"
 ```
 
 How it works:
@@ -49,7 +49,7 @@ How it works:
 
 **Real-world example:**
 ```bash
-$ chu git bisect --bad HEAD --good abc123 --test "npm test"
+$ gptcode git bisect --bad HEAD --good abc123 --test "npm test"
 
 🔍 Starting bisect: 24 commits to check (~4 steps)
   Step 1/4: Testing commit def456... ✓ GOOD
@@ -76,7 +76,7 @@ Changed files:
 **The Solution:** Intelligent conflict resolution that understands your code:
 
 ```bash
-chu git cherry-pick abc123
+gptcode git cherry-pick abc123
 ```
 
 When conflicts occur:
@@ -87,7 +87,7 @@ When conflicts occur:
 
 **Example conflict resolution:**
 ```bash
-$ chu git cherry-pick feature/new-auth
+$ gptcode git cherry-pick feature/new-auth
 
 ⚠️  Conflict in internal/auth/handler.go
 
@@ -109,7 +109,7 @@ Merged both features by:
 **The Solution:** Autonomous rebase that handles conflicts intelligently:
 
 ```bash
-chu git rebase main
+gptcode git rebase main
 ```
 
 Features:
@@ -120,7 +120,7 @@ Features:
 
 **Example:**
 ```bash
-$ chu git rebase main
+$ gptcode git rebase main
 
 🔄 Rebasing 5 commits from feature/api onto main...
   Commit 1/5: Add user endpoint... ✓
@@ -149,9 +149,9 @@ $ chu git rebase main
 **The Solution:** AI that understands your changes and writes professional commit messages:
 
 ```bash
-chu git squash --count 5
+gptcode git squash --count 5
 # or
-chu git squash --from abc123
+gptcode git squash --from abc123
 ```
 
 The AI analyzes all commits and generates a structured message with:
@@ -161,7 +161,7 @@ The AI analyzes all commits and generates a structured message with:
 
 **Example:**
 ```bash
-$ chu git squash --count 3
+$ gptcode git squash --count 3
 
 📝 Analyzing 3 commits:
   - fix: handle nil pointer in auth
@@ -192,7 +192,7 @@ and makes the authentication flow more robust.
 **The Solution:** AI that reads your diff and suggests professional messages:
 
 ```bash
-chu git reword abc123
+gptcode git reword abc123
 ```
 
 Features:
@@ -203,7 +203,7 @@ Features:
 
 **Example:**
 ```bash
-$ chu git reword HEAD
+$ gptcode git reword HEAD
 
 Current message: "update handler"
 
@@ -234,7 +234,7 @@ Which message? (1-3, or edit):
 **The Solution:** Standalone conflict resolver that can be called anytime:
 
 ```bash
-chu git resolve-conflicts
+gptcode git resolve-conflicts
 ```
 
 Works with any Git operation that causes conflicts:
@@ -248,7 +248,7 @@ Works with any Git operation that causes conflicts:
 $ git merge feature/new-api
 # ... conflicts occur ...
 
-$ chu git resolve-conflicts
+$ gptcode git resolve-conflicts
 
 🔍 Found 3 conflicted files:
   - internal/api/handler.go
@@ -281,7 +281,7 @@ Run 'git add .' to stage the resolutions.
 Bonus feature for database operations: intelligent migration strategies.
 
 ```bash
-chu gen migration --zero-downtime
+gptcode gen migration --zero-downtime
 ```
 
 For operations like "add NOT NULL column to users table", the AI generates a multi-phase migration:
@@ -432,32 +432,32 @@ func (g *GitBisect) Run(ctx context.Context, good, bad, testCmd string) (string,
 
 **Git Bisect:** When you know a test is failing but don't know which commit broke it
 ```bash
-chu git bisect --bad HEAD --good v1.0.0 --test "go test ./..."
+gptcode git bisect --bad HEAD --good v1.0.0 --test "go test ./..."
 ```
 
 **Cherry-Pick:** When you need a specific commit from another branch
 ```bash
-chu git cherry-pick feature/abc123
+gptcode git cherry-pick feature/abc123
 ```
 
 **Rebase:** When syncing your feature branch with main
 ```bash
-chu git rebase main
+gptcode git rebase main
 ```
 
 **Squash:** Before creating a PR to clean up commit history
 ```bash
-chu git squash --count 8
+gptcode git squash --count 8
 ```
 
 **Reword:** When you have commits with poor messages
 ```bash
-chu git reword HEAD~3  # Reword last 3 commits
+gptcode git reword HEAD~3  # Reword last 3 commits
 ```
 
 **Resolve Conflicts:** Anytime you encounter merge conflicts
 ```bash
-chu git resolve-conflicts
+gptcode git resolve-conflicts
 ```
 
 ### Safety Features
@@ -470,8 +470,8 @@ All commands include safety checks:
 - **Dry-run mode** - Preview changes before applying
 
 ```bash
-chu git squash --count 5 --dry-run
-chu git rebase main --backup
+gptcode git squash --count 5 --dry-run
+gptcode git rebase main --backup
 ```
 
 ## Future Enhancements

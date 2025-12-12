@@ -147,7 +147,7 @@ ollama pull qwen3-coder:latest
 
 2. **Update GPTCode's model catalog:**
 ```bash
-chu models update
+gptcode models update
 ```
 
 This will automatically detect installed Ollama models.
@@ -224,7 +224,7 @@ backend:
 ```
 
 **To switch backends:**
-1. Via CLI: `chu backend use ollama` or `chu backend use groq`
+1. Via CLI: `gptcode backend use ollama` or `gptcode backend use groq`
 2. In Neovim: Press `Ctrl+X` in chat buffer and select different backend
 
 **Important**: Only one backend is active at a time. Each backend has its own set of agent_models. You cannot mix models from different backends in the same session.
@@ -272,11 +272,11 @@ GPTCode includes built-in model discovery and installation for Ollama:
 
 ```bash
 # Search all ollama models
-chu models search -b ollama
+gptcode models search -b ollama
 
 # Search with filters (ANDed together)
-chu models search ollama coding fast
-chu models search ollama llama3
+gptcode models search ollama coding fast
+gptcode models search ollama llama3
 ```
 
 The search results include an `installed` field showing which models are already available:
@@ -295,7 +295,7 @@ The search results include an `installed` field showing which models are already
 
 ```bash
 # Install a specific model
-chu models install llama3.1:8b
+gptcode models install llama3.1:8b
 
 # If already installed, you'll see:
 # ✓ Model llama3.1:8b already installed
@@ -307,7 +307,7 @@ For the full catalog of available models, visit [ollama.com/library](https://oll
 
 Update GPTCode's model catalog periodically:
 ```bash
-chu models update
+gptcode models update
 ```
 
 ## Community Recommendations

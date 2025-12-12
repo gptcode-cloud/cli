@@ -1,20 +1,20 @@
-# chu do - Intelligent Task Execution with Efficiency Optimization
+# gptcode do - Intelligent Task Execution with Efficiency Optimization
 
 ## Overview
 
-`chu do` executes tasks autonomously with **intelligent efficiency optimization**. The system evaluates all available models across cost, speed, reliability, and availability to find the optimal path. When obstacles appear (failures, rate limits, high costs), it automatically adapts and finds a better route.
+`gptcode do` executes tasks autonomously with **intelligent efficiency optimization**. The system evaluates all available models across cost, speed, reliability, and availability to find the optimal path. When obstacles appear (failures, rate limits, high costs), it automatically adapts and finds a better route.
 
 ## Basic Usage
 
 ```bash
-chu do "create a hello.txt file with Hello World"
-chu do "read docs/README.md and create a getting-started guide"
-chu do "unify all feature files in /guides"
+gptcode do "create a hello.txt file with Hello World"
+gptcode do "read docs/README.md and create a getting-started guide"
+gptcode do "unify all feature files in /guides"
 ```
 
 ## Intelligence System
 
-Unlike traditional fallback systems with hardcoded alternatives, `chu do` uses **multi-criteria optimization** to find the most efficient model:
+Unlike traditional fallback systems with hardcoded alternatives, `gptcode do` uses **multi-criteria optimization** to find the most efficient model:
 
 **Evaluated Criteria:**
 - Success Rate (50%) - Reliability from historical data
@@ -65,7 +65,7 @@ Unlike traditional fallback systems with hardcoded alternatives, `chu do` uses *
 ```
 ┌─────────────────────────────────────────────┐
 │ 1. Attempt with current model              │
-│    chu do "create file"                     │
+│    gptcode do "create file"                     │
 └──────────────┬──────────────────────────────┘
                │
                ↓ Fails (tool not available)
@@ -106,7 +106,7 @@ Uses **orchestrated agent decomposition** for better results:
 4. **Validator Agent** - Verifies success criteria
 
 ```bash
-chu do "add debug flag to config.ini"
+gptcode do "add debug flag to config.ini"
 ```
 
 **Benefits:**
@@ -118,7 +118,7 @@ chu do "add debug flag to config.ini"
 Requires manual plan approval before execution:
 
 ```bash
-chu do --supervised "refactor authentication module"
+gptcode do --supervised "refactor authentication module"
 ```
 
 **Use when:**
@@ -139,12 +139,12 @@ chu do --supervised "refactor authentication module"
 
 ### Basic Execution
 ```bash
-chu do "create a config.yaml file"
+gptcode do "create a config.yaml file"
 ```
 
 ### With Verbose Output
 ```bash
-chu do "extract todos from code" --verbose
+gptcode do "extract todos from code" --verbose
 ```
 
 Shows:
@@ -156,7 +156,7 @@ Shows:
 
 ### Dry Run Analysis
 ```bash
-chu do "refactor util functions" --dry-run
+gptcode do "refactor util functions" --dry-run
 ```
 
 Analyzes without executing:
@@ -223,7 +223,7 @@ Example output:
 **Solution**: Configure additional backends with function-calling models:
 
 ```bash
-chu setup  # Add OpenRouter or other providers
+gptcode setup  # Add OpenRouter or other providers
 ```
 
 ### Still failing after retries
@@ -237,8 +237,8 @@ chu setup  # Add OpenRouter or other providers
 
 **Solution**:
 ```bash
-chu key openrouter  # Add missing API keys
-chu do "task" --verbose  # See detailed error messages
+gptcode key openrouter  # Add missing API keys
+gptcode do "task" --verbose  # See detailed error messages
 ```
 
 ### Recommendations not improving
@@ -258,7 +258,7 @@ chu do "task" --verbose  # See detailed error messages
 
 ### Use Verbose Mode Initially
 ```bash
-chu do "task" --verbose
+gptcode do "task" --verbose
 ```
 
 Helps you understand:
@@ -294,7 +294,7 @@ cat ~/.gptcode/task_execution_history.jsonl | \
 
 ## vs chu guided
 
-| Feature | chu do | chu guided |
+| Feature | gptcode do | chu guided |
 |---------|--------|------------|
 | **Approval** | None (autonomous) | Required |
 | **Auto-recovery** | ✓ Intelligent retry | ✗ Manual config change |
@@ -302,12 +302,12 @@ cat ~/.gptcode/task_execution_history.jsonl | \
 | **Speed** | Fast (auto-retry) | Slower (user approval) |
 | **Safety** | Medium | High |
 
-**Use `chu do` when:**
+**Use `gptcode do` when:**
 - Task is low-risk
 - You want autonomous execution
 - System has learned your setup
 
-**Use `chu guided` when:**
+**Use `gptcode guided` when:**
 - Task affects >10 files
 - Deleting/moving critical files
 - You want to review the plan first
@@ -328,6 +328,6 @@ Future enhancements (planned):
 
 ## Related Commands
 
-- `chu guided` - Interactive mode with plan approval
-- `chu plan` - Create plan without execution
-- `chu setup` - Configure backends and models
+- `gptcode guided` - Interactive mode with plan approval
+- `gptcode plan` - Create plan without execution
+- `gptcode setup` - Configure backends and models

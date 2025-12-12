@@ -7,7 +7,7 @@ This document tracks E2E testing implementation progress for **GPTCode**.
 
 ## Implementation Approach
 
-**Current (✅):** Go tests with `chu test e2e` command  
+**Current (✅):** Go tests with `gptcode test e2e` command  
 **Previous:** Bash scripts (deprecated, replaced by Go tests)
 
 ### Why Go Tests?
@@ -23,11 +23,11 @@ This document tracks E2E testing implementation progress for **GPTCode**.
 ## ✅ Phase 1 – E2E Infrastructure (COMPLETE)
 
 ### Command Implementation
-- ✅ `chu test e2e` - Profile-based test execution
-- ✅ `chu test e2e --interactive` - Interactive profile selection
-- ✅ `chu test e2e run` - Category-based execution
-- ✅ `chu test e2e --notify` - macOS desktop notifications
-- ✅ `chu test e2e --timeout N` - Custom timeout configuration
+- ✅ `gptcode test e2e` - Profile-based test execution
+- ✅ `gptcode test e2e --interactive` - Interactive profile selection
+- ✅ `gptcode test e2e run` - Category-based execution
+- ✅ `gptcode test e2e --notify` - macOS desktop notifications
+- ✅ `gptcode test e2e --timeout N` - Custom timeout configuration
 
 ### Test Runner Features
 - ✅ Real-time progress bar with countdown
@@ -38,7 +38,7 @@ This document tracks E2E testing implementation progress for **GPTCode**.
 
 ### Current Tests (tests/e2e/run/)
 - ✅ `TestE2EConfiguration` - Validates E2E environment
-- ✅ `TestChuCommand` - Verifies chu binary availability
+- ✅ `TestGptcodeCommand` - Verifies gptcode binary availability
 - ✅ `TestChuDoCreateFile` - File creation with content validation
 - ✅ `TestChuDoModifyFile` - File modification validation
 - ✅ `TestChuDoNoUnintendedFiles` - Extra file detection
@@ -58,7 +58,7 @@ e2e:
 ## ✅ Phase 2 – Chat & Interactive Commands (COMPLETE)
 
 ### Goals
-- ✅ Test `chu chat` single-shot and REPL mode
+- ✅ Test `gptcode chat` single-shot and REPL mode
 - ✅ Test conversation context management
 - ✅ Validate response capture and history
 
@@ -83,8 +83,8 @@ e2e:
 
 ### Goals
 - ✅ Validate commands exist and show help
-- ⏭️ Test `chu research` functionality (placeholder)
-- ⏭️ Test `chu plan` generation (placeholder)
+- ⏭️ Test `gptcode research` functionality (placeholder)
+- ⏭️ Test `gptcode plan` generation (placeholder)
 - ⏭️ Validate research → plan workflow (placeholder)
 
 ### Implemented Tests (tests/e2e/planning/)
@@ -102,8 +102,8 @@ e2e:
 ## 🚧 Phase 4 – Autonomous Execution (PLANNED)
 
 ### Goals
-- Test `chu implement plan.md`
-- Test `chu implement --auto` with verification
+- Test `gptcode implement plan.md`
+- Test `gptcode implement --auto` with verification
 - Validate retry logic and error recovery
 
 ### Planned Tests (tests/e2e/integration/)
@@ -132,18 +132,18 @@ e2e:
 
 ```bash
 # Run all tests
-chu test e2e
+gptcode test e2e
 
 # Run specific category
-chu test e2e run
-chu test e2e chat
-chu test e2e integration
+gptcode test e2e run
+gptcode test e2e chat
+gptcode test e2e integration
 
 # With notifications
-chu test e2e --notify
+gptcode test e2e --notify
 
 # Custom timeout (for slow local models)
-chu test e2e --timeout 900  # 15 minutes
+gptcode test e2e --timeout 900  # 15 minutes
 ```
 
 ---
@@ -174,7 +174,7 @@ chu test e2e --timeout 900  # 15 minutes
 
 **Replaced by:**
 - `tests/e2e/<category>/*_test.go` - Go test files
-- `chu test e2e` - New test runner
+- `gptcode test e2e` - New test runner
 
 **Advantages:**
 - Type-safe test code

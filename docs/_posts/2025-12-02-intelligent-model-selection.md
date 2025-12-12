@@ -208,7 +208,7 @@ Intelligent model selection delivers:
 Try it today:
 ```bash
 chu mode cloud
-chu do "refactor auth module"
+gptcode do "refactor auth module"
 chu stats
 ```
 

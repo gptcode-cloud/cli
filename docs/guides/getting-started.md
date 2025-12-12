@@ -13,11 +13,11 @@ go build -o ./bin/chu ./cmd/chu
 
 ## Initial setup
 ```bash
-chu setup             # creates ~/.gptcode/setup.yaml
-chu key openrouter    # add API key(s) as needed
-chu backend           # check current backend
-chu backend list      # list all backends
-chu profile           # check current profile
+gptcode setup             # creates ~/.gptcode/setup.yaml
+gptcode key openrouter    # add API key(s) as needed
+gptcode backend           # check current backend
+gptcode backend list      # list all backends
+gptcode profile           # check current profile
 ```
 
 ## Quick start: two‑keystroke feedback (Ctrl+g)
@@ -48,13 +48,13 @@ chu feedback stats
 
 - Chat (code‑focused Q&A):
 ```bash
-chu chat "how does auth middleware work?"
+gptcode chat "how does auth middleware work?"
 ```
 
 - Orchestrated execution (Analyzer → Planner → Editor → Validator):
 ```bash
-chu do "add feature"
-chu do --supervised "refactor module"
+gptcode do "add feature"
+gptcode do --supervised "refactor module"
 ```
 
 - Model management:
@@ -64,6 +64,6 @@ chu model recommend editor
 ```
 
 ## Troubleshooting
-- Missing API keys: `chu key <backend>`
+- Missing API keys: `gptcode key <backend>`
 - Hook not active: `source ~/.zshrc` (or your shell rc) and try Ctrl+g again
 - Files not captured: ensure you are inside a git repo

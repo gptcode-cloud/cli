@@ -44,7 +44,7 @@ If the directory is a git repo:
 
 ## Generate the demos via CLI
 ```bash
-chu demo feedback create           # also available as: `chu demo feedback:create` or `chu demo feedback.create`
+chu demo feedback create           # also available as: `gptcode demo feedback:create` or `gptcode demo feedback.create`
 ```
 
 ## Check events

@@ -31,7 +31,7 @@ You use **one backend at a time**, but can configure different agents to use dif
 2. Create an API key
 3. Add it to GPTCode:
    ```bash
-   chu key openrouter sk-or-v1-...
+   gptcode key openrouter sk-or-v1-...
    ```
 
 ### Step 2: Configure Agent Models
@@ -202,17 +202,17 @@ Grok 4.1 Fast is particularly interesting for AI coding agents:
 
 1. Update your model catalog:
    ```bash
-   chu models update
+   gptcode models update
    ```
 
 2. Verify your configuration:
    ```bash
-   chu profile
+   gptcode profile
    ```
 
 3. Test with a chat:
    ```bash
-   chu chat
+   gptcode chat
    ```
 
 ## The Result

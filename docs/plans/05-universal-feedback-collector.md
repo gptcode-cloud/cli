@@ -7,8 +7,8 @@
 ## Current State
 
 ✅ **What exists:**
-- `chu feedback submit` - Submit feedback to GPTCode
-- `chu feedback hook install` - Shell hooks for Ctrl+g → mark suggestion
+- `gptcode feedback submit` - Submit feedback to GPTCode
+- `gptcode feedback hook install` - Shell hooks for Ctrl+g → mark suggestion
 - Feedback collection works for GPTCode's own outputs
 - ML training pipeline consumes feedback
 
@@ -38,7 +38,7 @@ Extend current Ctrl+g hook to work with ANY command output:
 
 ```bash
 # Current (only works after chu commands)
-$ chu chat "install docker"
+$ gptcode chat "install docker"
 > sudo apt install docker  # Wrong for macOS
 <Ctrl+g>  # Marks this
 $ brew install docker  # Corrected
@@ -67,7 +67,7 @@ Capture corrections from web UIs:
 1. User gets bad suggestion in textarea
 2. User edits it
 3. Browser extension detects edit
-4. Sends to chu feedback submit --source=gemini-web
+4. Sends to gptcode feedback submit --source=gemini-web
 ```
 
 **Targets:**
@@ -83,7 +83,7 @@ Capture from Cursor, VSCode Copilot:
 1. Copilot suggests code
 2. User edits suggestion
 3. Extension captures diff
-4. Sends to chu feedback
+4. Sends to gptcode feedback
 ```
 
 ## Technical Design
@@ -141,13 +141,13 @@ bind \cg universal_feedback_mark  # Ctrl+g
 
 ```bash
 # Enable universal feedback (default: off)
-chu feedback config --universal=true
+gptcode feedback config --universal=true
 
 # Show what's being collected
-chu feedback config --show
+gptcode feedback config --show
 
 # Disable
-chu feedback config --universal=false
+gptcode feedback config --universal=false
 ```
 
 **Data handling:**
@@ -174,7 +174,7 @@ chu feedback config --universal=false
 ### Phase 3: Browser Extension (Week 3-4, Optional)
 - [ ] Chrome extension for Gemini AI
 - [ ] Capture textarea edits
-- [ ] Send to chu feedback API
+- [ ] Send to gptcode feedback API
 - [ ] Firefox support
 
 ### Phase 4: Editor Integration (Week 5+, Optional)

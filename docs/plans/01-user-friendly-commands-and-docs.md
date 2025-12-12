@@ -2,24 +2,24 @@
 Atualizar CLI para comandos user-friendly e sincronizar toda documentação com o estado real do projeto, seguindo as diretrizes dos notebooks compartilhados.
 
 # Contexto Atual
-- ✅ Já implementamos `chu profile` (singular) com subcomandos friendly
-- ⚠️ Ainda temos comandos verbosos como `chu config get defaults.backend`
+- ✅ Já implementamos `gptcode profile` (singular) com subcomandos friendly
+- ⚠️ Ainda temos comandos verbosos como `gptcode config get defaults.backend`
 - ⚠️ Documentação menciona comandos inexistentes ou desatualizados
 - ⚠️ Foco em TDD quando deveria destacar agents + validation
 
 # Mudanças no CLI
 
 ## 1. Backend Commands (Singular)
-Adicionar `chu backend` (singular) com subcomandos friendly:
+Adicionar `gptcode backend` (singular) com subcomandos friendly:
 
 ### Comandos Novos
 ```bash
-chu backend                    # show current backend
-chu backend list               # list all backends
-chu backend show [name]        # show backend config
-chu backend use <name>         # switch to backend
-chu backend create <name> <type> <url>  # já existe
-chu backend delete <name>      # já existe
+gptcode backend                    # show current backend
+gptcode backend list               # list all backends
+gptcode backend show [name]        # show backend config
+gptcode backend use <name>         # switch to backend
+gptcode backend create <name> <type> <url>  # já existe
+gptcode backend delete <name>      # já existe
 ```
 
 ### Implementação
@@ -29,18 +29,18 @@ chu backend delete <name>      # já existe
 - Arquivos: `cmd/chu/main.go`
 
 ## 2. Model Commands (já existe, verificar completude)
-Verificar se `chu model` já tem todos os comandos friendly:
+Verificar se `gptcode model` já tem todos os comandos friendly:
 ```bash
-chu model list
-chu model recommend
-chu model install
-chu model update
+gptcode model list
+gptcode model recommend
+gptcode model install
+gptcode model update
 ```
 
 ## 3. Atualizar Help Principal
 Atualizar `rootCmd.Long` para:
-- Remover menção a `chu config get/set` do help principal
-- Adicionar `chu profile` e `chu backend` nos exemplos
+- Remover menção a `gptcode config get/set` do help principal
+- Adicionar `gptcode profile` e `gptcode backend` nos exemplos
 - Manter categorização já feita
 
 # Atualização de Documentação
@@ -55,19 +55,19 @@ Atualizar seções:
 ### Backend Management (linha ~262)
 Substituir:
 ```bash
-chu config set defaults.backend mygroq
+gptcode config set defaults.backend mygroq
 ```
 Por:
 ```bash
-chu backend use mygroq
+gptcode backend use mygroq
 ```
 
 ### Profile Management (linha ~280)
-Adicionar exemplos com `chu profile` (singular):
+Adicionar exemplos com `gptcode profile` (singular):
 ```bash
-chu profile                  # show current
-chu profile list            # list all
-chu profile use groq.speed  # switch
+gptcode profile                  # show current
+gptcode profile list            # list all
+gptcode profile use groq.speed  # switch
 ```
 
 ## 5. docs/commands.md
@@ -75,23 +75,23 @@ Atualizar seção de configuração:
 
 ### Backend Management
 ```bash
-chu backend                 # Show current backend
-chu backend list           # List all backends  
-chu backend use groq       # Switch backend
-chu backend create <name> <type> <url>
-chu backend delete <name>
+gptcode backend                 # Show current backend
+gptcode backend list           # List all backends  
+gptcode backend use groq       # Switch backend
+gptcode backend create <name> <type> <url>
+gptcode backend delete <name>
 ```
 
 ### Profile Management
 ```bash
-chu profile                      # Show current profile
-chu profile list [backend]       # List all profiles
-chu profile show [backend.profile]
-chu profile use backend.profile  # Switch profile
+gptcode profile                      # Show current profile
+gptcode profile list [backend]       # List all profiles
+gptcode profile show [backend.profile]
+gptcode profile use backend.profile  # Switch profile
 ```
 
 ### Configuration (Advanced)
-Mover `chu config get/set` para seção "Advanced" e marcar como "para uso avançado".
+Mover `gptcode config get/set` para seção "Advanced" e marcar como "para uso avançado".
 
 ## 6. docs/index.md (Homepage)
 Baseado no notebook "Repensando o Site":
@@ -139,8 +139,8 @@ Baseado no notebook "Revisão completa dos posts":
   - Clarificar que só um backend por vez
   
 - `2025-11-21-profile-management.md`
-  - Atualizar exemplos para usar `chu profile` (singular)
-  - Adicionar `chu profile use`
+  - Atualizar exemplos para usar `gptcode profile` (singular)
+  - Adicionar `gptcode profile use`
 
 ### Média Prioridade
 - `2025-11-15-groq-optimal-configs.md`
@@ -151,20 +151,20 @@ Baseado no notebook "Revisão completa dos posts":
 
 ### Padrão de Busca e Substituição
 Em todos os posts:
-- `chu config set defaults.backend X` → `chu backend use X`
-- `chu config set defaults.profile Y` → `chu profile use X.Y`
-- `chu profiles list X` → `chu profile list X`
-- `chu profiles show X Y` → `chu profile show X.Y`
+- `gptcode config set defaults.backend X` → `gptcode backend use X`
+- `gptcode config set defaults.profile Y` → `gptcode profile use X.Y`
+- `gptcode profiles list X` → `gptcode profile list X`
+- `gptcode profiles show X Y` → `gptcode profile show X.Y`
 
 ## 9. Guias
 - `docs/guides/getting-started.md`
   - Atualizar comandos de configuração
-  - Usar `chu backend` e `chu profile` nos exemplos
+  - Usar `gptcode backend` e `gptcode profile` nos exemplos
 
 # Ordem de Implementação
 
 ## Fase 1: CLI Core (Alta Prioridade)
-1. ✅ Implementar `chu backend` (singular) commands
+1. ✅ Implementar `gptcode backend` (singular) commands
 2. ✅ Atualizar help principal (remover config get/set)
 3. ✅ Testar todos os comandos novos
 4. ✅ Build e install
@@ -184,16 +184,16 @@ Em todos os posts:
 12. ✅ Buscar e substituir em outros posts
 
 ## Fase 5: Validação (Baixa Prioridade)
-13. ⏳ Grep por `chu config set defaults` em todos os arquivos
+13. ⏳ Grep por `gptcode config set defaults` em todos os arquivos
 14. ⏳ Verificar se algum doc menciona comandos inexistentes
 15. ⏳ Criar checklist de comandos vs docs
 
 # Success Criteria
 
 ## CLI
-- ✅ `chu backend` mostra backend atual
-- ✅ `chu backend use <name>` troca backend
-- ✅ `chu profile use <backend>.<profile>` troca ambos
+- ✅ `gptcode backend` mostra backend atual
+- ✅ `gptcode backend use <name>` troca backend
+- ✅ `gptcode profile use <backend>.<profile>` troca ambos
 - ✅ Help principal não menciona config get/set
 - ✅ Todos os comandos friendly funcionam
 

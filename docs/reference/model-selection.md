@@ -108,7 +108,7 @@ Output:
 
 **Debug mode**:
 ```bash
-CHUCHU_DEBUG=1 chu do "add function"
+CHUCHU_DEBUG=1 gptcode do "add function"
 ```
 
 Shows: `[MODEL_SELECTOR] Action=edit Lang=go -> openrouter/gemini-2.0-flash-exp:free (score=145.30)`

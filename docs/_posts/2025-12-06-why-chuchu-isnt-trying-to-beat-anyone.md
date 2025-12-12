@@ -182,7 +182,7 @@ Honestly, try Cursor first. No hard feelings.
 ```bash
 # Try it yourself
 go install github.com/jadercorrea/gptcode/cmd/chu@latest
-chu setup
+gptcode setup
 
 # See exactly what's broken
 go test ./tests/e2e/...
