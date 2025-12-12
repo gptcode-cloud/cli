@@ -80,7 +80,7 @@ func (o *OrchestratedMode) Execute(ctx context.Context, userMessage string) erro
 
 	// Higher retry limit for autonomous error fixing
 	// Allows multiple fix-verify-fix cycles
-	maxRetries := 9  // 10 total attempts (0-9)
+	maxRetries := 9 // 10 total attempts (0-9)
 	for attempt := 0; attempt <= maxRetries; attempt++ {
 		if os.Getenv("CHUCHU_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[ORCHESTRATED] Implementation attempt %d/%d\n", attempt+1, maxRetries+1)
