@@ -1,3 +1,9 @@
+---
+layout: default
+title: Capabilities & Limitations
+permalink: /reference/capabilities/
+---
+
 # GPTCode Capabilities & Limitations
 
 **Last Updated:** December 2025  

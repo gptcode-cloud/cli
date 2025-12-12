@@ -3,7 +3,7 @@ description: AI coding assistant with specialized agents and validation
 baseurl: ""
 url: "https://jader-correa.com"
 
-theme: minima
+# theme: minima  # Disabled - using custom Tokyo Night CSS
 
 permalink: /blog/:year-:month-:day-:title
 
