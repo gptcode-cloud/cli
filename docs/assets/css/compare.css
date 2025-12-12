@@ -5,19 +5,20 @@
 }
 
 :root {
-    --color-bg: #ffffff;
-    --color-text: #1d1d1f;
-    --color-text-secondary: #6e6e73;
-    --color-border: #d2d2d7;
-    --color-accent: #0071e3;
-    --color-accent-hover: #0077ed;
-    --color-card-bg: #f5f5f7;
-    --color-success: #34c759;
-    --color-warning: #ff9500;
-    --color-error: #ff3b30;
+    /* Tokyo Night palette for Compare page */
+    --color-bg: #1a1b26;
+    --color-text: #c0caf5;
+    --color-text-secondary: #a9b1d6;
+    --color-border: #3b4261;
+    --color-accent: #7aa2f7;
+    --color-accent-hover: #7dcfff;
+    --color-card-bg: #16161e;
+    --color-success: #9ece6a;
+    --color-warning: #e0af68;
+    --color-error: #f7768e;
     --font-system: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.12);
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
     --radius: 12px;
     --transition: all 0.2s ease;
 }
@@ -64,7 +65,7 @@ main {
     gap: 24px;
     margin-bottom: 48px;
     padding: 24px;
-    background: var(--color-card-bg);
+    background: var(--color-bg);
     border-radius: var(--radius);
 }
 
@@ -105,7 +106,7 @@ select {
     border-radius: 8px;
     font-family: var(--font-system);
     font-size: 15px;
-    background: white;
+    background: var(--color-bg);
     cursor: pointer;
     transition: var(--transition);
 }
@@ -122,7 +123,7 @@ select:hover {
 }
 
 .model-card {
-    background: white;
+    background: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
     padding: 24px;
@@ -190,16 +191,31 @@ select:hover {
 
 .tag {
     padding: 4px 12px;
-    background: var(--color-card-bg);
+    background: var(--color-bg);
     border-radius: 16px;
     font-size: 12px;
     font-weight: 500;
 }
 
-.tag.free { background: #e8f5e9; color: #2e7d32; }
-.tag.budget { background: #e3f2fd; color: #1565c0; }
-.tag.fast { background: #fff3e0; color: #e65100; }
-.tag.quality { background: #f3e5f5; color: #6a1b9a; }
+.tag.free {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.tag.budget {
+    background: #e3f2fd;
+    color: #1565c0;
+}
+
+.tag.fast {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.tag.quality {
+    background: #f3e5f5;
+    color: #6a1b9a;
+}
 
 .benchmarks {
     display: grid;
@@ -260,7 +276,7 @@ button:hover {
 
 .comparison-table {
     overflow-x: auto;
-    background: white;
+    background: var(--color-bg);
     border: 1px solid var(--color-border);
     border-radius: var(--radius);
 }
@@ -278,7 +294,7 @@ button:hover {
 }
 
 .comparison-table th {
-    background: var(--color-card-bg);
+    background: var(--color-bg);
     font-weight: 600;
     font-size: 14px;
     text-transform: uppercase;
@@ -305,7 +321,7 @@ button:hover {
 }
 
 .cost-calculator {
-    background: var(--color-card-bg);
+    background: var(--color-bg);
     border-radius: var(--radius);
     padding: 32px;
     margin-bottom: 48px;
@@ -343,7 +359,7 @@ button:hover {
     border-radius: 8px;
     font-family: var(--font-system);
     font-size: 15px;
-    background: white;
+    background: var(--color-bg);
 }
 
 .agent-breakdown {
@@ -363,7 +379,7 @@ button:hover {
 }
 
 .cost-result {
-    background: white;
+    background: var(--color-bg);
     padding: 20px;
     border-radius: 8px;
     border: 1px solid var(--color-border);
@@ -412,19 +428,19 @@ footer a:hover {
     header h1 {
         font-size: 40px;
     }
-    
+
     .filters {
         grid-template-columns: 1fr;
     }
-    
+
     .model-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .comparison-table {
         font-size: 13px;
     }
-    
+
     .comparison-table th,
     .comparison-table td {
         padding: 12px 8px;
