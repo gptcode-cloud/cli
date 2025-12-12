@@ -91,7 +91,7 @@ Data stored in `~/.gptcode/usage.json`:
 ### Elegant Stats Dashboard
 
 ```bash
-chu stats
+gptcode stats
 ```
 
 Output:
@@ -114,7 +114,7 @@ Output:
   ────────────────────────────────────────────────────────
   gemini-2.0-flash-exp:free              47  ✓
 
-  » Tip: Use 'chu stats --today' for today's activity
+  » Tip: Use 'gptcode stats --today' for today's activity
 
 ────────────────────────────────────────────────────────────
 ```
@@ -124,9 +124,9 @@ Output:
 Simple switching between cloud and local execution:
 
 ```bash
-chu mode              # Show current mode
-chu mode cloud        # Use cloud providers (OpenRouter, Groq)
-chu mode local        # Use Ollama only
+gptcode mode              # Show current mode
+gptcode mode cloud        # Use cloud providers (OpenRouter, Groq)
+gptcode mode local        # Use Ollama only
 ```
 
 ## Real-World Example
@@ -207,9 +207,9 @@ Intelligent model selection delivers:
 
 Try it today:
 ```bash
-chu mode cloud
+gptcode mode cloud
 gptcode do "refactor auth module"
-chu stats
+gptcode stats
 ```
 
 ---

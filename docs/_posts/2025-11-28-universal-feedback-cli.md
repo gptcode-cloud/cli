@@ -23,11 +23,11 @@ With two keystrokes you turn everyday corrections into continuous learning for G
 ## Installation
 ```bash
 # zsh (with diff)
-chu feedback hook install --with-diff --and-source
+gptcode feedback hook install --with-diff --and-source
 # bash
-chu feedback hook install --shell=bash --with-diff --and-source
+gptcode feedback hook install --shell=bash --with-diff --and-source
 # fish
-chu feedback hook install --shell=fish --with-diff
+gptcode feedback hook install --shell=fish --with-diff
 ```
 
 ## See it in action

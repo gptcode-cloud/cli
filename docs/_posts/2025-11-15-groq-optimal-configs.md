@@ -305,8 +305,8 @@ agent_models:
 After changing profiles, update catalog to see available models:
 
 ```bash
-chu model update --all
-chu model list groq
+gptcode model update --all
+gptcode model list groq
 ```
 
 ## Monitoring & Optimization

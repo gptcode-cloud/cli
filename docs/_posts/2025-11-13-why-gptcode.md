@@ -108,7 +108,7 @@ GPTCode isn't trying to replace paid tools for everyone. If Cursor works for you
 
 ```bash
 # Install
-go install github.com/jadercorrea/gptcode/cmd/chu@latest
+go install github.com/jadercorrea/gptcode/cmd/gptcode@latest
 
 # Configure (use free Groq or local Ollama)
 gptcode setup

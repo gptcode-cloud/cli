@@ -440,9 +440,9 @@ See [Intelligence Layers notebook](../notebooks/intelligence-layers.md) for the 
 
 [^2]: Liu, Z., Ma, P., Wang, Y., Matusik, W., & Tegmark, M. (2024). KAN 2.0: Kolmogorov-Arnold Networks Meet Science. arXiv:2408.10205 [cs.LG]. [https://arxiv.org/abs/2408.10205](https://arxiv.org/abs/2408.10205)
 
-## Comparison: gptcode do vs chu guided
+## Comparison: gptcode do vs gptcode guided
 
-| Feature | gptcode do | chu guided |
+| Feature | gptcode do | gptcode guided |
 |---------|--------|------------|
 | User approval | None | Required |
 | Auto-recovery | ✓ With learning | ✗ Manual fix |
@@ -457,7 +457,7 @@ See [Intelligence Layers notebook](../notebooks/intelligence-layers.md) for the 
 ```bash
 cd ~/gptcode
 git pull origin main
-go build -o bin/chu cmd/chu/*.go
+go build -o bin/gptcode cmd/gptcode/*.go
 ```
 
 ### 2. Configure Multiple Backends

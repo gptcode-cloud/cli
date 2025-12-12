@@ -180,7 +180,7 @@ Output:
 [GRAPH] Selected 5 files:
 [GRAPH]   1. internal/agents/router.go (score: 0.842)
 [GRAPH]   2. internal/llm/provider.go (score: 0.731)
-[GRAPH]   3. cmd/chu/main.go (score: 0.689)
+[GRAPH]   3. cmd/gptcode/main.go (score: 0.689)
 [GRAPH]   4. internal/modes/chat.go (score: 0.654)
 [GRAPH]   5. internal/config/setup.go (score: 0.612)
 ```
@@ -303,7 +303,7 @@ Currently file-level. Planned:
 
 Predict which files might break:
 ```bash
-chu impact "change auth signature"
+gptcode impact "change auth signature"
 # Shows: Files that import auth + test files
 ```
 

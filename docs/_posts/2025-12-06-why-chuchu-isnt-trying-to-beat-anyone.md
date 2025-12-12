@@ -181,7 +181,7 @@ Honestly, try Cursor first. No hard feelings.
 
 ```bash
 # Try it yourself
-go install github.com/jadercorrea/gptcode/cmd/chu@latest
+go install github.com/jadercorrea/gptcode/cmd/gptcode@latest
 gptcode setup
 
 # See exactly what's broken

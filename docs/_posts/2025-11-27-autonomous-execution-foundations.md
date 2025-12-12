@@ -269,13 +269,13 @@ PASS
 
 **Before:**
 ```bash
-chu guided "add auth"
+gptcode guided "add auth"
 # Validator checks plan whitelist (not actual changes)
 ```
 
 **After:**
 ```bash
-chu guided "add auth"
+gptcode guided "add auth"
 # Validator checks actually modified files
 # Telemetry records what was changed
 ```
@@ -284,14 +284,14 @@ chu guided "add auth"
 
 **Before:**
 ```bash
-chu auto plan.md
+gptcode auto plan.md
 # No file validation on apply_patch
 # No telemetry on steps
 ```
 
 **After:**
 ```bash
-chu auto plan.md
+gptcode auto plan.md
 # Both write_file and apply_patch validated
 # Every step emits telemetry events
 ```
@@ -315,12 +315,12 @@ jobs:
   gptcode-auto:
     runs-on: ubuntu-latest
     steps:
-      - run: chu auto --from-issue ${{ github.event.issue.number }}
+      - run: gptcode auto --from-issue ${{ github.event.issue.number }}
 ```
 
 ### 2. Usage Command (Future)
 ```bash
-$ chu usage
+$ gptcode usage
 Usage Statistics
 ================
 
@@ -348,7 +348,7 @@ Language-specific heuristics to inject relevant code:
 
 ### 4. End-to-End Verification (Future)
 ```bash
-chu verify plan.md
+gptcode verify plan.md
 # Runs all success criteria
 # Returns structured results
 ```
@@ -371,7 +371,7 @@ The editor will only modify files mentioned in the plan.
 
 ```bash
 export CHUCHU_DEBUG=1
-chu guided "add feature"
+gptcode guided "add feature"
 ```
 
 Look for step events in stderr.

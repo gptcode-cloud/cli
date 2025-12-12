@@ -26,7 +26,7 @@ gptcode backend delete <name>      # já existe
 - Criar `backendShowCmd` para mostrar backend atual
 - Criar `backendUseCmd` para trocar backend (atualiza defaults.backend)
 - Modificar `backendCmd` para ter RunE que mostra backend atual
-- Arquivos: `cmd/chu/main.go`
+- Arquivos: `cmd/gptcode/main.go`
 
 ## 2. Model Commands (já existe, verificar completude)
 Verificar se `gptcode model` já tem todos os comandos friendly:

@@ -324,7 +324,7 @@ cp ml/{model}/models/{model}_model.json internal/ml/assets/
 
 Then rebuild:
 ```bash
-go build -o bin/chu cmd/chu/main.go
+go build -o bin/gptcode cmd/gptcode/main.go
 ```
 
 ---
@@ -398,7 +398,7 @@ pip install -r requirements.txt
 After retraining, copy new model:
 ```bash
 cp ml/{model}/models/{model}_model.json internal/ml/assets/
-go build ./cmd/chu
+go build ./cmd/gptcode
 ```
 
 ---

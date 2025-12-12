@@ -89,7 +89,7 @@ description: AI coding assistant with specialized agents and validation
   
   <div class="quick-start">
     <h3>1. Install CLI</h3>
-    <pre><code>go install github.com/jadercorrea/gptcode/cmd/chu@latest
+    <pre><code>go install github.com/jadercorrea/gptcode/cmd/gptcode@latest
 gptcode setup</code></pre>
     
     <h3>2. Add Neovim Plugin</h3>

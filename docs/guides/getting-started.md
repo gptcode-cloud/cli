@@ -7,7 +7,7 @@ This guide helps you install GPTCode, configure providers, and start using the c
 - Build from source:
 ```bash
 # from repository root
-go build -o ./bin/chu ./cmd/chu
+go build -o ./bin/gptcode ./cmd/gptcode
 ```
 - Or use your preferred package manager (coming soon).
 
@@ -24,13 +24,13 @@ gptcode profile           # check current profile
 Capture corrections from any CLI as training signals.
 ```bash
 # zsh
-chu feedback hook install --with-diff --and-source
+gptcode feedback hook install --with-diff --and-source
 
 # bash
-chu feedback hook install --shell=bash --with-diff --and-source
+gptcode feedback hook install --shell=bash --with-diff --and-source
 
 # fish
-chu feedback hook install --shell=fish --with-diff
+gptcode feedback hook install --shell=fish --with-diff
 ```
 Usage:
 1) Type/paste the suggested command
@@ -41,7 +41,7 @@ GPTCode records good/bad outcomes and saves changed files and optional git patch
 
 Check stats:
 ```bash
-chu feedback stats
+gptcode feedback stats
 ```
 
 ## Core commands
@@ -59,8 +59,8 @@ gptcode do --supervised "refactor module"
 
 - Model management:
 ```bash
-chu model list
-chu model recommend editor
+gptcode model list
+gptcode model recommend editor
 ```
 
 ## Troubleshooting

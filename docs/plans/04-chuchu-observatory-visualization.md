@@ -278,7 +278,7 @@ internal/observer/server.go         - NEW
 internal/observer/events.go         - NEW
 internal/events/emitter.go          - MODIFY (add WebSocket)
 internal/maestro/orchestrator.go    - MODIFY (emit events)
-cmd/chu/main.go                     - MODIFY (add --observer flag)
+cmd/gptcode/main.go                     - MODIFY (add --observer flag)
 observer-web/                       - NEW (React app)
 ```
 
@@ -752,7 +752,7 @@ docs/observer/
 **Arquivos:**
 ```
 internal/observer/server.go  - WebSocket
-cmd/chu/main.go                - Flag
+cmd/gptcode/main.go                - Flag
 internal/maestro/*.go          - Emit events
 ```
 

@@ -292,9 +292,9 @@ cat ~/.gptcode/task_execution_history.jsonl | \
          })'
 ```
 
-## vs chu guided
+## vs gptcode guided
 
-| Feature | gptcode do | chu guided |
+| Feature | gptcode do | gptcode guided |
 |---------|--------|------------|
 | **Approval** | None (autonomous) | Required |
 | **Auto-recovery** | ✓ Intelligent retry | ✗ Manual config change |

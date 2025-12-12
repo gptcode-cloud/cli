@@ -154,7 +154,7 @@ gptcode test e2e --timeout 900  # 15 minutes
 - ✅ Test infrastructure working
 - ✅ Profile-based execution
 - ✅ Progress tracking and notifications
-- ✅ Real chu command execution
+- ✅ Real gptcode command execution
 - ✅ File validation
 
 ### Phase 2-5 (Pending)

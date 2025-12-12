@@ -92,12 +92,12 @@ Tentativa de implementar os 26 cenários restantes para 100% autonomia. Criou 4 
 - Usuário deve revisar sempre
 
 ### 5. CLI Commands (261 LOC)
-Criou `cmd/chu/testgen.go` com subcomandos:
+Criou `cmd/gptcode/testgen.go` com subcomandos:
 ```bash
-chu testgen unit <file>
-chu testgen integration <component>
-chu testgen mocks [interfaces...]
-chu testgen coverage [--fill]
+gptcode testgen unit <file>
+gptcode testgen integration <component>
+gptcode testgen mocks [interfaces...]
+gptcode testgen coverage [--fill]
 ```
 
 **Problema:**

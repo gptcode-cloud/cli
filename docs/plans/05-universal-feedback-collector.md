@@ -37,7 +37,7 @@ Users interact with MANY AI coding assistants:
 Extend current Ctrl+g hook to work with ANY command output:
 
 ```bash
-# Current (only works after chu commands)
+# Current (only works after gptcode commands)
 $ gptcode chat "install docker"
 > sudo apt install docker  # Wrong for macOS
 <Ctrl+g>  # Marks this
@@ -54,7 +54,7 @@ $ brew install docker  # Corrected
 
 **Implementation:**
 - Detect ANY command that produces output
-- Allow Ctrl+g to mark ANY terminal line (not just chu outputs)
+- Allow Ctrl+g to mark ANY terminal line (not just gptcode outputs)
 - Track: `source_cli` (warp, gemini, claude, cursor, chu)
 - Store feedback with source attribution
 
@@ -112,7 +112,7 @@ Capture from Cursor, VSCode Copilot:
 **File**: Hook scripts (zsh/bash/fish)
 
 ```bash
-# Current: Only captures after chu commands
+# Current: Only captures after gptcode commands
 # New: Capture after ANY command
 
 function universal_feedback_mark() {
@@ -167,7 +167,7 @@ gptcode feedback config --universal=false
 
 ### Phase 2: ML Training Integration (Week 2)
 - [ ] Update ML pipeline to handle multi-source feedback
-- [ ] Weight feedback by source (chu > external)
+- [ ] Weight feedback by source (gptcode > external)
 - [ ] Add source attribution to training data
 - [ ] Retrain intent classifier with external feedback
 

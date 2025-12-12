@@ -17,13 +17,13 @@ Capture feedback from any CLI with two keystrokes:
 ### Install the hook
 ```bash
 # zsh (with diff)
-chu feedback hook install --with-diff
+gptcode feedback hook install --with-diff
 
 # bash
-chu feedback hook install --shell=bash --with-diff
+gptcode feedback hook install --shell=bash --with-diff
 
 # fish
-chu feedback hook install --shell=fish --with-diff
+gptcode feedback hook install --shell=fish --with-diff
 ```
 
 This creates and references a hook at `~/.gptcode/feedback_hook.<shell>` and updates your shell rc.
@@ -44,17 +44,17 @@ If the directory is a git repo:
 
 ## Generate the demos via CLI
 ```bash
-chu demo feedback create           # also available as: `gptcode demo feedback:create` or `gptcode demo feedback.create`
+gptcode demo feedback create           # also available as: `gptcode demo feedback:create` or `gptcode demo feedback.create`
 ```
 
 ## Check events
 ```bash
-chu feedback stats
+gptcode feedback stats
 ```
 
 ## Manual/programmatic submission (optional)
 ```bash
-chu feedback submit \
+gptcode feedback submit \
   --sentiment=bad --kind=command --source=shell --agent=editor \
   --task='open Elixir console on Fly.io' \
   --wrong='fly ssh console --exec "iex -S mix"' \

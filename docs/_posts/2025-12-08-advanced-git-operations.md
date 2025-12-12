@@ -487,7 +487,7 @@ Coming soon:
 
 Update to the latest version:
 ```bash
-chu upgrade
+gptcode upgrade
 ```
 
 Or install for the first time:
