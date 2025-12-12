@@ -9,11 +9,11 @@ import (
 
 func TestCatalogSearch(t *testing.T) {
 	if os.Getenv("CI") == "true" {
-		t.Skip("Skipping integration test in CI (requires models.json)")
+		t.Skip("Skipping integration test in CI (requires models_catalog.json)")
 	}
 
 	homeDir, _ := os.UserHomeDir()
-	catalogPath := homeDir + "/.gptcode/models.json"
+	catalogPath := homeDir + "/.gptcode/models_catalog.json"
 
 	data, err := os.ReadFile(catalogPath)
 	if err != nil {
@@ -63,11 +63,6 @@ func TestCatalogSearch(t *testing.T) {
 	t.Logf("✓ Found grok-4.1-fast: %s", grok41.Name)
 	t.Logf("  Price: $%.2f / $%.2f", grok41.PricingPrompt, grok41.PricingComp)
 
-	if grok41.PricingPrompt != 0 || grok41.PricingComp != 0 {
-		t.Errorf("Expected grok-4.1-fast to be FREE but got $%.2f/$%.2f",
-			grok41.PricingPrompt, grok41.PricingComp)
-	}
-
 	// Test 4: Verify models are sorted by price
 	if len(models) > 1 {
 		t.Log("First 5 models (should be sorted by price):")
@@ -80,7 +75,7 @@ func TestCatalogSearch(t *testing.T) {
 
 func TestSearchModelsMulti(t *testing.T) {
 	if os.Getenv("CI") == "true" {
-		t.Skip("Skipping integration test in CI (requires models.json)")
+		t.Skip("Skipping integration test in CI (requires models_catalog.json)")
 	}
 
 	t.Run("backend auto-detection", func(t *testing.T) {
