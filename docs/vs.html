@@ -1,0 +1,544 @@
+---
+layout: default
+title: GPTCode vs Cursor vs Copilot
+description: Honest comparison of AI coding assistants - features, pricing, and privacy
+permalink: /vs/
+---
+
+<style>
+    .vs-hero {
+        text-align: center;
+        padding: 3rem 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .vs-hero h1 {
+        font-size: 2.25rem;
+        margin-bottom: 0.75rem;
+        color: var(--color-text);
+    }
+
+    .vs-hero .subtitle {
+        font-size: 1.1rem;
+        color: var(--color-text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Main Comparison */
+    .main-comparison {
+        max-width: 1000px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .comparison-cards {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    @media (max-width: 768px) {
+        .comparison-cards {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .tool-card {
+        background: var(--color-card-bg, #16161e);
+        border: 1px solid var(--color-border, #3b4261);
+        border-radius: 12px;
+        padding: 1.5rem;
+        text-align: center;
+    }
+
+    .tool-card.highlight {
+        border-color: #7aa2f7;
+        box-shadow: 0 0 20px rgba(122, 162, 247, 0.15);
+    }
+
+    .tool-logo {
+        width: 48px;
+        height: 48px;
+        margin: 0 auto 1rem;
+        background: var(--color-border);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+    }
+
+    .tool-card.highlight .tool-logo {
+        background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+    }
+
+    .tool-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .tool-tagline {
+        font-size: 0.85rem;
+        color: var(--color-text-secondary);
+        margin-bottom: 1rem;
+    }
+
+    .tool-price {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--color-text);
+    }
+
+    .tool-price span {
+        font-size: 0.9rem;
+        font-weight: 400;
+        color: var(--color-text-secondary);
+    }
+
+    /* Detailed Comparison */
+    .detailed-comparison {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+
+    .comparison-category {
+        margin-bottom: 3rem;
+    }
+
+    .category-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--color-border);
+        color: var(--color-text);
+    }
+
+    .comparison-row {
+        display: grid;
+        grid-template-columns: 1.5fr repeat(3, 1fr);
+        gap: 1rem;
+        padding: 1rem 0;
+        border-bottom: 1px solid var(--color-border);
+        align-items: center;
+    }
+
+    .comparison-row:last-child {
+        border-bottom: none;
+    }
+
+    .feature-name {
+        font-weight: 500;
+        color: var(--color-text);
+    }
+
+    .feature-desc {
+        font-size: 0.85rem;
+        color: var(--color-text-secondary);
+        margin-top: 0.25rem;
+    }
+
+    .feature-value {
+        text-align: center;
+        font-size: 0.9rem;
+    }
+
+    .feature-value.yes {
+        color: #9ece6a;
+    }
+
+    .feature-value.no {
+        color: var(--color-text-secondary);
+        opacity: 0.5;
+    }
+
+    .feature-value.partial {
+        color: #e0af68;
+    }
+
+    /* Winner Badge */
+    .winner-badge {
+        display: inline-block;
+        background: rgba(158, 206, 106, 0.15);
+        border: 1px solid #9ece6a;
+        color: #9ece6a;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 2px 8px;
+        border-radius: 10px;
+        margin-left: 0.5rem;
+    }
+
+    /* Use Cases */
+    .use-cases {
+        max-width: 900px;
+        margin: 3rem auto;
+        padding: 0 1rem;
+    }
+
+    .use-cases h2 {
+        text-align: center;
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .use-case-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .use-case-card {
+        background: var(--color-card-bg);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+    }
+
+    .use-case-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: var(--color-text);
+    }
+
+    .use-case-tool {
+        font-size: 0.85rem;
+        color: #7aa2f7;
+        margin-bottom: 0.5rem;
+    }
+
+    .use-case-reason {
+        font-size: 0.9rem;
+        color: var(--color-text-secondary);
+        line-height: 1.5;
+    }
+
+    /* CTA */
+    .comparison-cta {
+        text-align: center;
+        padding: 3rem 1rem;
+        margin: 2rem auto;
+        max-width: 700px;
+    }
+
+    .comparison-cta h2 {
+        font-size: 1.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .comparison-cta p {
+        color: var(--color-text-secondary);
+        margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .cta-btn {
+        padding: 0.875rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .cta-btn.primary {
+        background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+        color: #1a1b26;
+    }
+
+    .cta-btn.secondary {
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+    }
+
+    .cta-btn:hover {
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="vs-hero">
+    <h1>GPTCode vs Cursor vs GitHub Copilot</h1>
+    <p class="subtitle">An honest comparison. We built GPTCode for developers who want control, transparency, and
+        freedom.</p>
+</div>
+
+<div class="main-comparison">
+    <div class="comparison-cards">
+        <div class="tool-card highlight">
+            <div class="tool-logo">⌘</div>
+            <div class="tool-name">GPTCode</div>
+            <div class="tool-tagline">Open-source, BYOK</div>
+            <div class="tool-price">$0-9<span>/mo</span></div>
+        </div>
+        <div class="tool-card">
+            <div class="tool-logo">▲</div>
+            <div class="tool-name">Cursor</div>
+            <div class="tool-tagline">AI-first editor</div>
+            <div class="tool-price">$20<span>/mo</span></div>
+        </div>
+        <div class="tool-card">
+            <div class="tool-logo">🐙</div>
+            <div class="tool-name">GitHub Copilot</div>
+            <div class="tool-tagline">IDE extension</div>
+            <div class="tool-price">$10<span>/mo</span></div>
+        </div>
+    </div>
+</div>
+
+<div class="detailed-comparison">
+    <!-- Pricing & Cost -->
+    <div class="comparison-category">
+        <h3 class="category-title">💰 Pricing & True Cost</h3>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Base Price</div>
+            </div>
+            <div class="feature-value yes"><strong>$0</strong> (CLI free)</div>
+            <div class="feature-value">$20/mo</div>
+            <div class="feature-value">$10/mo</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Team/Business Price</div>
+            </div>
+            <div class="feature-value yes">$29/user/mo</div>
+            <div class="feature-value">$40/user/mo</div>
+            <div class="feature-value">$19-39/user/mo</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Actual API Cost</div>
+                <div class="feature-desc">What you really pay for LLM usage</div>
+            </div>
+            <div class="feature-value yes"><strong>$2-5/mo</strong><span class="winner-badge">Lowest</span></div>
+            <div class="feature-value">Included (limited)</div>
+            <div class="feature-value">Included (limited)</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Free Tier</div>
+            </div>
+            <div class="feature-value yes">Unlimited local</div>
+            <div class="feature-value partial">2000 completions</div>
+            <div class="feature-value partial">2000 completions</div>
+        </div>
+    </div>
+
+    <!-- Data & Privacy -->
+    <div class="comparison-category">
+        <h3 class="category-title">🔒 Privacy & Control</h3>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Open Source</div>
+            </div>
+            <div class="feature-value yes">✓ MIT<span class="winner-badge">✓</span></div>
+            <div class="feature-value no">✗</div>
+            <div class="feature-value no">✗</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Your Own API Keys</div>
+                <div class="feature-desc">No vendor lock-in</div>
+            </div>
+            <div class="feature-value yes">✓<span class="winner-badge">BYOK</span></div>
+            <div class="feature-value no">✗</div>
+            <div class="feature-value no">✗</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Local/Offline Mode</div>
+            </div>
+            <div class="feature-value yes">✓ Ollama</div>
+            <div class="feature-value no">✗</div>
+            <div class="feature-value no">✗</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">No Telemetry</div>
+            </div>
+            <div class="feature-value yes">✓</div>
+            <div class="feature-value partial">Opt-out</div>
+            <div class="feature-value partial">Business only</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Code Stays Local</div>
+            </div>
+            <div class="feature-value yes">✓ Always</div>
+            <div class="feature-value partial">Privacy mode</div>
+            <div class="feature-value partial">Enterprise only</div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="comparison-category">
+        <h3 class="category-title">⚡ Features</h3>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Multi-Agent Architecture</div>
+                <div class="feature-desc">Specialized agents for different tasks</div>
+            </div>
+            <div class="feature-value yes">✓ 4 agents</div>
+            <div class="feature-value yes">✓</div>
+            <div class="feature-value partial">Limited</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Model Choice</div>
+            </div>
+            <div class="feature-value yes">Any LLM<span class="winner-badge">300+</span></div>
+            <div class="feature-value partial">Selected</div>
+            <div class="feature-value no">GitHub models</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Autonomous Execution</div>
+                <div class="feature-desc">End-to-end task completion</div>
+            </div>
+            <div class="feature-value yes">✓ gptcode do</div>
+            <div class="feature-value yes">✓</div>
+            <div class="feature-value partial">Chat only</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Validation & Safety</div>
+                <div class="feature-desc">Prevents unintended changes</div>
+            </div>
+            <div class="feature-value yes">✓ Built-in</div>
+            <div class="feature-value partial">Basic</div>
+            <div class="feature-value no">None</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Dependency Graph</div>
+                <div class="feature-desc">Smart context selection</div>
+            </div>
+            <div class="feature-value yes">✓ PageRank</div>
+            <div class="feature-value partial">Partial</div>
+            <div class="feature-value no">✗</div>
+        </div>
+    </div>
+
+    <!-- Editor Support -->
+    <div class="comparison-category">
+        <h3 class="category-title">🛠️ Editor & Workflow</h3>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">VS Code</div>
+            </div>
+            <div class="feature-value partial">Via terminal</div>
+            <div class="feature-value yes">✓ Native</div>
+            <div class="feature-value yes">✓</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Neovim</div>
+            </div>
+            <div class="feature-value yes">✓ Native plugin<span class="winner-badge">Best</span></div>
+            <div class="feature-value no">✗</div>
+            <div class="feature-value partial">Extension</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Terminal/CLI</div>
+            </div>
+            <div class="feature-value yes">✓ First-class</div>
+            <div class="feature-value no">✗</div>
+            <div class="feature-value partial">Copilot CLI</div>
+        </div>
+
+        <div class="comparison-row">
+            <div>
+                <div class="feature-name">Git Integration</div>
+            </div>
+            <div class="feature-value yes">✓ Full workflow</div>
+            <div class="feature-value yes">✓</div>
+            <div class="feature-value yes">✓</div>
+        </div>
+    </div>
+</div>
+
+<!-- Use Cases -->
+<div class="use-cases">
+    <h2>Choose the Right Tool for Your Situation</h2>
+
+    <div class="use-case-grid">
+        <div class="use-case-card">
+            <div class="use-case-title">💸 "I want the cheapest option"</div>
+            <div class="use-case-tool">→ GPTCode + Ollama (free) or Groq ($2-5/mo)</div>
+            <div class="use-case-reason">No subscriptions. Pay only for actual API usage, or run 100% free with local
+                models.</div>
+        </div>
+
+        <div class="use-case-card">
+            <div class="use-case-title">🔒 "Privacy is critical"</div>
+            <div class="use-case-tool">→ GPTCode + Ollama</div>
+            <div class="use-case-reason">Code never leaves your machine. No telemetry, no cloud services, open-source
+                you can audit.</div>
+        </div>
+
+        <div class="use-case-card">
+            <div class="use-case-title">⌨️ "I live in Neovim"</div>
+            <div class="use-case-tool">→ GPTCode</div>
+            <div class="use-case-reason">Native Lua plugin with floating windows, tree-sitter aware, and 300+ model
+                search.</div>
+        </div>
+
+        <div class="use-case-card">
+            <div class="use-case-title">🏢 "My team uses VS Code"</div>
+            <div class="use-case-tool">→ Cursor or Copilot</div>
+            <div class="use-case-reason">Native VS Code integration with inline suggestions. Better UX for VS Code power
+                users.</div>
+        </div>
+
+        <div class="use-case-card">
+            <div class="use-case-title">🔧 "I want to tinker"</div>
+            <div class="use-case-tool">→ GPTCode</div>
+            <div class="use-case-reason">Open-source Go codebase. Customize prompts, agents, and behavior. It's yours.
+            </div>
+        </div>
+
+        <div class="use-case-card">
+            <div class="use-case-title">🚀 "I just want it to work"</div>
+            <div class="use-case-tool">→ Cursor or Copilot</div>
+            <div class="use-case-reason">One subscription, no config. Works out of the box with curated models.</div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="comparison-cta">
+    <h2>Ready to Own Your AI Assistant?</h2>
+    <p>GPTCode is free, open-source, and respects your privacy. Start coding with AI that's truly yours.</p>
+    <div class="cta-buttons">
+        <a href="https://github.com/gptcode/cli" class="cta-btn primary">Get GPTCode Free →</a>
+        <a href="/pricing" class="cta-btn secondary">See Pricing</a>
+    </div>
+</div>

@@ -22,17 +22,18 @@
 <body>
   <nav class="main-nav">
     <div class="nav-container">
-<a href="{{ '/' | relative_url }}" class="nav-brand">
+      <a href="{{ '/' | relative_url }}" class="nav-brand">
         <img src="{{ '/assets/gptcode.svg' | relative_url }}?v={{ bust }}" alt="GPTCode" class="nav-logo" />
         <span>GPTCode</span>
       </a>
       <div class="nav-links">
         <a href="{{ '/reference/capabilities' | relative_url }}">Features</a>
         <a href="{{ '/reference/commands' | relative_url }}">Commands</a>
-        <a href="{{ '/reference/prompts' | relative_url }}">Prompts</a>
-        <a href="{{ '/compare' | relative_url }}">Compare</a>
+        <a href="{{ '/vs' | relative_url }}">Compare</a>
+        <a href="{{ '/pricing' | relative_url }}">Pricing</a>
+        <a href="{{ '/live' | relative_url }}" class="nav-live">Live</a>
         <a href="{{ '/blog' | relative_url }}">Blog</a>
-        <a href="https://github.com/jadercorrea/gptcode" class="nav-github" target="_blank">GitHub</a>
+        <a href="https://github.com/gptcode/cli" class="nav-github" target="_blank">GitHub</a>
       </div>
     </div>
   </nav>

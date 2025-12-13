@@ -1,0 +1,479 @@
+---
+layout: default
+title: GPTCode Live - Real-time AI Coding Dashboard
+description: Monitor, analyze, and optimize your AI coding sessions in real-time
+permalink: /live/
+---
+
+<style>
+    .live-hero {
+        text-align: center;
+        padding: 4rem 1rem;
+        background: linear-gradient(180deg, rgba(122, 162, 247, 0.05) 0%, transparent 100%);
+    }
+
+    .live-hero h1 {
+        font-size: 2.75rem;
+        margin-bottom: 1rem;
+        background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .live-hero .subtitle {
+        font-size: 1.25rem;
+        color: var(--color-text-secondary);
+        max-width: 600px;
+        margin: 0 auto 2rem;
+    }
+
+    .hero-cta-group {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+        margin-bottom: 2rem;
+    }
+
+    .hero-btn {
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.2s;
+    }
+
+    .hero-btn.primary {
+        background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+        color: #1a1b26;
+    }
+
+    .hero-btn.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(122, 162, 247, 0.3);
+    }
+
+    .hero-btn.secondary {
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+    }
+
+    .hero-btn.secondary:hover {
+        border-color: #7aa2f7;
+        color: #7aa2f7;
+    }
+
+    .hero-note {
+        font-size: 0.85rem;
+        color: var(--color-text-secondary);
+    }
+
+    /* Dashboard Preview */
+    .dashboard-preview {
+        max-width: 1000px;
+        margin: 0 auto 4rem;
+        padding: 0 1rem;
+    }
+
+    .preview-frame {
+        background: var(--color-card-bg, #16161e);
+        border: 1px solid var(--color-border, #3b4261);
+        border-radius: 12px;
+        padding: 1rem;
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    }
+
+    .preview-header {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .preview-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+    }
+
+    .preview-dot.red {
+        background: #f7768e;
+    }
+
+    .preview-dot.yellow {
+        background: #e0af68;
+    }
+
+    .preview-dot.green {
+        background: #9ece6a;
+    }
+
+    .preview-content {
+        display: grid;
+        grid-template-columns: 1fr 2fr;
+        gap: 1rem;
+        min-height: 300px;
+    }
+
+    @media (max-width: 768px) {
+        .preview-content {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .preview-sidebar {
+        background: var(--color-bg, #1a1b26);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .preview-session {
+        padding: 0.75rem;
+        margin-bottom: 0.5rem;
+        background: var(--color-card-bg);
+        border-radius: 6px;
+        border-left: 3px solid #7aa2f7;
+    }
+
+    .session-title {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--color-text);
+        margin-bottom: 0.25rem;
+    }
+
+    .session-meta {
+        font-size: 0.7rem;
+        color: var(--color-text-secondary);
+    }
+
+    .preview-main {
+        background: var(--color-bg, #1a1b26);
+        border-radius: 8px;
+        padding: 1rem;
+    }
+
+    .preview-terminal {
+        font-family: monospace;
+        font-size: 0.75rem;
+        color: #9ece6a;
+        line-height: 1.6;
+    }
+
+    .preview-line {
+        margin-bottom: 0.25rem;
+    }
+
+    .preview-line.info {
+        color: #7aa2f7;
+    }
+
+    .preview-line.success {
+        color: #9ece6a;
+    }
+
+    .preview-line.agent {
+        color: #bb9af7;
+    }
+
+    /* Features Grid */
+    .features-section {
+        max-width: 1000px;
+        margin: 0 auto 4rem;
+        padding: 0 1rem;
+    }
+
+    .features-section h2 {
+        text-align: center;
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .features-subtitle {
+        text-align: center;
+        color: var(--color-text-secondary);
+        margin-bottom: 2rem;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .feature-card {
+        background: var(--color-card-bg);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: border-color 0.2s;
+    }
+
+    .feature-card:hover {
+        border-color: #7aa2f7;
+    }
+
+    .feature-icon {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .feature-title {
+        font-size: 1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--color-text);
+    }
+
+    .feature-desc {
+        font-size: 0.9rem;
+        color: var(--color-text-secondary);
+        line-height: 1.5;
+    }
+
+    /* How It Works */
+    .how-it-works {
+        max-width: 900px;
+        margin: 0 auto 4rem;
+        padding: 0 1rem;
+    }
+
+    .how-it-works h2 {
+        text-align: center;
+        font-size: 1.75rem;
+        margin-bottom: 2rem;
+    }
+
+    .steps {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .steps {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .step {
+        text-align: center;
+        padding: 1.5rem;
+    }
+
+    .step-number {
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1a1b26;
+        font-weight: 700;
+        font-size: 1.25rem;
+        margin: 0 auto 1rem;
+    }
+
+    .step-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--color-text);
+    }
+
+    .step-desc {
+        font-size: 0.9rem;
+        color: var(--color-text-secondary);
+    }
+
+    /* CTA Section */
+    .cta-section {
+        text-align: center;
+        padding: 4rem 1rem;
+        background: linear-gradient(180deg, transparent 0%, rgba(122, 162, 247, 0.05) 100%);
+    }
+
+    .cta-section h2 {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    .cta-section p {
+        color: var(--color-text-secondary);
+        margin-bottom: 2rem;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .cta-btn {
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .cta-btn.primary {
+        background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+        color: #1a1b26;
+    }
+
+    .cta-btn.secondary {
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+    }
+
+    .cta-btn:hover {
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="live-hero">
+    <h1>GPTCode Live</h1>
+    <p class="subtitle">Real-time dashboard for your AI coding sessions. Monitor agents, track costs, and collaborate
+        with your team.</p>
+
+    <div class="hero-cta-group">
+        <a href="#waitlist" class="hero-btn primary">Join the Waitlist →</a>
+        <a href="/pricing" class="hero-btn secondary">See Pricing</a>
+    </div>
+
+    <p class="hero-note">🚀 Early access launching soon. The CLI is free and available now.</p>
+</div>
+
+<!-- Dashboard Preview -->
+<div class="dashboard-preview">
+    <div class="preview-frame">
+        <div class="preview-header">
+            <div class="preview-dot red"></div>
+            <div class="preview-dot yellow"></div>
+            <div class="preview-dot green"></div>
+        </div>
+        <div class="preview-content">
+            <div class="preview-sidebar">
+                <div class="preview-session">
+                    <div class="session-title">Session #42</div>
+                    <div class="session-meta">gptcode do "add auth" • 2m ago</div>
+                </div>
+                <div class="preview-session">
+                    <div class="session-title">Session #41</div>
+                    <div class="session-meta">gptcode chat • 15m ago</div>
+                </div>
+                <div class="preview-session">
+                    <div class="session-title">Session #40</div>
+                    <div class="session-meta">gptcode review • 1h ago</div>
+                </div>
+            </div>
+            <div class="preview-main">
+                <div class="preview-terminal">
+                    <div class="preview-line info">ℹ [Router] Analyzing request complexity...</div>
+                    <div class="preview-line agent">[Intelligence] KAN: 0.78, XGB: 0.65 → Using KAN</div>
+                    <div class="preview-line success">✓ [Router] Mode: OrchestratedMode (0.92)</div>
+                    <div class="preview-line info">ℹ [Analyzer] Scanning src/ directory...</div>
+                    <div class="preview-line"> → Found 14 relevant files</div>
+                    <div class="preview-line info">ℹ [Planner] Creating implementation plan...</div>
+                    <div class="preview-line success">✓ [Editor] Applied 3 file changes</div>
+                    <div class="preview-line success">✓ [Validator] All 12 tests passing</div>
+                    <div class="preview-line success">✓ Done! Authentication added successfully.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Features -->
+<div class="features-section">
+    <h2>Everything You Need to Master AI Coding</h2>
+    <p class="features-subtitle">Live adds powerful tools on top of the free CLI</p>
+
+    <div class="features-grid">
+        <div class="feature-card">
+            <div class="feature-icon">📊</div>
+            <div class="feature-title">Real-time Monitoring</div>
+            <div class="feature-desc">Watch agents work in real-time. See token usage, model selection, and
+                decision-making as it happens.</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🔄</div>
+            <div class="feature-title">Session Replay</div>
+            <div class="feature-desc">Review past sessions step-by-step. Understand what worked, what didn't, and why.
+            </div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">💰</div>
+            <div class="feature-title">Cost Analytics</div>
+            <div class="feature-desc">Track API costs per session, model, and agent. Optimize your spending with
+                actionable insights.</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">👥</div>
+            <div class="feature-title">Team Workspaces</div>
+            <div class="feature-desc">Collaborate with your team. Share prompts, monitor usage, and manage API keys
+                centrally.</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">📱</div>
+            <div class="feature-title">Multi-device Sync</div>
+            <div class="feature-desc">Start on your laptop, continue on your desktop. Your sessions sync across all
+                devices.</div>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">🔐</div>
+            <div class="feature-title">Enterprise Security</div>
+            <div class="feature-desc">SSO, audit logs, and role-based access. Meet your compliance requirements.</div>
+        </div>
+    </div>
+</div>
+
+<!-- How It Works -->
+<div class="how-it-works">
+    <h2>How It Works</h2>
+
+    <div class="steps">
+        <div class="step">
+            <div class="step-number">1</div>
+            <div class="step-title">Install the CLI</div>
+            <div class="step-desc">Free and open-source. Works with your existing API keys.</div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">2</div>
+            <div class="step-title">Connect to Live</div>
+            <div class="step-desc">One command to link your CLI to the dashboard: <code>gptcode live connect</code>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-number">3</div>
+            <div class="step-title">Code & Monitor</div>
+            <div class="step-desc">Use the CLI as normal. Sessions appear in your dashboard in real-time.</div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA -->
+<div class="cta-section" id="waitlist">
+    <h2>Be the First to Try Live</h2>
+    <p>Join the waitlist for early access. We'll notify you when it's ready.</p>
+
+    <div class="cta-buttons">
+        <a href="mailto:jader@gptcode.dev?subject=GPTCode Live Waitlist" class="cta-btn primary">Join Waitlist →</a>
+        <a href="https://github.com/gptcode/cli" class="cta-btn secondary">Get CLI Free</a>
+    </div>
+</div>

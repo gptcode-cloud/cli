@@ -1,0 +1,439 @@
+---
+layout: default
+title: Pricing
+description: Simple, transparent pricing for GPTCode Live
+permalink: /pricing/
+---
+
+<style>
+    .pricing-hero {
+        text-align: center;
+        padding: 3rem 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .pricing-hero h1 {
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
+        background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+    }
+
+    .pricing-hero .subtitle {
+        font-size: 1.25rem;
+        color: var(--color-text-secondary);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .pricing-toggle {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        margin: 2rem 0;
+        align-items: center;
+    }
+
+    .pricing-toggle span {
+        color: var(--color-text-secondary);
+    }
+
+    .pricing-toggle .active {
+        color: var(--color-text);
+        font-weight: 600;
+    }
+
+    .pricing-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        max-width: 1000px;
+        margin: 0 auto 3rem;
+        padding: 0 1rem;
+    }
+
+    .pricing-card {
+        background: var(--color-card-bg, #16161e);
+        border: 1px solid var(--color-border, #3b4261);
+        border-radius: 12px;
+        padding: 2rem;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .pricing-card.featured {
+        border-color: #7aa2f7;
+        box-shadow: 0 0 30px rgba(122, 162, 247, 0.15);
+        position: relative;
+    }
+
+    .pricing-card.featured::before {
+        content: "Most Popular";
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+        color: #1a1b26;
+        padding: 4px 16px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .plan-name {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--color-text);
+    }
+
+    .plan-description {
+        color: var(--color-text-secondary);
+        font-size: 0.9rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .plan-price {
+        margin-bottom: 1.5rem;
+    }
+
+    .price-amount {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: var(--color-text);
+    }
+
+    .price-period {
+        color: var(--color-text-secondary);
+        font-size: 0.9rem;
+    }
+
+    .plan-features {
+        list-style: none;
+        padding: 0;
+        margin: 0 0 2rem;
+        flex: 1;
+    }
+
+    .plan-features li {
+        padding: 0.5rem 0;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.75rem;
+        font-size: 0.9rem;
+        color: var(--color-text-secondary);
+    }
+
+    .plan-features li::before {
+        content: "✓";
+        color: #9ece6a;
+        font-weight: 600;
+        flex-shrink: 0;
+    }
+
+    .plan-cta {
+        display: block;
+        width: 100%;
+        padding: 0.875rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        text-align: center;
+        font-weight: 600;
+        transition: all 0.2s;
+    }
+
+    .plan-cta.primary {
+        background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+        color: #1a1b26;
+    }
+
+    .plan-cta.primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(122, 162, 247, 0.3);
+    }
+
+    .plan-cta.secondary {
+        background: transparent;
+        border: 1px solid var(--color-border);
+        color: var(--color-text);
+    }
+
+    .plan-cta.secondary:hover {
+        border-color: #7aa2f7;
+        color: #7aa2f7;
+    }
+
+    /* Comparison Section */
+    .comparison-section {
+        max-width: 900px;
+        margin: 4rem auto;
+        padding: 0 1rem;
+    }
+
+    .comparison-section h2 {
+        text-align: center;
+        font-size: 1.75rem;
+        margin-bottom: 2rem;
+    }
+
+    .comparison-table-wrapper {
+        overflow-x: auto;
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+    }
+
+    .comparison-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+        padding: 1rem;
+        text-align: left;
+        border-bottom: 1px solid var(--color-border);
+    }
+
+    .comparison-table th {
+        background: var(--color-card-bg);
+        font-weight: 600;
+        color: var(--color-text);
+    }
+
+    .comparison-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .comparison-table td:first-child {
+        color: var(--color-text-secondary);
+    }
+
+    .check {
+        color: #9ece6a;
+    }
+
+    .cross {
+        color: var(--color-text-secondary);
+        opacity: 0.5;
+    }
+
+    /* FAQ */
+    .faq-section {
+        max-width: 700px;
+        margin: 4rem auto;
+        padding: 0 1rem;
+    }
+
+    .faq-section h2 {
+        text-align: center;
+        font-size: 1.75rem;
+        margin-bottom: 2rem;
+    }
+
+    .faq-item {
+        border-bottom: 1px solid var(--color-border);
+        padding: 1.5rem 0;
+    }
+
+    .faq-item:first-child {
+        border-top: 1px solid var(--color-border);
+    }
+
+    .faq-question {
+        font-weight: 600;
+        color: var(--color-text);
+        margin-bottom: 0.75rem;
+    }
+
+    .faq-answer {
+        color: var(--color-text-secondary);
+        font-size: 0.95rem;
+        line-height: 1.6;
+    }
+</style>
+
+<div class="pricing-hero">
+    <h1>Simple, Transparent Pricing</h1>
+    <p class="subtitle">CLI is free and open-source. Live Dashboard unlocks team collaboration, monitoring, and advanced
+        features.</p>
+</div>
+
+<div class="pricing-grid">
+    <!-- Free Tier -->
+    <div class="pricing-card">
+        <div class="plan-name">Open Source</div>
+        <div class="plan-description">For individual developers who want full control</div>
+        <div class="plan-price">
+            <span class="price-amount">$0</span>
+            <span class="price-period">forever</span>
+        </div>
+        <ul class="plan-features">
+            <li>Full CLI with all commands</li>
+            <li>Bring your own API keys</li>
+            <li>Unlimited local usage</li>
+            <li>All agents (Router, Query, Editor, Research)</li>
+            <li>ML-powered routing (1ms inference)</li>
+            <li>Dependency graph analysis</li>
+            <li>Neovim plugin</li>
+            <li>Community support</li>
+        </ul>
+        <a href="https://github.com/gptcode/cli" class="plan-cta secondary">Get Started Free →</a>
+    </div>
+
+    <!-- Pro Tier -->
+    <div class="pricing-card featured">
+        <div class="plan-name">Live Pro</div>
+        <div class="plan-description">For developers who want the complete experience</div>
+        <div class="plan-price">
+            <span class="price-amount">$9</span>
+            <span class="price-period">/month</span>
+        </div>
+        <ul class="plan-features">
+            <li>Everything in Open Source</li>
+            <li>Live Dashboard (real-time agent monitoring)</li>
+            <li>Session history & replay</li>
+            <li>Cost tracking & analytics</li>
+            <li>Multi-device sync</li>
+            <li>Priority agent execution</li>
+            <li>Custom prompts library</li>
+            <li>Email support</li>
+        </ul>
+        <a href="/live" class="plan-cta primary">Start Free Trial →</a>
+    </div>
+
+    <!-- Team Tier -->
+    <div class="pricing-card">
+        <div class="plan-name">Live Team</div>
+        <div class="plan-description">For teams building together</div>
+        <div class="plan-price">
+            <span class="price-amount">$29</span>
+            <span class="price-period">/user/month</span>
+        </div>
+        <ul class="plan-features">
+            <li>Everything in Live Pro</li>
+            <li>Team workspaces</li>
+            <li>Shared prompt library</li>
+            <li>Centralized API key management</li>
+            <li>Usage analytics per member</li>
+            <li>SSO (SAML/OIDC)</li>
+            <li>Audit logs</li>
+            <li>Dedicated support</li>
+        </ul>
+        <a href="/contact" class="plan-cta secondary">Contact Sales →</a>
+    </div>
+</div>
+
+<!-- Comparison Table -->
+<div class="comparison-section">
+    <h2>GPTCode vs Competitors</h2>
+    <div class="comparison-table-wrapper">
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Feature</th>
+                    <th>GPTCode</th>
+                    <th>Cursor</th>
+                    <th>Copilot</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Starting Price</td>
+                    <td><strong>$0/mo</strong></td>
+                    <td>$20/mo</td>
+                    <td>$10/mo</td>
+                </tr>
+                <tr>
+                    <td>Open Source</td>
+                    <td><span class="check">✓</span></td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="cross">✗</span></td>
+                </tr>
+                <tr>
+                    <td>Your Own API Keys</td>
+                    <td><span class="check">✓</span></td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="cross">✗</span></td>
+                </tr>
+                <tr>
+                    <td>Model Agnostic</td>
+                    <td><span class="check">✓ Any LLM</span></td>
+                    <td>Limited</td>
+                    <td>GitHub models only</td>
+                </tr>
+                <tr>
+                    <td>Local/Offline Mode</td>
+                    <td><span class="check">✓ Ollama</span></td>
+                    <td><span class="cross">✗</span></td>
+                    <td><span class="cross">✗</span></td>
+                </tr>
+                <tr>
+                    <td>Multi-Agent Architecture</td>
+                    <td><span class="check">✓ 4 agents</span></td>
+                    <td><span class="check">✓</span></td>
+                    <td>Partial</td>
+                </tr>
+                <tr>
+                    <td>Neovim Native</td>
+                    <td><span class="check">✓</span></td>
+                    <td><span class="cross">✗</span></td>
+                    <td>Via extension</td>
+                </tr>
+                <tr>
+                    <td>Data Privacy</td>
+                    <td><span class="check">✓ No telemetry</span></td>
+                    <td>Opt-out</td>
+                    <td>Business tier only</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+    <h2>Frequently Asked Questions</h2>
+
+    <div class="faq-item">
+        <div class="faq-question">Do I need to pay for the CLI?</div>
+        <div class="faq-answer">No. The CLI is completely free and open-source. You only pay for your own API keys (like
+            Groq at $0-5/month or free with Ollama locally).</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">What's the difference between CLI and Live?</div>
+        <div class="faq-answer">The CLI is the core tool that runs locally on your machine. Live is a web dashboard that
+            adds real-time monitoring, session history, team collaboration, and analytics on top of your CLI usage.
+        </div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">Can I use GPTCode with my company's API keys?</div>
+        <div class="faq-answer">Yes! GPTCode is designed for BYOK (Bring Your Own Keys). Configure your OpenAI,
+            Anthropic, Groq, or any OpenAI-compatible endpoint. Your keys stay on your machine.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">Is there a free trial for Live Pro?</div>
+        <div class="faq-answer">Yes, Live Pro includes a 14-day free trial with full features. No credit card required
+            to start.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">How is this cheaper than Cursor or Copilot?</div>
+        <div class="faq-answer">GPTCode lets you use any LLM provider, including free ones like Ollama or ultra-cheap
+            ones like Groq (~$0.05/100K tokens). You pay the actual API cost, not a markup. Most developers spend
+            $2-5/month on API calls.</div>
+    </div>
+
+    <div class="faq-item">
+        <div class="faq-question">What if I want to self-host Live?</div>
+        <div class="faq-answer">Contact us for enterprise self-hosted licensing. The Live dashboard is built with
+            Phoenix LiveView and can run on your infrastructure.</div>
+    </div>
+</div>

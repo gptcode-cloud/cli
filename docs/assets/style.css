@@ -116,6 +116,20 @@ body {
   opacity: 0.85;
 }
 
+.nav-live {
+  padding: 8px 16px;
+  background: linear-gradient(135deg, #7aa2f7, #bb9af7);
+  color: #1a1b26 !important;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.2s;
+}
+
+.nav-live:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(122, 162, 247, 0.3);
+}
+
 /* Main Content */
 .main-content {
   max-width: 1200px;
