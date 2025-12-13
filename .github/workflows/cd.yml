@@ -38,7 +38,7 @@ jobs:
           cache: true
       
       - name: Build chu CLI
-        run: go build -o bin/chu ./cmd/chu
+        run: go build -o bin/gptcode ./cmd/gptcode
       
       - name: Update model catalog
         env:
@@ -48,7 +48,7 @@ jobs:
         run: |
           # Models will be saved to ~/.gptcode/models_catalog.json
           mkdir -p ~/.gptcode
-          ./bin/chu model update --all || echo "Model update completed with warnings"
+          ./bin/gptcode model update --all || echo "Model update completed with warnings"
       
       - name: Export models for web
         run: |
@@ -153,11 +153,11 @@ jobs:
       - name: Build binaries
         run: |
           # Build for multiple platforms
-          GOOS=linux GOARCH=amd64 go build -o bin/chu-linux-amd64 ./cmd/chu
-          GOOS=linux GOARCH=arm64 go build -o bin/chu-linux-arm64 ./cmd/chu
-          GOOS=darwin GOARCH=amd64 go build -o bin/chu-darwin-amd64 ./cmd/chu
-          GOOS=darwin GOARCH=arm64 go build -o bin/chu-darwin-arm64 ./cmd/chu
-          GOOS=windows GOARCH=amd64 go build -o bin/chu-windows-amd64.exe ./cmd/chu
+          GOOS=linux GOARCH=amd64 go build -o bin/gptcode-linux-amd64 ./cmd/gptcode
+          GOOS=linux GOARCH=arm64 go build -o bin/gptcode-linux-arm64 ./cmd/gptcode
+          GOOS=darwin GOARCH=amd64 go build -o bin/gptcode-darwin-amd64 ./cmd/gptcode
+          GOOS=darwin GOARCH=arm64 go build -o bin/gptcode-darwin-arm64 ./cmd/gptcode
+          GOOS=windows GOARCH=amd64 go build -o bin/gptcode-windows-amd64.exe ./cmd/gptcode
       
       - name: Generate changelog
         id: changelog
@@ -196,11 +196,11 @@ jobs:
             
             ${{ steps.version.outputs.auto_generated == 'true' && '> ⚡ Automated release triggered by CI' || '' }}
           files: |
-            bin/chu-linux-amd64
-            bin/chu-linux-arm64
-            bin/chu-darwin-amd64
-            bin/chu-darwin-arm64
-            bin/chu-windows-amd64.exe
+            bin/gptcode-linux-amd64
+            bin/gptcode-linux-arm64
+            bin/gptcode-darwin-amd64
+            bin/gptcode-darwin-arm64
+            bin/gptcode-windows-amd64.exe
           draft: false
           prerelease: false
         env:

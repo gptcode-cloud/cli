@@ -1,5 +1,6 @@
 # Binaries
 chu
+gptcode
 *.exe
 *.exe~
 *.dll
@@ -7,9 +8,10 @@ chu
 *.dylib
 
 # IMPORTANT: main.go should NEVER exist in root!
-# The actual main is in cmd/chu/main.go
-# Use `make build` or `go build -o bin/chu ./cmd/chu`
-main.go
+# The actual main is in cmd/gptcode/main.go
+# Use `make build` or `go build -o bin/gptcode ./cmd/gptcode`
+/main.go
+!cmd/*/main.go
 
 # Test binaries
 *.test

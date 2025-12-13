@@ -69,7 +69,7 @@ jobs:
           cache: true
       
       - name: Build
-        run: go build -v -o bin/chu ./cmd/chu
+        run: go build -v -o bin/gptcode ./cmd/gptcode
       
       - name: Verify binary
-        run: ./bin/chu --version || echo "Binary created successfully"
+        run: ./bin/gptcode --version || echo "Binary created successfully"

@@ -102,6 +102,7 @@ body {
 
 .nav-links a:hover {
   color: var(--color-text);
+  text-decoration: none;
 }
 
 .nav-github {
