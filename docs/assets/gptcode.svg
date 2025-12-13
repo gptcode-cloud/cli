@@ -1,0 +1,37 @@
+<svg
+  width="32"
+  height="32"
+  viewBox="0 0 512 512"
+  xmlns="http://www.w3.org/2000/svg"
+>
+  <defs>
+    <linearGradient id="gptcode-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7aa2f7"/>
+      <stop offset="100%" style="stop-color:#bb9af7"/>
+    </linearGradient>
+  </defs>
+  
+  <polygon
+    points="256 40 430 148 430 364 256 472 82 364 82 148"
+    fill="none"
+    stroke="url(#gptcode-gradient)"
+    stroke-width="36"
+    stroke-linejoin="round"
+  />
+  <polyline
+    points="220 180 300 256 220 332"
+    fill="none"
+    stroke="url(#gptcode-gradient)"
+    stroke-width="32"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+  <rect
+    x="300"
+    y="304"
+    width="90"
+    height="28"
+    rx="14"
+    fill="url(#gptcode-gradient)"
+  />
+</svg>

@@ -36,7 +36,7 @@ bin/
 *.swp
 *.swo
 *~
-gptcode.*
+# gptcode.* - commented out, was ignoring logo
 
 # OS
 .DS_Store
