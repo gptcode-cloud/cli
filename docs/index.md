@@ -45,6 +45,11 @@ description: AI coding assistant with specialized agents and validation
     <h3>Manual Workflow</h3>
     <p>Break down complex tasks: <code>gptcode research</code> → <code>gptcode plan</code> → <code>gptcode implement</code>. Full control when you need it.</p>
   </a>
+  
+  <a href="/blog/2025-12-14-universal-context-management" class="feature-card" style="border: 2px solid var(--color-primary);">
+    <h3>🆕 Universal Context</h3>
+    <p>Version-controlled context for <strong>any AI assistant</strong> (Warp, Cursor, Claude, Gemini). <code>gptcode context init</code> → team-shared, tool-agnostic, zero-effort.</p>
+  </a>
 </div>
 
 
@@ -163,10 +168,14 @@ gptcode plan "implement rate limiting"</code></pre>
   <p>
     <a href="/blog/2025-12-06-why-gptcode-isnt-trying-to-beat-anyone">Read the full positioning →</a>
     · <a href="/blog/2025-11-13-why-gptcode">Original vision →</a>
-    · <a href="/blog/2025-12-01-agent-routing-vs-tool-search">Agent routing vs tool search →</a>
+    <br/>
+    <a href="/blog/2025-12-01-agent-routing-vs-tool-search">Agent routing vs tool search →</a>
     · <a href="/blog/2025-12-02-intelligent-model-selection">Intelligent model selection →</a>
-    · <a href="/blog/2025-12-03-dependency-graph-context-optimization">Dependency graph →</a>
+    <br/>
+    <a href="/blog/2025-12-03-dependency-graph-context-optimization">Dependency graph →</a>
     · <a href="/blog/2025-12-04-chat-repl-conversational-coding">Chat REPL →</a>
+    <br/>
+    <a href="/blog/2025-12-14-universal-context-management"><strong>🆕 Universal Context Management →</strong></a>
   </p>
 </div>
 
