@@ -21,8 +21,8 @@ var perfProfileCmd = &cobra.Command{
 	Long: `Profile application performance (CPU, memory, etc).
 
 Examples:
-  chu perf profile          # Profile with go test
-  chu perf profile ./cmd    # Profile specific package`,
+  gptcode perf profile          # Profile with go test
+  gptcode perf profile ./cmd    # Profile specific package`,
 	RunE: runPerfProfile,
 }
 
@@ -32,8 +32,8 @@ var perfBenchCmd = &cobra.Command{
 	Long: `Run benchmarks and provide optimization suggestions.
 
 Examples:
-  chu perf bench          # Run all benchmarks
-  chu perf bench BenchmarkFoo  # Run specific benchmark`,
+  gptcode perf bench          # Run all benchmarks
+  gptcode perf bench BenchmarkFoo  # Run specific benchmark`,
 	RunE: runPerfBench,
 }
 
@@ -98,7 +98,7 @@ func runPerfBench(cmd *cobra.Command, args []string) error {
 		fmt.Println("  - Review allocations for hot paths")
 		fmt.Println("  - Consider object pooling for frequent allocations")
 	}
-	fmt.Println("  - Profile with: chu perf profile")
+	fmt.Println("  - Profile with: gptcode perf profile")
 	fmt.Println("  - Compare with: benchstat old.txt new.txt")
 
 	return nil

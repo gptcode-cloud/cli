@@ -32,12 +32,12 @@ var testE2ECmd = &cobra.Command{
 Categories: run, chat, tdd, integration, all (default)
 
 Examples:
-  chu test e2e                      # Run all tests with default E2E profile
-  chu test e2e --interactive        # Select profile interactively
-  chu test e2e --profile local      # Use specific profile
-  chu test e2e run                  # Run only REPL tests
-  chu test e2e chat --profile fast  # Chat tests with fast profile
-  chu test e2e --timeout 300        # Custom timeout per test`,
+  gptcode test e2e                      # Run all tests with default E2E profile
+  gptcode test e2e --interactive        # Select profile interactively
+  gptcode test e2e --profile local      # Use specific profile
+  gptcode test e2e run                  # Run only REPL tests
+  gptcode test e2e chat --profile fast  # Chat tests with fast profile
+  gptcode test e2e --timeout 300        # Custom timeout per test`,
 	RunE: runE2ETests,
 }
 
@@ -93,10 +93,10 @@ func runE2ETests(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf(`no E2E profile configured
 
 Run with --interactive to select a profile:
-  chu test e2e --interactive
+  gptcode test e2e --interactive
 
 Or specify profile directly:
-  chu test e2e --profile local`)
+  gptcode test e2e --profile local`)
 	}
 
 	if !profileExists(backend, profile, setup) {

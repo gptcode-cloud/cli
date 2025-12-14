@@ -319,7 +319,7 @@ func (ms *ModelSelector) RecordUsageWithTokens(backend, model string, success bo
 	}
 	ms.usage[today][key] = usage
 
-	if err := ms.saveUsage(); err != nil && os.Getenv("CHUCHU_DEBUG") == "1" {
+	if err := ms.saveUsage(); err != nil && os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[WARN] Failed to save usage: %v\n", err)
 	}
 }
@@ -335,7 +335,7 @@ func (ms *ModelSelector) getTodayUsage(backend, model string) ModelUsage {
 }
 
 func (ms *ModelSelector) SelectModel(action ActionType, language string, complexity string) (backend string, model string, err error) {
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] SelectModel called: action=%s lang=%s complexity=%s\n",
 			action, language, complexity)
 	}
@@ -350,7 +350,7 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 	}
 	var scored []scoredModel
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] SelectModel action=%s lang=%s mode=%s defaultBackend=%s\n",
 			action, language, mode, defaultBackend)
 		fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Catalog has %d backends\n", len(ms.catalog))
@@ -364,7 +364,7 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 			continue
 		}
 
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Checking backend=%s with %d models\n", backend, len(models))
 		}
 
@@ -385,7 +385,7 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 	}
 
 	if len(scored) == 0 {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] No models scored > 0 for action=%s lang=%s\n", action, language)
 			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Checked %d models in catalog\n", len(ms.catalog[defaultBackend]))
 		}
@@ -402,7 +402,7 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 
 	best := scored[0]
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Action=%s Lang=%s -> %s/%s (score=%.2f)\n",
 			action, language, best.backend, best.model, best.score)
 	}
@@ -413,7 +413,7 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 func (ms *ModelSelector) scoreModel(model ModelInfo, action ActionType, language string, complexity string) float64 {
 	if action == ActionEdit || action == ActionReview {
 		if !model.Capabilities.SupportsFileOperations {
-			if os.Getenv("CHUCHU_DEBUG") == "1" && action == ActionEdit {
+			if os.Getenv("GPTCODE_DEBUG") == "1" && action == ActionEdit {
 				fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Model %s/%s rejected: no file operations support\n", model.Backend, model.ID)
 			}
 			return 0

@@ -125,12 +125,12 @@ cd /Users/jadercorrea/workspace/opensource/gptcode
 
 ### With Custom Model
 ```bash
-CHUCHU_E2E_MODEL=qwen3-coder:latest ./tests/e2e.sh
+GPTCODE_E2E_MODEL=qwen3-coder:latest ./tests/e2e.sh
 ```
 
 ### Debug Mode
 ```bash
-CHUCHU_DEBUG=1 ./tests/e2e/scenarios/conversational_code_exploration.sh
+GPTCODE_DEBUG=1 ./tests/e2e/scenarios/conversational_code_exploration.sh
 ```
 
 ## Next Actions
@@ -237,7 +237,7 @@ CHUCHU_DEBUG=1 ./tests/e2e/scenarios/conversational_code_exploration.sh
 ## Contact & Support
 
 For questions or issues with E2E tests:
-1. Check `CHUCHU_DEBUG=1` output
+1. Check `GPTCODE_DEBUG=1` output
 2. Review recent commits in `/tests`
 3. Check Ollama service status: `ollama list`
 4. Verify model availability: `ollama pull llama3.1:8b`

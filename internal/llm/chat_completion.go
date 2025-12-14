@@ -292,7 +292,7 @@ func (c *ChatCompletionProvider) Chat(ctx context.Context, req ChatRequest) (*Ch
 		b, _ = json.Marshal(body)
 	}
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "\n=== REQUEST TO %s ===\n%s\n\n", c.BaseURL, string(b))
 	}
 
@@ -300,7 +300,7 @@ func (c *ChatCompletionProvider) Chat(ctx context.Context, req ChatRequest) (*Ch
 	httpReq.Header.Set("Authorization", "Bearer "+c.APIKey)
 	httpReq.Header.Set("Content-Type", "application/json")
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[HTTP] Making request to %s\n", c.BaseURL)
 	}
 
@@ -313,7 +313,7 @@ func (c *ChatCompletionProvider) Chat(ctx context.Context, req ChatRequest) (*Ch
 	var responseBody []byte
 	responseBody, _ = io.ReadAll(resp.Body)
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "=== RESPONSE ===\n%s\n\n", string(responseBody))
 	}
 

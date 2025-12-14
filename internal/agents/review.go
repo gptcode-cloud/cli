@@ -152,7 +152,7 @@ func (r *ReviewAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 		if statusCallback != nil {
 			statusCallback(fmt.Sprintf("Review: Analyzing (Iteration %d/%d)...", i+1, maxIterations))
 		}
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[REVIEW] Iteration %d/%d\n", i+1, maxIterations)
 		}
 

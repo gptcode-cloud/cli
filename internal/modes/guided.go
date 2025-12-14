@@ -176,7 +176,7 @@ func (g *GuidedMode) Implement(ctx context.Context, plan string) error {
 	var editorAgent *agents.EditorAgent
 	if len(allowedFiles) > 0 {
 		editorAgent = agents.NewEditorWithFileValidation(g.baseProvider, g.cwd, g.editorModel, allowedFiles)
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[IMPLEMENT] Allowed files: %v\n", allowedFiles)
 		}
 	} else {
@@ -193,7 +193,7 @@ func (g *GuidedMode) Implement(ctx context.Context, plan string) error {
 	// Allows multiple fix-verify-fix cycles
 	maxRetries := 9 // 10 total attempts (0-9)
 	for attempt := 0; attempt <= maxRetries; attempt++ {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[IMPLEMENT] Attempt %d/%d\n", attempt+1, maxRetries+1)
 		}
 
@@ -222,7 +222,7 @@ Execute the plan directly and minimally.`, plan)
 			return err
 		}
 
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[IMPLEMENT] Editor result: %s\n", result)
 		}
 
@@ -238,7 +238,7 @@ Execute the plan directly and minimally.`, plan)
 
 		reviewResult, err := reviewerAgent.Review(ctx, plan, filesToValidate, statusCallback)
 		if err != nil {
-			if os.Getenv("CHUCHU_DEBUG") == "1" {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[IMPLEMENT] Validation failed: %v\n", err)
 			}
 			return err
@@ -258,7 +258,7 @@ Execute the plan directly and minimally.`, plan)
 			}
 			feedback += "\nFix these issues and try again."
 
-			if os.Getenv("CHUCHU_DEBUG") == "1" {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[IMPLEMENT] Feedback: %s\n", feedback)
 			}
 

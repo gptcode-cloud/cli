@@ -222,7 +222,7 @@ Be precise and specific.`, plan, filesStr)
 	// 4. Make final determination
 	maxIterations := 10
 	for i := 0; i < maxIterations; i++ {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[VALIDATOR] Iteration %d/%d\n", i+1, maxIterations)
 		}
 
@@ -249,7 +249,7 @@ Be precise and specific.`, plan, filesStr)
 				result.Issues = extractIssues(resp.Text)
 			}
 
-			if os.Getenv("CHUCHU_DEBUG") == "1" {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[VALIDATOR] Result: success=%v, issues=%v\n", result.Success, result.Issues)
 			}
 

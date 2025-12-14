@@ -18,9 +18,9 @@ var coverageCmd = &cobra.Command{
 	Long: `Analyze test coverage for a package and identify functions that need tests.
 
 Examples:
-  chu coverage ./...           # Analyze all packages
-  chu coverage ./internal/...  # Analyze internal packages
-  chu coverage .               # Analyze current package`,
+  gptcode coverage ./...           # Analyze all packages
+  gptcode coverage ./internal/...  # Analyze internal packages
+  gptcode coverage .               # Analyze current package`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: runCoverage,
 }

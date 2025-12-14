@@ -127,9 +127,9 @@ go 1.21
 func runChuResearch(t *testing.T, dir string, query string, timeout time.Duration) string {
 	t.Helper()
 
-	cmd := exec.Command("chu", "research", query)
+	cmd := exec.Command("gptcode", "research", query)
 	cmd.Dir = dir
-	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 
 	done := make(chan struct{})
 	var output []byte
@@ -159,9 +159,9 @@ func runChuResearch(t *testing.T, dir string, query string, timeout time.Duratio
 func runChuPlan(t *testing.T, dir string, task string, timeout time.Duration) string {
 	t.Helper()
 
-	cmd := exec.Command("chu", "plan", task)
+	cmd := exec.Command("gptcode", "plan", task)
 	cmd.Dir = dir
-	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 
 	done := make(chan struct{})
 	var output []byte

@@ -10,10 +10,10 @@ while true; do
   echo "==================== ITERATION $iteration ===================="
   
   echo "[1/4] Building..."
-  go install ./cmd/chu 2>&1 | grep -v "^$"
+  go install ./cmd/gptcode 2>&1 | grep -v "^$"
   
   echo "[2/4] Testing CLI..."
-  timeout 5 bash -c 'echo "{\"messages\":[{\"role\":\"user\",\"content\":\"Analyse codebase and add pix\"}]}" | chu chat 2>/dev/null' | head -20
+  timeout 5 bash -c 'echo "{\"messages\":[{\"role\":\"user\",\"content\":\"Analyse codebase and add pix\"}]}" | gptcode chat 2>/dev/null' | head -20
   
   echo "[3/4] Testing Neovim event parsing..."
   nvim --headless -u test_events_simple.lua 2>&1 | grep -E "\[TEST\]"

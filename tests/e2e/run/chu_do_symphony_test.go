@@ -44,9 +44,9 @@ func TestChuDoComplexTaskAnalysis(t *testing.T) {
 	t.Logf("This tests Symphony task decomposition...")
 
 	// Run chu do with --dry-run to test analysis without execution
-	cmd := exec.Command("chu", "do", "reorganize docs folder into features and guides subdirectories", "--dry-run")
+	cmd := exec.Command("gptcode", "do", "reorganize docs folder into features and guides subdirectories", "--dry-run")
 	cmd.Dir = tmpDir
-	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 
 	done := make(chan struct{})
 	var output []byte
@@ -119,9 +119,9 @@ func TestChuDoSimpleTaskExecution(t *testing.T) {
 	t.Logf("This may take 2-5 minutes with local Ollama...")
 
 	// Simple task that should NOT trigger Symphony decomposition
-	cmd := exec.Command("chu", "do", "create notes.md with the text 'test notes'")
+	cmd := exec.Command("gptcode", "do", "create notes.md with the text 'test notes'")
 	cmd.Dir = tmpDir
-	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 
 	done := make(chan struct{})
 	var output []byte
@@ -199,9 +199,9 @@ func TestChuDoComplexityThreshold(t *testing.T) {
 
 			t.Logf("Testing task: %s (expected complex: %v)", tt.task, tt.shouldBeComplex)
 
-			cmd := exec.Command("chu", "do", tt.task, "--dry-run", "--verbose")
+			cmd := exec.Command("gptcode", "do", tt.task, "--dry-run", "--verbose")
 			cmd.Dir = tmpDir
-			cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+			cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 
 			output, err := cmd.CombinedOutput()
 			outputStr := string(output)

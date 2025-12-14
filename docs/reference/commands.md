@@ -571,7 +571,7 @@ gptcode config set defaults.graph_max_files 8
 ### Debug Graph
 
 ```bash
-export CHUCHU_DEBUG=1
+export GPTCODE_DEBUG=1
 gptcode chat "your query"  # Shows graph stats
 ```
 
@@ -734,12 +734,12 @@ gptcode profiles set-agent groq speed research llama-3.1-8b-instant
 
 ## Environment Variables
 
-### `CHUCHU_DEBUG`
+### `GPTCODE_DEBUG`
 
 Enable debug output to stderr.
 
 ```bash
-CHUCHU_DEBUG=1 gptcode chat
+GPTCODE_DEBUG=1 gptcode chat
 ```
 
 Shows:

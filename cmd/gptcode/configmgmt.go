@@ -31,9 +31,9 @@ var configUpdateCmd = &cobra.Command{
 	Long: `Update a configuration key across environments.
 
 Examples:
-  chu cfg update DATABASE_URL "postgres://..."        # Update in all configs
-  chu cfg update --env=production PORT 8080           # Production only
-  chu cfg update --apply API_KEY "secret"             # Apply immediately`,
+  gptcode cfg update DATABASE_URL "postgres://..."        # Update in all configs
+  gptcode cfg update --env=production PORT 8080           # Production only
+  gptcode cfg update --apply API_KEY "secret"             # Apply immediately`,
 	Args: cobra.ExactArgs(2),
 	RunE: runConfigUpdate,
 }

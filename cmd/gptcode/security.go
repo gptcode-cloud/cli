@@ -30,8 +30,8 @@ Supported tools:
 - Ruby: bundle audit
 
 Examples:
-  chu security scan           # Scan only
-  chu security scan --fix     # Scan and auto-fix`,
+  gptcode security scan           # Scan only
+  gptcode security scan --fix     # Scan and auto-fix`,
 	RunE: runSecurityScan,
 }
 

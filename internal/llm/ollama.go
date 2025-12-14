@@ -177,11 +177,11 @@ func (o *OllamaProvider) Chat(ctx context.Context, req ChatRequest) (*ChatRespon
 			}
 		}
 	} else if strings.Contains(or.Message.Content, "<function=") {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "\n### XML DETECTED in response:\n%s\n\n", or.Message.Content)
 		}
 		parsedCalls := parseXMLToolCalls(or.Message.Content)
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "### PARSED %d XML tool calls\n\n", len(parsedCalls))
 		}
 		if len(parsedCalls) > 0 {

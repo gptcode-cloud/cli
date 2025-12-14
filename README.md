@@ -52,11 +52,11 @@ GPTCode can now autonomously resolve GitHub issues end-to-end with 100% MVAA cov
 
 ```bash
 # Complete autonomous workflow
-chu issue fix 123                    # Fetch issue, find files, implement
-chu issue commit 123 --auto-fix      # Test, lint, build, auto-fix failures
-chu issue push 123                   # Create PR, link to issue
-chu issue ci 42                      # Handle CI failures
-chu issue review 42                  # Address review comments
+gptcode issue fix 123                    # Fetch issue, find files, implement
+gptcode issue commit 123 --auto-fix      # Test, lint, build, auto-fix failures
+gptcode issue push 123                   # Create PR, link to issue
+gptcode issue ci 42                      # Handle CI failures
+gptcode issue review 42                  # Address review comments
 # Iterate until approved!
 ```
 
@@ -79,9 +79,9 @@ chu issue review 42                  # Address review comments
 Let gptcode handle everything - analysis, planning, execution, and validation:
 
 ```bash
-chu do "add user authentication"
-chu do "fix bug in payment processing"
-chu do "add password reset feature" --supervised
+gptcode do "add user authentication"
+gptcode do "fix bug in payment processing"
+gptcode do "add password reset feature" --supervised
 ```
 
 **Features:**
@@ -95,9 +95,9 @@ chu do "add password reset feature" --supervised
 Conversational interface for exploration and quick tasks:
 
 ```bash
-chu chat "explain this function"
-chu chat "add error handling to the database connection"
-chu chat  # Enter interactive REPL
+gptcode chat "explain this function"
+gptcode chat "add error handling to the database connection"
+gptcode chat  # Enter interactive REPL
 ```
 
 **Features:**
@@ -112,14 +112,14 @@ Manual control over each phase for complex changes:
 
 ```bash
 # 1. Research: Understand your codebase
-chu research "How does authentication work?"
+gptcode research "How does authentication work?"
 
 # 2. Plan: Create detailed implementation steps
-chu plan "Add password reset feature"
+gptcode plan "Add password reset feature"
 
 # 3. Implement: Execute with verification
-chu implement plan.md              # Interactive (step-by-step)
-chu implement plan.md --auto       # Autonomous (fully automated)
+gptcode implement plan.md              # Interactive (step-by-step)
+gptcode implement plan.md --auto       # Autonomous (fully automated)
 ```
 
 **Why use structured workflow:**
@@ -131,11 +131,11 @@ chu implement plan.md --auto       # Autonomous (fully automated)
 ### Special Modes
 
 ```bash
-chu tdd                  # Test-driven development
-chu feature "user auth"  # Auto-generate tests + implementation
-chu review               # Code review for current changes
-chu review path/to/file  # Review specific file
-chu run "deploy to prod" # Task execution with follow-up
+gptcode tdd                  # Test-driven development
+gptcode feature "user auth"  # Auto-generate tests + implementation
+gptcode review               # Code review for current changes
+gptcode review path/to/file  # Review specific file
+gptcode run "deploy to prod" # Task execution with follow-up
 ```
 
 **[Complete Workflow Guide](docs/workflow-guide.md)** | **[Autonomous Mode Deep Dive](docs/autonomous-mode.md)**
@@ -146,19 +146,19 @@ chu run "deploy to prod" # Task execution with follow-up
 
 ```bash
 # Install via go
-go install github.com/jadercorrea/gptcode/cmd/chu@latest
+go install github.com/jadercorrea/gptcode/cmd/gptcode@latest
 
 # Or build from source
 git clone https://github.com/jadercorrea/gptcode
 cd gptcode
-go install ./cmd/chu
+go install ./cmd/gptcode
 ```
 
 ### Setup
 
 ```bash
 # Interactive setup wizard
-chu setup
+gptcode setup
 
 # For ultra-cheap setup, use Groq (get free key at console.groq.com)
 # For free local setup, use Ollama (no API key needed)
@@ -205,13 +205,13 @@ Add to your Neovim config:
 GPTCode embeds two lightweight ML models for instant decision-making with zero external dependencies:
 
 #### 1. Complexity Detection
-Automatically triggers Guided Mode for complex/multistep tasks in `chu chat`.
+Automatically triggers Guided Mode for complex/multistep tasks in `gptcode chat`.
 
 **Configuration:**
 ```bash
 # View/set complexity threshold (default: 0.55)
-chu config get defaults.ml_complex_threshold
-chu config set defaults.ml_complex_threshold 0.6
+gptcode config get defaults.ml_complex_threshold
+gptcode config set defaults.ml_complex_threshold 0.6
 ```
 
 #### 2. Intent Classifier
@@ -225,27 +225,27 @@ Replaces LLM call with 1ms local inference to route requests (query/editor/resea
 **Configuration:**
 ```bash
 # View/set intent threshold (default: 0.7)
-chu config get defaults.ml_intent_threshold
-chu config set defaults.ml_intent_threshold 0.8
+gptcode config get defaults.ml_intent_threshold
+gptcode config set defaults.ml_intent_threshold 0.8
 ```
 
 **ML CLI Commands:**
 ```bash
 # List available models
-chu ml list
+gptcode ml list
 
 # Train models (uses Python)
-chu ml train complexity
-chu ml train intent
+gptcode ml train complexity
+gptcode ml train intent
 
 # Test models
-chu ml test intent "explain this code"
-chu ml eval intent -f ml/intent/data/eval.csv
+gptcode ml test intent "explain this code"
+gptcode ml eval intent -f ml/intent/data/eval.csv
 
 # Pure-Go inference (no Python runtime)
-chu ml predict "your task"                    # complexity (default)
-chu ml predict complexity "implement oauth"   # explicit
-chu ml predict intent "explain this code"     # intent classification
+gptcode ml predict "your task"                    # complexity (default)
+gptcode ml predict complexity "implement oauth"   # explicit
+gptcode ml predict intent "explain this code"     # intent classification
 ```
 
 #### 3. Dependency Graph + Context Optimization
@@ -272,7 +272,7 @@ Automatically analyzes your codebase structure to provide only relevant context 
 **Control:**
 ```bash
 # Debug mode shows graph stats
-CHUCHU_DEBUG=1 chu chat "your query"
+GPTCODE_DEBUG=1 gptcode chat "your query"
 # [GRAPH] Built graph: 142 nodes, 287 edges
 # [GRAPH] Selected 5 files:
 # [GRAPH]   1. internal/agents/router.go (score: 0.842)
@@ -281,7 +281,7 @@ CHUCHU_DEBUG=1 chu chat "your query"
 
 **Example:**
 ```bash
-chu chat "fix bug in authentication"
+gptcode chat "fix bug in authentication"
 # Without graph: Sends entire codebase (100k tokens)
 # With graph: Sends auth.go + user.go + middleware.go + session.go + config.go (18k tokens)
 ```
@@ -291,62 +291,62 @@ chu chat "fix bug in authentication"
 ### Quick Tasks (Autonomous)
 
 ```bash
-# Let chu handle everything
-chu do "add logging to the API handlers"
-chu do "create a dockerfile for this project"
-chu do "fix the failing tests in user_test.go"
+# Let gptcode handle everything
+gptcode do "add logging to the API handlers"
+gptcode do "create a dockerfile for this project"
+gptcode do "fix the failing tests in user_test.go"
 
 # With supervision (confirm before changes)
-chu do "refactor the authentication module" --supervised
+gptcode do "refactor the authentication module" --supervised
 ```
 
 ### Exploration & Learning (Chat)
 
 ```bash
 # Ask questions about your codebase
-chu chat "how does the auth system work?"
-chu chat "where is user validation happening?"
+gptcode chat "how does the auth system work?"
+gptcode chat "where is user validation happening?"
 
 # Quick fixes and modifications
-chu chat "add error handling to database connections"
-chu chat "optimize the query in getUsers"
+gptcode chat "add error handling to database connections"
+gptcode chat "optimize the query in getUsers"
 ```
 
 ### Complex Changes (Structured Workflow)
 
 ```bash
 # Step 1: Research the codebase
-chu research "current authentication implementation"
+gptcode research "current authentication implementation"
 
 # Step 2: Create detailed plan
-chu plan "add OAuth2 support"
+gptcode plan "add OAuth2 support"
 
 # Step 3: Execute plan
-chu implement docs/plans/oauth2-implementation.md
-chu implement docs/plans/oauth2-implementation.md --auto  # Fully autonomous
+gptcode implement docs/plans/oauth2-implementation.md
+gptcode implement docs/plans/oauth2-implementation.md --auto  # Fully autonomous
 ```
 
 ### Specialized Workflows
 
 ```bash
 # Test-driven development
-chu tdd
+gptcode tdd
 # 1. Describe feature
 # 2. Generate tests
 # 3. Implement
 # 4. Refine
 
 # Feature generation (tests + implementation)
-chu feature "user registration with email verification"
+gptcode feature "user registration with email verification"
 
 # Code review
-chu review                # Review staged changes
-chu review src/auth.go    # Review specific file
-chu review --full         # Full codebase review
+gptcode review                # Review staged changes
+gptcode review src/auth.go    # Review specific file
+gptcode review --full         # Full codebase review
 
 # Task execution with context
-chu run "deploy to staging"
-chu run "migrate database"
+gptcode run "deploy to staging"
+gptcode run "migrate database"
 ```
 
 ### Advanced Git Operations (NEW! 🎯)
@@ -355,29 +355,29 @@ GPTCode provides AI-powered Git operations for complex workflows:
 
 ```bash
 # Git Bisect - Find which commit introduced a bug
-chu git bisect v1.0.0 HEAD
+gptcode git bisect v1.0.0 HEAD
 # Automatically runs tests on each commit
 # Uses LLM to analyze the breaking commit
 
 # Cherry-pick with conflict resolution
-chu git cherry-pick abc123 def456
+gptcode git cherry-pick abc123 def456
 # Applies commits with AI-powered conflict resolution
 
 # Smart Rebase
-chu git rebase main
+gptcode git rebase main
 # Rebases with automatic conflict resolution
 
 # Squash commits with AI-generated message
-chu git squash HEAD~3
+gptcode git squash HEAD~3
 # Squashes last 3 commits
 # Generates professional commit message via LLM
 
 # Improve commit messages
-chu git reword HEAD
+gptcode git reword HEAD
 # Suggests improved commit message following best practices
 
 # Resolve merge conflicts
-chu merge resolve
+gptcode merge resolve
 # Detects and resolves all conflicted files
 # Uses LLM to merge changes intelligently
 ```
@@ -396,16 +396,16 @@ chu merge resolve
 
 ```bash
 # Execute a plan with automatic verification
-chu implement docs/plans/my-implementation.md --auto
+gptcode implement docs/plans/my-implementation.md --auto
 
 # With custom retry limit
-chu implement docs/plans/my-implementation.md --auto --max-retries 5
+gptcode implement docs/plans/my-implementation.md --auto --max-retries 5
 
 # Resume from last checkpoint
-chu implement docs/plans/my-implementation.md --auto --resume
+gptcode implement docs/plans/my-implementation.md --auto --resume
 
 # Enable lint verification (optional)
-chu implement docs/plans/my-implementation.md --auto --lint
+gptcode implement docs/plans/my-implementation.md --auto --lint
 ```
 
 **Interactive Mode (default):**
@@ -425,7 +425,7 @@ chu implement docs/plans/my-implementation.md --auto --lint
 
 **Neovim Integration:**
 ```vim
-:GPTCodeAuto        " prompts for plan file and runs: chu implement <file> --auto
+:GPTCodeAuto        " prompts for plan file and runs: gptcode implement <file> --auto
 " Or keymap: <leader>ca
 ```
 
@@ -433,74 +433,74 @@ chu implement docs/plans/my-implementation.md --auto --lint
 
 ```bash
 # Show current backend
-chu backend
+gptcode backend
 
 # List all backends
-chu backend list
+gptcode backend list
 
 # Show backend details
-chu backend show groq
+gptcode backend show groq
 
 # Switch backend
-chu backend use groq
+gptcode backend use groq
 
 # Create new backend
-chu backend create mygroq openai https://api.groq.com/openai/v1
-chu key mygroq  # Set API key
-chu config set backend.mygroq.default_model llama-3.3-70b-versatile
-chu backend use mygroq
+gptcode backend create mygroq openai https://api.groq.com/openai/v1
+gptcode key mygroq  # Set API key
+gptcode config set backend.mygroq.default_model llama-3.3-70b-versatile
+gptcode backend use mygroq
 
 # Delete backend
-chu backend delete mygroq
+gptcode backend delete mygroq
 ```
 
 ### Profile Management
 
 ```bash
 # Show current profile
-chu profile
+gptcode profile
 
 # List all profiles
-chu profile list
+gptcode profile list
 
 # Show profile details
-chu profile show groq.speed
+gptcode profile show groq.speed
 
 # Switch profile (backend + profile)
-chu profile use groq.speed
+gptcode profile use groq.speed
 
 # Create new profile
-chu profiles create groq speed
+gptcode profiles create groq speed
 
 # Configure agents
-chu profiles set-agent groq speed router llama-3.1-8b-instant
-chu profiles set-agent groq speed query llama-3.1-8b-instant
+gptcode profiles set-agent groq speed router llama-3.1-8b-instant
+gptcode profiles set-agent groq speed query llama-3.1-8b-instant
 ```
 
 ### Model Discovery & Installation
 
 ```bash
 # Search for ollama models
-chu models search ollama llama3
+gptcode models search ollama llama3
 
 # Search with multiple filters (ANDed)
-chu models search ollama coding fast
+gptcode models search ollama coding fast
 
 # Install ollama model
-chu models install llama3.1:8b
+gptcode models install llama3.1:8b
 ```
 
 ### Feedback & Learning
 
 ```bash
 # Record positive feedback
-chu feedback good --backend groq --model llama-3.3-70b-versatile --agent query
+gptcode feedback good --backend groq --model llama-3.3-70b-versatile --agent query
 
 # Record negative feedback
-chu feedback bad --backend groq --model llama-3.1-8b-instant --agent router
+gptcode feedback bad --backend groq --model llama-3.1-8b-instant --agent router
 
 # View statistics
-chu feedback stats
+gptcode feedback stats
 ```
 
 GPTCode learns from your feedback to recommend better models over time.
@@ -513,16 +513,16 @@ GPTCode supports multiple backends and profiles optimized for different use case
 
 ```bash
 # List available profiles
-chu profile list
+gptcode profile list
 
 # Switch profiles
-chu profile use ollama.default      # $0/month (local)
-chu profile use openrouter.free    # $0/month (cloud, rate-limited)
-chu profile use groq.budget        # ~$0.85/month (3M tokens)
-chu profile use groq.performance   # ~$2.41/month (3M tokens)
+gptcode profile use ollama.default      # $0/month (local)
+gptcode profile use openrouter.free    # $0/month (cloud, rate-limited)
+gptcode profile use groq.budget        # ~$0.85/month (3M tokens)
+gptcode profile use groq.performance   # ~$2.41/month (3M tokens)
 
 # Show current profile
-chu profile
+gptcode profile
 ```
 
 ### Pre-configured Profiles
@@ -611,16 +611,16 @@ backend:
 
 ```bash
 # Create new profile
-chu profiles create groq myprofile
+gptcode profiles create groq myprofile
 
 # Configure agents
-chu profiles set-agent groq myprofile router llama-3.1-8b-instant
-chu profiles set-agent groq myprofile query openai/gpt-oss-120b
-chu profiles set-agent groq myprofile editor llama-3.3-70b-versatile
-chu profiles set-agent groq myprofile research groq/compound
+gptcode profiles set-agent groq myprofile router llama-3.1-8b-instant
+gptcode profiles set-agent groq myprofile query openai/gpt-oss-120b
+gptcode profiles set-agent groq myprofile editor llama-3.3-70b-versatile
+gptcode profiles set-agent groq myprofile research groq/compound
 
 # Use it
-chu profile use groq.myprofile
+gptcode profile use groq.myprofile
 ```
 
 ### Cost Comparison
@@ -713,38 +713,38 @@ ollama pull qwen3-coder:latest
 ollama pull gpt-oss:latest
 
 # 3. Create E2E profile (if not exists)
-chu setup  # or manually configure ~/.gptcode/setup.yaml
+gptcode setup  # or manually configure ~/.gptcode/setup.yaml
 ```
 
 ### Running Tests
 
 **Interactive profile selection (first time):**
 ```bash
-chu test e2e --interactive
+gptcode test e2e --interactive
 # Lists available profiles, saves selection as default
 ```
 
 **With default profile:**
 ```bash
-chu test e2e              # Run all tests
-chu test e2e run          # Run only 'run' category tests
+gptcode test e2e              # Run all tests
+gptcode test e2e run          # Run only 'run' category tests
 ```
 
 **With specific profile:**
 ```bash
-chu test e2e --profile local
-chu test e2e run --profile local
+gptcode test e2e --profile local
+gptcode test e2e run --profile local
 ```
 
 **With notifications (macOS):**
 ```bash
-chu test e2e --notify
+gptcode test e2e --notify
 # Shows desktop notification when tests complete
 ```
 
 **Custom timeout:**
 ```bash
-chu test e2e --timeout 600  # 10 minutes per test
+gptcode test e2e --timeout 600  # 10 minutes per test
 ```
 
 **Features:**
@@ -779,7 +779,7 @@ backend:
 - `E2E_BACKEND` - Backend being used (set by chu test e2e)
 - `E2E_PROFILE` - Profile being used (set by chu test e2e)
 - `E2E_TIMEOUT` - Timeout in seconds (set by chu test e2e)
-- `CHUCHU_NO_NOTIFY` - Set to disable notifications
+- `GPTCODE_NO_NOTIFY` - Set to disable notifications
 
 ### Current Test Coverage
 
@@ -836,7 +836,7 @@ func TestYourFeature(t *testing.T) {
 
 	tmpDir := t.TempDir()
 	
-	cmd := exec.Command("chu", "your", "command")
+	cmd := exec.Command("gptcode", "your", "command")
 	cmd.Dir = tmpDir
 	
 	output, err := cmd.CombinedOutput()
@@ -850,7 +850,7 @@ func TestYourFeature(t *testing.T) {
 
 2. Run tests:
 ```bash
-chu test e2e <category>
+gptcode test e2e <category>
 ```
 
 3. Categories:
@@ -863,14 +863,14 @@ chu test e2e <category>
 
 **Built-in Go testing:**
 - `t.TempDir()` - Creates isolated test directory
-- `exec.Command()` - Executes chu commands
+- `exec.Command()` - Executes gptcode commands
 - `os.ReadFile()` - Validates file contents
 - `os.ReadDir()` - Validates directory structure
 
 **Environment variables:**
 - Tests automatically skip when `E2E_BACKEND` not set
 - Use `skipIfNoE2E(t)` helper in your tests
-- chu test e2e sets E2E_BACKEND, E2E_PROFILE, E2E_TIMEOUT
+- gptcode test e2e sets E2E_BACKEND, E2E_PROFILE, E2E_TIMEOUT
 
 **Timeout handling:**
 - Use Go channels for async execution with timeout
@@ -879,7 +879,7 @@ chu test e2e <category>
 ### Test Output Example
 
 ```bash
-$ chu test e2e run
+$ gptcode test e2e run
 
 🧪 GPTCode E2E Tests
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -898,9 +898,9 @@ Agent Models:
 Running Run tests from tests/e2e/run...
 
 === RUN   TestChuDoCreateFile
-    chu_do_test.go:28: Running chu do in /tmp/TestChuDoCreateFile123
+    chu_do_test.go:28: Running gptcode do in /tmp/TestChuDoCreateFile123
     chu_do_test.go:29: This may take 2-5 minutes with local Ollama...
-    chu_do_test.go:60: ✓ chu do successfully created hello.txt
+    chu_do_test.go:60: ✓ gptcode do successfully created hello.txt
 --- PASS: TestChuDoCreateFile (143.21s)
 
 ⏱️  2m23s | ✅ 1 passed | ❌ 0 failed | ⏳ 7m37s remaining | 🔄 TestChuDoModifyFile

@@ -37,9 +37,9 @@ The system analyzes:
 - Current backend configuration
 
 Examples:
-  chu model recommend           # All agents (default)
-  chu model recommend editor    # Specific agent
-  chu model recommend query`,
+  gptcode model recommend           # All agents (default)
+  gptcode model recommend editor    # Specific agent
+  gptcode model recommend query`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		// Se nenhum argumento, mostrar todos (comportamento default)
@@ -130,7 +130,7 @@ Use --recommended flag to show only recommended models for current setup.`,
 
 		catalogData, err := catalog.Load()
 		if err != nil {
-			return fmt.Errorf("failed to load catalog: %w\nRun 'chu model update --all' to create catalog", err)
+			return fmt.Errorf("failed to load catalog: %w\nRun 'gptcode model update --all' to create catalog", err)
 		}
 
 		setup, err := config.LoadSetup()
@@ -207,9 +207,9 @@ This checks if the model exists and downloads it if needed.
 Only works with Ollama backend.
 
 Examples:
-  chu model install qwen3-coder
-  chu model install llama3.3:70b
-  chu model install deepseek-coder-v2:latest`,
+  gptcode model install qwen3-coder
+  gptcode model install llama3.3:70b
+  gptcode model install deepseek-coder-v2:latest`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		modelName := args[0]
@@ -226,8 +226,8 @@ Without arguments: updates only the specified model's information.
 With --all flag: updates the entire catalog from all providers.
 
 Examples:
-  chu model update claude-3.5-sonnet    # Update specific model
-  chu model update --all                # Update entire catalog`,
+  gptcode model update claude-3.5-sonnet    # Update specific model
+  gptcode model update --all                # Update entire catalog`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		updateAll, _ := cmd.Flags().GetBool("all")
@@ -291,12 +291,12 @@ func updateSingleModel(modelName string) error {
 	if !found {
 		fmt.Printf("Model '%s' not found in catalog.\n", modelName)
 		fmt.Println("Try one of these commands:")
-		fmt.Println("  chu model list              # See all available models")
-		fmt.Println("  chu model update --all      # Update full catalog")
+		fmt.Println("  gptcode model list              # See all available models")
+		fmt.Println("  gptcode model update --all      # Update full catalog")
 		return fmt.Errorf("model not found")
 	}
 
-	fmt.Println("Note: This shows cached data. Use 'chu model update --all' to refresh.")
+	fmt.Println("Note: This shows cached data. Use 'gptcode model update --all' to refresh.")
 
 	return nil
 }
@@ -327,9 +327,9 @@ func installOllamaModel(modelName string) error {
 	}
 
 	fmt.Printf("\nModel '%s' installed successfully!\n", modelName)
-	fmt.Println("You can now use it in your chu configuration:")
-	fmt.Printf("  chu config set defaults.backend ollama\n")
-	fmt.Printf("  chu config set defaults.model %s\n", modelName)
+	fmt.Println("You can now use it in your gptcode configuration:")
+	fmt.Printf("  gptcode config set defaults.backend ollama\n")
+	fmt.Printf("  gptcode config set defaults.model %s\n", modelName)
 
 	return nil
 }
@@ -378,7 +378,7 @@ func updateCatalogFromAllProviders() error {
 
 	fmt.Printf("\nCatalog updated successfully!\n")
 	fmt.Printf("   Saved to: %s\n", outputPath)
-	fmt.Println("Use 'chu model list' to see all available models.")
+	fmt.Println("Use 'gptcode model list' to see all available models.")
 
 	return nil
 }

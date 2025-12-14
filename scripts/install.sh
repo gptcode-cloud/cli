@@ -11,7 +11,7 @@ fi
 echo "[gptcode] GOBIN=${GOBIN}"
 
 # Instala binário
-go install ./cmd/chu
+go install ./cmd/gptcode
 
 # Garante que esteja no PATH
 if ! command -v chu >/dev/null 2>&1; then

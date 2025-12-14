@@ -25,7 +25,7 @@ var refactorAPICmd = &cobra.Command{
 	Long: `Detect API routes and ensure handlers and tests are updated.
 
 Examples:
-  chu refactor api           # Analyze and coordinate all API changes`,
+  gptcode refactor api           # Analyze and coordinate all API changes`,
 	RunE: runRefactorAPI,
 }
 
@@ -35,8 +35,8 @@ var refactorSignatureCmd = &cobra.Command{
 	Long: `Refactor function signature across all files that use it.
 
 Examples:
-  chu refactor signature ProcessData "(ctx context.Context, data []byte) error"
-  chu refactor signature handleRequest "(w http.ResponseWriter, r *http.Request, logger *log.Logger)"`,
+  gptcode refactor signature ProcessData "(ctx context.Context, data []byte) error"
+  gptcode refactor signature handleRequest "(w http.ResponseWriter, r *http.Request, logger *log.Logger)"`,
 	Args: cobra.ExactArgs(2),
 	RunE: runRefactorSignature,
 }
@@ -54,7 +54,7 @@ Detects:
 Generates migration plan and updates all consuming code.
 
 Examples:
-  chu refactor breaking    # Analyze and update breaking changes`,
+  gptcode refactor breaking    # Analyze and update breaking changes`,
 	RunE: runRefactorBreaking,
 }
 
@@ -64,8 +64,8 @@ var refactorTypeCmd = &cobra.Command{
 	Long: `Change type definition and update all usages.
 
 Examples:
-  chu refactor type User "struct{ID int; Name string; Email string}"
-  chu refactor type Config "map[string]interface{}"`,
+  gptcode refactor type User "struct{ID int; Name string; Email string}"
+  gptcode refactor type Config "map[string]interface{}"`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: runRefactorType,
 }
@@ -76,8 +76,8 @@ var refactorCompatCmd = &cobra.Command{
 	Long: `Generate wrapper code for deprecated API.
 
 Examples:
-  chu refactor compat ProcessData ProcessDataV2 v2.0.0
-  chu refactor compat GetUser GetUserByID v1.5.0`,
+  gptcode refactor compat ProcessData ProcessDataV2 v2.0.0
+  gptcode refactor compat GetUser GetUserByID v1.5.0`,
 	Args: cobra.ExactArgs(3),
 	RunE: runRefactorCompat,
 }

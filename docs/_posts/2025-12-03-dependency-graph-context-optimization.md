@@ -170,7 +170,7 @@ The system:
 See what the graph is doing:
 
 ```bash
-CHUCHU_DEBUG=1 gptcode chat "your query"
+GPTCODE_DEBUG=1 gptcode chat "your query"
 ```
 
 Output:
@@ -205,7 +205,7 @@ gptcode config set defaults.graph_max_files 10
 ### Disable (if needed)
 
 ```bash
-CHUCHU_GRAPH=false gptcode chat "query"
+GPTCODE_GRAPH=false gptcode chat "query"
 ```
 
 ## Technical Details
@@ -341,7 +341,7 @@ make install
 
 ```bash
 # Enable debug to see graph in action
-CHUCHU_DEBUG=1 gptcode chat "explain authentication flow"
+GPTCODE_DEBUG=1 gptcode chat "explain authentication flow"
 ```
 
 ### 3. Observe the Magic
@@ -355,7 +355,7 @@ Watch as GPTCode:
 
 Try the same query with graph disabled:
 ```bash
-CHUCHU_GRAPH=false gptcode chat "explain authentication flow"
+GPTCODE_GRAPH=false gptcode chat "explain authentication flow"
 ```
 
 Notice:
@@ -377,7 +377,7 @@ Better queries → better file selection:
 
 ### Check Debug Output
 
-If answers seem off, use `CHUCHU_DEBUG=1` to see which files were selected. Adjust `graph_max_files` if needed.
+If answers seem off, use `GPTCODE_DEBUG=1` to see which files were selected. Adjust `graph_max_files` if needed.
 
 ### Combine with Other Features
 

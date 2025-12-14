@@ -25,8 +25,8 @@ var gitBisectCmd = &cobra.Command{
 	Long: `Automatically find which commit introduced a bug using binary search.
 
 Examples:
-  chu git bisect v1.0.0 HEAD
-  chu git bisect abc123 def456`,
+  gptcode git bisect v1.0.0 HEAD
+  gptcode git bisect abc123 def456`,
 	Args: cobra.ExactArgs(2),
 	RunE: runGitBisect,
 }
@@ -37,8 +37,8 @@ var gitCherryPickCmd = &cobra.Command{
 	Long: `Cherry-pick commits with AI-powered conflict resolution.
 
 Examples:
-  chu git cherry-pick abc123
-  chu git cherry-pick abc123 def456 ghi789`,
+  gptcode git cherry-pick abc123
+  gptcode git cherry-pick abc123 def456 ghi789`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: runGitCherryPick,
 }
@@ -49,8 +49,8 @@ var gitRebaseCmd = &cobra.Command{
 	Long: `Rebase with intelligent conflict resolution and commit management.
 
 Examples:
-  chu git rebase main
-  chu git rebase --interactive HEAD~5`,
+  gptcode git rebase main
+  gptcode git rebase --interactive HEAD~5`,
 	RunE: runGitRebase,
 }
 
@@ -60,8 +60,8 @@ var gitSquashCmd = &cobra.Command{
 	Long: `Squash multiple commits into one with an intelligent commit message.
 
 Examples:
-  chu git squash HEAD~3
-  chu git squash abc123`,
+  gptcode git squash HEAD~3
+  gptcode git squash abc123`,
 	Args: cobra.ExactArgs(1),
 	RunE: runGitSquash,
 }
@@ -72,8 +72,8 @@ var gitRewordCmd = &cobra.Command{
 	Long: `Improve or fix a commit message using AI.
 
 Examples:
-  chu git reword HEAD
-  chu git reword abc123`,
+  gptcode git reword HEAD
+  gptcode git reword abc123`,
 	Args: cobra.ExactArgs(1),
 	RunE: runGitReword,
 }

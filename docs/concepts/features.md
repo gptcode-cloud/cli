@@ -125,7 +125,7 @@ Go, Python, JavaScript/TypeScript, Ruby, Rust
 
 **Debug mode:**
 ```bash
-CHUCHU_DEBUG=1 gptcode chat "your query"
+GPTCODE_DEBUG=1 gptcode chat "your query"
 # [GRAPH] Built graph: 142 nodes, 287 edges
 # [GRAPH] Selected 5 files:
 # [GRAPH]   1. internal/agents/router.go (score: 0.842)

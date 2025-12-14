@@ -48,7 +48,7 @@ func (o *OrchestratedMode) Execute(ctx context.Context, userMessage string) erro
 		return fmt.Errorf("analysis failed: %w", err)
 	}
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[ORCHESTRATED] Analysis: %s\n", analysis[:min(200, len(analysis))])
 	}
 
@@ -58,7 +58,7 @@ func (o *OrchestratedMode) Execute(ctx context.Context, userMessage string) erro
 		return fmt.Errorf("planning failed: %w", err)
 	}
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[ORCHESTRATED] Plan created\n")
 	}
 
@@ -69,7 +69,7 @@ func (o *OrchestratedMode) Execute(ctx context.Context, userMessage string) erro
 	var editorAgent *agents.EditorAgent
 	if len(allowedFiles) > 0 {
 		editorAgent = agents.NewEditorWithFileValidation(o.baseProvider, o.cwd, o.editorModel, allowedFiles)
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[ORCHESTRATED] Allowed files: %v\n", allowedFiles)
 		}
 	} else {
@@ -82,7 +82,7 @@ func (o *OrchestratedMode) Execute(ctx context.Context, userMessage string) erro
 	// Allows multiple fix-verify-fix cycles
 	maxRetries := 9 // 10 total attempts (0-9)
 	for attempt := 0; attempt <= maxRetries; attempt++ {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[ORCHESTRATED] Implementation attempt %d/%d\n", attempt+1, maxRetries+1)
 		}
 
@@ -103,7 +103,7 @@ ONLY modify files listed in the plan. ONLY make changes described. NO extras.`, 
 			return fmt.Errorf("implementation failed: %w", err)
 		}
 
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[ORCHESTRATED] Editor result: %s\n", result)
 		}
 

@@ -46,7 +46,7 @@ func RunSetup() {
 }
 
 func detectTemplateDir() string {
-	if env := os.Getenv("CHUCHU_TEMPLATES_DIR"); env != "" {
+	if env := os.Getenv("GPTCODE_TEMPLATES_DIR"); env != "" {
 		return env
 	}
 	if _, err := os.Stat("internal/prompt/templates"); err == nil {

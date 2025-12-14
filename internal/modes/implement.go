@@ -47,13 +47,13 @@ Execute the plan phase by phase:
 
 Focus on making the actual code changes described in the plan.`, string(planContent))
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[IMPLEMENT] Plan length: %d bytes\n", len(planContent))
 		fmt.Fprintf(os.Stderr, "[IMPLEMENT] Prompt preview: %s...\n", implementPrompt[:min(200, len(implementPrompt))])
 	}
 
 	editorModel := backendCfg.GetModelForAgent("editor")
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[IMPLEMENT] Using editor model: %s\n", editorModel)
 	}
 	editorAgent := agents.NewEditor(customExec, cwd, editorModel)

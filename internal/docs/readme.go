@@ -141,7 +141,7 @@ func (u *ReadmeUpdater) getNewFiles() ([]string, error) {
 }
 
 func (u *ReadmeUpdater) detectNewCommands() ([]string, error) {
-	cmdPath := filepath.Join(u.workDir, "cmd/chu")
+	cmdPath := filepath.Join(u.workDir, "cmd/gptcode")
 
 	entries, err := os.ReadDir(cmdPath)
 	if err != nil {

@@ -34,9 +34,9 @@ var genChangelogCmd = &cobra.Command{
 	Long: `Generate a CHANGELOG entry using conventional commits.
 
 Examples:
-  chu gen changelog           # All commits since last tag
-  chu gen changelog v1.0.0    # From v1.0.0 to HEAD
-  chu gen changelog v1.0.0 v1.1.0  # Between two tags`,
+  gptcode gen changelog           # All commits since last tag
+  gptcode gen changelog v1.0.0    # From v1.0.0 to HEAD
+  gptcode gen changelog v1.0.0 v1.1.0  # Between two tags`,
 	Args: cobra.MaximumNArgs(2),
 	RunE: runGenChangelog,
 }
@@ -47,8 +47,8 @@ var genMockCmd = &cobra.Command{
 	Long: `Generate mock objects for Go interfaces.
 
 Examples:
-  chu gen mock internal/storage/storage.go
-  chu gen mock pkg/service/service.go`,
+  gptcode gen mock internal/storage/storage.go
+  gptcode gen mock pkg/service/service.go`,
 	Args: cobra.ExactArgs(1),
 	RunE: runGenMock,
 }
@@ -59,8 +59,8 @@ var genIntegrationCmd = &cobra.Command{
 	Long: `Generate integration tests that test component interactions.
 
 Examples:
-  chu gen integration ./internal/api
-  chu gen integration ./pkg/service`,
+  gptcode gen integration ./internal/api
+  gptcode gen integration ./pkg/service`,
 	Args: cobra.ExactArgs(1),
 	RunE: runGenIntegration,
 }
@@ -71,8 +71,8 @@ var genMigrationCmd = &cobra.Command{
 	Long: `Detect changes in model structs and generate SQL migration.
 
 Examples:
-  chu gen migration "add user email"
-  chu gen migration "update product schema"`,
+  gptcode gen migration "add user email"
+  gptcode gen migration "update product schema"`,
 	Args: cobra.ExactArgs(1),
 	RunE: runGenMigration,
 }
@@ -85,8 +85,8 @@ var genSnapshotCmd = &cobra.Command{
 Supports: Go, TypeScript/React, Python, Ruby
 
 Examples:
-  chu gen snapshot components/Button.tsx
-  chu gen snapshot pkg/formatter/formatter.go`,
+  gptcode gen snapshot components/Button.tsx
+  gptcode gen snapshot pkg/formatter/formatter.go`,
 	Args: cobra.ExactArgs(1),
 	RunE: runGenSnapshot,
 }

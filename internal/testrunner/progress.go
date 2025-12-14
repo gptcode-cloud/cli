@@ -155,7 +155,7 @@ func (pt *ProgressTracker) Finish(success bool) {
 }
 
 func (pt *ProgressTracker) sendNotification(success bool) {
-	if os.Getenv("CHUCHU_NO_NOTIFY") != "" {
+	if os.Getenv("GPTCODE_NO_NOTIFY") != "" {
 		return
 	}
 

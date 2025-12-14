@@ -48,7 +48,7 @@ run_chu_command() {
 }
 
 run_chu_command_with_timeout() {
-    local timeout_seconds="${CHUCHU_E2E_TIMEOUT:-180}"
+    local timeout_seconds="${GPTCODE_E2E_TIMEOUT:-180}"
     local cmd="$1"
     shift
     

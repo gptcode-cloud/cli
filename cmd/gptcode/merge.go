@@ -23,8 +23,8 @@ var mergeResolveCmd = &cobra.Command{
 	Long: `Detect and resolve all merge conflicts in the working directory.
 
 Examples:
-  chu merge resolve
-  chu merge resolve --model claude-3-5-sonnet-20241022`,
+  gptcode merge resolve
+  gptcode merge resolve --model claude-3-5-sonnet-20241022`,
 	RunE: runMergeResolve,
 }
 

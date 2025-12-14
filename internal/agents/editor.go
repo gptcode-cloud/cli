@@ -229,11 +229,11 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 		if statusCallback != nil {
 			statusCallback(fmt.Sprintf("Editor: Thinking (Iteration %d/%d)...", i+1, maxIterations))
 		}
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[EDITOR] Iteration %d/%d\n", i+1, maxIterations)
 		}
 
-		if os.Getenv("CHUCHU_DEBUG") == "1" && i == 0 {
+		if os.Getenv("GPTCODE_DEBUG") == "1" && i == 0 {
 			fmt.Fprintf(os.Stderr, "[EDITOR] Messages count: %d\n", len(messages))
 			if len(messages) > 0 {
 				fmt.Fprintf(os.Stderr, "[EDITOR] First message: %s...\n", messages[0].Content[:min(200, len(messages[0].Content))])
@@ -250,7 +250,7 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 			return "", nil, err
 		}
 
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[EDITOR] Response text length: %d\n", len(resp.Text))
 			fmt.Fprintf(os.Stderr, "[EDITOR] Tool calls: %d\n", len(resp.ToolCalls))
 			if len(resp.Text) > 0 {
@@ -261,7 +261,7 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 		if len(resp.ToolCalls) == 0 {
 			parsedCalls := llm.ParseToolCallsFromText(resp.Text)
 			if len(parsedCalls) > 0 {
-				if os.Getenv("CHUCHU_DEBUG") == "1" {
+				if os.Getenv("GPTCODE_DEBUG") == "1" {
 					fmt.Fprintf(os.Stderr, "[EDITOR] Parsed %d tool calls from text\n", len(parsedCalls))
 				}
 				resp.ToolCalls = parsedCalls
@@ -314,7 +314,7 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 						if result.Result != "" && result.Error == "" {
 							isQueryTask := len(messages) > 0 && !containsEditKeywords(messages[0].Content)
 							if isQueryTask {
-								if os.Getenv("CHUCHU_DEBUG") == "1" {
+								if os.Getenv("GPTCODE_DEBUG") == "1" {
 									fmt.Fprintf(os.Stderr, "[EDITOR] Early return for query task, result length=%d\n", len(result.Result))
 								}
 								return result.Result, modifiedFiles, nil
@@ -346,7 +346,7 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 						ToolCallID: tc.ID,
 					})
 
-					if os.Getenv("CHUCHU_DEBUG") == "1" {
+					if os.Getenv("GPTCODE_DEBUG") == "1" {
 						fmt.Fprintf(os.Stderr, "[EDITOR] Executed %s: %s\n", tc.Name, result.Result[:min(50, len(result.Result))])
 					}
 				}
@@ -404,7 +404,7 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 				if result.Result != "" && result.Error == "" {
 					isQueryTask := len(messages) > 0 && !containsEditKeywords(messages[0].Content)
 					if isQueryTask {
-						if os.Getenv("CHUCHU_DEBUG") == "1" {
+						if os.Getenv("GPTCODE_DEBUG") == "1" {
 							fmt.Fprintf(os.Stderr, "[EDITOR] Early return for query task (path 2), result length=%d\n", len(result.Result))
 						}
 						return result.Result, modifiedFiles, nil
@@ -436,7 +436,7 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 				ToolCallID: tc.ID,
 			})
 
-			if os.Getenv("CHUCHU_DEBUG") == "1" {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[EDITOR] Executed %s: %s\n", tc.Name, result.Result[:min(50, len(result.Result))])
 			}
 		}

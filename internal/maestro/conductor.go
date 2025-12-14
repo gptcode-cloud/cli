@@ -37,7 +37,7 @@ func NewConductor(
 
 // ExecuteTask orchestrates the execution of a task
 func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity string) error {
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[MAESTRO] ExecuteTask called: task=%s complexity=%s lang=%s\n", task, complexity, c.language)
 	}
 
@@ -47,7 +47,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		return fmt.Errorf("failed to select planner model: %w", err)
 	}
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[MAESTRO] Planner: %s/%s\n", planBackend, planModel)
 	}
 
@@ -74,7 +74,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 	// 3. Fix cascading errors
 	// 4. Verify final solution
 	maxAttempts := 10
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[MAESTRO] maxAttempts = %d\n", maxAttempts)
 	}
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
@@ -83,18 +83,18 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		}
 
 		// Select model for editing
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[MAESTRO] About to select editor model for lang=%s complexity=%s\n", c.language, complexity)
 		}
 		editBackend, editModel, err := c.selector.SelectModel(config.ActionEdit, c.language, complexity)
 		if err != nil {
-			if os.Getenv("CHUCHU_DEBUG") == "1" {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[MAESTRO] SelectModel failed: %v\n", err)
 			}
 			return fmt.Errorf("failed to select editor model: %w", err)
 		}
 
-		if os.Getenv("CHUCHU_DEBUG") == "1" && attempt == 1 {
+		if os.Getenv("GPTCODE_DEBUG") == "1" && attempt == 1 {
 			fmt.Fprintf(os.Stderr, "[MAESTRO] Editor: %s/%s\n", editBackend, editModel)
 		}
 
@@ -137,7 +137,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 			return fmt.Errorf("failed to select reviewer model: %w", err)
 		}
 
-		if os.Getenv("CHUCHU_DEBUG") == "1" && attempt == 1 {
+		if os.Getenv("GPTCODE_DEBUG") == "1" && attempt == 1 {
 			fmt.Fprintf(os.Stderr, "[MAESTRO] Reviewer: %s/%s\n", reviewBackend, reviewModel)
 		}
 
@@ -220,7 +220,7 @@ func (c *Conductor) recordFeedback(backend, model, agent, task string, success b
 	}
 
 	if err := feedback.Record(event); err != nil {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[WARN] Failed to record feedback: %v\n", err)
 		}
 	}

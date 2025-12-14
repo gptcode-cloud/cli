@@ -42,7 +42,7 @@ func main() {
 	}
 
 	// Ask about the code
-	cmd := exec.Command("chu", "chat", "explain what fib.go does")
+	cmd := exec.Command("gptcode", "chat", "explain what fib.go does")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("chu chat failed: %v\nOutput: %s", err, output)
@@ -303,7 +303,7 @@ func TestChatBasicInteraction(t *testing.T) {
 	os.Chdir(tmpDir)
 
 	// Simple question
-	cmd := exec.Command("chu", "chat", "what is 5 times 5?")
+	cmd := exec.Command("gptcode", "chat", "what is 5 times 5?")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("chu chat failed: %v\nOutput: %s", err, output)

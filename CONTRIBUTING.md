@@ -54,8 +54,8 @@ When suggesting:
 4. **Test your changes**
    ```bash
    go test ./...
-   go install ./cmd/chu
-   chu setup  # test CLI
+   go install ./cmd/gptcode
+   gptcode setup  # test CLI
    ```
 
 5. **Commit with clear messages**
@@ -83,7 +83,7 @@ When suggesting:
 
 ```
 gptcode/
-├── cmd/chu/              # CLI entry point
+├── cmd/gptcode/          # CLI entry point
 ├── internal/
 │   ├── config/           # Configuration loading
 │   ├── llm/              # LLM provider implementations
@@ -98,17 +98,17 @@ gptcode/
 
 ### Building
 
-**IMPORTANT:** The main entry point is `cmd/chu/main.go`, NOT `main.go` in the root.
+**IMPORTANT:** The main entry point is `cmd/gptcode/main.go`, NOT `main.go` in the root.
 The root `main.go` is in `.gitignore` and should never exist.
 
 ```bash
 # Recommended: Use Makefile
-make build          # Builds to bin/chu
+make build          # Builds to bin/gptcode
 make install        # Builds and installs to $GOPATH/bin
 
 # Alternative: Direct Go commands
-go build -o bin/chu ./cmd/chu
-go install ./cmd/chu
+go build -o bin/gptcode ./cmd/gptcode
+go install ./cmd/gptcode
 
 # Run tests
 go test ./...

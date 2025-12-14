@@ -38,7 +38,7 @@ func NewEmitter(w io.Writer) *Emitter {
 	eventLog := filepath.Join(home, ".gptcode", "events.jsonl")
 	_ = os.MkdirAll(filepath.Dir(eventLog), 0755)
 
-	if os.Getenv("CHUCHU_NVIM_MODE") != "1" {
+	if os.Getenv("GPTCODE_NVIM_MODE") != "1" {
 		w = io.Discard
 	}
 

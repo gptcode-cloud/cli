@@ -350,12 +350,12 @@ func isOpsQuery(s string) bool {
 }
 
 func RunSingleShot(input string, args []string) error {
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[RunSingleShot] Input: %s\n", input)
 		fmt.Fprintf(os.Stderr, "[RunSingleShot] isOpsQuery: %v\n", isOpsQuery(input))
 	}
 	if isOpsQuery(input) {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[RunSingleShot] Routing to run mode\n")
 		}
 		setup, _ := config.LoadSetup()

@@ -21,9 +21,9 @@ var doCmd = &cobra.Command{
 	Long: `Execute a task autonomously using the agent system.
 
 Examples:
-  chu do "add error handling to main.go"
-  chu do "read docs/README.md and create a getting-started guide"
-  chu do "unify all feature files in /guides"`,
+  gptcode do "add error handling to main.go"
+  gptcode do "read docs/README.md and create a getting-started guide"
+  gptcode do "unify all feature files in /guides"`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		task := strings.Join(args, " ")

@@ -25,8 +25,8 @@ var docsUpdateCmd = &cobra.Command{
 	Long: `Analyze recent commits and update README.md automatically.
 
 Examples:
-  chu docs update           # Analyze and update README
-  chu docs update --apply   # Apply changes automatically`,
+  gptcode docs update           # Analyze and update README
+  gptcode docs update --apply   # Apply changes automatically`,
 	RunE: runDocsUpdate,
 }
 
@@ -41,9 +41,9 @@ Supported formats:
   postman           - Postman Collection JSON
 
 Examples:
-  chu docs api              # Generate API.md
-  chu docs api openapi      # Generate api-spec.yaml
-  chu docs api postman      # Generate api-collection.json`,
+  gptcode docs api              # Generate API.md
+  gptcode docs api openapi      # Generate api-spec.yaml
+  gptcode docs api postman      # Generate api-collection.json`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: runDocsAPI,
 }

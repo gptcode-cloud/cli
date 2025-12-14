@@ -370,7 +370,7 @@ The editor will only modify files mentioned in the plan.
 ### 2. Check Telemetry
 
 ```bash
-export CHUCHU_DEBUG=1
+export GPTCODE_DEBUG=1
 gptcode guided "add feature"
 ```
 

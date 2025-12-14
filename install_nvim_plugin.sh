@@ -30,11 +30,11 @@ echo "2. Copying Lua files..."
 cp -v ./neovim/lua/gptcode/init.lua "$PLUGIN_DIR/lua/gptcode.lua"
 
 # Ensure binary is in place
-if [ ! -f "$HOME/.local/bin/chu" ]; then
+if [ ! -f "$HOME/.local/bin/gptcode" ]; then
     echo ""
-    echo "Warning: chu binary not found at ~/.local/bin/chu"
+    echo "Warning: gptcode binary not found at ~/.local/bin/gptcode"
     echo "Building it now..."
-    go build -o "$HOME/.local/bin/chu" ./cmd/chu
+    go build -o "$HOME/.local/bin/gptcode" ./cmd/gptcode
     echo "✓ Binary built and installed"
 fi
 
@@ -45,4 +45,4 @@ echo "Next steps:"
 echo "1. Restart Neovim or run: :luafile $PLUGIN_DIR/lua/gptcode.lua"
 echo "2. Test with: :lua require('gptcode').start_code_conversation()"
 echo ""
-echo "The plugin is now using: ~/.local/bin/chu"
+echo "The plugin is now using: ~/.local/bin/gptcode"

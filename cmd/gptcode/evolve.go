@@ -23,8 +23,8 @@ var evolveGenerateCmd = &cobra.Command{
 	Long: `Generate a multi-phase migration strategy that can be safely deployed to production.
 
 Examples:
-  chu evolve generate "add email column to users table"
-  chu evolve generate "rename status to state in orders"`,
+  gptcode evolve generate "add email column to users table"
+  gptcode evolve generate "rename status to state in orders"`,
 	Args: cobra.ExactArgs(1),
 	RunE: runEvolveGenerate,
 }

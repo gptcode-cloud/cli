@@ -120,7 +120,7 @@ func (q *QueryAgent) Execute(ctx context.Context, history []llm.ChatMessage, sta
 		if statusCallback != nil {
 			statusCallback(fmt.Sprintf("Query: Thinking (Iteration %d/%d)...", i+1, maxIterations))
 		}
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[QUERY] Iteration %d/%d\n", i+1, maxIterations)
 		}
 

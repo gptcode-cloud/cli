@@ -24,9 +24,9 @@ Modes:
   local - Use local Ollama models only
 
 Examples:
-  chu mode            # Show current mode
-  chu mode cloud      # Switch to cloud mode
-  chu mode local      # Switch to local mode`,
+  gptcode mode            # Show current mode
+  gptcode mode cloud      # Switch to cloud mode
+  gptcode mode local      # Switch to local mode`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		setup, err := config.LoadSetup()
@@ -68,9 +68,9 @@ Flags:
   --all    Show all time stats (default)
 
 Examples:
-  chu stats
-  chu stats --today
-  chu stats --week`,
+  gptcode stats
+  gptcode stats --today
+  gptcode stats --week`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		today, _ := cmd.Flags().GetBool("today")
 		week, _ := cmd.Flags().GetBool("week")
@@ -84,7 +84,7 @@ Examples:
 		data, err := os.ReadFile(usagePath)
 		if err != nil {
 			if os.IsNotExist(err) {
-				fmt.Println("No usage data yet. Start using chu to see stats!")
+				fmt.Println("No usage data yet. Start using gptcode to see stats!")
 				return nil
 			}
 			return err
@@ -234,7 +234,7 @@ func displayStatsBox(usage map[string]map[string]struct {
 	}
 
 	fmt.Println()
-	fmt.Println("  » Tip: Use 'chu stats --today' for today's activity")
+	fmt.Println("  » Tip: Use 'gptcode stats --today' for today's activity")
 	fmt.Println()
 	fmt.Println(strings.Repeat("─", width))
 

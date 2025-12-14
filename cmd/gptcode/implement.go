@@ -23,10 +23,10 @@ By default, prompts for confirmation before each step.
 Use --auto for autonomous execution with automatic verification and retry.
 
 Examples:
-  chu implement plan.md
-  chu implement plan.md --auto
-  chu implement plan.md --auto --lint
-  chu implement plan.md --auto --max-retries 5`,
+  gptcode implement plan.md
+  gptcode implement plan.md --auto
+  gptcode implement plan.md --auto --lint
+  gptcode implement plan.md --auto --max-retries 5`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		planPath := args[0]

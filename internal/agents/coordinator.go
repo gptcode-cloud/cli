@@ -50,13 +50,13 @@ func (c *Coordinator) Execute(ctx context.Context, history []llm.ChatMessage, st
 
 	intent, err := c.classifier.ClassifyIntent(ctx, lastMessage)
 	if err != nil {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[COORDINATOR] Classifier error: %v, defaulting to query\n", err)
 		}
 		intent = IntentQuery
 	}
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[COORDINATOR] Intent classified as: %s\n", intent)
 	}
 

@@ -1,5 +1,5 @@
 // Template for chu auto command
-// Copy this to cmd/chu/auto.go or integrate into existing commands
+// Copy this to cmd/gptcode/auto.go or integrate into existing commands
 
 package main
 

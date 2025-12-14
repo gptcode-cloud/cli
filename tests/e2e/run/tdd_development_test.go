@@ -91,9 +91,9 @@ require github.com/stretchr/testify v1.8.4
 func runChuTDD(t *testing.T, dir string, task string, timeout time.Duration) string {
 	t.Helper()
 
-	cmd := exec.Command("chu", "tdd", task)
+	cmd := exec.Command("gptcode", "tdd", task)
 	cmd.Dir = dir
-	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 
 	done := make(chan struct{})
 	var output []byte

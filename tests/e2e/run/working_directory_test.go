@@ -106,9 +106,9 @@ func setupProjectDirs(t *testing.T, tmpDir string) {
 func runChuRunWithInput(t *testing.T, dir string, input string, timeout time.Duration) string {
 	t.Helper()
 
-	cmd := exec.Command("chu", "run", "--raw")
+	cmd := exec.Command("gptcode", "run", "--raw")
 	cmd.Dir = dir
-	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 	cmd.Stdin = strings.NewReader(input)
 
 	done := make(chan struct{})

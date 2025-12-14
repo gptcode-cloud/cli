@@ -29,9 +29,9 @@ func TestChuDoCreateFile(t *testing.T) {
 	t.Logf("Running chu do in %s", tmpDir)
 	t.Logf("This may take 2-5 minutes with local Ollama...")
 
-	cmd := exec.Command("chu", "do", "create a file called hello.txt with content 'Hello from GPTCode E2E test'")
+	cmd := exec.Command("gptcode", "do", "create a file called hello.txt with content 'Hello from GPTCode E2E test'")
 	cmd.Dir = tmpDir
-	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 
 	done := make(chan struct{})
 	var output []byte
@@ -87,9 +87,9 @@ func TestChuDoModifyFile(t *testing.T) {
 	t.Logf("Running chu do in %s", tmpDir)
 	t.Logf("This may take 2-5 minutes with local Ollama...")
 
-	cmd := exec.Command("chu", "do", "modify test.txt to say 'modified by E2E test'")
+	cmd := exec.Command("gptcode", "do", "modify test.txt to say 'modified by E2E test'")
 	cmd.Dir = tmpDir
-	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 
 	done := make(chan struct{})
 	var output []byte
@@ -138,9 +138,9 @@ func TestChuDoTimeout(t *testing.T) {
 
 	tmpDir := t.TempDir()
 
-	cmd := exec.Command("chu", "do", "create hello.txt")
+	cmd := exec.Command("gptcode", "do", "create hello.txt")
 	cmd.Dir = tmpDir
-	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 
 	done := make(chan error, 1)
 	go func() {
@@ -175,9 +175,9 @@ func TestChuDoNoUnintendedFiles(t *testing.T) {
 	t.Logf("Running chu do in %s", tmpDir)
 	t.Logf("This may take 2-5 minutes with local Ollama...")
 
-	cmd := exec.Command("chu", "do", "create result.txt with just the word 'success'")
+	cmd := exec.Command("gptcode", "do", "create result.txt with just the word 'success'")
 	cmd.Dir = tmpDir
-	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 
 	done := make(chan struct{})
 	var output []byte

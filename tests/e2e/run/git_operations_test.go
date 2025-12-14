@@ -115,9 +115,9 @@ func setupGitRepo(t *testing.T, dir string) {
 func runChuDo(t *testing.T, dir string, task string, timeout time.Duration) string {
 	t.Helper()
 
-	cmd := exec.Command("chu", "do", task)
+	cmd := exec.Command("gptcode", "do", task)
 	cmd.Dir = dir
-	cmd.Env = append(os.Environ(), "CHUCHU_TELEMETRY=false")
+	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
 
 	done := make(chan struct{})
 	var output []byte

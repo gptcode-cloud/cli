@@ -135,7 +135,7 @@ gptcode config set defaults.graph_max_files 3
 
 **Enable debug mode:**
 ```bash
-export CHUCHU_DEBUG=1
+export GPTCODE_DEBUG=1
 gptcode chat "your query"  # Shows graph stats
 ```
 
@@ -426,7 +426,7 @@ gptcode chat "list all api endpoints"
 ls **/*.go **/*.py **/*.ts
 
 # Enable debug mode
-export CHUCHU_DEBUG=1
+export GPTCODE_DEBUG=1
 gptcode graph build
 
 # Check for errors in output

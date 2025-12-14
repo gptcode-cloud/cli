@@ -26,7 +26,7 @@ func TestChuChatSingleShot(t *testing.T) {
 	}
 
 	// Run chu chat with a simple question
-	cmd := exec.Command("chu", "chat", "what is 2 plus 2?")
+	cmd := exec.Command("gptcode", "chat", "what is 2 plus 2?")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("chu chat failed: %v\nOutput: %s", err, output)
@@ -56,7 +56,7 @@ func TestChuChatWithInitialMessage(t *testing.T) {
 	}
 
 	// Run chu chat with initial message (should process and exit since non-interactive)
-	cmd := exec.Command("chu", "chat", "tell me what files are in this directory")
+	cmd := exec.Command("gptcode", "chat", "tell me what files are in this directory")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("chu chat failed: %v\nOutput: %s", err, output)
@@ -76,7 +76,7 @@ func TestChuChatHelp(t *testing.T) {
 		t.Skip("Skipping E2E test in short mode")
 	}
 
-	cmd := exec.Command("chu", "chat", "--help")
+	cmd := exec.Command("gptcode", "chat", "--help")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("chu chat --help failed: %v", err)

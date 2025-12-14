@@ -1,5 +1,5 @@
-APP_NAME=chu
-APP_PATH=./cmd/chu
+APP_NAME=gptcode
+APP_PATH=./cmd/gptcode
 
 GOBIN?=$(shell go env GOBIN)
 ifeq ($(GOBIN),)
@@ -20,7 +20,7 @@ install: build
 	@echo "-> Installing $(APP_NAME) to $(GOBIN)..."
 	@mkdir -p $(GOBIN)
 	@cp bin/$(APP_NAME) $(GOBIN)/
-	@echo "-> Running chu setup..."
+	@echo "-> Running gptcode setup..."
 	@$(GOBIN)/$(APP_NAME) setup
 	@echo "-> Done."
 
@@ -45,7 +45,7 @@ test:
 
 # ML Training targets
 train-ml:
-	@chu train
+	@gptcode train
 
 train-complexity:
-	@chu train complexity_detection
+	@gptcode train complexity_detection

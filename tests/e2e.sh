@@ -16,17 +16,17 @@ echo " GPTCode E2E Test Suite"
 echo "============================"
 echo ""
 
-check_chu_installed() {
-    if ! command -v chu &> /dev/null; then
-        echo " Error: chu command not found"
+check_gptcode_installed() {
+    if ! command -v gptcode &> /dev/null; then
+        echo " Error: gptcode command not found"
         echo ""
-        echo "Please install chu first:"
+        echo "Please install gptcode first:"
         echo "  cd $(dirname "$SCRIPT_DIR")"
-        echo "  go install ./cmd/chu"
+        echo "  go install ./cmd/gptcode"
         exit 1
     fi
     
-    echo "✓ chu command found: $(which chu)"
+    echo "✓ gptcode command found: $(which gptcode)"
     echo ""
 }
 
@@ -48,7 +48,7 @@ run_scenario() {
 }
 
 main() {
-    check_chu_installed
+    check_gptcode_installed
     show_current_profile
     
     local failed=0

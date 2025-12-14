@@ -15,7 +15,7 @@ func TestResearchHelp(t *testing.T) {
 		t.Skip("Skipping E2E test in short mode")
 	}
 
-	cmd := exec.Command("chu", "research", "--help")
+	cmd := exec.Command("gptcode", "research", "--help")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("chu research --help failed: %v", err)
@@ -35,7 +35,7 @@ func TestPlanHelp(t *testing.T) {
 		t.Skip("Skipping E2E test in short mode")
 	}
 
-	cmd := exec.Command("chu", "plan", "--help")
+	cmd := exec.Command("gptcode", "plan", "--help")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("chu plan --help failed: %v", err)
@@ -55,7 +55,7 @@ func TestTDDHelp(t *testing.T) {
 		t.Skip("Skipping E2E test in short mode")
 	}
 
-	cmd := exec.Command("chu", "tdd", "--help")
+	cmd := exec.Command("gptcode", "tdd", "--help")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("chu tdd --help failed: %v", err)
@@ -75,7 +75,7 @@ func TestDoHelp(t *testing.T) {
 		t.Skip("Skipping E2E test in short mode")
 	}
 
-	cmd := exec.Command("chu", "do", "--help")
+	cmd := exec.Command("gptcode", "do", "--help")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("chu do --help failed: %v", err)
@@ -107,7 +107,7 @@ func TestResearchBasic(t *testing.T) {
 	}
 
 	// Try to research the codebase
-	cmd := exec.Command("chu", "research", "How does this project work?")
+	cmd := exec.Command("gptcode", "research", "How does this project work?")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Logf("Research command failed (expected if not implemented): %v", err)
@@ -133,7 +133,7 @@ func TestPlanGeneration(t *testing.T) {
 	}
 
 	// Try to create a plan
-	cmd := exec.Command("chu", "plan", "Add error handling")
+	cmd := exec.Command("gptcode", "plan", "Add error handling")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Logf("Plan command failed (expected if not implemented): %v", err)
@@ -159,7 +159,7 @@ func TestTDDWorkflow(t *testing.T) {
 	}
 
 	// Try TDD mode
-	cmd = exec.Command("chu", "tdd", "create a sum function")
+	cmd = exec.Command("gptcode", "tdd", "create a sum function")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Logf("TDD command failed (expected if not implemented): %v", err)
@@ -173,7 +173,7 @@ func TestCommandsExist(t *testing.T) {
 
 	for _, cmdName := range commands {
 		t.Run(cmdName, func(t *testing.T) {
-			cmd := exec.Command("chu", cmdName, "--help")
+			cmd := exec.Command("gptcode", cmdName, "--help")
 			output, err := cmd.CombinedOutput()
 			if err != nil {
 				t.Errorf("Command '%s' failed: %v\nOutput: %s", cmdName, err, output)

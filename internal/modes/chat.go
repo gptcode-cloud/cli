@@ -60,7 +60,7 @@ func Chat(input string, args []string) {
 
 	fmt.Fprintf(os.Stderr, "[CHAT] Starting Chat function, input len=%d\n", len(input))
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[CHAT] Input: %s\n", input[:min(100, len(input))])
 	}
 
@@ -112,14 +112,14 @@ func Chat(input string, args []string) {
 
 	lastUserMessage := history.Messages[len(history.Messages)-1].Content
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[CHAT] Checking isOpsQuery for: %s\n", lastUserMessage)
 		fmt.Fprintf(os.Stderr, "[CHAT] isOpsQuery result: %v\n", isOpsQuery(lastUserMessage))
 	}
 
 	// Check if this is an ops/troubleshooting query - route to run mode
 	if isOpsQuery(lastUserMessage) {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintln(os.Stderr, "[CHAT] Ops query detected, routing to run mode")
 		}
 		builder := prompt.NewDefaultBuilder(nil)
@@ -159,7 +159,7 @@ func Chat(input string, args []string) {
 	}
 
 	var stopSpinner chan bool
-	if os.Getenv("CHUCHU_DEBUG") != "1" {
+	if os.Getenv("GPTCODE_DEBUG") != "1" {
 		stopSpinner = make(chan bool, 1)
 		go showSpinner(stopSpinner)
 	}
@@ -171,15 +171,15 @@ func Chat(input string, args []string) {
 	// Dependency Graph Integration
 	// We build the graph and find relevant context to prepend to the message
 	// This is a simple MVP integration
-	if os.Getenv("CHUCHU_GRAPH") != "false" {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_GRAPH") != "false" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintln(os.Stderr, "[GRAPH] Building dependency graph...")
 		}
 
 		// Build graph
 		builder := graph.NewBuilder(cwd)
 		if g, err := builder.Build(); err == nil {
-			if os.Getenv("CHUCHU_DEBUG") == "1" {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[GRAPH] Built graph: %d nodes, %d edges\n", len(g.Nodes), countEdges(g))
 			}
 			g.PageRank(0.85, 20)
@@ -193,7 +193,7 @@ func Chat(input string, args []string) {
 			relevantFiles := optimizer.OptimizeContext(lastUserMessage, maxFiles)
 
 			if len(relevantFiles) > 0 {
-				if os.Getenv("CHUCHU_DEBUG") == "1" {
+				if os.Getenv("GPTCODE_DEBUG") == "1" {
 					fmt.Fprintf(os.Stderr, "[GRAPH] Selected %d files:\n", len(relevantFiles))
 					for i, f := range relevantFiles {
 						fmt.Fprintf(os.Stderr, "[GRAPH]   %d. %s (score: %.3f)\n", i+1, f, g.Nodes[g.Paths[f]].Score)
@@ -233,7 +233,7 @@ func Chat(input string, args []string) {
 				history.Messages[len(history.Messages)-1].Content += contextBuilder.String()
 			}
 		} else {
-			if os.Getenv("CHUCHU_DEBUG") == "1" {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[GRAPH] Failed to build graph: %v\n", err)
 			}
 		}
@@ -242,7 +242,7 @@ func Chat(input string, args []string) {
 	coordinator := agents.NewCoordinator(provider, orchestrator, cwd, routerModel, editorModel, queryModel, researchModel)
 
 	statusCallback := func(status string) {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[STATUS] %s\n", status)
 		} else {
 			fmt.Fprintf(os.Stderr, "\r[STATUS] %s", status)
@@ -251,7 +251,7 @@ func Chat(input string, args []string) {
 
 	result, err := coordinator.Execute(context.Background(), history.Messages, statusCallback)
 
-	if os.Getenv("CHUCHU_DEBUG") != "1" {
+	if os.Getenv("GPTCODE_DEBUG") != "1" {
 		stopSpinner <- true
 		time.Sleep(100 * time.Millisecond)
 		fmt.Fprint(os.Stderr, "\r\033[K")
@@ -322,7 +322,7 @@ func RunChat(builder *prompt.Builder, provider llm.Provider, model string, cliAr
 func ChatWithResponse(input string, args []string) (string, error) {
 	os.Stdout.Sync()
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[CHAT] ChatWithResponse: input len=%d\n", len(input))
 	}
 
@@ -366,7 +366,7 @@ func ChatWithResponse(input string, args []string) (string, error) {
 
 	// Check if this is an ops/troubleshooting query - route to run mode
 	if isOpsQuery(lastUserMessage) {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintln(os.Stderr, "[CHAT] Ops query detected, routing to run mode")
 		}
 		builder := prompt.NewDefaultBuilder(nil)
@@ -383,7 +383,7 @@ func ChatWithResponse(input string, args []string) (string, error) {
 	queryModel := backendCfg.GetModelForAgent("query")
 
 	// Build dependency graph context if enabled
-	if os.Getenv("CHUCHU_GRAPH") != "false" {
+	if os.Getenv("GPTCODE_GRAPH") != "false" {
 		builder := graph.NewBuilder(cwd)
 		if g, err := builder.Build(); err == nil {
 			g.PageRank(0.85, 20)
@@ -420,7 +420,7 @@ func ChatWithResponse(input string, args []string) (string, error) {
 	coordinator := agents.NewCoordinator(provider, orchestrator, cwd, routerModel, editorModel, queryModel, researchModel)
 
 	statusCallback := func(status string) {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[STATUS] %s\n", status)
 		}
 	}

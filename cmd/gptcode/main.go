@@ -34,7 +34,7 @@ func main() {
 }
 
 var rootCmd = &cobra.Command{
-	Use:   "chu",
+	Use:   "gptcode",
 	Short: "GPTCode – AI Coding Assistant with Specialized Agents",
 	Long: `GPTCode – AI Coding Assistant with Specialized Agents
 
@@ -42,72 +42,72 @@ Autonomous execution with validation. Analyzer → Planner → Editor → Valida
 $0-5/month vs $20-30/month subscriptions.
 
 ## COPILOT (Autonomous)
-  chu do "task" [--supervised] [--interactive]  - Autonomous execution with agent orchestration
+  gptcode do "task" [--supervised] [--interactive]  - Autonomous execution with agent orchestration
 
 ## INTERACTIVE (Conversational)
-  chu chat                - Code-focused conversation (CLI or Neovim)
-  chu run "task"          - Execute tasks with follow-up
+  gptcode chat                - Code-focused conversation (CLI or Neovim)
+  gptcode run "task"          - Execute tasks with follow-up
 
 ## WORKFLOW (Manual Control)
-  chu research "question" - Document codebase and architecture
-  chu plan "task"         - Create implementation plan
-  chu implement plan.md   - Execute plan step-by-step
+  gptcode research "question" - Document codebase and architecture
+  gptcode plan "task"         - Create implementation plan
+  gptcode implement plan.md   - Execute plan step-by-step
 
 ## SPECIALIZED TOOLS
-  chu gen test <file>        - Generate unit tests for a file
-  chu gen integration <pkg>  - Generate integration tests for a package
-  chu gen snapshot <file>    - Generate snapshot tests for regression
-  chu gen mock <file>        - Generate mocks for interfaces
-  chu gen migration <name>   - Generate DB migration from model changes
-  chu gen changelog          - Generate CHANGELOG from git commits
-  chu docs update            - Update README based on changes
-  chu docs api               - Generate API docs (Markdown/OpenAPI/Postman)
-  chu coverage [pkg]         - Analyze test coverage gaps
-  chu tdd                    - Test-driven development mode
-  chu feature "desc"      - Generate tests + implementation
-  chu review [target]     - Code review for bugs, security, improvements
+  gptcode gen test <file>        - Generate unit tests for a file
+  gptcode gen integration <pkg>  - Generate integration tests for a package
+  gptcode gen snapshot <file>    - Generate snapshot tests for regression
+  gptcode gen mock <file>        - Generate mocks for interfaces
+  gptcode gen migration <name>   - Generate DB migration from model changes
+  gptcode gen changelog          - Generate CHANGELOG from git commits
+  gptcode docs update            - Update README based on changes
+  gptcode docs api               - Generate API docs (Markdown/OpenAPI/Postman)
+  gptcode coverage [pkg]         - Analyze test coverage gaps
+  gptcode tdd                    - Test-driven development mode
+  gptcode feature "desc"      - Generate tests + implementation
+  gptcode review [target]     - Code review for bugs, security, improvements
 
 ## MODEL MANAGEMENT
-  chu model list [--recommended]   - List models from catalog
-  chu model recommend [agent]      - Get model recommendations
-  chu model install <model>        - Install Ollama model
-  chu model update [--all]         - Update catalog from providers
+  gptcode model list [--recommended]   - List models from catalog
+  gptcode model recommend [agent]      - Get model recommendations
+  gptcode model install <model>        - Install Ollama model
+  gptcode model update [--all]         - Update catalog from providers
 
 ## CONFIGURATION
-  chu setup                - Initialize ~/.gptcode configuration
-  chu key [backend]        - Add/update API key
-  chu backend              - Show current backend
-  chu backend list         - List all backends
-  chu backend use <name>   - Switch backend
-  chu profile              - Show current profile
-  chu profile list         - List all profiles
-  chu profile use <backend>.<profile> - Switch profile
+  gptcode setup                - Initialize ~/.gptcode configuration
+  gptcode key [backend]        - Add/update API key
+  gptcode backend              - Show current backend
+  gptcode backend list         - List all backends
+  gptcode backend use <name>   - Switch backend
+  gptcode profile              - Show current profile
+  gptcode profile list         - List all profiles
+  gptcode profile use <backend>.<profile> - Switch profile
 
 ## REFACTORING
-  chu refactor api              - Coordinate API changes (routes, handlers, tests)
-  chu refactor signature <func> - Change function signature and update all call sites
-  chu refactor breaking         - Detect breaking changes and update all consumers
-  chu refactor type <name>      - Refactor type definition and propagate changes
-  chu refactor compat <old> <new> - Add backward compatibility wrapper
+  gptcode refactor api              - Coordinate API changes (routes, handlers, tests)
+  gptcode refactor signature <func> - Change function signature and update all call sites
+  gptcode refactor breaking         - Detect breaking changes and update all consumers
+  gptcode refactor type <name>      - Refactor type definition and propagate changes
+  gptcode refactor compat <old> <new> - Add backward compatibility wrapper
 
 ## SECURITY
-  chu security scan             - Scan for vulnerabilities
-  chu security scan --fix       - Scan and auto-fix vulnerabilities
+  gptcode security scan             - Scan for vulnerabilities
+  gptcode security scan --fix       - Scan and auto-fix vulnerabilities
 
 ## CONFIGURATION
-  chu cfg list                  - List configuration files
-  chu cfg update KEY VALUE      - Update config value across environments
+  gptcode cfg list                  - List configuration files
+  gptcode cfg update KEY VALUE      - Update config value across environments
 
 ## PERFORMANCE
-  chu perf profile [target]     - Profile CPU/memory performance
-  chu perf bench [pattern]      - Run benchmarks with optimization tips
+  gptcode perf profile [target]     - Profile CPU/memory performance
+  gptcode perf bench [pattern]      - Run benchmarks with optimization tips
 
 ## ADVANCED
-  chu config get/set       - Direct config manipulation (advanced)
-  chu ml list|train|test|eval|predict - Machine learning features
-  chu graph build|query    - Dependency graph analysis
-  chu feedback good|bad    - User feedback tracking
-  chu detect-language      - Detect project language`,
+  gptcode config get/set       - Direct config manipulation (advanced)
+  gptcode ml list|train|test|eval|predict - Machine learning features
+  gptcode graph build|query    - Dependency graph analysis
+  gptcode feedback good|bad    - User feedback tracking
+  gptcode detect-language      - Detect project language`,
 }
 
 func init() {
@@ -126,6 +126,8 @@ func init() {
 	rootCmd.AddCommand(featureCmd)
 	rootCmd.AddCommand(reviewCmd)
 	rootCmd.AddCommand(issueCmd)
+	rootCmd.AddCommand(loginCmd)
+	rootCmd.AddCommand(logoutCmd)
 }
 
 func newBuilderAndLLM(lang, mode, hint string) (*prompt.Builder, llm.Provider, string, error) {
@@ -181,7 +183,7 @@ var setupCmd = &cobra.Command{
 
 var keyCmd = &cobra.Command{
 	Use:   "key [backend]",
-	Short: "Add or update API key for a backend (e.g., chu key openrouter)",
+	Short: "Add or update API key for a backend (e.g., gptcode key openrouter)",
 	Args:  cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		backendName := args[0]
@@ -245,8 +247,8 @@ var backendCreateCmd = &cobra.Command{
 Type must be: openai, ollama
 
 Examples:
-  chu backend create mygroq openai https://api.groq.com/openai/v1
-  chu backend create local ollama http://localhost:11434`,
+  gptcode backend create mygroq openai https://api.groq.com/openai/v1
+  gptcode backend create local ollama http://localhost:11434`,
 	Args: cobra.ExactArgs(3),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		name := args[0]
@@ -264,10 +266,10 @@ Examples:
 		fmt.Printf("[OK] Created backend: %s\n", name)
 		fmt.Println("\nNext steps:")
 		if backendType == "openai" {
-			fmt.Printf("  chu key %s                    # Set API key\n", name)
+			fmt.Printf("  gptcode key %s                    # Set API key\n", name)
 		}
-		fmt.Printf("  chu config set backend.%s.default_model <model>\n", name)
-		fmt.Printf("  chu backend use %s            # Switch to this backend\n", name)
+		fmt.Printf("  gptcode config set backend.%s.default_model <model>\n", name)
+		fmt.Printf("  gptcode backend use %s            # Switch to this backend\n", name)
 		return nil
 	},
 }
@@ -330,9 +332,9 @@ var backendUseCmd = &cobra.Command{
 	Long: `Switch to a specific backend.
 
 Examples:
-  chu backend use groq
-  chu backend use openrouter
-  chu backend use ollama`,
+  gptcode backend use groq
+  gptcode backend use openrouter
+  gptcode backend use ollama`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		backendName := args[0]
@@ -357,9 +359,9 @@ var configGetCmd = &cobra.Command{
 	Long: `Get a configuration value from ~/.gptcode/setup.yaml
 
 Examples:
-  chu config get defaults.backend
-  chu config get defaults.profile
-  chu config get backend.groq.default_model`,
+  gptcode config get defaults.backend
+  gptcode config get defaults.profile
+  gptcode config get backend.groq.default_model`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key := args[0]
@@ -378,9 +380,9 @@ var configSetCmd = &cobra.Command{
 	Long: `Set a configuration value in ~/.gptcode/setup.yaml
 
 Examples:
-  chu config set defaults.backend groq
-  chu config set defaults.profile speed
-  chu config set backend.groq.default_model llama-3.3-70b-versatile`,
+  gptcode config set defaults.backend groq
+  gptcode config set defaults.profile speed
+  gptcode config set backend.groq.default_model llama-3.3-70b-versatile`,
 	Args: cobra.ExactArgs(2),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		key := args[0]
@@ -403,9 +405,9 @@ Uses go-enry (GitHub Linguist port) for accurate multi-language detection.
 Automatically excludes vendored code, generated files, and documentation.
 
 Examples:
-  chu detect language
-  chu detect language /path/to/project
-  chu detect language .`,
+  gptcode detect language
+  gptcode detect language /path/to/project
+  gptcode detect language .`,
 	Args: cobra.MaximumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		path := "."
@@ -458,14 +460,14 @@ var modelsSearchCmd = &cobra.Command{
 Models are automatically sorted by price (lowest first), then by context window (largest first).
 
 Single term: filters across all backends
-  chu models search gemini
+  gptcode models search gemini
 
 Multiple terms: ANDs all terms (must match all)
-  chu models search groq llama     # groq models with "llama" in name
-  chu models search free coding     # free models tagged as coding
+  gptcode models search groq llama     # groq models with "llama" in name
+  gptcode models search free coding     # free models tagged as coding
 
 Flags override positional backend:
-  chu models search gemini --backend openrouter`,
+  gptcode models search gemini --backend openrouter`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		backendFlag, _ := cmd.Flags().GetString("backend")
 		agentFlag, _ := cmd.Flags().GetString("agent")
@@ -676,9 +678,9 @@ var profileUseCmd = &cobra.Command{
 	Long: `Switch to a specific backend and profile in one command.
 
 Examples:
-  chu profile use openrouter.free
-  chu profile use groq.speed
-  chu profile use ollama.local`,
+  gptcode profile use openrouter.free
+  gptcode profile use groq.speed
+  gptcode profile use ollama.local`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		parts := strings.Split(args[0], ".")
@@ -760,10 +762,10 @@ var profilesCreateCmd = &cobra.Command{
 
 		fmt.Printf("[OK] Created profile: %s/%s\n", backend, name)
 		fmt.Println("\nConfigure agent models using:")
-		fmt.Printf("  chu profiles set-agent %s %s router <model>\n", backend, name)
-		fmt.Printf("  chu profiles set-agent %s %s query <model>\n", backend, name)
-		fmt.Printf("  chu profiles set-agent %s %s editor <model>\n", backend, name)
-		fmt.Printf("  chu profiles set-agent %s %s research <model>\n", backend, name)
+		fmt.Printf("  gptcode profiles set-agent %s %s router <model>\n", backend, name)
+		fmt.Printf("  gptcode profiles set-agent %s %s query <model>\n", backend, name)
+		fmt.Printf("  gptcode profiles set-agent %s %s editor <model>\n", backend, name)
+		fmt.Printf("  gptcode profiles set-agent %s %s research <model>\n", backend, name)
 		return nil
 	},
 }
@@ -776,7 +778,7 @@ var profilesSetAgentCmd = &cobra.Command{
 Agent types: router, query, editor, research
 
 Example:
-  chu profiles set-agent openrouter free router google/gemini-2.0-flash-exp:free`,
+  gptcode profiles set-agent openrouter free router google/gemini-2.0-flash-exp:free`,
 	Args: cobra.ExactArgs(4),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		backend := args[0]
@@ -816,9 +818,9 @@ var profilesUseCmd = &cobra.Command{
 	Long: `Switch to a specific backend and profile in one command.
 
 Examples:
-  chu profiles use openrouter.free
-  chu profiles use groq.speed
-  chu profiles use ollama.local`,
+  gptcode profiles use openrouter.free
+  gptcode profiles use groq.speed
+  gptcode profiles use ollama.local`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		parts := strings.Split(args[0], ".")
@@ -1203,7 +1205,7 @@ precmd_chu_feedback() {
 			done
 		fi
 		if [[ %WITH_DIFF% == 1 ]]; then args+=(--capture-diff); fi
-		chu $args >/dev/null 2>&1
+		gptcode $args >/dev/null 2>&1
 		rm -f "$wrongf" "$correctf" "$HOME/.gptcode/last_suggestion_cmd"
 	fi
 }
@@ -1277,7 +1279,7 @@ chu_precmd() {
 		if [[ -n "$files" ]]; then
 			while IFS= read -r f; do args+=(--files "$f"); done <<< "$files"
 		fi
-		chu "${args[@]}" >/dev/null 2>&1
+		gptcode "${args[@]}" >/dev/null 2>&1
 		rm -f "$wrongf" "$correctf" "$HOME/.gptcode/last_suggestion_cmd"
 	fi
 }
@@ -1342,7 +1344,7 @@ function chufb_postexec --on-event fish_postexec
 		for f in $files
 			set args $args --files $f
 		end
-		chu $args >/dev/null 2>&1
+		gptcode $args >/dev/null 2>&1
 		rm -f $wrongf $correctf "$HOME/.gptcode/last_suggestion_cmd"
 	end
 end
@@ -1374,11 +1376,11 @@ var chatCmd = &cobra.Command{
 	Long: `Interactive chat mode - always stays open for follow-up questions.
 
 With initial message:
-   chu chat "investigate 700GB system data"
+   gptcode chat "investigate 700GB system data"
    # Processes message and stays open for follow-up
    
 Without message:
-   chu chat
+   gptcode chat
    # Starts interactive session
 
 REPL Commands:
@@ -1438,7 +1440,7 @@ var researchCmd = &cobra.Command{
 	Long: `Research mode uses subagents to explore the codebase and document findings.
 Provide a research question or area to investigate.
 
-Example: chu research "How does authentication work?"`,
+Example: gptcode research "How does authentication work?"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return modes.RunResearch(args)
 	},
@@ -1450,7 +1452,7 @@ var planCmd = &cobra.Command{
 	Long: `Plan mode creates a detailed implementation plan through interactive research.
 Provide a task description or path to a ticket/spec file.
 
-Example: chu plan "Add user authentication"`,
+Example: gptcode plan "Add user authentication"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		return modes.RunPlan(args)
 	},
@@ -1464,13 +1466,13 @@ var runCmd = &cobra.Command{
 Two modes available:
 
 1. AI-assisted mode (new, default when no args provided):
-   chu run
-   chu run --help  # Show REPL commands
-   chu run --once   # Force single-shot AI mode
+   gptcode run
+   gptcode run --help  # Show REPL commands
+   gptcode run --once   # Force single-shot AI mode
 
 2. Direct REPL mode with command history:
-   chu run "command and args" --raw
-   chu run "curl https://api.github.com" --raw
+   gptcode run "command and args" --raw
+   gptcode run "curl https://api.github.com" --raw
 
 AI-assisted mode provides:
 - Command suggestions and execution
@@ -1487,9 +1489,9 @@ REPL Commands:
   /env           - Show/set environment variables
 
 Examples:
-  chu run                # Start AI-assisted mode
-  chu run "deploy to staging" --once  # Single AI execution
-  chu run "docker ps"    --raw     # Direct command REPL`,
+  gptcode run                # Start AI-assisted mode
+  gptcode run "deploy to staging" --once  # Single AI execution
+  gptcode run "docker ps"    --raw     # Direct command REPL`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		raw, _ := cmd.Flags().GetBool("raw")
 		once, _ := cmd.Flags().GetBool("once")
@@ -1569,9 +1571,9 @@ Available commands:
   test  - Test a trained model
 
 Examples:
-  chu ml list
-  chu ml train complexity_detection
-  chu ml test complexity_detection "implement oauth2"`,
+  gptcode ml list
+  gptcode ml train complexity_detection
+  gptcode ml test complexity_detection "implement oauth2"`,
 }
 
 var mlListCmd = &cobra.Command{
@@ -1594,7 +1596,7 @@ var mlTrainCmd = &cobra.Command{
 	Long: `Train a machine learning model.
 
 Examples:
-  chu ml train complexity_detection`,
+  gptcode ml train complexity_detection`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cwd, err := os.Getwd()
@@ -1622,9 +1624,9 @@ Without a query, runs pre-defined test examples.
 With a query, tests that specific input.
 
 Examples:
-  chu ml test complexity_detection
-  chu ml test complexity_detection "fix typo in readme"
-  chu ml test complexity_detection "implement oauth2 with google"`,
+  gptcode ml test complexity_detection
+  gptcode ml test complexity_detection "fix typo in readme"
+  gptcode ml test complexity_detection "implement oauth2 with google"`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		cwd, err := os.Getwd()
@@ -1674,9 +1676,9 @@ var mlPredictCmd = &cobra.Command{
 If model-name is omitted, defaults to 'complexity_detection'.
 
 Examples:
-  chu ml predict "fix typo in readme"
-  chu ml predict complexity_detection "implement oauth"
-  chu ml predict router_agent "explain this code"`,
+  gptcode ml predict "fix typo in readme"
+  gptcode ml predict complexity_detection "implement oauth"
+  gptcode ml predict router_agent "explain this code"`,
 	Args: cobra.MinimumNArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		var modelName, text string
@@ -1721,17 +1723,17 @@ var reviewCmd = &cobra.Command{
 	Long: `Review mode performs detailed code analysis.
 
 Review a specific file:
-  chu review main.go
-  chu review src/auth.go
+  gptcode review main.go
+  gptcode review src/auth.go
 
 Review a directory:
-  chu review .
-  chu review ./src
+  gptcode review .
+  gptcode review ./src
 
 Focus on specific aspects:
-  chu review main.go --focus security
-  chu review . --focus performance
-  chu review src/ --focus "error handling"`,
+  gptcode review main.go --focus security
+  gptcode review . --focus performance
+  gptcode review src/ --focus "error handling"`,
 	RunE: func(cmd *cobra.Command, args []string) error {
 		target := "."
 		if len(args) > 0 {

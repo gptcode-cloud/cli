@@ -126,7 +126,7 @@ Do NOT suggest changes. Just report what exists.`, task)
 
 	maxIterations := 5
 	for i := 0; i < maxIterations; i++ {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[ANALYZER] Iteration %d/%d\n", i+1, maxIterations)
 		}
 
@@ -141,7 +141,7 @@ Do NOT suggest changes. Just report what exists.`, task)
 		}
 
 		if len(resp.ToolCalls) == 0 {
-			if os.Getenv("CHUCHU_DEBUG") == "1" {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[ANALYZER] Analysis complete\n")
 			}
 			return resp.Text, nil

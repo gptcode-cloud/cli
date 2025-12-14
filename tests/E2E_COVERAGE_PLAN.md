@@ -373,7 +373,7 @@ nvim_get_buffer_content
 ### Investigation Procedure
 ```bash
 # 1. Run single scenario with debug
-CHUCHU_DEBUG=1 ./tests/e2e/scenarios/scenario_name.sh
+GPTCODE_DEBUG=1 ./tests/e2e/scenarios/scenario_name.sh
 
 # 2. Check generated files
 ls -la $TEST_DIR

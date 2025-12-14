@@ -28,9 +28,9 @@ var issueCmd = &cobra.Command{
 	Long: `Manage GitHub issues and automate issue resolution.
 
 Examples:
-  chu issue fix 123              Fix issue #123 autonomously
-  chu issue fix 123 --repo owner/repo  Fix issue from specific repo
-  chu issue show 123             Show issue details`,
+  gptcode issue fix 123              Fix issue #123 autonomously
+  gptcode issue fix 123 --repo owner/repo  Fix issue from specific repo
+  gptcode issue show 123             Show issue details`,
 }
 
 var issueFixCmd = &cobra.Command{
@@ -50,9 +50,9 @@ This command will:
 8. Create pull request
 
 Examples:
-  chu issue fix 123                    Fix issue #123
-  chu issue fix 123 --repo owner/repo Fix from specific repo
-  chu issue fix 123 --draft           Create draft PR`,
+  gptcode issue fix 123                    Fix issue #123
+  gptcode issue fix 123 --repo owner/repo Fix from specific repo
+  gptcode issue fix 123 --draft           Create draft PR`,
 	Args: cobra.ExactArgs(1),
 	RunE: func(cmd *cobra.Command, args []string) error {
 		issueNum, err := strconv.Atoi(args[0])
@@ -199,8 +199,8 @@ Examples:
 		}
 
 		fmt.Println("\nNext steps:")
-		fmt.Printf("   chu issue commit %d\n", issueNum)
-		fmt.Printf("   chu issue push %d\n", issueNum)
+		fmt.Printf("   gptcode issue commit %d\n", issueNum)
+		fmt.Printf("   gptcode issue push %d\n", issueNum)
 
 		return nil
 	},
@@ -430,7 +430,7 @@ This will:
 
 		fmt.Println("\n✨ All validation passed!")
 		fmt.Println("Next steps:")
-		fmt.Printf("  chu issue push %d\n", issueNum)
+		fmt.Printf("  gptcode issue push %d\n", issueNum)
 
 		return nil
 	},

@@ -32,7 +32,7 @@ var compoundBuiltInTools = map[string]bool{
 }
 
 func (o *OrchestratorProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, error) {
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "\n[ORCHESTRATOR] Starting autonomous execution loop\n")
 	}
 
@@ -48,7 +48,7 @@ func (o *OrchestratorProvider) Chat(ctx context.Context, req ChatRequest) (*Chat
 	}
 
 	for iteration := 0; iteration < maxIterations; iteration++ {
-		if os.Getenv("CHUCHU_DEBUG") == "1" {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[ORCHESTRATOR] Iteration %d/%d\n", iteration+1, maxIterations)
 		}
 
@@ -67,7 +67,7 @@ func (o *OrchestratorProvider) Chat(ctx context.Context, req ChatRequest) (*Chat
 		if len(resp.ToolCalls) == 0 && resp.Text != "" {
 			parsedCalls := ParseToolCallsFromText(resp.Text)
 			if len(parsedCalls) > 0 {
-				if os.Getenv("CHUCHU_DEBUG") == "1" {
+				if os.Getenv("GPTCODE_DEBUG") == "1" {
 					fmt.Fprintf(os.Stderr, "[ORCHESTRATOR] Parsed %d tool calls from text\n", len(parsedCalls))
 				}
 				resp.ToolCalls = parsedCalls
@@ -75,7 +75,7 @@ func (o *OrchestratorProvider) Chat(ctx context.Context, req ChatRequest) (*Chat
 		}
 
 		if len(resp.ToolCalls) == 0 {
-			if os.Getenv("CHUCHU_DEBUG") == "1" {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[ORCHESTRATOR] No more tools to call, returning final response\n")
 			}
 			return &ChatResponse{
@@ -94,7 +94,7 @@ func (o *OrchestratorProvider) Chat(ctx context.Context, req ChatRequest) (*Chat
 			toolCallHistory[toolKey]++
 
 			if toolCallHistory[toolKey] > 1 {
-				if os.Getenv("CHUCHU_DEBUG") == "1" {
+				if os.Getenv("GPTCODE_DEBUG") == "1" {
 					fmt.Fprintf(os.Stderr, "[ORCHESTRATOR] Tool %s called %d times with same args - forcing stop\n", tc.Name, toolCallHistory[toolKey])
 				}
 
@@ -114,7 +114,7 @@ func (o *OrchestratorProvider) Chat(ctx context.Context, req ChatRequest) (*Chat
 			var toolResult string
 
 			if compoundBuiltInTools[tc.Name] {
-				if os.Getenv("CHUCHU_DEBUG") == "1" {
+				if os.Getenv("GPTCODE_DEBUG") == "1" {
 					fmt.Fprintf(os.Stderr, "[ORCHESTRATOR] Executing Compound tool: %s\n", tc.Name)
 				}
 
@@ -142,7 +142,7 @@ func (o *OrchestratorProvider) Chat(ctx context.Context, req ChatRequest) (*Chat
 					toolResult = "Error: invalid arguments"
 				}
 			} else {
-				if os.Getenv("CHUCHU_DEBUG") == "1" {
+				if os.Getenv("GPTCODE_DEBUG") == "1" {
 					fmt.Fprintf(os.Stderr, "[ORCHESTRATOR] Executing custom tool: %s\n", tc.Name)
 				}
 
@@ -176,7 +176,7 @@ func (o *OrchestratorProvider) Chat(ctx context.Context, req ChatRequest) (*Chat
 		}
 
 		if iteration >= 2 {
-			if os.Getenv("CHUCHU_DEBUG") == "1" {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[ORCHESTRATOR] Reached iteration limit - forcing final answer\n")
 			}
 

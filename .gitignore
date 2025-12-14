@@ -1,6 +1,6 @@
 # Binaries
 chu
-gptcode
+/gptcode
 *.exe
 *.exe~
 *.dll

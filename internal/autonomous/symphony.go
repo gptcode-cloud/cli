@@ -63,7 +63,7 @@ func (e *Executor) Execute(ctx context.Context, task string) error {
 	fmt.Printf("   Complexity: %d/10\n", analysis.Complexity)
 
 	// 2. If query task with read-only movements, execute directly
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		readOnly := isReadOnlyMovements(analysis.Movements)
 		fmt.Fprintf(os.Stderr, "[SYMPHONY] Intent=%s, #movements=%d, isReadOnly=%v\n",
 			analysis.Intent, len(analysis.Movements), readOnly)
@@ -139,7 +139,7 @@ func (e *Executor) Execute(ctx context.Context, task string) error {
 
 // executeDirect executes a simple task without decomposition
 func (e *Executor) executeDirect(ctx context.Context, task string, analysis *TaskAnalysis) error {
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[SYMPHONY] executeDirect called: complexity=%d\n", analysis.Complexity)
 	}
 
@@ -151,7 +151,7 @@ func (e *Executor) executeDirect(ctx context.Context, task string, analysis *Tas
 		complexityStr = "medium"
 	}
 
-	if os.Getenv("CHUCHU_DEBUG") == "1" {
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[SYMPHONY] Calling maestro.ExecuteTask with complexityStr=%s\n", complexityStr)
 	}
 
