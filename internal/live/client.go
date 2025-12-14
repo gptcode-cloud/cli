@@ -11,18 +11,23 @@ import (
 	"sync"
 	"time"
 
+	"gptcode/internal/crypto"
+
 	"github.com/gorilla/websocket"
 )
 
 // Client connects to the GPTCode Live Dashboard via Phoenix WebSocket
 type Client struct {
-	conn     *websocket.Conn
-	agentID  string
-	url      string
-	mu       sync.Mutex
-	joinRef  int
-	msgRef   int
-	onEdit   func(contextType, content string)
+	conn               *websocket.Conn
+	agentID            string
+	url                string
+	mu                 sync.Mutex
+	joinRef            int
+	msgRef             int
+	onEdit             func(contextType, content string)
+	e2e                *crypto.E2ESession
+	encrypted          bool
+	onEncryptedMessage func(data []byte)
 }
 
 // NewClient creates a new Live Dashboard client
@@ -173,6 +178,95 @@ func (c *Client) Close() error {
 	return nil
 }
 
+// EnableEncryption initializes E2E encryption and sends public key to server
+func (c *Client) EnableEncryption() error {
+	session, err := crypto.NewE2ESession()
+	if err != nil {
+		return fmt.Errorf("failed to create E2E session: %w", err)
+	}
+	c.e2e = session
+
+	// Send our public key to server
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	topic := fmt.Sprintf("agent:%s", c.agentID)
+	msg := []interface{}{
+		c.joinRef,
+		c.msgRef,
+		topic,
+		"key_exchange",
+		map[string]interface{}{
+			"public_key": c.e2e.PublicKey(),
+		},
+	}
+	c.msgRef++
+
+	log.Printf("Live: Initiated key exchange, fingerprint: %s", c.e2e.Fingerprint())
+	return c.conn.WriteJSON(msg)
+}
+
+// SetRemotePublicKey completes key exchange with browser's public key
+func (c *Client) SetRemotePublicKey(publicKey string) error {
+	if c.e2e == nil {
+		return fmt.Errorf("encryption not initialized")
+	}
+	if err := c.e2e.SetRemotePublicKey(publicKey); err != nil {
+		return err
+	}
+	c.encrypted = true
+	log.Printf("Live: Key exchange complete, remote fingerprint: %s", c.e2e.RemoteFingerprint())
+	return nil
+}
+
+// SendEncrypted sends an encrypted message
+func (c *Client) SendEncrypted(sessionID string, data []byte) error {
+	if !c.encrypted || c.e2e == nil {
+		return fmt.Errorf("encryption not ready")
+	}
+
+	ciphertext, err := c.e2e.Encrypt(data)
+	if err != nil {
+		return err
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	topic := fmt.Sprintf("agent:%s", c.agentID)
+	msg := []interface{}{
+		c.joinRef,
+		c.msgRef,
+		topic,
+		"encrypted_payload",
+		map[string]interface{}{
+			"session_id": sessionID,
+			"data":       ciphertext,
+		},
+	}
+	c.msgRef++
+
+	return c.conn.WriteJSON(msg)
+}
+
+// DecryptMessage decrypts a message from the browser
+func (c *Client) DecryptMessage(ciphertext string) ([]byte, error) {
+	if !c.encrypted || c.e2e == nil {
+		return nil, fmt.Errorf("encryption not ready")
+	}
+	return c.e2e.Decrypt(ciphertext)
+}
+
+// IsEncrypted returns true if E2E encryption is active
+func (c *Client) IsEncrypted() bool {
+	return c.encrypted && c.e2e != nil && c.e2e.IsReady()
+}
+
+// OnEncryptedMessage sets callback for encrypted messages from browser
+func (c *Client) OnEncryptedMessage(fn func(data []byte)) {
+	c.onEncryptedMessage = fn
+}
+
 // ReadContextFile reads a context file from .gptcode/context/
 func ReadContextFile(contextType string) (string, error) {
 	gptcodeDir, err := findGPTCodeDir()
@@ -289,13 +383,13 @@ func GetAgentID() string {
 	if err != nil {
 		hostname = "unknown"
 	}
-	
+
 	// Make it unique per workspace
 	cwd, _ := os.Getwd()
 	parts := strings.Split(cwd, string(os.PathSeparator))
 	if len(parts) > 0 {
 		hostname = hostname + "-" + parts[len(parts)-1]
 	}
-	
+
 	return hostname
 }
