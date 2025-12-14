@@ -10,8 +10,8 @@ import (
 	"testing"
 )
 
-// TestChuChatSingleShot tests single-shot chat mode with a message argument
-func TestChuChatSingleShot(t *testing.T) {
+// TestGptcodeChatSingleShot tests single-shot chat mode with a message argument
+func TestGptcodeChatSingleShot(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping E2E test in short mode")
 	}
@@ -25,11 +25,11 @@ func TestChuChatSingleShot(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Run chu chat with a simple question
+	// Run gptcode chat with a simple question
 	cmd := exec.Command("gptcode", "chat", "what is 2 plus 2?")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("chu chat failed: %v\nOutput: %s", err, output)
+		t.Fatalf("gptcode chat failed: %v\nOutput: %s", err, output)
 	}
 
 	outputStr := string(output)
@@ -40,8 +40,8 @@ func TestChuChatSingleShot(t *testing.T) {
 	}
 }
 
-// TestChuChatWithInitialMessage tests chat with initial message then exit (non-interactive)
-func TestChuChatWithInitialMessage(t *testing.T) {
+// TestGptcodeChatWithInitialMessage tests chat with initial message then exit (non-interactive)
+func TestGptcodeChatWithInitialMessage(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping E2E test in short mode")
 	}
@@ -55,11 +55,11 @@ func TestChuChatWithInitialMessage(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Run chu chat with initial message (should process and exit since non-interactive)
+	// Run gptcode chat with initial message (should process and exit since non-interactive)
 	cmd := exec.Command("gptcode", "chat", "tell me what files are in this directory")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("chu chat failed: %v\nOutput: %s", err, output)
+		t.Fatalf("gptcode chat failed: %v\nOutput: %s", err, output)
 	}
 
 	outputStr := string(output)
@@ -70,8 +70,8 @@ func TestChuChatWithInitialMessage(t *testing.T) {
 	}
 }
 
-// TestChuChatHelp tests that help flag shows REPL information
-func TestChuChatHelp(t *testing.T) {
+// TestGptcodeChatHelp tests that help flag shows REPL information
+func TestGptcodeChatHelp(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping E2E test in short mode")
 	}
@@ -79,7 +79,7 @@ func TestChuChatHelp(t *testing.T) {
 	cmd := exec.Command("gptcode", "chat", "--help")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
-		t.Fatalf("chu chat --help failed: %v", err)
+		t.Fatalf("gptcode chat --help failed: %v", err)
 	}
 
 	outputStr := string(output)
@@ -98,8 +98,8 @@ func TestChuChatHelp(t *testing.T) {
 	}
 }
 
-// TestChuChatContextManager tests the context manager in isolation
-func TestChuChatContextManager(t *testing.T) {
+// TestGptcodeChatContextManager tests the context manager in isolation
+func TestGptcodeChatContextManager(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping E2E test in short mode")
 	}

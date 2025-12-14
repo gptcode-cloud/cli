@@ -11,8 +11,8 @@ eval "$sugg" || true
 
 # 2) User presses Ctrl+g to mark suggestion (simulate)
 echo "[Pressing Ctrl+g]"
-mkdir -p ~/.chuchu
-print -r -- "$sugg" > ~/.chuchu/last_suggestion_cmd
+mkdir -p ~/.gptcode
+print -r -- "$sugg" > ~/.gptcode/last_suggestion_cmd
 
 # 3) Edit & Run corrected command (hook will record feedback)
 echo "Editing to corrected command"
@@ -22,12 +22,12 @@ eval "$corr" || true
 sleep 0.3
 echo
 echo "Stats after correction:"
-chu feedback stats | sed -n '1,80p'
+gptcode feedback stats | sed -n '1,80p'
 
 echo
 
 echo "Last feedback event:"
-lf=$(ls -t ~/.chuchu/feedback/*.json 2>/dev/null | head -n1)
+lf=$(ls -t ~/.gptcode/feedback/*.json 2>/dev/null | head -n1)
 if [ -n "$lf" ]; then
   tail -n 200 "$lf" | sed -n '1,200p'
 else

@@ -5,7 +5,7 @@ echo "Suggested: fly ssh console --exec \"iex -S mix\""
 echo
 
 echo "Submitting corrected command as feedback"
-chu feedback submit \
+gptcode feedback submit \
   --sentiment=bad \
   --kind=command \
   --source=shell \
@@ -17,7 +17,7 @@ chu feedback submit \
 
 echo
 echo "Last feedback event:"
-lf=$(ls -t ~/.chuchu/feedback/*.json 2>/dev/null | head -n1)
+lf=$(ls -t ~/.gptcode/feedback/*.json 2>/dev/null | head -n1)
 if [ -n "$lf" ]; then
   tail -n 40 "$lf"
 else
@@ -27,4 +27,4 @@ fi
 echo
 echo "Training:"
 echo "python3 ml/intent/scripts/process_feedback.py"
-echo "chu ml train intent"
+echo "gptcode ml train intent"

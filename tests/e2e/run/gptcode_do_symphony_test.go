@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func TestChuDoComplexTaskAnalysis(t *testing.T) {
+func TestGptcodeDoComplexTaskAnalysis(t *testing.T) {
 	skipIfNoE2E(t)
 
 	if testing.Short() {
@@ -40,10 +40,10 @@ func TestChuDoComplexTaskAnalysis(t *testing.T) {
 		}
 	}
 
-	t.Logf("Running chu do --dry-run in %s", tmpDir)
+	t.Logf("Running gptcode do --dry-run in %s", tmpDir)
 	t.Logf("This tests Symphony task decomposition...")
 
-	// Run chu do with --dry-run to test analysis without execution
+	// Run gptcode do with --dry-run to test analysis without execution
 	cmd := exec.Command("gptcode", "do", "reorganize docs folder into features and guides subdirectories", "--dry-run")
 	cmd.Dir = tmpDir
 	cmd.Env = append(os.Environ(), "GPTCODE_TELEMETRY=false")
@@ -62,13 +62,13 @@ func TestChuDoComplexTaskAnalysis(t *testing.T) {
 	case <-done:
 		if cmdErr != nil {
 			t.Logf("Command output:\n%s", string(output))
-			t.Fatalf("chu do --dry-run failed: %v", cmdErr)
+			t.Fatalf("gptcode do --dry-run failed: %v", cmdErr)
 		}
 	case <-time.After(timeout):
 		if cmd.Process != nil {
 			cmd.Process.Kill()
 		}
-		t.Fatalf("chu do --dry-run exceeded timeout of %s", timeout)
+		t.Fatalf("gptcode do --dry-run exceeded timeout of %s", timeout)
 	}
 
 	outputStr := string(output)
@@ -103,10 +103,10 @@ func TestChuDoComplexTaskAnalysis(t *testing.T) {
 		}
 	}
 
-	t.Logf("✓ chu do --dry-run completed task analysis")
+	t.Logf("✓ gptcode do --dry-run completed task analysis")
 }
 
-func TestChuDoSimpleTaskExecution(t *testing.T) {
+func TestGptcodeDoSimpleTaskExecution(t *testing.T) {
 	skipIfNoE2E(t)
 
 	if testing.Short() {
@@ -115,7 +115,7 @@ func TestChuDoSimpleTaskExecution(t *testing.T) {
 
 	tmpDir := t.TempDir()
 
-	t.Logf("Running chu do in %s", tmpDir)
+	t.Logf("Running gptcode do in %s", tmpDir)
 	t.Logf("This may take 2-5 minutes with local Ollama...")
 
 	// Simple task that should NOT trigger Symphony decomposition
@@ -137,13 +137,13 @@ func TestChuDoSimpleTaskExecution(t *testing.T) {
 	case <-done:
 		if cmdErr != nil {
 			t.Logf("Command output:\n%s", string(output))
-			t.Fatalf("chu do failed: %v", cmdErr)
+			t.Fatalf("gptcode do failed: %v", cmdErr)
 		}
 	case <-time.After(timeout):
 		if cmd.Process != nil {
 			cmd.Process.Kill()
 		}
-		t.Fatalf("chu do exceeded timeout of %s", timeout)
+		t.Fatalf("gptcode do exceeded timeout of %s", timeout)
 	}
 
 	// Verify the file was created
@@ -157,10 +157,10 @@ func TestChuDoSimpleTaskExecution(t *testing.T) {
 		t.Errorf("File content mismatch.\nExpected to contain: test notes\nGot: %s", string(content))
 	}
 
-	t.Logf("✓ chu do successfully executed simple task")
+	t.Logf("✓ gptcode do successfully executed simple task")
 }
 
-func TestChuDoComplexityThreshold(t *testing.T) {
+func TestGptcodeDoComplexityThreshold(t *testing.T) {
 	skipIfNoE2E(t)
 
 	if testing.Short() {

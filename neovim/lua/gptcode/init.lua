@@ -1,32 +1,32 @@
--- chuchu.nvim – generic Neovim integration for Chuchu
+-- gptcode.nvim – generic Neovim integration for GPTCode
 --
 -- Features:
 -- - Detects project type (Elixir / Ruby / Go / TypeScript) via simple heuristics.
 -- - Uses corresponding CLI commands:
---     Elixir     -> `chu feature-elixir`
---     Ruby       -> `chu feature-ruby`   (you implement this in Go)
---     Go         -> `chu feature-go`     (you implement this in Go)
---     TypeScript -> `chu feature-ts`     (already scaffolded)
--- - :ChuchuFeature → opens a floating prompt for the feature description.
+--     Elixir     -> `gptcode feature-elixir`
+--     Ruby       -> `gptcode feature-ruby`   (you implement this in Go)
+--     Go         -> `gptcode feature-go`     (you implement this in Go)
+--     TypeScript -> `gptcode feature-ts`     (already scaffolded)
+-- - :GPTCodeFeature → opens a floating prompt for the feature description.
 -- - Renders ```tests / ```impl fenced blocks from stdout and opens a 3-pane layout:
 --     left top: tests
 --     left bottom: implementation
 --     right: conversation (prompt + raw output)
--- - Feedback commands store snapshots in ~/.chuchu/memories.jsonl:
---     :ChuchuFeedbackGood  (default key: <leader>ck)
---     :ChuchuFeedbackBad   (default key: <leader>cx)
+-- - Feedback commands store snapshots in ~/.gptcode/memories.jsonl:
+--     :GPTCodeFeedbackGood  (default key: <leader>ck)
+--     :GPTCodeFeedbackBad   (default key: <leader>cx)
 
 local M = {}
 
 local config = {
-  chat_cmd = { "chu", "chat" },
+  chat_cmd = { "gptcode", "chat" },
   keymaps = {
     chat          = "<leader>cd",
     verified      = "<leader>vf",
     failed        = "<leader>fr",
     shell_help    = "<leader>xs",
   },
-  memory_file = vim.fn.expand("~/.chuchu/memories.jsonl"),
+  memory_file = vim.fn.expand("~/.gptcode/memories.jsonl"),
 }
 
 local chat_state = { 
@@ -96,48 +96,48 @@ end
 --- Setup to be called from your plugin manager.
 -- Example (lazy.nvim):
 --   {
---     dir = "~/workspace/chuchu/neovim",
+--     dir = "~/workspace/gptcode/neovim",
 --     config = function()
---       require("chuchu").setup()
+--       require("gptcode").setup()
 --     end,
 --   }
 function M.setup(opts)
   config = vim.tbl_deep_extend("force", config, opts or {})
 
-  vim.api.nvim_create_user_command("ChuchuChat", function()
+  vim.api.nvim_create_user_command("GPTCodeChat", function()
     M.toggle_chat()
   end, {})
 
-  vim.api.nvim_create_user_command("ChuchuVerified", function()
+  vim.api.nvim_create_user_command("GPTCodeVerified", function()
     M.record_feedback("good")
   end, {})
 
-  vim.api.nvim_create_user_command("ChuchuFailed", function()
+  vim.api.nvim_create_user_command("GPTCodeFailed", function()
     M.record_feedback("bad")
   end, {})
 
-  vim.api.nvim_create_user_command("ChuchuShell", function()
+  vim.api.nvim_create_user_command("GPTCodeShell", function()
     M.shell_help()
   end, {})
 
-  vim.api.nvim_create_user_command("ChuchuModels", function()
+  vim.api.nvim_create_user_command("GPTCodeModels", function()
     M.switch_model()
   end, {})
 
-  vim.api.nvim_create_user_command("ChuchuAuto", function(opts)
+  vim.api.nvim_create_user_command("GPTCodeAuto", function(opts)
     local default = vim.fn.getcwd() .. "/docs/plans/maestro-autonomous-execution-plan.md"
     vim.ui.input({ prompt = "Plan file:", default = default }, function(input)
       if not input or input == "" then return end
-      local cmd = { "chu", "implement", input, "--auto" }
+      local cmd = { "gptcode", "implement", input, "--auto" }
       vim.fn.jobstart(cmd, {
-        env = vim.tbl_extend("force", vim.fn.environ(), {CHUCHU_NVIM_MODE = "1"}),
+        env = vim.tbl_extend("force", vim.fn.environ(), {GPTCODE_NVIM_MODE = "1"}),
         stdout_buffered = true,
         on_stdout = function(_, data)
           if not data then return end
           for _, line in ipairs(data) do
             if line ~= "" then
               vim.schedule(function()
-                vim.notify(line, vim.log.levels.INFO, { title = "Chuchu Implement" })
+                vim.notify(line, vim.log.levels.INFO, { title = "GPTCode Implement" })
               end)
             end
           end
@@ -147,7 +147,7 @@ function M.setup(opts)
           for _, line in ipairs(data) do
             if line ~= "" then
               vim.schedule(function()
-                vim.notify(line, vim.log.levels.WARN, { title = "Chuchu Implement" })
+                vim.notify(line, vim.log.levels.WARN, { title = "GPTCode Implement" })
               end)
             end
           end
@@ -156,73 +156,73 @@ function M.setup(opts)
     end)
   end, { nargs = "?" })
 
-  vim.api.nvim_create_user_command("ChuchuModelSearch", function()
+  vim.api.nvim_create_user_command("GPTCodeModelSearch", function()
     M.search_models()
   end, {})
 
   local km = config.keymaps
   if km.chat and km.chat ~= "" then
-    vim.keymap.set("n", km.chat, ":ChuchuChat<CR>", {
+    vim.keymap.set("n", km.chat, ":GPTCodeChat<CR>", {
       silent = true,
       noremap = true,
-      desc = "Chuchu: toggle chat",
+      desc = "GPTCode: toggle chat",
     })
   end
   if km.verified and km.verified ~= "" then
-    vim.keymap.set("n", km.verified, ":ChuchuVerified<CR>", {
+    vim.keymap.set("n", km.verified, ":GPTCodeVerified<CR>", {
       silent = true,
       noremap = true,
-      desc = "Chuchu: verified code",
+      desc = "GPTCode: verified code",
     })
   end
   if km.failed and km.failed ~= "" then
-    vim.keymap.set("n", km.failed, ":ChuchuFailed<CR>", {
+    vim.keymap.set("n", km.failed, ":GPTCodeFailed<CR>", {
       silent = true,
       noremap = true,
-      desc = "Chuchu: failed code",
+      desc = "GPTCode: failed code",
     })
   end
   if km.shell_help and km.shell_help ~= "" then
-    vim.keymap.set("n", km.shell_help, ":ChuchuShell<CR>", {
+    vim.keymap.set("n", km.shell_help, ":GPTCodeShell<CR>", {
       silent = true,
       noremap = true,
-      desc = "Chuchu: shell help",
+      desc = "GPTCode: shell help",
     })
   end
-  vim.keymap.set("n", "<C-d>", ":ChuchuChat<CR>", {
+  vim.keymap.set("n", "<C-d>", ":GPTCodeChat<CR>", {
     silent = true,
     noremap = true,
-    desc = "Chuchu: toggle chat",
+    desc = "GPTCode: toggle chat",
   })
-  vim.keymap.set("n", "<leader>ca", ":ChuchuAuto<CR>", {
+  vim.keymap.set("n", "<leader>ca", ":GPTCodeAuto<CR>", {
     silent = true,
     noremap = true,
-    desc = "Chuchu: autonomous implement",
+    desc = "GPTCode: autonomous implement",
   })
-  vim.keymap.set("n", "<C-v>", ":ChuchuVerified<CR>", {
+  vim.keymap.set("n", "<C-v>", ":GPTCodeVerified<CR>", {
     silent = true,
     noremap = true,
-    desc = "Chuchu: verified code",
+    desc = "GPTCode: verified code",
   })
-  vim.keymap.set("n", "<C-r>", ":ChuchuFailed<CR>", {
+  vim.keymap.set("n", "<C-r>", ":GPTCodeFailed<CR>", {
     silent = true,
     noremap = true,
-    desc = "Chuchu: rejected code",
+    desc = "GPTCode: rejected code",
   })
-  vim.keymap.set("n", "<C-x>", ":ChuchuShell<CR>", {
+  vim.keymap.set("n", "<C-x>", ":GPTCodeShell<CR>", {
     silent = true,
     noremap = true,
-    desc = "Chuchu: generate shell",
+    desc = "GPTCode: generate shell",
   })
-  vim.keymap.set("n", "<C-m>", ":ChuchuModels<CR>", {
+  vim.keymap.set("n", "<C-m>", ":GPTCodeModels<CR>", {
     silent = true,
     noremap = true,
-    desc = "Chuchu: switch model",
+    desc = "GPTCode: switch model",
   })
-  vim.keymap.set("n", "<leader>ms", ":ChuchuModelSearch<CR>", {
+  vim.keymap.set("n", "<leader>ms", ":GPTCodeModelSearch<CR>", {
     silent = true,
     noremap = true,
-    desc = "Chuchu: search models",
+    desc = "GPTCode: search models",
   })
   
   vim.api.nvim_create_autocmd("VimLeave", {
@@ -275,7 +275,7 @@ function M.toggle_chat()
 end
 
 function M.load_profile_info()
-  local setup_path = vim.fn.expand("~/.chuchu/setup.yaml")
+  local setup_path = vim.fn.expand("~/.gptcode/setup.yaml")
   if vim.fn.filereadable(setup_path) == 0 then
     chat_state.model = "not configured"
     chat_state.backend = "not configured"
@@ -395,7 +395,7 @@ function M.render_chat()
   
   local backend_display = chat_state.backend and chat_state.backend:sub(1,1):upper()..chat_state.backend:sub(2) or "?"
   local profile_display = chat_state.profile or "default"
-  table.insert(lines, "🐺 Chuchu")
+  table.insert(lines, "🐺 GPTCode")
   table.insert(lines, string.format("Backend: %s / %s", backend_display, profile_display))
   
   if chat_state.agent_models and next(chat_state.agent_models) then
@@ -458,7 +458,7 @@ function M.send_message_from_buffer()
   end
   
   if not separator_idx then
-    vim.notify("Chuchu: could not find message separator", vim.log.levels.ERROR)
+    vim.notify("GPTCode: could not find message separator", vim.log.levels.ERROR)
     return
   end
   
@@ -466,7 +466,7 @@ function M.send_message_from_buffer()
   local user_msg = emoji_line:gsub("^👤 %| ", ""):gsub("^%s*(.-)%s*$", "%1")
   
   if user_msg == "" then
-    vim.notify("Chuchu: empty message", vim.log.levels.WARN)
+    vim.notify("GPTCode: empty message", vim.log.levels.WARN)
     return
   end
   
@@ -514,10 +514,10 @@ function M.stop_loading_animation()
 end
 
 function M.switch_model()
-  local catalog_path = vim.fn.expand("~/.chuchu/models.json")
+  local catalog_path = vim.fn.expand("~/.gptcode/models.json")
   
   if vim.fn.filereadable(catalog_path) == 0 then
-    vim.notify("Model catalog not found. Run 'chu models update'", vim.log.levels.WARN)
+    vim.notify("Model catalog not found. Run 'gptcode models update'", vim.log.levels.WARN)
     return
   end
   
@@ -589,7 +589,7 @@ function M.show_model_configuration_menu(backend)
 end
 
 function M.list_profiles(backend)
-  local output = vim.fn.system({"chu", "profiles", "list", backend})
+  local output = vim.fn.system({"gptcode", "profiles", "list", backend})
   
   if vim.v.shell_error ~= 0 then
     return {"default"}
@@ -617,7 +617,7 @@ function M.create_profile_interactive(backend)
       return
     end
     
-    local result = vim.fn.system({"chu", "profiles", "create", backend, name})
+    local result = vim.fn.system({"gptcode", "profiles", "create", backend, name})
     if vim.v.shell_error == 0 then
       vim.notify(string.format("✓ Created profile: %s/%s", backend, name), vim.log.levels.INFO)
       M.configure_profile_agents(backend, name)
@@ -673,7 +673,7 @@ function M.configure_profile_agents(backend, profile_name)
       
       local selected_model = models[1]
       if selected_model then
-        vim.fn.system({"chu", "profiles", "set-agent", backend, profile_name, agent, selected_model})
+        vim.fn.system({"gptcode", "profiles", "set-agent", backend, profile_name, agent, selected_model})
         agent_idx = agent_idx + 1
         configure_next_agent()
       end
@@ -684,7 +684,7 @@ function M.configure_profile_agents(backend, profile_name)
 end
 
 function M.show_profile_details(backend, profile_name)
-  local output = vim.fn.system({"chu", "profiles", "show", backend, profile_name})
+  local output = vim.fn.system({"gptcode", "profiles", "show", backend, profile_name})
   
   if vim.v.shell_error == 0 then
     local lines = vim.split(output, "\n")
@@ -715,7 +715,7 @@ function M.delete_profile(backend, profile_name)
     default = "N"
   }, function(response)
     if response and response:lower() == "y" then
-      local result = vim.fn.system({"chu", "profiles", "delete", backend, profile_name})
+      local result = vim.fn.system({"gptcode", "profiles", "delete", backend, profile_name})
       if vim.v.shell_error == 0 then
         vim.notify(string.format("✓ Deleted profile: %s/%s", backend, profile_name), vim.log.levels.INFO)
       else
@@ -728,13 +728,13 @@ function M.delete_profile(backend, profile_name)
 end
 
 function M.load_profile(backend, profile_name)
-  vim.fn.system({"chu", "config", "set", "defaults.backend", backend})
+  vim.fn.system({"gptcode", "config", "set", "defaults.backend", backend})
   if vim.v.shell_error ~= 0 then
     vim.notify("Failed to set backend", vim.log.levels.ERROR)
     return
   end
   
-  vim.fn.system({"chu", "config", "set", "defaults.profile", profile_name})
+  vim.fn.system({"gptcode", "config", "set", "defaults.profile", profile_name})
   if vim.v.shell_error ~= 0 then
     vim.notify("Failed to set profile", vim.log.levels.ERROR)
     return
@@ -806,7 +806,7 @@ function M.show_model_picker(callback, agent, backend)
     
     query = query or ""
     
-    local cmd = {"chu", "models", "search"}
+    local cmd = {"gptcode", "models", "search"}
     if query ~= "" then
       for term in query:gmatch("%S+") do
         table.insert(cmd, term)
@@ -821,7 +821,7 @@ function M.show_model_picker(callback, agent, backend)
     
     local stdout_data = {}
     vim.fn.jobstart(cmd, {
-      env = vim.tbl_extend("force", vim.fn.environ(), {CHUCHU_NVIM_MODE = "1"}),
+      env = vim.tbl_extend("force", vim.fn.environ(), {GPTCODE_NVIM_MODE = "1"}),
       stdout_buffered = true,
       on_stdout = function(_, data)
         if data then
@@ -927,8 +927,8 @@ function M.prompt_ollama_install(model, callback)
     if not response or response == "" or response:lower() == "y" then
       vim.notify(string.format("Installing %s...", model.id), vim.log.levels.INFO)
       
-      vim.fn.jobstart({"chu", "models", "install", model.id}, {
-        env = vim.tbl_extend("force", vim.fn.environ(), {CHUCHU_NVIM_MODE = "1"}),
+      vim.fn.jobstart({"gptcode", "models", "install", model.id}, {
+        env = vim.tbl_extend("force", vim.fn.environ(), {GPTCODE_NVIM_MODE = "1"}),
         on_exit = function(_, exit_code)
           if exit_code == 0 then
             vim.schedule(function()
@@ -975,14 +975,14 @@ function M.search_models()
       table.insert(terms, term)
     end
     
-    local cmd = {"chu", "models", "search"}
+    local cmd = {"gptcode", "models", "search"}
     for _, term in ipairs(terms) do
       table.insert(cmd, term)
     end
     
     local output = {}
     vim.fn.jobstart(cmd, {
-      env = vim.tbl_extend("force", vim.fn.environ(), {CHUCHU_NVIM_MODE = "1"}),
+      env = vim.tbl_extend("force", vim.fn.environ(), {GPTCODE_NVIM_MODE = "1"}),
       stdout_buffered = true,
       on_stdout = function(_, data)
         if data then
@@ -1078,8 +1078,8 @@ function M.show_model_actions(model)
     
     if choice:match("^1") then
       local backend = model.id:match("^([^/]+)/") or "ollama"
-      vim.fn.system({"chu", "config", "set", "defaults.model", model.id})
-      vim.fn.system({"chu", "config", "set", "defaults.backend", backend})
+      vim.fn.system({"gptcode", "config", "set", "defaults.model", model.id})
+      vim.fn.system({"gptcode", "config", "set", "defaults.backend", backend})
       M.load_profile_info()
       M.render_chat()
       vim.notify(string.format("✓ Set as default: %s", model.id), vim.log.levels.INFO)
@@ -1093,13 +1093,13 @@ end
 
 
 function M.update_defaults(backend, model)
-  vim.fn.system({"chu", "config", "set", "defaults.backend", backend})
+  vim.fn.system({"gptcode", "config", "set", "defaults.backend", backend})
   if vim.v.shell_error ~= 0 then
     vim.notify("Failed to set backend", vim.log.levels.ERROR)
     return
   end
   
-  vim.fn.system({"chu", "config", "set", "defaults.model", model})
+  vim.fn.system({"gptcode", "config", "set", "defaults.model", model})
   if vim.v.shell_error ~= 0 then
     vim.notify("Failed to set model", vim.log.levels.ERROR)
     return
@@ -1115,15 +1115,15 @@ end
 function M.shell_help()
   vim.ui.input({ prompt = "Shell command help: " }, function(text)
     if not text or text == "" then
-      vim.notify("Chuchu: empty query", vim.log.levels.WARN)
+      vim.notify("GPTCode: empty query", vim.log.levels.WARN)
       return
     end
 
-    local cmd = { "chu", "chat" }
+    local cmd = { "gptcode", "chat" }
     local output = {}
 
     local job = vim.fn.jobstart(cmd, {
-      env = vim.tbl_extend("force", vim.fn.environ(), {CHUCHU_NVIM_MODE = "1"}),
+      env = vim.tbl_extend("force", vim.fn.environ(), {GPTCODE_NVIM_MODE = "1"}),
       stdout_buffered = true,
       on_stdout = function(_, data, _)
         if data then vim.list_extend(output, data) end
@@ -1136,7 +1136,7 @@ function M.shell_help()
     })
 
     if job <= 0 then
-      vim.notify("Chuchu: failed to start chat command", vim.log.levels.ERROR)
+      vim.notify("GPTCode: failed to start chat command", vim.log.levels.ERROR)
       return
     end
 
@@ -1166,7 +1166,7 @@ local function open_floating_prompt(title, on_submit)
   })
 
   vim.api.nvim_buf_set_lines(buf, 0, -1, false, {
-    "Describe your feature. Chuchu will ask questions via the CLI.",
+    "Describe your feature. GPTCode will ask questions via the CLI.",
     "",
     "> ",
   })
@@ -1212,16 +1212,16 @@ end
 function M.start_code_conversation()
   local lang = detect_language()
   if not lang then
-    vim.notify("Chuchu: could not detect project language (Elixir/Ruby/Go/TS).", vim.log.levels.WARN)
+    vim.notify("GPTCode: could not detect project language (Elixir/Ruby/Go/TS).", vim.log.levels.WARN)
     return
   end
 
   chat_state.lang = lang
   chat_state.conversation = {}
 
-  open_floating_prompt("Chuchu (" .. lang .. ")", function(text)
+  open_floating_prompt("GPTCode (" .. lang .. ")", function(text)
     if text == "" then
-      vim.notify("Chuchu: empty query", vim.log.levels.WARN)
+      vim.notify("GPTCode: empty query", vim.log.levels.WARN)
       return
     end
 
@@ -1253,7 +1253,7 @@ function M.send_to_llm(user_input)
   chat_state.active_tools = {}
   chat_state.tool_outputs = {}
   
-  local event_file = vim.fn.expand("~/.chuchu/events.jsonl")
+  local event_file = vim.fn.expand("~/.gptcode/events.jsonl")
   vim.fn.writefile({}, event_file)
   vim.notify("[DEBUG] Events file cleared: " .. event_file, vim.log.levels.INFO)
   
@@ -1270,7 +1270,7 @@ function M.send_to_llm(user_input)
           local event_json = lines[i]
           local ok, event = pcall(vim.fn.json_decode, event_json)
           if ok and event then
-            if os.getenv("CHUCHU_DEBUG") == "1" then
+            if os.getenv("GPTCODE_DEBUG") == "1" then
               print("[WATCHER] Processing event #" .. i .. ": " .. event.type)
             end
             M.handle_tool_event(event_json, #chat_state.conversation)
@@ -1281,7 +1281,7 @@ function M.send_to_llm(user_input)
     end
   end))
   
-  if os.getenv("CHUCHU_DEBUG") == "1" then
+  if os.getenv("GPTCODE_DEBUG") == "1" then
     print("DEBUG: conversation size = " .. #chat_state.conversation)
     for i, c in ipairs(chat_state.conversation) do
       print(string.format("  [%d] %s", i, c:sub(1, 60)))
@@ -1305,7 +1305,7 @@ function M.send_to_llm(user_input)
     end
   end
   
-  if os.getenv("CHUCHU_DEBUG") == "1" then
+  if os.getenv("GPTCODE_DEBUG") == "1" then
     print("DEBUG: messages count = " .. #messages)
     for i, m in ipairs(messages) do
       print(string.format("  [%d] role=%s, content=%s", i, m.role, m.content:sub(1, 50)))
@@ -1321,7 +1321,7 @@ function M.send_to_llm(user_input)
   local git_dir = vim.fn.finddir('.git', '.;')
   local project_root = git_dir ~= '' and vim.fn.fnamemodify(git_dir, ':h') or vim.fn.getcwd()
   chat_state.job = vim.fn.jobstart(cmd, { 
-    env = vim.tbl_extend("force", vim.fn.environ(), {CHUCHU_NVIM_MODE = "1"}),
+    env = vim.tbl_extend("force", vim.fn.environ(), {GPTCODE_NVIM_MODE = "1"}),
     cwd = project_root,
     stdout_buffered = false,
     on_stdout = function(_, data, _)
@@ -1381,7 +1381,7 @@ function M.send_to_llm(user_input)
   })
 
   if chat_state.job <= 0 then
-    vim.notify("Chuchu: failed to start command", vim.log.levels.ERROR)
+    vim.notify("GPTCode: failed to start command", vim.log.levels.ERROR)
     return
   end
 
@@ -1395,7 +1395,7 @@ function M.send_to_llm(user_input)
 end
 
 function M.handle_tool_event(event_json, assistant_idx)
-  if os.getenv("CHUCHU_DEBUG") == "1" then
+  if os.getenv("GPTCODE_DEBUG") == "1" then
     print("[PLUGIN] Event: " .. event_json:sub(1, 100) .. " type=" .. (vim.fn.json_decode(event_json).type or "?"))
   end
   
@@ -1606,7 +1606,7 @@ function M.show_chat_panel()
   end
 
   local convo_lines = {}
-  table.insert(convo_lines, "# Chuchu (" .. (chat_state.lang or "unknown") .. ")")
+  table.insert(convo_lines, "# GPTCode (" .. (chat_state.lang or "unknown") .. ")")
   table.insert(convo_lines, "")
   
   for _, line in ipairs(chat_state.conversation) do
@@ -1738,13 +1738,13 @@ function M.record_feedback(kind)
 
   local fh, err = io.open(mem_path, "a")
   if not fh then
-    vim.notify("Chuchu: failed to open memory file: " .. tostring(err), vim.log.levels.ERROR)
+    vim.notify("GPTCode: failed to open memory file: " .. tostring(err), vim.log.levels.ERROR)
     return
   end
   fh:write(entry)
   fh:close()
 
-  vim.notify("Chuchu: feedback '" .. kind .. "' recorded for " .. file, vim.log.levels.INFO)
+  vim.notify("GPTCode: feedback '" .. kind .. "' recorded for " .. file, vim.log.levels.INFO)
 end
 
 return M

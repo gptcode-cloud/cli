@@ -257,7 +257,7 @@ observer-web/
 
 ### Deploy
 - Frontend: GitHub Pages ou Vercel
-- Backend WebSocket: Embeded no `chu` binary
+- Backend WebSocket: Embeded no `gptcode` binary
 - Acesso: `http://localhost:5150` quando rodando com `--observer`
 
 ## Implementação por Fases
@@ -744,7 +744,7 @@ docs/observer/
 **Objetivo:** Usuários reais podem usar
 
 **Entregas:**
-1. WebSocket server no `chu` binary
+1. WebSocket server no `gptcode` binary
 2. Frontend conecta em localhost
 3. Flag `--observer`
 4. Eventos reais do Maestro

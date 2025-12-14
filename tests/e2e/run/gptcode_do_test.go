@@ -13,11 +13,11 @@ import (
 
 func skipIfNoE2E(t *testing.T) {
 	if os.Getenv("E2E_BACKEND") == "" {
-		t.Skip("Skipping E2E test: run via 'chu test e2e'")
+		t.Skip("Skipping E2E test: gptcode test e2e")
 	}
 }
 
-func TestChuDoCreateFile(t *testing.T) {
+func TestGptcodeDoCreateFile(t *testing.T) {
 	skipIfNoE2E(t)
 
 	if testing.Short() {
@@ -26,7 +26,7 @@ func TestChuDoCreateFile(t *testing.T) {
 
 	tmpDir := t.TempDir()
 
-	t.Logf("Running chu do in %s", tmpDir)
+	t.Logf("Running gptcode do in %s", tmpDir)
 	t.Logf("This may take 2-5 minutes with local Ollama...")
 
 	cmd := exec.Command("gptcode", "do", "create a file called hello.txt with content 'Hello from GPTCode E2E test'")
@@ -47,13 +47,13 @@ func TestChuDoCreateFile(t *testing.T) {
 	case <-done:
 		if cmdErr != nil {
 			t.Logf("Command output:\n%s", string(output))
-			t.Fatalf("chu do failed: %v", cmdErr)
+			t.Fatalf("gptcode do failed: %v", cmdErr)
 		}
 	case <-time.After(timeout):
 		if cmd.Process != nil {
 			cmd.Process.Kill()
 		}
-		t.Fatalf("chu do exceeded timeout of %s", timeout)
+		t.Fatalf("gptcode do exceeded timeout of %s", timeout)
 	}
 
 	helloFile := filepath.Join(tmpDir, "hello.txt")
@@ -67,10 +67,10 @@ func TestChuDoCreateFile(t *testing.T) {
 		t.Errorf("File content mismatch.\nExpected to contain: %s\nGot: %s", expectedContent, string(content))
 	}
 
-	t.Logf("✓ chu do successfully created hello.txt")
+	t.Logf("✓ gptcode do successfully created hello.txt")
 }
 
-func TestChuDoModifyFile(t *testing.T) {
+func TestGptcodeDoModifyFile(t *testing.T) {
 	skipIfNoE2E(t)
 
 	if testing.Short() {
@@ -84,7 +84,7 @@ func TestChuDoModifyFile(t *testing.T) {
 		t.Fatalf("Failed to create test file: %v", err)
 	}
 
-	t.Logf("Running chu do in %s", tmpDir)
+	t.Logf("Running gptcode do in %s", tmpDir)
 	t.Logf("This may take 2-5 minutes with local Ollama...")
 
 	cmd := exec.Command("gptcode", "do", "modify test.txt to say 'modified by E2E test'")
@@ -105,13 +105,13 @@ func TestChuDoModifyFile(t *testing.T) {
 	case <-done:
 		if cmdErr != nil {
 			t.Logf("Command output:\n%s", string(output))
-			t.Fatalf("chu do failed: %v", cmdErr)
+			t.Fatalf("gptcode do failed: %v", cmdErr)
 		}
 	case <-time.After(timeout):
 		if cmd.Process != nil {
 			cmd.Process.Kill()
 		}
-		t.Fatalf("chu do exceeded timeout of %s", timeout)
+		t.Fatalf("gptcode do exceeded timeout of %s", timeout)
 	}
 
 	content, err := os.ReadFile(testFile)
@@ -124,10 +124,10 @@ func TestChuDoModifyFile(t *testing.T) {
 		t.Errorf("File content mismatch.\nExpected to contain: %s\nGot: %s", expectedContent, string(content))
 	}
 
-	t.Logf("✓ chu do successfully modified test.txt")
+	t.Logf("✓ gptcode do successfully modified test.txt")
 }
 
-func TestChuDoTimeout(t *testing.T) {
+func TestGptcodeDoTimeout(t *testing.T) {
 	skipIfNoE2E(t)
 
 	if testing.Short() {
@@ -153,17 +153,17 @@ func TestChuDoTimeout(t *testing.T) {
 		if err != nil {
 			t.Logf("Command failed (expected for some backends): %v", err)
 		} else {
-			t.Logf("✓ chu do completed within %s", timeout)
+			t.Logf("✓ gptcode do completed within %s", timeout)
 		}
 	case <-time.After(timeout):
 		if err := cmd.Process.Kill(); err != nil {
 			t.Logf("Failed to kill process: %v", err)
 		}
-		t.Fatalf("chu do exceeded timeout of %s", timeout)
+		t.Fatalf("gptcode do exceeded timeout of %s", timeout)
 	}
 }
 
-func TestChuDoNoUnintendedFiles(t *testing.T) {
+func TestGptcodeDoNoUnintendedFiles(t *testing.T) {
 	skipIfNoE2E(t)
 
 	if testing.Short() {
@@ -172,7 +172,7 @@ func TestChuDoNoUnintendedFiles(t *testing.T) {
 
 	tmpDir := t.TempDir()
 
-	t.Logf("Running chu do in %s", tmpDir)
+	t.Logf("Running gptcode do in %s", tmpDir)
 	t.Logf("This may take 2-5 minutes with local Ollama...")
 
 	cmd := exec.Command("gptcode", "do", "create result.txt with just the word 'success'")
@@ -193,13 +193,13 @@ func TestChuDoNoUnintendedFiles(t *testing.T) {
 	case <-done:
 		if cmdErr != nil {
 			t.Logf("Command output:\n%s", string(output))
-			t.Fatalf("chu do failed: %v", cmdErr)
+			t.Fatalf("gptcode do failed: %v", cmdErr)
 		}
 	case <-time.After(timeout):
 		if cmd.Process != nil {
 			cmd.Process.Kill()
 		}
-		t.Fatalf("chu do exceeded timeout of %s", timeout)
+		t.Fatalf("gptcode do exceeded timeout of %s", timeout)
 	}
 
 	entries, err := os.ReadDir(tmpDir)
@@ -219,5 +219,5 @@ func TestChuDoNoUnintendedFiles(t *testing.T) {
 		t.Errorf("Expected result.txt, got %s", entries[0].Name())
 	}
 
-	t.Logf("✓ chu do created only the intended file")
+	t.Logf("✓ gptcode do created only the intended file")
 }
