@@ -140,6 +140,51 @@ gptcode run "deploy to prod" # Task execution with follow-up
 
 **[Complete Workflow Guide](docs/workflow-guide.md)** | **[Autonomous Mode Deep Dive](docs/autonomous-mode.md)**
 
+### 4. 📋 Universal Context Management (NEW!)
+
+Manage project context that works with ANY AI assistant (Warp, Cursor, Claude, Gemini, Cline, etc):
+
+```bash
+# Initialize context layer
+gptcode context init
+
+# Edit context files
+vi .gptcode/context/shared.md   # Architecture, stack, patterns
+vi .gptcode/context/next.md     # Next tasks
+vi .gptcode/context/roadmap.md  # Long-term roadmap
+
+# Show context
+gptcode context show              # Show all
+gptcode context show shared       # Show specific
+
+# Export for use
+gptcode context export clipboard  # Copy to paste in any AI chat
+gptcode context sync              # Sync to WARP.md, .cursor/docs
+```
+
+**Structure created:**
+```
+.gptcode/
+  context/
+    shared.md   → Architecture, stack, patterns
+    next.md     → Immediate next tasks
+    roadmap.md  → Long-term roadmap
+  config.yml    → Integration configuration
+```
+
+**Why use context layer:**
+- ✅ **Universal**: Works with Warp, Cursor, Claude, Gemini, Cline, any AI
+- ✅ **Version-controlled**: Commit with code, track changes over time
+- ✅ **Team-shared**: Everyone on the team has the same context
+- ✅ **Zero-effort**: Auto-syncs to WARP.md and other integrations
+- ✅ **Separation**: Keep "what to do next" separate from "how things work"
+
+**Perfect for:**
+- Large monorepos with multiple services
+- Teams working across different AI assistants
+- Maintaining consistent context across sessions
+- Onboarding new team members or AI assistants
+
 ## Quick Start
 
 ### Installation
