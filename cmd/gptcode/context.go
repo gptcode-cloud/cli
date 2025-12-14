@@ -72,7 +72,7 @@ type ContextConfig struct {
 		Next    string `yaml:"next"`
 		Roadmap string `yaml:"roadmap"`
 	} `yaml:"context"`
-	AutoLoad []string `yaml:"auto_load"`
+	AutoLoad     []string `yaml:"auto_load"`
 	Integrations struct {
 		Warp struct {
 			Enabled  bool   `yaml:"enabled"`
