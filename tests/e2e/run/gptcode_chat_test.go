@@ -25,8 +25,8 @@ func TestGptcodeChatSingleShot(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	// Run gptcode chat with a simple question
-	cmd := exec.Command("gptcode", "chat", "what is 2 plus 2?")
+	// Run gptcode chat with a simple question about the README file
+	cmd := exec.Command("gptcode", "chat", "What is the name of the project in README.md?")
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		t.Fatalf("gptcode chat failed: %v\nOutput: %s", err, output)
@@ -34,9 +34,9 @@ func TestGptcodeChatSingleShot(t *testing.T) {
 
 	outputStr := string(output)
 
-	// Should contain an answer with 4
-	if !strings.Contains(outputStr, "4") {
-		t.Errorf("Expected answer to contain '4', got: %s", outputStr)
+	// Should mention the project name or README
+	if !strings.Contains(strings.ToLower(outputStr), "test project") && !strings.Contains(strings.ToLower(outputStr), "readme") {
+		t.Errorf("Expected answer to mention 'Test Project' or README, got: %s", outputStr)
 	}
 }
 
