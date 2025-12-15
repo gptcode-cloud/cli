@@ -216,11 +216,6 @@ permalink: /live/
         border-color: #7aa2f7;
     }
 
-    .feature-icon {
-        font-size: 1.5rem;
-        margin-bottom: 1rem;
-    }
-
     .feature-title {
         font-size: 1rem;
         font-weight: 600;
@@ -345,11 +340,11 @@ permalink: /live/
         with your team.</p>
 
     <div class="hero-cta-group">
-        <a href="#waitlist" class="hero-btn primary">Join the Waitlist →</a>
+        <a href="#waitlist" class="hero-btn primary">Join the Waitlist</a>
         <a href="/pricing" class="hero-btn secondary">See Pricing</a>
     </div>
 
-    <p class="hero-note">🚀 Early access launching soon. The CLI is free and available now.</p>
+    <p class="hero-note">Early access launching soon. The CLI is free and available now.</p>
 </div>
 
 <!-- Dashboard Preview -->
@@ -377,15 +372,15 @@ permalink: /live/
             </div>
             <div class="preview-main">
                 <div class="preview-terminal">
-                    <div class="preview-line info">ℹ [Router] Analyzing request complexity...</div>
-                    <div class="preview-line agent">[Intelligence] KAN: 0.78, XGB: 0.65 → Using KAN</div>
-                    <div class="preview-line success">✓ [Router] Mode: OrchestratedMode (0.92)</div>
-                    <div class="preview-line info">ℹ [Analyzer] Scanning src/ directory...</div>
-                    <div class="preview-line"> → Found 14 relevant files</div>
-                    <div class="preview-line info">ℹ [Planner] Creating implementation plan...</div>
-                    <div class="preview-line success">✓ [Editor] Applied 3 file changes</div>
-                    <div class="preview-line success">✓ [Validator] All 12 tests passing</div>
-                    <div class="preview-line success">✓ Done! Authentication added successfully.</div>
+                    <div class="preview-line info">[Router] Analyzing request complexity...</div>
+                    <div class="preview-line agent">[Intelligence] KAN: 0.78, XGB: 0.65 - Using KAN</div>
+                    <div class="preview-line success">[Router] Mode: OrchestratedMode (0.92)</div>
+                    <div class="preview-line info">[Analyzer] Scanning src/ directory...</div>
+                    <div class="preview-line">  Found 14 relevant files</div>
+                    <div class="preview-line info">[Planner] Creating implementation plan...</div>
+                    <div class="preview-line success">[Editor] Applied 3 file changes</div>
+                    <div class="preview-line success">[Validator] All 12 tests passing</div>
+                    <div class="preview-line success">Done! Authentication added successfully.</div>
                 </div>
             </div>
         </div>
@@ -399,42 +394,36 @@ permalink: /live/
 
     <div class="features-grid">
         <div class="feature-card">
-            <div class="feature-icon">📊</div>
             <div class="feature-title">Real-time Monitoring</div>
             <div class="feature-desc">Watch agents work in real-time. See token usage, model selection, and
                 decision-making as it happens.</div>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🔄</div>
             <div class="feature-title">Session Replay</div>
             <div class="feature-desc">Review past sessions step-by-step. Understand what worked, what didn't, and why.
             </div>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">💰</div>
             <div class="feature-title">Cost Analytics</div>
             <div class="feature-desc">Track API costs per session, model, and agent. Optimize your spending with
                 actionable insights.</div>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">👥</div>
             <div class="feature-title">Team Workspaces</div>
             <div class="feature-desc">Collaborate with your team. Share prompts, monitor usage, and manage API keys
                 centrally.</div>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">📱</div>
             <div class="feature-title">Multi-device Sync</div>
             <div class="feature-desc">Start on your laptop, continue on your desktop. Your sessions sync across all
                 devices.</div>
         </div>
 
         <div class="feature-card">
-            <div class="feature-icon">🔐</div>
             <div class="feature-title">Enterprise Security</div>
             <div class="feature-desc">SSO, audit logs, and role-based access. Meet your compliance requirements.</div>
         </div>
@@ -469,15 +458,23 @@ permalink: /live/
 
 <!-- CTA -->
 <div class="cta-section" id="waitlist">
-    <h2>Be the First to Try Live</h2>
-    <p>Join the waitlist for early access. We'll notify you when it's ready.</p>
+    <h2>Get Early Access to Live</h2>
+    <p>Schedule a 30-minute demo or join the waitlist to be notified when we launch.</p>
+
+    <div style="margin-bottom: 3rem;">
+        <a href="https://cal.com/gptcode/gptcode-live-early-access?product=live" class="cta-btn primary" style="display: inline-block; text-decoration: none; margin-bottom: 1.5rem;">
+            Schedule a Demo (30 min)
+        </a>
+    </div>
+
+    <p style="font-size: 0.9rem; color: var(--color-text-secondary); margin-bottom: 1rem;">Or join the waitlist:</p>
 
     <form action="https://formspree.io/f/xanyzkgj" method="POST" style="max-width: 400px; margin: 0 auto 1.5rem;">
         <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;">
             <input type="email" name="email" placeholder="your@email.com" required
                 style="flex: 1; min-width: 200px; padding: 0.875rem 1rem; border-radius: 8px; border: 1px solid var(--color-border, #3b4261); background: var(--color-card-bg, #16161e); color: var(--color-text, #c0caf5); font-size: 1rem;">
             <button type="submit" class="cta-btn primary" style="border: none; cursor: pointer;">
-                Join Waitlist →
+                Join Waitlist
             </button>
         </div>
         <input type="hidden" name="_subject" value="New GPTCode Live Waitlist Signup">
