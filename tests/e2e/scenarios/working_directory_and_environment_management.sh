@@ -32,7 +32,7 @@ create_test_file "config/dev.env" "API_URL=http://localhost:3000"
 echo ""
 echo "Step 2: Navigate to frontend directory"
 echo "---------------------------------------"
-run_chu_with_input "run" "/cd frontend
+run_gptcode_with_input "run" "/cd frontend
 pwd
 /exit" "--raw"
 assert_exit_code 0
@@ -42,7 +42,7 @@ assert_contains "$OUTPUT" "frontend"
 echo ""
 echo "Step 3: Set environment variable"
 echo "--------------------------------"
-run_chu_with_input "run" "/env NODE_ENV=development
+run_gptcode_with_input "run" "/env NODE_ENV=development
 /env NODE_ENV
 /exit" "--raw"
 assert_exit_code 0
@@ -52,7 +52,7 @@ assert_contains "$OUTPUT" "NODE_ENV=development"
 echo ""
 echo "Step 4: List all environment variables"
 echo "---------------------------------------"
-run_chu_with_input "run" "/env API_KEY=secret123
+run_gptcode_with_input "run" "/env API_KEY=secret123
 /env DB_URL=postgres://localhost
 /env
 /exit" "--raw"
@@ -63,7 +63,7 @@ assert_contains "$OUTPUT" "DB_URL=postgres://localhost"
 echo ""
 echo "Step 5: Change directory and verify pwd"
 echo "----------------------------------------"
-run_chu_with_input "run" "/cd backend
+run_gptcode_with_input "run" "/cd backend
 pwd
 ls
 /exit" "--raw"

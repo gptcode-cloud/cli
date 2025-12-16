@@ -10,11 +10,11 @@ show_current_profile() {
     echo "E2E Test Configuration"
     echo "======================"
     echo ""
-    echo "Using current chu profile:"
-    chu profile 2>&1 | head -6
+    echo "Using current gptcode profile:"
+    gptcode profile 2>&1 | head -6
     echo ""
-    echo "Note: Configure profile with 'chu profile use <backend>.<profile>'"
-    echo "      Example: chu profile use groq.budget"
+    echo "Note: Configure profile with 'gptcode profile use <backend>.<profile>'"
+    echo "      Example: gptcode profile use groq.budget"
     echo ""
 }
 
@@ -33,12 +33,12 @@ cleanup_test_dir() {
     fi
 }
 
-run_chu_command() {
+run_gptcode_command() {
     local cmd="$1"
     shift
     
     set +e
-    OUTPUT=$(chu "$cmd" "$@" 2>&1)
+    OUTPUT=$(gptcode "$cmd" "$@" 2>&1)
     EXIT_CODE=$?
     set -e
     
@@ -47,13 +47,13 @@ run_chu_command() {
     echo "Exit code: $EXIT_CODE"
 }
 
-run_chu_command_with_timeout() {
+run_gptcode_command_with_timeout() {
     local timeout_seconds="${GPTCODE_E2E_TIMEOUT:-180}"
     local cmd="$1"
     shift
     
     set +e
-    OUTPUT=$(timeout "$timeout_seconds" chu "$cmd" "$@" 2>&1)
+    OUTPUT=$(timeout "$timeout_seconds" gptcode "$cmd" "$@" 2>&1)
     EXIT_CODE=$?
     set -e
     
@@ -71,13 +71,13 @@ run_chu_command_with_timeout() {
     echo "Exit code: $EXIT_CODE"
 }
 
-run_chu_with_input() {
+run_gptcode_with_input() {
     local cmd="$1"
     local input="$2"
     shift 2
     
     set +e
-    OUTPUT=$(echo "$input" | chu "$cmd" "$@" 2>&1)
+    OUTPUT=$(echo "$input" | gptcode "$cmd" "$@" 2>&1)
     EXIT_CODE=$?
     set -e
     

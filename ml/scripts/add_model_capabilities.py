@@ -129,5 +129,5 @@ def add_capabilities_to_catalog(catalog_path: Path):
     print("✅ Done!")
 
 if __name__ == "__main__":
-    catalog_path = Path.home() / ".chuchu" / "models_catalog.json"
+    catalog_path = Path.home() / ".gptcode" / "models_catalog.json"
     add_capabilities_to_catalog(catalog_path)

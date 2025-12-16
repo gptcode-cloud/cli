@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 def main():
     home = Path.home()
-    usage_path = home / ".chuchu" / "usage.json"
+    usage_path = home / ".gptcode" / "usage.json"
     
     if not usage_path.exists():
         print("No usage data yet.")

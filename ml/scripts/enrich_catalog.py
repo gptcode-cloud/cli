@@ -86,7 +86,7 @@ ENRICHMENT = {
 
 def main():
     home = Path.home()
-    catalog_path = home / ".chuchu" / "models_catalog.json"
+    catalog_path = home / ".gptcode" / "models_catalog.json"
     
     with open(catalog_path) as f:
         catalog = json.load(f)

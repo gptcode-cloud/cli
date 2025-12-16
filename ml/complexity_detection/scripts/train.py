@@ -193,7 +193,7 @@ def main():
     print(f"   1. Review model at: {MODEL_OUTPUT}")
     print(f"   2. Copy to Go embed location if satisfied with accuracy")
     print(f"   3. Implement Go inference code")
-    print(f"   4. Rebuild binary: go build -o chuchu cmd/chuchu/main.go")
+    print(f"   4. Rebuild binary: go build -o gptcode cmd/gptcode/main.go")
 
 if __name__ == "__main__":
     main()

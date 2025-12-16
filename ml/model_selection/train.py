@@ -23,9 +23,9 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import accuracy_score, classification_report
 
 def load_feedback_data():
-    """Load all feedback events from ~/.chuchu/feedback/"""
+    """Load all feedback events from ~/.gptcode/feedback/"""
     home = Path.home()
-    feedback_dir = home / ".chuchu" / "feedback"
+    feedback_dir = home / ".gptcode" / "feedback"
     
     if not feedback_dir.exists():
         print(f"No feedback directory found at {feedback_dir}")

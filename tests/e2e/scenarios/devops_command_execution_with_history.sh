@@ -36,7 +36,7 @@ Disk: 120GB / 500GB"
 echo ""
 echo "Step 2: Run directory listing"
 echo "------------------------------"
-run_chu_command "run" "ls -la" "--raw"
+run_gptcode_command "run" "ls -la" "--raw"
 assert_exit_code 0
 assert_contains "$OUTPUT" "app.log"
 assert_contains "$OUTPUT" "system.log"
@@ -44,14 +44,14 @@ assert_contains "$OUTPUT" "system.log"
 echo ""
 echo "Step 3: View log file"
 echo "----------------------"
-run_chu_command "run" "cat app.log" "--raw"
+run_gptcode_command "run" "cat app.log" "--raw"
 assert_exit_code 0
 assert_contains "$OUTPUT" "ERROR Failed to load config"
 
 echo ""
 echo "Step 4: Check command history"
 echo "------------------------------"
-run_chu_with_input "run" "ls -la
+run_gptcode_with_input "run" "ls -la
 cat app.log
 /history
 /exit" "--raw"
@@ -63,7 +63,7 @@ assert_contains "$OUTPUT" "cat app.log"
 echo ""
 echo "Step 5: Reference previous command output"
 echo "------------------------------------------"
-run_chu_with_input "run" "echo hello
+run_gptcode_with_input "run" "echo hello
 /output 1
 /exit" "--raw"
 assert_exit_code 0

@@ -69,27 +69,27 @@ EOF
 echo ""
 echo "Step 2: Ask about User struct in main.go"
 echo "------------------------------------------"
-run_chu_command_with_timeout "do" "Explain the User struct and its methods in main.go"
+run_gptcode_command_with_timeout "do" "Explain the User struct and its methods in main.go"
 assert_exit_code 0
 assert_contains "$OUTPUT" "User"
 
 echo ""
 echo "Step 3: Ask about authorization logic in main.go"
 echo "--------------------------------------------------"
-run_chu_command_with_timeout "do" "How does the AuthorizeAction function work in main.go?"
+run_gptcode_command_with_timeout "do" "How does the AuthorizeAction function work in main.go?"
 assert_exit_code 0
 assert_contains "$OUTPUT" "AuthorizeAction"
 
 echo ""
 echo "Step 4: Ask about improvements to main.go"
 echo "------------------------------------------"
-run_chu_command_with_timeout "do" "What improvements could be made to the authorization in main.go?"
+run_gptcode_command_with_timeout "do" "What improvements could be made to the authorization in main.go?"
 assert_exit_code 0
 
 echo ""
 echo "Step 5: Verify file context in main.go is being used"
 echo "-------------------------------------------------------"
-run_chu_command_with_timeout "do" "What parameters does the FullInfo method take in main.go?"
+run_gptcode_command_with_timeout "do" "What parameters does the FullInfo method take in main.go?"
 assert_exit_code 0
 
 cleanup_test_dir

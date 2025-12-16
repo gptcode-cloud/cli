@@ -1,4 +1,4 @@
-local logfile = io.open("/tmp/chuchu_debug.log", "w")
+local logfile = io.open("/tmp/gptcode_debug.log", "w")
 
 local function log(msg)
   if logfile then
@@ -58,5 +58,5 @@ vim.ui.input = function(opts, callback)
   end)
 end
 
-log("Hooks installed. Tail -f /tmp/chuchu_debug.log to monitor")
-vim.notify("Debug hooks active. Check /tmp/chuchu_debug.log", vim.log.levels.INFO)
+log("Hooks installed. Tail -f /tmp/gptcode_debug.log to monitor")
+vim.notify("Debug hooks active. Check /tmp/gptcode_debug.log", vim.log.levels.INFO)

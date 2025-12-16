@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Process user feedback from ~/.chuchu/feedback/*.json into training data.
+Process user feedback from ~/.gptcode/feedback/*.json into training data.
 
 Converts feedback events into intent classification training examples.
 Bad feedback with task info can help improve model accuracy.
@@ -13,7 +13,7 @@ from datetime import datetime
 
 SCRIPT_DIR = Path(__file__).parent
 PROJECT_ROOT = SCRIPT_DIR.parent
-FEEDBACK_DIR = Path.home() / ".chuchu" / "feedback"
+FEEDBACK_DIR = Path.home() / ".gptcode" / "feedback"
 OUTPUT_CSV = PROJECT_ROOT / "data" / "training_data_feedback.csv"
 
 def infer_intent_from_task(task):
@@ -70,7 +70,7 @@ def infer_intent_from_task(task):
     return 'query'
 
 def load_feedback_events():
-    """Load all feedback events from ~/.chuchu/feedback/*.json"""
+    """Load all feedback events from ~/.gptcode/feedback/*.json"""
     if not FEEDBACK_DIR.exists():
         print(f"No feedback directory found: {FEEDBACK_DIR}")
         return []
