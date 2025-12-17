@@ -18,6 +18,8 @@ highlighter: rouge
 timezone: America/Sao_Paulo
 future: false
 
+google_analytics: G-PBKPBY1N9H
+
 plugins:
   - jekyll-feed
   - jekyll-seo-tag
