@@ -16,6 +16,9 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+// Global client instance
+var globalClient *Client
+
 // Client connects to the GPTCode Live Dashboard via Phoenix WebSocket
 type Client struct {
 	conn               *websocket.Conn
@@ -159,6 +162,24 @@ func (c *Client) SendContextUpdate(shared, next, roadmap string) error {
 			"next":    next,
 			"roadmap": roadmap,
 		},
+	}
+	c.msgRef++
+
+	return c.conn.WriteJSON(msg)
+}
+
+// SendTraceData sends trace data to the Live dashboard
+func (c *Client) SendTraceData(data map[string]interface{}) error {
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	topic := fmt.Sprintf("agent:%s", c.agentID)
+	msg := []interface{}{
+		c.joinRef,
+		c.msgRef,
+		topic,
+		"trace_data",
+		data,
 	}
 	c.msgRef++
 
@@ -392,4 +413,14 @@ func GetAgentID() string {
 	}
 
 	return hostname
+}
+
+// GetClient returns the global live client instance
+func GetClient() *Client {
+	return globalClient
+}
+
+// SetGlobalClient sets the global live client instance
+func SetGlobalClient(client *Client) {
+	globalClient = client
 }

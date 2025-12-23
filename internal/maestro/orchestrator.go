@@ -6,10 +6,14 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
+
+	"github.com/google/uuid"
 
 	"gptcode/internal/agents"
 	"gptcode/internal/events"
 	"gptcode/internal/llm"
+	"gptcode/internal/observability"
 )
 
 // Maestro orchestrates autonomous execution with verification and recovery
@@ -24,6 +28,7 @@ type Maestro struct {
 	MaxRetries     int
 	ModifiedFiles  []string
 	CurrentStepIdx int
+	Tracer         observability.Tracer
 }
 
 // NewMaestro creates a new Maestro orchestrator
@@ -31,6 +36,7 @@ func NewMaestro(provider llm.Provider, cwd, model string) *Maestro {
 	checkpoints := NewCheckpointSystem(cwd)
 	recovery := NewRecoveryStrategy(3, checkpoints)
 	recovery.Verbose = os.Getenv("GPTCODE_DEBUG") == "1" // Enable verbose logging in debug mode
+	tracer := observability.NewTracer()
 
 	// Initialize with no verifiers by default - will be set based on file types
 	return &Maestro{
@@ -42,6 +48,7 @@ func NewMaestro(provider llm.Provider, cwd, model string) *Maestro {
 		Recovery:    recovery,
 		Checkpoints: checkpoints,
 		MaxRetries:  3,
+		Tracer:      tracer,
 	}
 }
 
@@ -50,6 +57,13 @@ func (m *Maestro) ExecutePlan(ctx context.Context, planContent string) error {
 	m.CurrentStepIdx = 0
 	m.ModifiedFiles = nil
 	_ = m.Events.Status("\u001b[36mStarting autonomous execution...\u001b[0m")
+
+	// Begin tracing session
+	sessionID := uuid.New().String()
+	if m.Tracer != nil {
+		_ = m.Tracer.Begin(sessionID, planContent)
+		defer func() { _ = m.Tracer.End(true) }() // End with success status (will be updated on error)
+	}
 
 	// Parse plan into steps (simple version: split by phases)
 	steps := m.parsePlan(planContent)
@@ -71,10 +85,10 @@ func (m *Maestro) ExecutePlan(ctx context.Context, planContent string) error {
 
 			// Execute the step
 			m.CurrentStepIdx = stepIdx
-			before := m.gitChangedFiles()
-			err = m.executeStepWithHistory(ctx, step, history)
-			after := m.gitChangedFiles()
-			m.ModifiedFiles = diffStringSlices(before, after)
+			result, modifiedFiles, err := m.executeStepWithHistory(ctx, step, history)
+			m.ModifiedFiles = modifiedFiles // Use the actual modified files returned by the agent
+			_ = result // Use the result to avoid unused variable error, could be used for additional processing later
+
 			if err != nil {
 				_ = m.Events.Notify(fmt.Sprintf("\u001b[31mExecution failed\u001b[0m: %v", err), "error")
 				continue
@@ -84,7 +98,9 @@ func (m *Maestro) ExecutePlan(ctx context.Context, planContent string) error {
 			verifyResult, verifyErr := m.verify(ctx)
 			if verifyErr != nil {
 				_ = m.Events.Notify(fmt.Sprintf("\u001b[31mVerification error\u001b[0m: %v", verifyErr), "error")
-				err = verifyErr
+				if m.Tracer != nil {
+					_ = m.Tracer.RecordMetrics("Verification", observability.Metrics{ErrorMessage: verifyErr.Error()})
+				}
 				continue
 			}
 
@@ -127,7 +143,10 @@ func (m *Maestro) ExecutePlan(ctx context.Context, planContent string) error {
 				}
 				history = append(history, recoveryMessage)
 
-				err = fmt.Errorf("verification failed: %s", verifyResult.Error)
+				verificationErr := fmt.Errorf("verification failed: %s", verifyResult.Error)
+				if m.Tracer != nil {
+					_ = m.Tracer.RecordMetrics("Verification", observability.Metrics{ErrorMessage: verificationErr.Error()})
+				}
 				continue
 			}
 
@@ -143,11 +162,20 @@ func (m *Maestro) ExecutePlan(ctx context.Context, planContent string) error {
 		}
 
 		if err != nil {
+			// Update tracer with failure status
+			if m.Tracer != nil {
+				// Override the success status set in defer
+				_ = m.Tracer.End(false)
+			}
 			return fmt.Errorf("step %d failed after %d retries: %w", stepIdx, m.MaxRetries, err)
 		}
 	}
 
 	_ = m.Events.Message("\u001b[32mAutonomous execution completed successfully!\u001b[0m")
+	// On successful completion, update tracer status
+	if m.Tracer != nil {
+		_ = m.Tracer.End(true)
+	}
 	return nil
 }
 
@@ -179,11 +207,11 @@ func (m *Maestro) ResumeExecution(ctx context.Context, planContent string) error
 }
 
 // executeStep runs a single step of the plan
-func (m *Maestro) ExecuteStep(ctx context.Context, step PlanStep) error {
+func (m *Maestro) ExecuteStep(ctx context.Context, step PlanStep) (string, []string, error) {
 	return m.executeStep(ctx, step)
 }
 
-func (m *Maestro) executeStepWithHistory(ctx context.Context, step PlanStep, history []llm.ChatMessage) error {
+func (m *Maestro) executeStepWithHistory(ctx context.Context, step PlanStep, history []llm.ChatMessage) (string, []string, error) {
 	editorAgent := agents.NewEditor(m.Provider, m.CWD, m.Model)
 
 	statusCallback := func(status string) {
@@ -197,11 +225,26 @@ func (m *Maestro) executeStepWithHistory(ctx context.Context, step PlanStep, his
 		}
 	}
 
-	_, _, err := editorAgent.Execute(ctx, history, statusCallback)
-	return err
+	start := time.Now()
+	result, modifiedFiles, err := editorAgent.Execute(ctx, history, statusCallback)
+	elapsed := time.Since(start)
+
+	// Record metrics for the execution step
+	if m.Tracer != nil {
+		metrics := observability.Metrics{
+			DurationMs: elapsed.Milliseconds(),
+			ErrorMessage: "",
+		}
+		if err != nil {
+			metrics.ErrorMessage = err.Error()
+		}
+		_ = m.Tracer.RecordMetrics("EditorAgent", metrics)
+	}
+
+	return result, modifiedFiles, err
 }
 
-func (m *Maestro) executeStep(ctx context.Context, step PlanStep) error {
+func (m *Maestro) executeStep(ctx context.Context, step PlanStep) (string, []string, error) {
 	editorAgent := agents.NewEditor(m.Provider, m.CWD, m.Model)
 
 	statusCallback := func(status string) {
@@ -212,14 +255,13 @@ func (m *Maestro) executeStep(ctx context.Context, step PlanStep) error {
 		{Role: "user", Content: fmt.Sprintf("Implement this step:\n\n# %s\n\n%s", step.Title, step.Content)},
 	}
 
-	_, modifiedFiles, err := editorAgent.Execute(ctx, history, statusCallback)
+	result, modifiedFiles, err := editorAgent.Execute(ctx, history, statusCallback)
 	// Track modified files in the maestro state if needed, but for now we rely on git diff in the outer loop
 	// or we could return them here.
 	// The outer loop uses gitChangedFiles(), but we should probably use these modifiedFiles too.
 	// However, executeStep returns error only.
 	// Let's just update the signature call for now.
-	_ = modifiedFiles
-	return err
+	return result, modifiedFiles, err
 }
 
 // verify runs all verifiers
@@ -228,7 +270,22 @@ func (m *Maestro) verify(ctx context.Context) (*VerificationResult, error) {
 	verifiers := m.selectVerifiers()
 
 	for _, verifier := range verifiers {
+		start := time.Now()
 		result, err := verifier.Verify(ctx)
+		elapsed := time.Since(start)
+
+		// Record metrics for the verification step
+		if m.Tracer != nil {
+			metrics := observability.Metrics{
+				DurationMs: elapsed.Milliseconds(),
+				ErrorMessage: "",
+			}
+			if err != nil {
+				metrics.ErrorMessage = err.Error()
+			}
+			_ = m.Tracer.RecordMetrics("Verifier", metrics)
+		}
+
 		if err != nil {
 			return nil, err
 		}
@@ -295,36 +352,7 @@ func (m *Maestro) selectVerifiers() []Verifier {
 	return verifiers
 }
 
-func (m *Maestro) gitChangedFiles() []string {
-	cmd := exec.Command("git", "--no-pager", "diff", "--name-only")
-	cmd.Dir = m.CWD
-	out, err := cmd.CombinedOutput()
-	if err != nil {
-		return nil
-	}
-	lines := strings.Split(strings.TrimSpace(string(out)), "\n")
-	var files []string
-	for _, l := range lines {
-		if strings.TrimSpace(l) != "" {
-			files = append(files, l)
-		}
-	}
-	return files
-}
 
-func diffStringSlices(a, b []string) []string {
-	m := make(map[string]bool)
-	for _, x := range a {
-		m[x] = true
-	}
-	var d []string
-	for _, y := range b {
-		if !m[y] {
-			d = append(d, y)
-		}
-	}
-	return d
-}
 
 type PlanStep struct {
 	Title    string

@@ -156,11 +156,12 @@ func setNestedValue(setup *Setup, key, value string) error {
 			setup.Defaults.GraphMaxFiles = i
 		case "budget_mode":
 			var b bool
-			if value == "true" || value == "1" || value == "yes" {
+			switch value {
+			case "true", "1", "yes":
 				b = true
-			} else if value == "false" || value == "0" || value == "no" {
+			case "false", "0", "no":
 				b = false
-			} else {
+			default:
 				return fmt.Errorf("invalid boolean value for budget_mode: %s", value)
 			}
 			setup.Defaults.BudgetMode = b

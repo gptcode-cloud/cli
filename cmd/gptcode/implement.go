@@ -152,7 +152,7 @@ func runInteractiveImplement(planPath string) error {
 			continue
 		}
 
-		if err := m.ExecuteStep(context.Background(), step); err != nil {
+		if _, _, err := m.ExecuteStep(context.Background(), step); err != nil {
 			fmt.Fprintf(os.Stderr, "\n\033[31m✗ Step failed: %v\033[0m\n", err)
 			fmt.Fprint(os.Stderr, "Continue anyway? [y/N]: ")
 			continueResp, _ := reader.ReadString('\n')

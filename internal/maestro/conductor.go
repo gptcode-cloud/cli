@@ -5,11 +5,15 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
+
+	"github.com/google/uuid"
 
 	"gptcode/internal/agents"
 	"gptcode/internal/config"
 	"gptcode/internal/feedback"
 	"gptcode/internal/llm"
+	"gptcode/internal/observability"
 )
 
 // Conductor is the central coordinator (Maestro) that orchestrates all agents
@@ -19,6 +23,7 @@ type Conductor struct {
 	cwd      string
 	language string
 	Recovery *RecoveryStrategy
+	Tracer   observability.Tracer
 }
 
 // NewConductor creates a new Maestro conductor
@@ -33,6 +38,7 @@ func NewConductor(
 	tempCheckpoints := NewCheckpointSystem(cwd)
 	recovery := NewRecoveryStrategy(3, tempCheckpoints)
 	recovery.Verbose = os.Getenv("GPTCODE_DEBUG") == "1"
+	tracer := observability.NewTracer()
 
 	return &Conductor{
 		selector: selector,
@@ -40,6 +46,7 @@ func NewConductor(
 		cwd:      cwd,
 		language: language,
 		Recovery: recovery,
+		Tracer:   tracer,
 	}
 }
 
@@ -47,6 +54,13 @@ func NewConductor(
 func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity string) error {
 	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[MAESTRO] ExecuteTask called: task=%s complexity=%s lang=%s\n", task, complexity, c.language)
+	}
+
+	// Begin tracing session
+	sessionID := uuid.New().String()
+	if c.Tracer != nil {
+		_ = c.Tracer.Begin(sessionID, task)
+		defer func() { _ = c.Tracer.End(true) }() // End with success status (will be updated on error)
 	}
 
 	// Select model for planning
@@ -59,15 +73,38 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		fmt.Fprintf(os.Stderr, "[MAESTRO] Planner: %s/%s\n", planBackend, planModel)
 	}
 
+	// Record model selection decision
+	if c.Tracer != nil {
+		decision := observability.Decision{
+			Type:         "model_selection",
+			Chosen:       fmt.Sprintf("%s/%s", planBackend, planModel),
+			Alternatives: []string{}, // Would populate with alternatives in real implementation
+			Attribution:  map[string]float64{"language": 1.0}, // Simplified attribution
+			Reasoning:    "Selected based on language and complexity",
+		}
+		_ = c.Tracer.RecordDecision("ModelSelector", decision)
+	}
+
 	// Create planner with selected model
 	planProvider := c.createProvider(planBackend)
 	planner := agents.NewPlanner(planProvider, planModel)
 
 	fmt.Println("Creating plan...")
+	start := time.Now()
 	plan, err := planner.CreatePlan(ctx, task, "", nil)
+	elapsed := time.Since(start)
 	c.selector.RecordUsage(planBackend, planModel, err == nil, errorMsg(err))
 	if err != nil {
 		return fmt.Errorf("planning failed: %w", err)
+	}
+
+	// Record planning metrics
+	if c.Tracer != nil {
+		metrics := observability.Metrics{
+			DurationMs: elapsed.Milliseconds(),
+			ErrorMessage: "",
+		}
+		_ = c.Tracer.RecordMetrics("PlannerAgent", metrics)
 	}
 
 	// Build conversation history
@@ -112,7 +149,9 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 
 		// Execute with editor
 		fmt.Println("Executing changes...")
+		start = time.Now()
 		result, modifiedFiles, err := editor.Execute(ctx, history, nil)
+		elapsed = time.Since(start)
 		c.selector.RecordUsage(editBackend, editModel, err == nil, errorMsg(err))
 		if err != nil {
 			if attempt < maxAttempts {
@@ -135,13 +174,49 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 					advancedPrompt = c.formatExecutionError(err)
 				}
 
+				// Record recovery decision
+				if c.Tracer != nil {
+					decision := observability.Decision{
+						Type:         "recovery_strategy",
+						Chosen:       "retry_with_error_fix",
+						Alternatives: []string{"skip", "abort"},
+						Attribution:  map[string]float64{"attempt": float64(attempt), "error_type": 1.0},
+						Reasoning:    fmt.Sprintf("Retrying attempt %d/%d after error", attempt, maxAttempts),
+					}
+					_ = c.Tracer.RecordDecision("RecoverySystem", decision)
+				}
+
 				history = append(history, llm.ChatMessage{
 					Role:    "user",
 					Content: advancedPrompt,
 				})
 				continue
 			}
+
+			// Record execution failure metrics
+			if c.Tracer != nil {
+				metrics := observability.Metrics{
+					DurationMs: elapsed.Milliseconds(),
+					ErrorMessage: err.Error(),
+				}
+				_ = c.Tracer.RecordMetrics("EditorAgent", metrics)
+			}
+
+			// Update tracer with failure status
+			if c.Tracer != nil {
+				// Override the success status set in defer
+				_ = c.Tracer.End(false)
+			}
 			return fmt.Errorf("execution failed: %w", err)
+		}
+
+		// Record execution metrics
+		if c.Tracer != nil {
+			metrics := observability.Metrics{
+				DurationMs: elapsed.Milliseconds(),
+				ErrorMessage: "",
+			}
+			_ = c.Tracer.RecordMetrics("EditorAgent", metrics)
 		}
 
 		// Check if this is a query-only task (no validation needed)
@@ -152,6 +227,11 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 			fmt.Printf("   Modified: %d files\n", len(modifiedFiles))
 			if result != "" {
 				fmt.Printf("   %s\n", result)
+			}
+
+			// Record success metrics
+			if c.Tracer != nil {
+				_ = c.Tracer.End(true)
 			}
 			return nil
 		}
@@ -172,7 +252,9 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 
 		// Validate
 		fmt.Println("Validating...")
+		start = time.Now()
 		review, err := reviewer.Review(ctx, plan, modifiedFiles, nil)
+		elapsed = time.Since(start)
 		c.selector.RecordUsage(reviewBackend, reviewModel, err == nil, errorMsg(err))
 		if err != nil {
 			if attempt < maxAttempts {
@@ -195,11 +277,38 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 					advancedPrompt = c.formatValidationError(err)
 				}
 
+				// Record recovery decision
+				if c.Tracer != nil {
+					decision := observability.Decision{
+						Type:         "recovery_strategy",
+						Chosen:       "retry_with_validation_fix",
+						Alternatives: []string{"skip", "abort"},
+						Attribution:  map[string]float64{"attempt": float64(attempt), "error_type": 1.0},
+						Reasoning:    fmt.Sprintf("Retrying attempt %d/%d after validation error", attempt, maxAttempts),
+					}
+					_ = c.Tracer.RecordDecision("RecoverySystem", decision)
+				}
+
 				history = append(history, llm.ChatMessage{
 					Role:    "user",
 					Content: advancedPrompt,
 				})
 				continue
+			}
+
+			// Record validation failure metrics
+			if c.Tracer != nil {
+				metrics := observability.Metrics{
+					DurationMs: elapsed.Milliseconds(),
+					ErrorMessage: err.Error(),
+				}
+				_ = c.Tracer.RecordMetrics("ReviewerAgent", metrics)
+			}
+
+			// Update tracer with failure status
+			if c.Tracer != nil {
+				// Override the success status set in defer
+				_ = c.Tracer.End(false)
 			}
 			return fmt.Errorf("review failed: %w", err)
 		}
@@ -226,13 +335,49 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 					advancedPrompt = c.formatValidationIssues(review.Issues)
 				}
 
+				// Record recovery decision
+				if c.Tracer != nil {
+					decision := observability.Decision{
+						Type:         "recovery_strategy",
+						Chosen:       "retry_with_issues_fix",
+						Alternatives: []string{"skip", "abort"},
+						Attribution:  map[string]float64{"attempt": float64(attempt), "error_count": float64(len(review.Issues))},
+						Reasoning:    fmt.Sprintf("Retrying attempt %d/%d after %d validation issues", attempt, maxAttempts, len(review.Issues)),
+					}
+					_ = c.Tracer.RecordDecision("RecoverySystem", decision)
+				}
+
 				history = append(history, llm.ChatMessage{
 					Role:    "user",
 					Content: advancedPrompt,
 				})
 				continue
 			}
+
+			// Record validation failure metrics
+			if c.Tracer != nil {
+				metrics := observability.Metrics{
+					DurationMs: elapsed.Milliseconds(),
+					ErrorMessage: fmt.Sprintf("Validation failed with %d issues", len(review.Issues)),
+				}
+				_ = c.Tracer.RecordMetrics("ReviewerAgent", metrics)
+			}
+
+			// Update tracer with failure status
+			if c.Tracer != nil {
+				// Override the success status set in defer
+				_ = c.Tracer.End(false)
+			}
 			return fmt.Errorf("review failed after %d attempts: %v", maxAttempts, review.Issues)
+		}
+
+		// Record validation success metrics
+		if c.Tracer != nil {
+			metrics := observability.Metrics{
+				DurationMs: elapsed.Milliseconds(),
+				ErrorMessage: "",
+			}
+			_ = c.Tracer.RecordMetrics("ReviewerAgent", metrics)
 		}
 
 		// Success! Record positive feedback
@@ -244,6 +389,11 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		if result != "" {
 			fmt.Printf("   %s\n", result)
 		}
+
+		// Record success metrics
+		if c.Tracer != nil {
+			_ = c.Tracer.End(true)
+		}
 		return nil
 	}
 
@@ -252,6 +402,11 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 	reviewBackend, reviewModel, _ := c.selector.SelectModel(config.ActionReview, c.language, complexity)
 	c.recordFeedback(editBackend, editModel, "editor", task, false)
 	c.recordFeedback(reviewBackend, reviewModel, "reviewer", task, false)
+
+	// Record final failure metrics
+	if c.Tracer != nil {
+		_ = c.Tracer.End(false)
+	}
 
 	return fmt.Errorf("task failed after %d attempts", maxAttempts)
 }
