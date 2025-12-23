@@ -78,7 +78,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		decision := observability.Decision{
 			Type:         "model_selection",
 			Chosen:       fmt.Sprintf("%s/%s", planBackend, planModel),
-			Alternatives: []string{}, // Would populate with alternatives in real implementation
+			Alternatives: []string{},                          // Would populate with alternatives in real implementation
 			Attribution:  map[string]float64{"language": 1.0}, // Simplified attribution
 			Reasoning:    "Selected based on language and complexity",
 		}
@@ -101,7 +101,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 	// Record planning metrics
 	if c.Tracer != nil {
 		metrics := observability.Metrics{
-			DurationMs: elapsed.Milliseconds(),
+			DurationMs:   elapsed.Milliseconds(),
 			ErrorMessage: "",
 		}
 		_ = c.Tracer.RecordMetrics("PlannerAgent", metrics)
@@ -196,7 +196,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 			// Record execution failure metrics
 			if c.Tracer != nil {
 				metrics := observability.Metrics{
-					DurationMs: elapsed.Milliseconds(),
+					DurationMs:   elapsed.Milliseconds(),
 					ErrorMessage: err.Error(),
 				}
 				_ = c.Tracer.RecordMetrics("EditorAgent", metrics)
@@ -213,7 +213,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		// Record execution metrics
 		if c.Tracer != nil {
 			metrics := observability.Metrics{
-				DurationMs: elapsed.Milliseconds(),
+				DurationMs:   elapsed.Milliseconds(),
 				ErrorMessage: "",
 			}
 			_ = c.Tracer.RecordMetrics("EditorAgent", metrics)
@@ -299,7 +299,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 			// Record validation failure metrics
 			if c.Tracer != nil {
 				metrics := observability.Metrics{
-					DurationMs: elapsed.Milliseconds(),
+					DurationMs:   elapsed.Milliseconds(),
 					ErrorMessage: err.Error(),
 				}
 				_ = c.Tracer.RecordMetrics("ReviewerAgent", metrics)
@@ -357,7 +357,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 			// Record validation failure metrics
 			if c.Tracer != nil {
 				metrics := observability.Metrics{
-					DurationMs: elapsed.Milliseconds(),
+					DurationMs:   elapsed.Milliseconds(),
 					ErrorMessage: fmt.Sprintf("Validation failed with %d issues", len(review.Issues)),
 				}
 				_ = c.Tracer.RecordMetrics("ReviewerAgent", metrics)
@@ -374,7 +374,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		// Record validation success metrics
 		if c.Tracer != nil {
 			metrics := observability.Metrics{
-				DurationMs: elapsed.Milliseconds(),
+				DurationMs:   elapsed.Milliseconds(),
 				ErrorMessage: "",
 			}
 			_ = c.Tracer.RecordMetrics("ReviewerAgent", metrics)

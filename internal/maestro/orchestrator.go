@@ -87,7 +87,7 @@ func (m *Maestro) ExecutePlan(ctx context.Context, planContent string) error {
 			m.CurrentStepIdx = stepIdx
 			result, modifiedFiles, err := m.executeStepWithHistory(ctx, step, history)
 			m.ModifiedFiles = modifiedFiles // Use the actual modified files returned by the agent
-			_ = result // Use the result to avoid unused variable error, could be used for additional processing later
+			_ = result                      // Use the result to avoid unused variable error, could be used for additional processing later
 
 			if err != nil {
 				_ = m.Events.Notify(fmt.Sprintf("\u001b[31mExecution failed\u001b[0m: %v", err), "error")
@@ -232,7 +232,7 @@ func (m *Maestro) executeStepWithHistory(ctx context.Context, step PlanStep, his
 	// Record metrics for the execution step
 	if m.Tracer != nil {
 		metrics := observability.Metrics{
-			DurationMs: elapsed.Milliseconds(),
+			DurationMs:   elapsed.Milliseconds(),
 			ErrorMessage: "",
 		}
 		if err != nil {
@@ -277,7 +277,7 @@ func (m *Maestro) verify(ctx context.Context) (*VerificationResult, error) {
 		// Record metrics for the verification step
 		if m.Tracer != nil {
 			metrics := observability.Metrics{
-				DurationMs: elapsed.Milliseconds(),
+				DurationMs:   elapsed.Milliseconds(),
 				ErrorMessage: "",
 			}
 			if err != nil {
@@ -351,8 +351,6 @@ func (m *Maestro) selectVerifiers() []Verifier {
 
 	return verifiers
 }
-
-
 
 type PlanStep struct {
 	Title    string

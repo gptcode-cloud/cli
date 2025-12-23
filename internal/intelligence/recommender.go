@@ -95,7 +95,7 @@ func RecommendModelForRetry(setup *config.Setup, agentType string, failedBackend
 		}
 
 		score := calculateScore(metrics, backend == failedBackend)
-		
+
 		// Apply additional budget penalty if in budget mode
 		if setup.Defaults.BudgetMode {
 			// Boost score for free/local models in budget mode
@@ -106,7 +106,7 @@ func RecommendModelForRetry(setup *config.Setup, agentType string, failedBackend
 				score *= 1.1 // 10% boost for local models
 			}
 		}
-		
+
 		confidence := metrics.SuccessRate
 
 		reason := buildReason(metrics, hasHistory, h.TotalTasks)
