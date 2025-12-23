@@ -31,7 +31,7 @@ func NewMaestro(provider llm.Provider, cwd, model string) *Maestro {
 	checkpoints := NewCheckpointSystem(cwd)
 	recovery := NewRecoveryStrategy(3, checkpoints)
 	recovery.Verbose = os.Getenv("GPTCODE_DEBUG") == "1" // Enable verbose logging in debug mode
-	
+
 	// Initialize with no verifiers by default - will be set based on file types
 	return &Maestro{
 		Provider:    provider,
@@ -226,7 +226,7 @@ func (m *Maestro) executeStep(ctx context.Context, step PlanStep) error {
 func (m *Maestro) verify(ctx context.Context) (*VerificationResult, error) {
 	// Dynamically select verifiers based on modified files
 	verifiers := m.selectVerifiers()
-	
+
 	for _, verifier := range verifiers {
 		result, err := verifier.Verify(ctx)
 		if err != nil {
@@ -252,7 +252,7 @@ func (m *Maestro) selectVerifiers() []Verifier {
 	}
 
 	modifiedFiles := strings.Split(strings.TrimSpace(string(out)), "\n")
-	
+
 	// Check if any modified file is a code file
 	hasCodeFiles := false
 	codeExtensions := map[string]bool{
@@ -283,7 +283,7 @@ func (m *Maestro) selectVerifiers() []Verifier {
 		verifiers = append(verifiers, NewBuildVerifier(m.CWD))
 		verifiers = append(verifiers, NewTestVerifier(m.CWD))
 	}
-	
+
 	// Add lint verifier if it was specifically requested
 	for _, originalVerifier := range m.Verifiers {
 		// Check if it's a LintVerifier by type assertion
