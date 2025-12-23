@@ -9,6 +9,8 @@ import (
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
+
+	"gptcode/internal/live"
 )
 
 var contextCmd = &cobra.Command{
@@ -497,35 +499,67 @@ func buildContextContent(gptcodeDir string, types []string) (string, error) {
 }
 
 func runContextLive(cmd *cobra.Command, args []string) error {
-	_, err := getGPTCodeDir()
+	gptcodeDir, err := getGPTCodeDir()
 	if err != nil {
 		return err
 	}
 
-	dashboardURL := os.Getenv("GPTCODE_LIVE_URL")
-	if dashboardURL == "" {
-		dashboardURL = "https://live.gptcode.app"
-	}
-
-	// Get agent ID (hostname + workspace)
-	hostname, _ := os.Hostname()
-	cwd, _ := os.Getwd()
-	parts := strings.Split(cwd, string(os.PathSeparator))
-	agentID := hostname
-	if len(parts) > 0 {
-		agentID = hostname + "-" + parts[len(parts)-1]
-	}
+	dashboardURL := live.GetDashboardURL()
+	agentID := live.GetAgentID()
 
 	fmt.Printf("🔄 Connecting to Live Dashboard at %s...\n", dashboardURL)
 	fmt.Printf("   Agent ID: %s\n", agentID)
 
-	// Import and use the live package
-	// For now, just show the command would work
-	fmt.Println("\n✅ Connected! Context will sync bidirectionally.")
+	// Create and connect live client
+	client, err := live.AutoSync(dashboardURL, agentID)
+	if err != nil {
+		return fmt.Errorf("failed to connect to Live Dashboard: %w", err)
+	}
+
+	// Set up callback for when dashboard edits context
+	client.OnContextEdit(func(contextType, content string) {
+		if err := writeContextFileWithBackup(gptcodeDir, contextType, content); err != nil {
+			fmt.Printf("⚠️  Failed to update local context: %v\n", err)
+			return
+		}
+		fmt.Printf("✅ Updated local %s context from Live Dashboard\n", contextType)
+	})
+
+	fmt.Println("\n✅ Connected! Context sync active:")
 	fmt.Println("   - Local changes → Live Dashboard")
 	fmt.Println("   - Dashboard edits → Local files")
 	fmt.Println("\n📡 Watching for changes... (Ctrl+C to stop)")
 
-	// Block forever, watching for changes
+	// Block until interrupted
 	select {}
+}
+
+// writeContextFileWithBackup writes context to file with backup
+func writeContextFileWithBackup(gptcodeDir, contextType, content string) error {
+	filename := contextType + ".md"
+	path := filepath.Join(gptcodeDir, "context", filename)
+
+	// Create backup
+	backupPath := path + ".backup"
+	if _, err := os.Stat(path); err == nil {
+		if err := os.Rename(path, backupPath); err != nil {
+			return fmt.Errorf("failed to create backup: %w", err)
+		}
+	}
+
+	// Write new content
+	if err := os.WriteFile(path, []byte(content), 0644); err != nil {
+		// Restore backup on failure
+		if _, backupErr := os.Stat(backupPath); backupErr == nil {
+			os.Rename(backupPath, path) // Best effort restore
+		}
+		return fmt.Errorf("failed to write context: %w", err)
+	}
+
+	// Remove backup on success
+	if _, err := os.Stat(backupPath); err == nil {
+		os.Remove(backupPath)
+	}
+
+	return nil
 }
