@@ -62,6 +62,12 @@ func getNestedValue(setup *Setup, key string) (interface{}, error) {
 			return setup.Defaults.MLIntentThreshold, nil
 		case "graph_max_files":
 			return setup.Defaults.GraphMaxFiles, nil
+		case "budget_mode":
+			return setup.Defaults.BudgetMode, nil
+		case "max_cost_per_task":
+			return setup.Defaults.MaxCostPerTask, nil
+		case "monthly_budget":
+			return setup.Defaults.MonthlyBudget, nil
 		default:
 			return nil, fmt.Errorf("unknown defaults field: %s", parts[1])
 		}
@@ -148,6 +154,34 @@ func setNestedValue(setup *Setup, key, value string) error {
 				return fmt.Errorf("graph_max_files must be between 1 and 20")
 			}
 			setup.Defaults.GraphMaxFiles = i
+		case "budget_mode":
+			var b bool
+			if value == "true" || value == "1" || value == "yes" {
+				b = true
+			} else if value == "false" || value == "0" || value == "no" {
+				b = false
+			} else {
+				return fmt.Errorf("invalid boolean value for budget_mode: %s", value)
+			}
+			setup.Defaults.BudgetMode = b
+		case "max_cost_per_task":
+			var f float64
+			if _, err := fmt.Sscan(value, &f); err != nil {
+				return fmt.Errorf("invalid float value for max_cost_per_task: %s", value)
+			}
+			if f < 0 {
+				return fmt.Errorf("max_cost_per_task must be non-negative")
+			}
+			setup.Defaults.MaxCostPerTask = f
+		case "monthly_budget":
+			var f float64
+			if _, err := fmt.Sscan(value, &f); err != nil {
+				return fmt.Errorf("invalid float value for monthly_budget: %s", value)
+			}
+			if f < 0 {
+				return fmt.Errorf("monthly_budget must be non-negative")
+			}
+			setup.Defaults.MonthlyBudget = f
 		default:
 			return fmt.Errorf("unknown defaults field: %s", parts[1])
 		}

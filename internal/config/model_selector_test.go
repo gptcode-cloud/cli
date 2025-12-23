@@ -16,6 +16,9 @@ func TestModelSelectorScoring(t *testing.T) {
 			MLComplexThreshold float64 `yaml:"ml_complex_threshold,omitempty"`
 			MLIntentThreshold  float64 `yaml:"ml_intent_threshold,omitempty"`
 			GraphMaxFiles      int     `yaml:"graph_max_files,omitempty"`
+			BudgetMode         bool    `yaml:"budget_mode,omitempty"`
+			MaxCostPerTask     float64 `yaml:"max_cost_per_task,omitempty"`
+			MonthlyBudget      float64 `yaml:"monthly_budget,omitempty"`
 		}{
 			Mode:    "cloud",
 			Backend: "openrouter",

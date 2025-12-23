@@ -69,6 +69,13 @@ func RecommendModelForRetry(setup *config.Setup, agentType string, failedBackend
 			continue
 		}
 
+		// Budget constraint check
+		if setup.Defaults.BudgetMode {
+			if modelInfo.CostPer1M > setup.Defaults.MaxCostPerTask && setup.Defaults.MaxCostPerTask > 0 {
+				continue // Skip models that exceed per-task cost limit
+			}
+		}
+
 		key := backend + "/" + model
 		h, hasHistory := historyMap[key]
 
@@ -88,6 +95,18 @@ func RecommendModelForRetry(setup *config.Setup, agentType string, failedBackend
 		}
 
 		score := calculateScore(metrics, backend == failedBackend)
+		
+		// Apply additional budget penalty if in budget mode
+		if setup.Defaults.BudgetMode {
+			// Boost score for free/local models in budget mode
+			if modelInfo.CostPer1M == 0.0 {
+				score *= 1.2 // 20% boost for free models
+			}
+			if modelInfo.Backend == "ollama" {
+				score *= 1.1 // 10% boost for local models
+			}
+		}
+		
 		confidence := metrics.SuccessRate
 
 		reason := buildReason(metrics, hasHistory, h.TotalTasks)
@@ -266,6 +285,13 @@ func SelectBestModelForAgent(setup *config.Setup, agentType string) (backend str
 			continue
 		}
 
+		// Budget constraint check
+		if setup.Defaults.BudgetMode {
+			if modelInfo.CostPer1M > setup.Defaults.MaxCostPerTask && setup.Defaults.MaxCostPerTask > 0 {
+				continue // Skip models that exceed per-task cost limit
+			}
+		}
+
 		key := modelInfo.Backend + "/" + modelInfo.Name
 		h, hasHistory := historyMap[key]
 
@@ -285,6 +311,17 @@ func SelectBestModelForAgent(setup *config.Setup, agentType string) (backend str
 		}
 
 		score := calculateScore(metrics, false)
+
+		// Apply additional budget penalty if in budget mode
+		if setup.Defaults.BudgetMode {
+			// Boost score for free/local models in budget mode
+			if modelInfo.CostPer1M == 0.0 {
+				score *= 1.2 // 20% boost for free models
+			}
+			if modelInfo.Backend == "ollama" {
+				score *= 1.1 // 10% boost for local models
+			}
+		}
 
 		rec := ModelRecommendation{
 			Backend:    modelInfo.Backend,

@@ -251,9 +251,107 @@ func formatNumber(n int) string {
 	return fmt.Sprintf("%.1fM", float64(n)/1000000)
 }
 
+var budgetCmd = &cobra.Command{
+	Use:   "budget [set|show] [amount]",
+	Short: "Manage budget settings for cost-conscious usage",
+	Long: `Manage budget settings to control costs and optimize for low-cost alternatives.
+
+Commands:
+  set [amount] - Set monthly budget limit in USD
+  show         - Show current budget settings and usage
+  enable       - Enable budget mode to prioritize free/low-cost models
+  disable      - Disable budget mode
+
+Examples:
+  gptcode budget show          # Show current budget settings
+  gptcode budget set 10        # Set monthly budget to $10
+  gptcode budget enable        # Enable budget-conscious mode
+  gptcode budget disable       # Disable budget mode`,
+	Args: cobra.MinimumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		command := args[0]
+		setup, err := config.LoadSetup()
+		if err != nil {
+			return fmt.Errorf("failed to load setup: %w", err)
+		}
+
+		switch command {
+		case "show":
+			fmt.Printf("Budget Mode: %t\n", setup.Defaults.BudgetMode)
+			if setup.Defaults.MonthlyBudget > 0 {
+				fmt.Printf("Monthly Budget: $%.2f\n", setup.Defaults.MonthlyBudget)
+			} else {
+				fmt.Printf("Monthly Budget: Not set\n")
+			}
+			if setup.Defaults.MaxCostPerTask > 0 {
+				fmt.Printf("Max Cost Per Task: $%.4f\n", setup.Defaults.MaxCostPerTask)
+			} else {
+				fmt.Printf("Max Cost Per Task: Not set\n")
+			}
+			fmt.Printf("Current Mode: %s\n", setup.Defaults.Mode)
+			fmt.Println("\nRecommendation: For low-cost usage, consider 'gptcode mode local' to use free local models")
+
+		case "set":
+			if len(args) < 2 {
+				return fmt.Errorf("please provide a budget amount")
+			}
+			var amount float64
+			fmt.Sscanf(args[1], "%f", &amount)
+			if amount < 0 {
+				return fmt.Errorf("budget amount must be non-negative")
+			}
+			setup.Defaults.MonthlyBudget = amount
+			setup.Defaults.BudgetMode = true // Enable budget mode when setting a budget
+			if err := config.SaveSetup(setup); err != nil {
+				return fmt.Errorf("failed to save setup: %w", err)
+			}
+			fmt.Printf("✓ Monthly budget set to $%.2f and budget mode enabled\n", amount)
+
+		case "enable":
+			setup.Defaults.BudgetMode = true
+			if setup.Defaults.MonthlyBudget == 0 {
+				fmt.Println("⚠ Monthly budget not set. Consider setting a budget with 'gptcode budget set [amount]'")
+			}
+			if err := config.SaveSetup(setup); err != nil {
+				return fmt.Errorf("failed to save setup: %w", err)
+			}
+			fmt.Println("✓ Budget mode enabled. System will prioritize free and low-cost models.")
+
+		case "disable":
+			setup.Defaults.BudgetMode = false
+			if err := config.SaveSetup(setup); err != nil {
+				return fmt.Errorf("failed to save setup: %w", err)
+			}
+			fmt.Println("✓ Budget mode disabled.")
+
+		case "max-task":
+			if len(args) < 2 {
+				return fmt.Errorf("please provide a max cost per task")
+			}
+			var amount float64
+			fmt.Sscanf(args[1], "%f", &amount)
+			if amount < 0 {
+				return fmt.Errorf("max cost per task must be non-negative")
+			}
+			setup.Defaults.MaxCostPerTask = amount
+			setup.Defaults.BudgetMode = true // Enable budget mode when setting max cost
+			if err := config.SaveSetup(setup); err != nil {
+				return fmt.Errorf("failed to save setup: %w", err)
+			}
+			fmt.Printf("✓ Max cost per task set to $%.4f and budget mode enabled\n", amount)
+
+		default:
+			return fmt.Errorf("unknown command: %s. Use 'show', 'set', 'enable', 'disable', or 'max-task'", command)
+		}
+
+		return nil
+	},
+}
+
 func init() {
 	rootCmd.AddCommand(modeCmd)
 	rootCmd.AddCommand(statsCmd)
+	rootCmd.AddCommand(budgetCmd)
 
 	statsCmd.Flags().Bool("today", false, "Show today's stats only")
 	statsCmd.Flags().Bool("week", false, "Show last 7 days")
