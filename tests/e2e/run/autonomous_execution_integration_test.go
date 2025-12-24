@@ -82,7 +82,7 @@ go 1.21
 	// Run gptcode do with a task that will modify the Go file, triggering verification
 	cmd := exec.Command("gptcode", "do", "add a new function called Multiply that multiplies two integers and update the test to include it", "--budget-mode", "--monthly-budget", "10.0", "--max-cost-per-task", "2.0")
 	cmd.Dir = goDir
-	cmd.Env = append(os.Environ(), 
+	cmd.Env = append(os.Environ(),
 		"GPTCODE_TELEMETRY=false",
 		"GPTCODE_BUDGET_MODE=true",
 		"GPTCODE_MONTHLY_BUDGET=10.0",
@@ -119,7 +119,7 @@ go 1.21
 	// Verify that budget-related messages appear in output
 	hasBudgetCheck := strings.Contains(outputStr, "budget") || strings.Contains(outputStr, "Budget")
 	hasCostTracking := strings.Contains(outputStr, "cost") || strings.Contains(outputStr, "Cost")
-	
+
 	if !hasBudgetCheck {
 		t.Logf("Warning: Budget check message not found in output, but this may be expected depending on implementation")
 	}
@@ -135,7 +135,7 @@ go 1.21
 
 	updatedContentStr := string(updatedContent)
 	hasMultiplyFunction := strings.Contains(updatedContentStr, "Multiply")
-	
+
 	if !hasMultiplyFunction {
 		t.Logf("Updated file content:\n%s", updatedContentStr)
 		t.Errorf("Expected Multiply function to be added to main.go")
@@ -151,7 +151,7 @@ go 1.21
 	} else {
 		updatedTestStr := string(updatedTestContent)
 		hasMultiplyTest := strings.Contains(updatedTestStr, "Multiply")
-		
+
 		if hasMultiplyTest {
 			t.Logf("✓ Test file was successfully updated with Multiply test")
 		} else {
@@ -363,10 +363,10 @@ go 1.21
 	}
 
 	fixedStr := string(fixedContent)
-	
+
 	// Check if the syntax error was fixed (closing parenthesis added)
 	hasValidSyntax := strings.Contains(fixedStr, `"Hello, World!")`) // Properly closed
-	
+
 	if hasValidSyntax {
 		t.Logf("✓ Syntax error was successfully recovered and fixed")
 	} else {
@@ -375,10 +375,10 @@ go 1.21
 	}
 
 	// Look for evidence of recovery attempts in the output
-	hasRecoveryAttempt := strings.Contains(outputStr, "recovery") || 
-		strings.Contains(outputStr, "retry") || 
-		strings.Contains(outputStr, "attempt") || 
-		strings.Contains(outputStr, "error") || 
+	hasRecoveryAttempt := strings.Contains(outputStr, "recovery") ||
+		strings.Contains(outputStr, "retry") ||
+		strings.Contains(outputStr, "attempt") ||
+		strings.Contains(outputStr, "error") ||
 		strings.Contains(outputStr, "fix")
 
 	if hasRecoveryAttempt {

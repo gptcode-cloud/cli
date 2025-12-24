@@ -173,8 +173,8 @@ func TestBudgetTracking(t *testing.T) {
 	tracker := NewUsageTracker()
 
 	// Record some requests with cheaper models
-	tracker.RecordRequest("groq", "llama-3.1-8b-instant", 100000)  // 0.1M tokens at $0.05/M = $0.005
-	tracker.RecordRequest("groq", "llama-3.1-8b-instant", 50000)   // 0.05M tokens at $0.05/M = $0.0025
+	tracker.RecordRequest("groq", "llama-3.1-8b-instant", 100000) // 0.1M tokens at $0.05/M = $0.005
+	tracker.RecordRequest("groq", "llama-3.1-8b-instant", 50000)  // 0.05M tokens at $0.05/M = $0.0025
 	tracker.RecordRequest("groq", "llama-3.1-8b-instant", 200000) // 0.2M tokens at $0.05/M = $0.01
 
 	// Check total cost

@@ -73,7 +73,7 @@ func (m *Maestro) ExecutePlan(ctx context.Context, planContent string) error {
 	if setup.Defaults.BudgetMode {
 		exceeded, remaining := m.UsageTracker.CheckBudget(setup.Defaults.MonthlyBudget)
 		if exceeded {
-			return fmt.Errorf("monthly budget exceeded: $%.2f spent, $%.2f budget, -$%.2f remaining", 
+			return fmt.Errorf("monthly budget exceeded: $%.2f spent, $%.2f budget, -$%.2f remaining",
 				m.UsageTracker.GetTotalCost(), setup.Defaults.MonthlyBudget, -remaining)
 		}
 		if remaining < setup.Defaults.MaxCostPerTask {
