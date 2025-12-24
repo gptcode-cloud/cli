@@ -54,18 +54,18 @@ func (t *Telemetry) RecordStep(ctx context.Context, event StepEvent) {
 
 // UsageTracker tracks API request, token usage, and costs
 type UsageTracker struct {
-	requests map[string]int // backend/model -> request count
-	tokens   map[string]int // backend/model -> token count
-	costs    map[string]float64 // backend/model -> cost in USD
-	totalCost float64 // total cost across all models
+	requests  map[string]int     // backend/model -> request count
+	tokens    map[string]int     // backend/model -> token count
+	costs     map[string]float64 // backend/model -> cost in USD
+	totalCost float64            // total cost across all models
 }
 
 // NewUsageTracker creates a new usage tracker
 func NewUsageTracker() *UsageTracker {
 	return &UsageTracker{
-		requests: make(map[string]int),
-		tokens:   make(map[string]int),
-		costs:    make(map[string]float64),
+		requests:  make(map[string]int),
+		tokens:    make(map[string]int),
+		costs:     make(map[string]float64),
 		totalCost: 0,
 	}
 }
@@ -75,7 +75,7 @@ func (u *UsageTracker) RecordRequest(backend, model string, tokens int) {
 	key := backend + "/" + model
 	u.requests[key]++
 	u.tokens[key] += tokens
-	
+
 	// Calculate cost based on model's cost per 1M tokens
 	catalog := intelligence.NewModelCatalog()
 	modelInfo := catalog.GetModelInfo(backend, model)
