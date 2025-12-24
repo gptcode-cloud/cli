@@ -11,9 +11,11 @@ import (
 	"github.com/google/uuid"
 
 	"gptcode/internal/agents"
+	"gptcode/internal/config"
 	"gptcode/internal/events"
 	"gptcode/internal/llm"
 	"gptcode/internal/observability"
+	"gptcode/internal/telemetry"
 )
 
 // Maestro orchestrates autonomous execution with verification and recovery
@@ -29,6 +31,7 @@ type Maestro struct {
 	ModifiedFiles  []string
 	CurrentStepIdx int
 	Tracer         observability.Tracer
+	UsageTracker   *telemetry.UsageTracker
 }
 
 // NewMaestro creates a new Maestro orchestrator
@@ -37,18 +40,20 @@ func NewMaestro(provider llm.Provider, cwd, model string) *Maestro {
 	recovery := NewRecoveryStrategy(3, checkpoints)
 	recovery.Verbose = os.Getenv("GPTCODE_DEBUG") == "1" // Enable verbose logging in debug mode
 	tracer := observability.NewTracer()
+	usageTracker := telemetry.NewUsageTracker()
 
 	// Initialize with no verifiers by default - will be set based on file types
 	return &Maestro{
-		Provider:    provider,
-		CWD:         cwd,
-		Model:       model,
-		Events:      events.NewEmitter(os.Stderr),
-		Verifiers:   []Verifier{}, // Will be populated dynamically based on modified files
-		Recovery:    recovery,
-		Checkpoints: checkpoints,
-		MaxRetries:  3,
-		Tracer:      tracer,
+		Provider:     provider,
+		CWD:          cwd,
+		Model:        model,
+		Events:       events.NewEmitter(os.Stderr),
+		Verifiers:    []Verifier{}, // Will be populated dynamically based on modified files
+		Recovery:     recovery,
+		Checkpoints:  checkpoints,
+		MaxRetries:   3,
+		Tracer:       tracer,
+		UsageTracker: usageTracker,
 	}
 }
 
@@ -57,6 +62,24 @@ func (m *Maestro) ExecutePlan(ctx context.Context, planContent string) error {
 	m.CurrentStepIdx = 0
 	m.ModifiedFiles = nil
 	_ = m.Events.Status("\u001b[36mStarting autonomous execution...\u001b[0m")
+
+	// Load setup to access budget settings
+	setup, err := config.LoadSetup()
+	if err != nil {
+		return fmt.Errorf("failed to load config: %w", err)
+	}
+
+	// Check if budget is exceeded before starting
+	if setup.Defaults.BudgetMode {
+		exceeded, remaining := m.UsageTracker.CheckBudget(setup.Defaults.MonthlyBudget)
+		if exceeded {
+			return fmt.Errorf("monthly budget exceeded: $%.2f spent, $%.2f budget, -$%.2f remaining", 
+				m.UsageTracker.GetTotalCost(), setup.Defaults.MonthlyBudget, -remaining)
+		}
+		if remaining < setup.Defaults.MaxCostPerTask {
+			_ = m.Events.Notify(fmt.Sprintf("\u001b[33mWarning: Budget running low ($%.2f remaining)\u001b[0m", remaining), "warn")
+		}
+	}
 
 	// Begin tracing session
 	sessionID := uuid.New().String()
@@ -299,8 +322,8 @@ func (m *Maestro) verify(ctx context.Context) (*VerificationResult, error) {
 
 // selectVerifiers dynamically selects which verifiers to run based on modified files
 func (m *Maestro) selectVerifiers() []Verifier {
-	// Get current modified files
-	gitCmd := exec.Command("git", "--no-pager", "diff", "--name-only")
+	// Get current modified files (including added, modified, deleted, renamed, copied)
+	gitCmd := exec.Command("git", "--no-pager", "diff", "--name-only", "--diff-filter=ACMR")
 	gitCmd.Dir = m.CWD
 	out, err := gitCmd.CombinedOutput()
 	if err != nil {
