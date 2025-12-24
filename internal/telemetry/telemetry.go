@@ -7,6 +7,8 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
+
+	"gptcode/internal/intelligence"
 )
 
 // Telemetry provides OpenTelemetry-based telemetry tracking
@@ -50,10 +52,12 @@ func (t *Telemetry) RecordStep(ctx context.Context, event StepEvent) {
 	}
 }
 
-// UsageTracker tracks API request and token usage
+// UsageTracker tracks API request, token usage, and costs
 type UsageTracker struct {
 	requests map[string]int // backend/model -> request count
 	tokens   map[string]int // backend/model -> token count
+	costs    map[string]float64 // backend/model -> cost in USD
+	totalCost float64 // total cost across all models
 }
 
 // NewUsageTracker creates a new usage tracker
@@ -61,6 +65,8 @@ func NewUsageTracker() *UsageTracker {
 	return &UsageTracker{
 		requests: make(map[string]int),
 		tokens:   make(map[string]int),
+		costs:    make(map[string]float64),
+		totalCost: 0,
 	}
 }
 
@@ -69,6 +75,13 @@ func (u *UsageTracker) RecordRequest(backend, model string, tokens int) {
 	key := backend + "/" + model
 	u.requests[key]++
 	u.tokens[key] += tokens
+	
+	// Calculate cost based on model's cost per 1M tokens
+	catalog := intelligence.NewModelCatalog()
+	modelInfo := catalog.GetModelInfo(backend, model)
+	cost := (float64(tokens) / 1000000.0) * modelInfo.CostPer1M
+	u.costs[key] += cost
+	u.totalCost += cost
 }
 
 // GetStats returns usage statistics
@@ -78,6 +91,7 @@ func (u *UsageTracker) GetStats() map[string]UsageStats {
 		stats[key] = UsageStats{
 			Requests: requests,
 			Tokens:   u.tokens[key],
+			Cost:     u.costs[key],
 		}
 	}
 	return stats
@@ -87,4 +101,20 @@ func (u *UsageTracker) GetStats() map[string]UsageStats {
 type UsageStats struct {
 	Requests int
 	Tokens   int
+	Cost     float64
+}
+
+// GetTotalCost returns the total cost across all models
+func (u *UsageTracker) GetTotalCost() float64 {
+	return u.totalCost
+}
+
+// CheckBudget checks if the total cost exceeds the monthly budget
+func (u *UsageTracker) CheckBudget(monthlyBudget float64) (exceeded bool, remaining float64) {
+	if monthlyBudget <= 0 {
+		return false, -1 // No budget set
+	}
+	exceeded = u.totalCost >= monthlyBudget
+	remaining = monthlyBudget - u.totalCost
+	return exceeded, remaining
 }

@@ -98,6 +98,10 @@ func TestRecordRequest(t *testing.T) {
 		if stat.Tokens != 1500 {
 			t.Errorf("Expected 1500 tokens for %s, got %d", key, stat.Tokens)
 		}
+		// Note: Cost will be calculated based on model catalog, so we check if it's positive
+		if stat.Cost <= 0 {
+			t.Errorf("Expected positive cost for %s, got %f", key, stat.Cost)
+		}
 	} else {
 		t.Errorf("Expected stats for %s", key)
 	}
@@ -110,6 +114,9 @@ func TestRecordRequest(t *testing.T) {
 		}
 		if stat.Tokens != 2000 {
 			t.Errorf("Expected 2000 tokens for %s, got %d", key, stat.Tokens)
+		}
+		if stat.Cost <= 0 {
+			t.Errorf("Expected positive cost for %s, got %f", key, stat.Cost)
 		}
 	} else {
 		t.Errorf("Expected stats for %s", key)
@@ -142,9 +149,11 @@ func TestUsageTrackerMultipleModels(t *testing.T) {
 	// Verify total requests
 	totalRequests := 0
 	totalTokens := 0
+	totalCost := 0.0
 	for _, stat := range stats {
 		totalRequests += stat.Requests
 		totalTokens += stat.Tokens
+		totalCost += stat.Cost
 	}
 
 	if totalRequests != 3 {
@@ -153,5 +162,51 @@ func TestUsageTrackerMultipleModels(t *testing.T) {
 
 	if totalTokens != 350 {
 		t.Errorf("Expected 350 total tokens, got %d", totalTokens)
+	}
+
+	if totalCost <= 0 {
+		t.Errorf("Expected positive total cost, got %f", totalCost)
+	}
+}
+
+func TestBudgetTracking(t *testing.T) {
+	tracker := NewUsageTracker()
+
+	// Record some requests with cheaper models
+	tracker.RecordRequest("groq", "llama-3.1-8b-instant", 100000)  // 0.1M tokens at $0.05/M = $0.005
+	tracker.RecordRequest("groq", "llama-3.1-8b-instant", 50000)   // 0.05M tokens at $0.05/M = $0.0025
+	tracker.RecordRequest("groq", "llama-3.1-8b-instant", 200000) // 0.2M tokens at $0.05/M = $0.01
+
+	// Check total cost
+	totalCost := tracker.GetTotalCost()
+	if totalCost <= 0 {
+		t.Errorf("Expected positive total cost, got %f", totalCost)
+	}
+
+	// Test budget checking - with budget that should be exceeded
+	exceeded, remaining := tracker.CheckBudget(0.01) // $0.01 budget (should be exceeded since we spent ~$0.0175)
+	if !exceeded {
+		t.Errorf("Expected budget to be exceeded, but it wasn't. Total cost: %f", totalCost)
+	}
+	if remaining >= 0 {
+		t.Errorf("Expected negative remaining, got %f", remaining)
+	}
+
+	// Test budget checking - with budget that should not be exceeded
+	exceeded, remaining = tracker.CheckBudget(1.0) // $1 budget
+	if exceeded {
+		t.Errorf("Expected budget to not be exceeded, but it was. Total cost: %f, budget: 1.0", totalCost)
+	}
+	if remaining <= 0 {
+		t.Errorf("Expected positive remaining, got %f", remaining)
+	}
+
+	// Test budget checking - with no budget set
+	exceeded, remaining = tracker.CheckBudget(0) // No budget
+	if exceeded {
+		t.Errorf("Expected no budget exceeded when budget is 0, got exceeded: %t", exceeded)
+	}
+	if remaining != -1 {
+		t.Errorf("Expected -1 remaining when no budget set, got %f", remaining)
 	}
 }
