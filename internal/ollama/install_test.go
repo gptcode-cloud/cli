@@ -6,8 +6,11 @@ import (
 )
 
 func TestIsInstalled(t *testing.T) {
-	if os.Getenv("CI") == "true" {
+	if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
 		t.Skip("Skipping integration test in CI (requires Ollama service)")
+	}
+	if !IsRunning() {
+		t.Skip("Skipping test: Ollama daemon not running")
 	}
 
 	tests := []struct {
@@ -50,8 +53,11 @@ func TestIsInstalled(t *testing.T) {
 }
 
 func TestCheckAndInstall(t *testing.T) {
-	if os.Getenv("CI") == "true" {
+	if os.Getenv("CI") == "true" || os.Getenv("GITHUB_ACTIONS") == "true" {
 		t.Skip("Skipping integration test in CI (requires Ollama service)")
+	}
+	if !IsRunning() {
+		t.Skip("Skipping test: Ollama daemon not running")
 	}
 
 	tests := []struct {

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os/exec"
 	"strings"
+	"time"
 )
 
 type InstalledModel struct {
@@ -108,4 +109,14 @@ func CheckAndInstall(modelName string, autoInstall bool, progressCallback func(s
 	}
 
 	return Install(modelName, progressCallback)
+}
+
+func IsRunning() bool {
+	client := &http.Client{Timeout: 2 * time.Second}
+	resp, err := client.Get("http://localhost:11434/api/tags")
+	if err != nil {
+		return false
+	}
+	defer resp.Body.Close()
+	return resp.StatusCode == http.StatusOK
 }
