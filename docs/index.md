@@ -94,7 +94,13 @@ description: AI coding assistant with specialized agents and validation
   
   <div class="quick-start">
     <h3>1. Install CLI</h3>
-    <pre><code>go install github.com/gptcode-cloud/cli/cmd/gptcode@latest
+    <pre><code># One-line install (creates gptcode and gt commands)
+curl -sSL https://gptcode.dev/install.sh | bash
+
+# Or using go install
+go install github.com/gptcode-cloud/cli/cmd/gptcode@latest
+
+# Setup
 gptcode setup</code></pre>
     
     <h3>2. Add Neovim Plugin</h3>
@@ -111,9 +117,11 @@ gptcode setup</code></pre>
 }</code></pre>
     
     <h3>3. Start Coding</h3>
-    <pre><code>gptcode chat "add user authentication with JWT"
-gptcode research "best practices for error handling"
-gptcode plan "implement rate limiting"</code></pre>
+    <pre><code># Use gptcode or the short alias gt
+gt do "add user authentication with JWT"
+gt chat
+gt research "best practices for error handling"
+gt plan "implement rate limiting"</code></pre>
   </div>
 </div>
 

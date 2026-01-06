@@ -1,81 +1,85 @@
 # GPTCode CLI
 
-[![CI](https://img.shields.io/github/actions/workflow/status/gptcode-cloud/cli/ci.yml?label=CI)](https://github.com/gptcode-cloud/cli/actions/workflows/ci.yml)
-[![CD](https://img.shields.io/github/actions/workflow/status/gptcode-cloud/cli/cd.yml?label=CD)](https://github.com/gptcode-cloud/cli/actions/workflows/cd.yml)
-[![Go Version](https://img.shields.io/badge/go-1.24+-blue.svg)](#)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](#license)
-
-Open-source AI coding assistant with specialized agents, validation, and an ML-driven model selector. Fast, affordable, and transparent. Works from your terminal and Neovim.
-
-- Autonomous mode with Analyzer → Planner → Editor → Validator
-- Smart context via dependency graph + PageRank
-- ML intent/complexity classifiers and model recommender
-- Cost-aware profiles and multiple backends (Groq, OpenRouter, Ollama)
+> Autonomous AI Coding Assistant — **$0-5/month** vs $20-30/month subscriptions
 
 ## Quick Start
 
-### Install (Go)
 ```bash
-go install github.com/gptcode-cloud/cli/cmd/gptcode@latest
+# Install (creates both gptcode and gt commands)
+curl -sSL https://gptcode.dev/install.sh | bash
+
+# Or using go install
+go install github.com/gptcode/cli/cmd/gptcode@latest
 ```
 
-### Install (prebuilt binaries)
+## Usage
+
+Use `gptcode` or the short alias `gt`:
+
 ```bash
-curl -fsSL https://raw.githubusercontent.com/gptcode-cloud/cli/main/install.sh | bash
+# Autonomous mode - AI completes the task
+gt do "add user authentication"
+
+# Interactive chat
+gt chat
+
+# Code review
+gt review
+
+# Research mode
+gt research "how does the payment system work?"
 ```
 
-### Setup and first run
+## Commands
+
+| Command | Description |
+|---------|-------------|
+| `gt do "task"` | Autonomous task completion |
+| `gt chat` | Interactive code conversation |
+| `gt run "task"` | Execute with follow-up |
+| `gt research "question"` | Document codebase/architecture |
+| `gt plan "task"` | Create implementation plan |
+| `gt implement plan.md` | Execute plan step-by-step |
+| `gt review` | Code review for bugs/security |
+| `gt tdd` | Test-driven development mode |
+| `gt feature "desc"` | Generate tests + implementation |
+
+## Skills
+
+Language-specific guidelines injected into prompts:
+
 ```bash
-gptcode setup
-# Chat
-gptcode chat "add user authentication with JWT"
-# Research / Plan / Implement
-gptcode research "error handling best practices"
-gptcode plan "implement rate limiting"
-gptcode implement <plan-id>
+gt skills list              # List available skills
+gt skills install ruby      # Install Ruby skill
+gt skills install-all       # Install all skills
+gt skills show go           # View skill content
 ```
 
-## Profiles and Backends
+Available: Go, Elixir, Ruby, Rails, Python, TypeScript, JavaScript, Rust
+
+## Configuration
+
 ```bash
-# Show backends
-gptcode backend list
-# Use a backend profile
-gptcode profiles use openrouter.free
-# Set models per agent
-gptcode profiles set-agent openrouter free router google/gemini-2.0-flash-exp:free
+gt setup                    # Initialize ~/.gptcode
+gt key groq                 # Set API key
+gt backend use groq         # Switch backend
+gt profile use groq.speed   # Switch profile
 ```
 
-## Neovim Integration
-Minimal example (lazy.nvim):
-```lua
-{
-  dir = "~/workspace/gptcode/neovim",
-  config = function()
-    require("gptcode").setup()
-  end,
-  keys = {
-    { "<C-d>", "<cmd>GPTCodeChat<cr>", desc = "Toggle Chat" },
-    { "<C-m>", "<cmd>GPTCodeModels<cr>", desc = "Profiles" },
-  }
-}
-```
+## Why GPTCode?
 
-## Feedback and Model Learning
-- Record feedback: `gptcode feedback good|bad --backend=<b> --model=<m> --agent=<a> --task "..."`
-- Stats: `gptcode feedback stats`
-- Export anonymized data (for community dataset): `gptcode feedback export --dry-run`
+- **Cost**: $0-5/month using Groq/OpenRouter free tiers
+- **Model Selection**: Intelligent routing to best model per task
+- **Skills**: Language-specific guidelines for idiomatic code
+- **E2E Encryption**: Your code never stored on our servers
 
 ## Documentation
-- Commands: `docs/` and the website pages under `docs/`
-- Concepts: agent orchestration, dependency graph, ML features
-- Blog posts for positioning and guides
 
-## Contributing
-We welcome contributions! Please read [CONTRIBUTING.md](CONTRIBUTING.md).
-
-- Go 1.24+
-- Tests: `go test ./...`
-- Linting and CI are enforced
+- [Installation Guide](https://gptcode.dev/guides/installation)
+- [Configuration](https://gptcode.dev/guides/configuration)
+- [Skills Index](https://gptcode.dev/skills)
+- [API Reference](https://gptcode.dev/reference)
 
 ## License
-MIT — see CONTRIBUTING for details.
+
+MIT

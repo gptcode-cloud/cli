@@ -103,26 +103,68 @@ mkdir -p "$INSTALL_DIR"
 chmod +x "$BINARY"
 mv "$BINARY" "$INSTALL_DIR/gptcode"
 
-# Verify
+# Create gt alias (symlink)
+ln -sf "$INSTALL_DIR/gptcode" "$INSTALL_DIR/gt"
+
+# Auto-configure PATH if needed
+add_to_path() {
+  local shell_config="$1"
+  local path_line="export PATH=\"\$PATH:$INSTALL_DIR\""
+  
+  if [ -f "$shell_config" ]; then
+    if ! grep -q "$INSTALL_DIR" "$shell_config" 2>/dev/null; then
+      echo "" >> "$shell_config"
+      echo "# Added by GPTCode installer" >> "$shell_config"
+      echo "$path_line" >> "$shell_config"
+      echo "   ✓ Added to $shell_config"
+      return 0
+    fi
+  fi
+  return 1
+}
+
+# Verify installation
 if [ -x "$INSTALL_DIR/gptcode" ]; then
   echo ""
   echo "✅ GPTCode installed successfully!"
   echo ""
   echo "   Location: $INSTALL_DIR/gptcode"
-  echo "   Version:  $("$INSTALL_DIR/gptcode" --version 2>/dev/null || echo "$VERSION")"
+  echo "   Alias:    $INSTALL_DIR/gt"
   echo ""
   
-  # Check if in PATH
+  # Auto-configure PATH if not already set
   if ! echo "$PATH" | grep -q "$INSTALL_DIR"; then
-    echo "⚠️  $INSTALL_DIR is not in your PATH"
-    echo ""
-    echo "   Add this to your shell profile (~/.bashrc, ~/.zshrc, etc.):"
-    echo ""
-    echo "   export PATH=\"\$PATH:$INSTALL_DIR\""
-    echo ""
+    echo "📝 Configuring PATH..."
+    
+    # Try to add to the appropriate shell config
+    added=false
+    
+    # Detect current shell and add to config
+    if [ -n "$ZSH_VERSION" ] || [ "$SHELL" = "/bin/zsh" ] || [ "$SHELL" = "/usr/bin/zsh" ]; then
+      add_to_path "$HOME/.zshrc" && added=true
+    elif [ -n "$BASH_VERSION" ] || [ "$SHELL" = "/bin/bash" ] || [ "$SHELL" = "/usr/bin/bash" ]; then
+      add_to_path "$HOME/.bashrc" && added=true
+    fi
+    
+    # Fallback to .profile if nothing else worked
+    if [ "$added" = false ]; then
+      add_to_path "$HOME/.profile" && added=true
+    fi
+    
+    if [ "$added" = true ]; then
+      echo ""
+      echo "   ⚠️  Restart your terminal or run:"
+      echo ""
+      echo "   source ~/.zshrc  # or ~/.bashrc"
+      echo ""
+    fi
   fi
   
-  echo "🎉 Run 'gptcode --help' to get started!"
+  echo "🎉 Run 'gt --help' to get started!"
+  echo ""
+  echo "   gt do \"your task\"     # Autonomous mode"
+  echo "   gt chat               # Interactive chat"
+  echo "   gt skills install-all # Install coding skills"
 else
   echo "❌ Installation failed"
   exit 1
