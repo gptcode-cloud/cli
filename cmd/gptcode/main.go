@@ -128,6 +128,7 @@ func init() {
 	rootCmd.AddCommand(issueCmd)
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(logoutCmd)
+	rootCmd.AddCommand(trainingCmd)
 }
 
 func newBuilderAndLLM(lang, mode, hint string) (*prompt.Builder, llm.Provider, string, error) {
