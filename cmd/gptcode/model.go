@@ -343,9 +343,11 @@ func updateCatalogFromAllProviders() error {
 	}
 
 	apiKeys := make(map[string]string)
+	// Get API keys using GetAPIKey which checks:
+	// 1. Environment variables (BACKEND_API_KEY)
+	// 2. keys.yaml
 	for backendName := range setup.Backend {
-		envVarName := strings.ToUpper(backendName) + "_API_KEY"
-		if key := os.Getenv(envVarName); key != "" {
+		if key := config.GetAPIKey(backendName); key != "" {
 			apiKeys[backendName] = key
 		}
 	}

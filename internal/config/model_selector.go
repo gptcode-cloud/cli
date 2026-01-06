@@ -3,6 +3,7 @@ package config
 import (
 	"encoding/json"
 	"fmt"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
@@ -34,6 +35,7 @@ type ModelInfo struct {
 	ContextWindow  int               `json:"context_window"`
 	TokensPerSec   int               `json:"tokens_per_sec"`
 	Capabilities   ModelCapabilities `json:"capabilities"`
+	RecommendedFor []string          `json:"recommended_for"` // e.g. ["editor", "query", "router"]
 	Backend        string
 }
 
@@ -162,6 +164,15 @@ func (ms *ModelSelector) loadCatalog() error {
 				}
 				if val, ok := caps["notes"].(string); ok {
 					model.Capabilities.Notes = val
+				}
+			}
+
+			// Load recommended_for tags from catalog
+			if recFor, ok := modelMap["recommended_for"].([]interface{}); ok {
+				for _, r := range recFor {
+					if s, ok := r.(string); ok {
+						model.RecommendedFor = append(model.RecommendedFor, s)
+					}
 				}
 			}
 
@@ -398,7 +409,20 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 		}
 	}
 
+	// EXPLORATION: 10% chance to pick from top 5 models to try new ones
 	best := scored[0]
+	if len(scored) > 1 && rand.Float64() < 0.10 {
+		// Pick randomly from top 5 (or however many we have)
+		topN := 5
+		if len(scored) < topN {
+			topN = len(scored)
+		}
+		exploreIdx := rand.Intn(topN)
+		best = scored[exploreIdx]
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
+			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] EXPLORATION: picked %s/%s instead of best\n", best.backend, best.model)
+		}
+	}
 
 	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Action=%s Lang=%s -> %s/%s (score=%.2f)\n",
@@ -420,6 +444,38 @@ func (ms *ModelSelector) scoreModel(model ModelInfo, action ActionType, language
 
 	score := 100.0
 
+	// PRIORITY 0: recommended_for from catalog - this is the pre-trained recommendation
+	actionStr := strings.ToLower(string(action))
+	for _, rec := range model.RecommendedFor {
+		recLower := strings.ToLower(rec)
+		// Map action types to catalog recommendation tags
+		if (actionStr == "edit" && (recLower == "editor" || recLower == "edit")) ||
+			(actionStr == "review" && (recLower == "review" || recLower == "reviewer")) ||
+			(actionStr == "plan" && (recLower == "plan" || recLower == "planner" || recLower == "query")) ||
+			(actionStr == "research" && (recLower == "research" || recLower == "query")) ||
+			(actionStr == "route" && recLower == "router") {
+			score += 100 // Strong boost for catalog-recommended models
+			break
+		}
+	}
+
+	// PRIORITY 1: Context window - models with larger context are significantly better
+	if model.ContextWindow > 0 {
+		score += (float64(model.ContextWindow) / 100000.0) * 50 // Was 10, now 50
+	}
+
+	// PRIORITY 2: Compound/Auto models that do internal routing get a boost
+	modelLower := strings.ToLower(model.ID)
+	if strings.Contains(modelLower, "compound") || strings.Contains(modelLower, "auto") || strings.Contains(modelLower, "router") {
+		score += 75 // Compound models use best model internally
+	}
+
+	// PRIORITY 3: Speed bonus
+	if model.TokensPerSec > 0 {
+		score += (float64(model.TokensPerSec) / 100.0) * 5
+	}
+
+	// Rate limit penalty
 	usage := ms.getTodayUsage(model.Backend, model.ID)
 	if model.RateLimitDaily > 0 {
 		utilization := float64(usage.Requests) / float64(model.RateLimitDaily)
@@ -433,31 +489,34 @@ func (ms *ModelSelector) scoreModel(model ModelInfo, action ActionType, language
 		score -= 30
 	}
 
+	// Cost penalty (smaller weight)
 	if model.CostPer1M > 0 {
-		score -= (model.CostPer1M / 10.0) * 30
+		score -= (model.CostPer1M / 10.0) * 20 // Was 30, now 20
 	}
 
-	if model.ContextWindow > 0 {
-		score += (float64(model.ContextWindow) / 100000.0) * 10
-	}
-
-	if model.TokensPerSec > 0 {
-		score += (float64(model.TokensPerSec) / 100.0) * 5
-	}
-
+	// Feedback with CAP at ±100 total
+	feedbackScore := 0.0
 	for _, fb := range ms.feedback {
 		if fb.ModelID != model.ID {
 			continue
 		}
 		if fb.Action == action && strings.EqualFold(fb.Language, language) {
 			if fb.Success {
-				score += 20
+				feedbackScore += 5 // Was 20, now 5 per feedback
 			} else {
-				score -= 40
+				feedbackScore -= 10 // Was 40, now 10 per feedback
 			}
 		}
 	}
+	// Cap feedback contribution
+	if feedbackScore > 100 {
+		feedbackScore = 100
+	} else if feedbackScore < -100 {
+		feedbackScore = -100
+	}
+	score += feedbackScore
 
+	// ML recommender
 	if ms.recommender != nil {
 		successProb := ms.recommender.PredictSuccess(
 			model.ID, action, language, complexity,
