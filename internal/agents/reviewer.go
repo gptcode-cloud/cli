@@ -214,13 +214,9 @@ Be precise and specific.`, plan, filesStr)
 		{Role: "user", Content: reviewPrompt},
 	}
 
-	// Higher iteration limit for complex validation tasks
-	// The validator may need multiple tool calls to:
-	// 1. Read modified files
-	// 2. Run build command (mix compile, go build, etc)
-	// 3. Parse build output
-	// 4. Make final determination
-	maxIterations := 10
+	// Tool call processing loop for validation - Maestro controls outer retry logic.
+	// Lower internal limit (5) since most validations complete in 2-3 iterations.
+	maxIterations := 5
 	for i := 0; i < maxIterations; i++ {
 		if os.Getenv("GPTCODE_DEBUG") == "1" {
 			fmt.Fprintf(os.Stderr, "[VALIDATOR] Iteration %d/%d\n", i+1, maxIterations)

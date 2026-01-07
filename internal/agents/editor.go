@@ -218,28 +218,27 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 	messages := make([]llm.ChatMessage, len(history))
 	copy(messages, history)
 
-	// Higher iteration limit for complex editing tasks
-	// The editor may need multiple tool calls to:
-	// 1. Read existing files
-	// 2. Apply patches or write files
-	// 3. Run verification commands
-	// 4. Fix errors discovered during execution
-	maxIterations := 10
-	for i := 0; i < maxIterations; i++ {
-		if statusCallback != nil {
-			statusCallback(fmt.Sprintf("Editor: Thinking (Iteration %d/%d)...", i+1, maxIterations))
-		}
-		if os.Getenv("GPTCODE_DEBUG") == "1" {
-			fmt.Fprintf(os.Stderr, "[EDITOR] Iteration %d/%d\n", i+1, maxIterations)
-		}
+	// Single-pass execution: Maestro/Conductor handles iteration control
+	// via centralized LoopDetector. This agent executes once and returns.
+	if statusCallback != nil {
+		statusCallback("Editor: Thinking...")
+	}
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[EDITOR] Single-pass execution (Maestro controls iterations)\n")
+	}
 
-		if os.Getenv("GPTCODE_DEBUG") == "1" && i == 0 {
-			fmt.Fprintf(os.Stderr, "[EDITOR] Messages count: %d\n", len(messages))
-			if len(messages) > 0 {
-				fmt.Fprintf(os.Stderr, "[EDITOR] First message: %s...\n", messages[0].Content[:min(200, len(messages[0].Content))])
-			}
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[EDITOR] Messages count: %d\n", len(messages))
+		if len(messages) > 0 {
+			fmt.Fprintf(os.Stderr, "[EDITOR] First message: %s...\n", messages[0].Content[:min(200, len(messages[0].Content))])
 		}
+	}
 
+	// Tool call processing loop: handles multiple sequential tool calls within a single editor run.
+	// The outer retry logic (errors, validation failures) is controlled by Maestro's LoopDetector.
+	// This internal loop is just for processing a chain of tool calls before returning.
+	maxToolChainDepth := 5
+	for iteration := 0; iteration < maxToolChainDepth; iteration++ {
 		resp, err := e.provider.Chat(ctx, llm.ChatRequest{
 			SystemPrompt: editorPrompt,
 			Messages:     messages,
