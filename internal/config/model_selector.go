@@ -148,8 +148,10 @@ func (ms *ModelSelector) loadCatalog() error {
 				model.TokensPerSec = int(tps)
 			}
 
-			model.Capabilities.SupportsTools = true
-			model.Capabilities.SupportsFileOperations = true
+			// CRITICAL: Default to false - models must explicitly declare tool support
+			// Small models (8B and below) typically don't support tool calling well
+			model.Capabilities.SupportsTools = false
+			model.Capabilities.SupportsFileOperations = false
 			model.Capabilities.SupportsCodeExecution = false
 
 			if caps, ok := modelMap["capabilities"].(map[string]interface{}); ok {
@@ -433,9 +435,16 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 }
 
 func (ms *ModelSelector) scoreModel(model ModelInfo, action ActionType, language string, complexity string) float64 {
+	// CRITICAL: For edit/review actions, model MUST support tools
 	if action == ActionEdit || action == ActionReview {
+		if !model.Capabilities.SupportsTools {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
+				fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Model %s/%s rejected: no tool calling support\n", model.Backend, model.ID)
+			}
+			return 0
+		}
 		if !model.Capabilities.SupportsFileOperations {
-			if os.Getenv("GPTCODE_DEBUG") == "1" && action == ActionEdit {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
 				fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Model %s/%s rejected: no file operations support\n", model.Backend, model.ID)
 			}
 			return 0
