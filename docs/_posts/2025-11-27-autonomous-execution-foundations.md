@@ -361,7 +361,7 @@ gptcode verify plan.md
 
 Create a plan with specific files:
 ```bash
-gptcode plan "add logout endpoint"
+gt plan "add logout endpoint"
 gptcode implement ~/.gptcode/plans/2025-11-27-logout.md
 ```
 

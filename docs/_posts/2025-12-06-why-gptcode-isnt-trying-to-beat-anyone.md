@@ -182,7 +182,7 @@ Honestly, try Cursor first. No hard feelings.
 ```bash
 # Try it yourself
 go install github.com/gptcode-cloud/cli/cmd/gptcode@latest
-gptcode setup
+gt setup
 
 # See exactly what's broken
 go test ./tests/e2e/...

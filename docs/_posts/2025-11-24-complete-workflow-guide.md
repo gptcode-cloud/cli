@@ -42,7 +42,7 @@ Let's add a "password reset" feature:
 ### 1. Research
 
 ```bash
-gptcode research "How is user authentication currently implemented?"
+gt research "How is user authentication currently implemented?"
 ```
 
 GPTCode will:
@@ -54,7 +54,7 @@ GPTCode will:
 ### 2. Plan
 
 ```bash
-gptcode plan "Add password reset feature with email verification"
+gt plan "Add password reset feature with email verification"
 ```
 
 GPTCode creates a detailed plan:
@@ -225,8 +225,8 @@ Implementation itself works for any language (LLM-based), but build/test verific
 ## Try It Yourself
 
 1. Pick a small feature to implement
-2. Start with: `gptcode research "How does X work?"`
-3. Create plan: `gptcode plan "Add Y feature"`
+2. Start with: `gt research "How does X work?"`
+3. Create plan: `gt plan "Add Y feature"`
 4. Implement interactively: `gptcode implement <plan>`
 5. Review results, iterate if needed
 6. Next time: use `--auto` for speed

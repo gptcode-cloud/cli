@@ -208,7 +208,7 @@ Intelligent model selection delivers:
 Try it today:
 ```bash
 gptcode mode cloud
-gptcode do "refactor auth module"
+gt do "refactor auth module"
 gptcode stats
 ```
 

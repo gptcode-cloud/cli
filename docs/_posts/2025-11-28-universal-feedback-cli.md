@@ -23,11 +23,11 @@ With two keystrokes you turn everyday corrections into continuous learning for G
 ## Installation
 ```bash
 # zsh (with diff)
-gptcode feedback hook install --with-diff --and-source
+gt feedback hook install --with-diff --and-source
 # bash
-gptcode feedback hook install --shell=bash --with-diff --and-source
+gt feedback hook install --shell=bash --with-diff --and-source
 # fish
-gptcode feedback hook install --shell=fish --with-diff
+gt feedback hook install --shell=fish --with-diff
 ```
 
 ## See it in action
@@ -44,14 +44,14 @@ gptcode feedback hook install --shell=fish --with-diff
 python3 ml/intent/scripts/process_feedback.py
 
 # Retrain the intent model (feedback weighted)
-gptcode ml train intent
+gt ml train intent
 ```
 
 ## For UIs/CLIs
 No API integration required. Let users press **Ctrl+g** before running.
 
 ## Advanced
-- Manual/programmatic submissions: `gptcode feedback submit --json -`
+- Manual/programmatic submissions: `gt feedback submit --json -`
 - Attach files: `--files path --files another`
 - Capture patch: `--capture-diff` (saved under `~/.gptcode/diffs/*.patch`)
 

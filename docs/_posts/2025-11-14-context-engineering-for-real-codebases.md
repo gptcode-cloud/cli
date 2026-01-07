@@ -219,11 +219,11 @@ Research/Plan/Implement artifacts solve this:
 ### Start With Focused Commands
 ```bash
 # Research phase - understand the codebase
-gptcode research "how does user auth work in this codebase"
+gt research "how does user auth work in this codebase"
 # Read the output, steer if needed
 
 # Plan phase - create structured plan
-gptcode plan "add password reset via email"
+gt plan "add password reset via email"
 # Review the plan before implementing
 
 # Implement phase - execute the plan
@@ -264,8 +264,8 @@ If you notice responses getting worse or repetitive:
 3. **Resume with context**: Load the compact summary
 
 GPTCode's command-based workflow naturally encourages this:
-- `gptcode research` → outputs findings
-- `gptcode plan` → reads findings, outputs plan  
+- `gt research` → outputs findings
+- `gt plan` → reads findings, outputs plan  
 - `gptcode implement` → reads plan, outputs code
 
 Each step is **independently verifiable** and **resumable**.
@@ -276,10 +276,10 @@ Don't try to do everything in one go:
 
 ```bash
 # Step 1: Understand what needs to change
-gptcode research "payment processing flow"
+gt research "payment processing flow"
 
 # Step 2: Create detailed plan
-gptcode plan "add Stripe webhook handling"
+gt plan "add Stripe webhook handling"
 # Review plan - does it make sense?
 
 # Step 3: Implement incrementally

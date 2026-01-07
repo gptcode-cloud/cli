@@ -9,19 +9,19 @@ GPTCode can now autonomously resolve GitHub issues from start to finish, includi
 
 ```bash
 # 1. Fix an issue
-gptcode issue fix 123
+gt issue fix 123
 
 # 2. Validate and commit
-gptcode issue commit 123 --auto-fix --check-coverage --security-scan
+gt issue commit 123 --auto-fix --check-coverage --security-scan
 
 # 3. Create pull request
-gptcode issue push 123
+gt issue push 123
 
 # 4. Handle CI failures (if any)
-gptcode issue ci 42
+gt issue ci 42
 
 # 5. Address review comments
-gptcode issue review 42
+gt issue review 42
 
 # 6. Repeat steps 4-5 until approved!
 ```
@@ -31,7 +31,7 @@ gptcode issue review 42
 ### Step 1: Fix Issue
 
 ```bash
-gptcode issue fix 123 [--repo owner/repo] [--autonomous] [--find-files]
+gt issue fix 123 [--repo owner/repo] [--autonomous] [--find-files]
 ```
 
 **What it does:**
@@ -74,14 +74,14 @@ Relevant files identified:
 [OK] Implementation complete
 
 Next steps:
-   gptcode issue commit 123
-   gptcode issue push 123
+   gt issue commit 123
+   gt issue push 123
 ```
 
 ### Step 2: Commit with Validation
 
 ```bash
-gptcode issue commit 123 [options]
+gt issue commit 123 [options]
 ```
 
 **What it does:**
@@ -153,13 +153,13 @@ When tests or linters fail, GPTCode uses LLM to:
 
 ✨ All validation passed!
 Next steps:
-  gptcode issue push 123
+  gt issue push 123
 ```
 
 ### Step 3: Push and Create PR
 
 ```bash
-gptcode issue push 123 [--repo owner/repo] [--draft]
+gt issue push 123 [--repo owner/repo] [--draft]
 ```
 
 **What it does:**
@@ -186,7 +186,7 @@ gptcode issue push 123 [--repo owner/repo] [--draft]
 ### Step 4: Handle CI Failures
 
 ```bash
-gptcode issue ci 42 [--repo owner/repo]
+gt issue ci 42 [--repo owner/repo]
 ```
 
 **What it does:**
@@ -245,7 +245,7 @@ Add special character check in validator
 ### Step 5: Address Review Comments
 
 ```bash
-gptcode issue review 42 [--repo owner/repo]
+gt issue review 42 [--repo owner/repo]
 ```
 
 **What it does:**
@@ -298,10 +298,10 @@ Repeat steps 4-5 as needed:
 
 ```bash
 # Check if new CI failures appeared
-gptcode issue ci 42
+gt issue ci 42
 
 # Check if new review comments appeared
-gptcode issue review 42
+gt issue review 42
 
 # Repeat until PR is approved and merged!
 ```
@@ -311,26 +311,26 @@ gptcode issue review 42
 ### Custom Commit Messages
 
 ```bash
-gptcode issue commit 123 --message "feat: Add password validation with special char requirement"
+gt issue commit 123 --message "feat: Add password validation with special char requirement"
 ```
 
 ### Strict Coverage Requirements
 
 ```bash
-gptcode issue commit 123 --check-coverage --min-coverage 90
+gt issue commit 123 --check-coverage --min-coverage 90
 ```
 
 ### Security-First Validation
 
 ```bash
-gptcode issue commit 123 --security-scan --skip-tests
+gt issue commit 123 --security-scan --skip-tests
 ```
 
 ### Manual Steps Only
 
 ```bash
-gptcode issue fix 123 --autonomous=false    # Show what needs to be done
-gptcode issue commit 123 --skip-tests --skip-lint  # Only commit
+gt issue fix 123 --autonomous=false    # Show what needs to be done
+gt issue commit 123 --skip-tests --skip-lint  # Only commit
 ```
 
 ## Architecture
@@ -422,7 +422,7 @@ git remote get-url origin
 Or specify explicitly:
 
 ```bash
-gptcode issue fix 123 --repo owner/repo
+gt issue fix 123 --repo owner/repo
 ```
 
 ## Limitations
@@ -465,7 +465,7 @@ git remote -v
 git remote add origin https://github.com/owner/repo.git
 
 # Or specify explicitly
-gptcode issue fix 123 --repo owner/repo
+gt issue fix 123 --repo owner/repo
 ```
 
 ### "gh: command not found"
@@ -498,7 +498,7 @@ gh pr checks 42
 
 # Wait for CI to complete
 # Then run:
-gptcode issue ci 42
+gt issue ci 42
 ```
 
 ### Review Comments Not Found
@@ -529,7 +529,7 @@ After achieving 100% MVAA:
 ## Changelog
 
 **2025-12-06** - MVP Complete (100% MVAA)
-- Added `gptcode issue ci` for CI failure handling
-- Added `gptcode issue review` for review comment handling
+- Added `gt issue ci` for CI failure handling
+- Added `gt issue review` for review comment handling
 - Achieved 100% MVAA Critical Path coverage
 - Overall autonomy: 59% (38/64 scenarios)

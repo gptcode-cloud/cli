@@ -102,7 +102,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 ### Workflow
 ```bash
-gptcode research "how does authentication work"
+gt research "how does authentication work"
 ```
 
 1. **Context gathering**: Reads mentioned files fully
@@ -150,7 +150,7 @@ Authentication is handled in internal/auth/:
 
 ### Workflow
 ```bash
-gptcode plan "add JWT authentication"
+gt plan "add JWT authentication"
 ```
 
 1. **Initial research**: Gathers context about current state
@@ -313,13 +313,13 @@ compare bcrypt vs argon2 for passwords
 **Example:**
 ```bash
 # Understanding (Query)
-gptcode chat "how does the current auth work"
+gt chat "how does the current auth work"
 
 # Research external approaches (Research)
-gptcode research "JWT best practices"
+gt research "JWT best practices"
 
 # Planning (Plan)
-gptcode plan "add JWT authentication"
+gt plan "add JWT authentication"
 
 # Implementation (Editor)
 gptcode implement plan.md
@@ -330,13 +330,13 @@ gptcode implement plan.md
 Start broad, then narrow:
 ```bash
 # 1. High-level understanding
-gptcode research "authentication system"
+gt research "authentication system"
 
 # 2. Specific area
-gptcode chat "show me the token validation logic"
+gt chat "show me the token validation logic"
 
 # 3. Targeted change
-gptcode chat "add refresh token support to the existing JWT validation"
+gt chat "add refresh token support to the existing JWT validation"
 ```
 
 ---
@@ -348,10 +348,10 @@ gptcode chat "add refresh token support to the existing JWT validation"
 For new features:
 ```bash
 # 1. Understand current state
-gptcode research "current user management system"
+gt research "current user management system"
 
 # 2. Create detailed plan
-gptcode plan "add role-based permissions"
+gt plan "add role-based permissions"
 
 # 3. Execute plan
 gptcode implement permissions-plan.md
@@ -362,13 +362,13 @@ gptcode implement permissions-plan.md
 For bug fixes:
 ```bash
 # 1. Find the bug
-gptcode chat "trace the login flow to find where session expires"
+gt chat "trace the login flow to find where session expires"
 
 # 2. Fix it
-gptcode chat "fix session expiry in auth/session.go"
+gt chat "fix session expiry in auth/session.go"
 
 # 3. Verify
-gptcode chat "write tests for session expiry edge cases"
+gt chat "write tests for session expiry edge cases"
 ```
 
 ### Pattern: Research → Compare → Decide
@@ -376,13 +376,13 @@ gptcode chat "write tests for session expiry edge cases"
 For architectural decisions:
 ```bash
 # 1. Research options
-gptcode research "authentication libraries in Go"
+gt research "authentication libraries in Go"
 
 # 2. Compare approaches
-gptcode research "JWT vs session-based auth pros/cons"
+gt research "JWT vs session-based auth pros/cons"
 
 # 3. Make informed decision
-gptcode plan "implement JWT authentication using github.com/golang-jwt"
+gt plan "implement JWT authentication using github.com/golang-jwt"
 ```
 
 ---
@@ -425,8 +425,8 @@ backend:
 
 ### Wrong agent selected
 - ML classifier has 89% accuracy, uses LLM fallback
-- Adjust threshold: `gptcode config set defaults.ml_intent_threshold 0.8`
-- Or specify explicitly: `gptcode chat --agent query "your question"`
+- Adjust threshold: `gt config set defaults.ml_intent_threshold 0.8`
+- Or specify explicitly: `gt chat --agent query "your question"`
 
 ---
 

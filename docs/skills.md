@@ -1,19 +1,44 @@
 ---
 layout: default
 title: Skills
-description: Language-specific guidelines and best practices that gptcode injects into AI prompts for better code quality.
+description: Language-specific expertise that gt injects into AI prompts for generating production-quality, idiomatic code.
 permalink: /skills/
 ---
 
 # GPTCode Skills
 
-Skills are language-specific guidelines that gptcode automatically injects into AI prompts when working with code. They help the AI write idiomatic, maintainable code following community best practices.
+**Skills are the secret sauce** behind `gt`'s ability to generate production-quality code. When you run any `gt` command, it automatically detects your project's language and injects the relevant skill into the AI's system prompt.
+
+> 💡 **The result**: Instead of generic code that "works", you get idiomatic code that follows community best practices, proper error handling, and language-specific patterns.
+
+## Why Skills Matter
+
+Without skills, AI models produce **generic** code:
+- No language idioms
+- Inconsistent error handling
+- Poor naming conventions
+- Missing documentation patterns
+
+With skills, `gt` produces **production-ready** code:
+- Idiomatic patterns (e.g., Go's explicit error handling, Elixir's pattern matching)
+- Consistent style following community guidelines
+- Proper documentation and testing patterns
+- Framework-specific best practices (Rails, Phoenix, React)
 
 ## How Skills Work
 
-1. **Detection**: gptcode detects the programming language of your project
-2. **Injection**: The relevant skill is automatically injected into the AI's system prompt
-3. **Better Output**: The AI follows language-specific patterns and idioms
+```
+┌──────────────────────────────────────────────────────────┐
+│  You run: gt do "add user authentication"                │
+│                        ↓                                 │
+│  gt detects: Ruby on Rails project (Gemfile, config/)   │
+│                        ↓                                 │
+│  gt injects: Rails skill + Ruby skill into prompt       │
+│                        ↓                                 │
+│  AI generates: Service objects, proper migrations,      │
+│                RSpec tests, Devise patterns             │
+└──────────────────────────────────────────────────────────┘
+```
 
 ## Available Skills
 
@@ -42,16 +67,16 @@ Skills are language-specific guidelines that gptcode automatically injects into 
 
 ```bash
 # List available skills
-gptcode skills list
+gt skills list
 
 # Install a specific skill
-gptcode skills install ruby
+gt skills install ruby
 
 # Install all built-in skills
-gptcode skills install-all
+gt skills install-all
 
 # View skill content
-gptcode skills show ruby
+gt skills show ruby
 ```
 
 ## Creating Custom Skills

@@ -57,7 +57,7 @@ GPTCode analyzes your codebase structure to provide **only relevant context** to
 
 ### Example: Authentication Bug
 
-**Your query**: `gptcode chat "fix bug in authentication"`
+**Your query**: `gt chat "fix bug in authentication"`
 
 **Without graph** (naive):
 - Sends: All 142 files (100,000 tokens)
@@ -153,10 +153,10 @@ More languages coming soon (Java, C++, etc.)
 
 ### Automatic (Default)
 
-Graph analysis works transparently in `gptcode chat`:
+Graph analysis works transparently in `gt chat`:
 
 ```bash
-gptcode chat "explain how routing works"
+gt chat "explain how routing works"
 ```
 
 The system:
@@ -170,7 +170,7 @@ The system:
 See what the graph is doing:
 
 ```bash
-GPTCODE_DEBUG=1 gptcode chat "your query"
+GPTCODE_DEBUG=1 gt chat "your query"
 ```
 
 Output:
@@ -191,13 +191,13 @@ Control how many files to include:
 
 ```bash
 # View current setting
-gptcode config get defaults.graph_max_files
+gt config get defaults.graph_max_files
 
 # Change to 3 files (more focused)
-gptcode config set defaults.graph_max_files 3
+gt config set defaults.graph_max_files 3
 
 # Change to 10 files (broader context)
-gptcode config set defaults.graph_max_files 10
+gt config set defaults.graph_max_files 10
 ```
 
 **Recommendation**: Start with 5 (default), adjust based on codebase size.
@@ -205,7 +205,7 @@ gptcode config set defaults.graph_max_files 10
 ### Disable (if needed)
 
 ```bash
-GPTCODE_GRAPH=false gptcode chat "query"
+GPTCODE_GRAPH=false gt chat "query"
 ```
 
 ## Technical Details
@@ -341,7 +341,7 @@ make install
 
 ```bash
 # Enable debug to see graph in action
-GPTCODE_DEBUG=1 gptcode chat "explain authentication flow"
+GPTCODE_DEBUG=1 gt chat "explain authentication flow"
 ```
 
 ### 3. Observe the Magic
@@ -355,7 +355,7 @@ Watch as GPTCode:
 
 Try the same query with graph disabled:
 ```bash
-GPTCODE_GRAPH=false gptcode chat "explain authentication flow"
+GPTCODE_GRAPH=false gt chat "explain authentication flow"
 ```
 
 Notice:
@@ -413,7 +413,7 @@ Dependency graph delivers:
 
 Try it today:
 ```bash
-gptcode chat "your question about the codebase"
+gt chat "your question about the codebase"
 ```
 
 ---

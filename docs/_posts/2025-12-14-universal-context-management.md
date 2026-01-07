@@ -54,13 +54,13 @@ Just like you wouldn't copy-paste code between developers, why copy-paste contex
 ```bash
 # One time setup
 cd ~/your-project
-gptcode context init
+gt context init
 
 # Edit context (like editing code)
 vi .gptcode/context/shared.md
 
 # Sync to ALL your AI tools
-gptcode context sync
+gt context sync
 # ✅ Warp
 # ✅ Cursor
 # ✅ Clipboard (for ChatGPT/Claude web)
@@ -74,7 +74,7 @@ That's it. **Single source of truth.** Version-controlled. Team-shared.
 
 ```bash
 # Every Warp session
-gptcode context sync  # ← 1 second
+gt context sync  # ← 1 second
 # vs
 # 10 minutes of copy-pasting and explaining
 ```
@@ -89,7 +89,7 @@ git push
 
 # Developer B gets it automatically
 git pull
-gptcode context sync
+gt context sync
 # ✅ Their AI now knows about Redis too
 ```
 
@@ -161,7 +161,7 @@ See .gptcode/context/next.md
 
 **Every developer, every session:**
 ```bash
-gptcode context sync  # ← Done
+gt context sync  # ← Done
 ```
 
 AI knows:
@@ -211,7 +211,7 @@ Changes occasionally (quarterly):
 ### 2. Auto-Sync to Integrations
 
 ```bash
-gptcode context sync
+gt context sync
 
 # Writes:
 WARP.md              ← Warp reads this
@@ -231,7 +231,7 @@ commit abc123 - "Update: migrated to microservices"
 
 ```bash
 git pull              # Get team's context updates
-gptcode context sync  # Update local tools
+gt context sync  # Update local tools
 ```
 
 ## Use Cases
@@ -248,7 +248,7 @@ gptcode context sync  # Update local tools
 - notification-service: Go, port 8080
 [... 17 more services]
 
-gptcode context sync  # AI knows ALL services
+gt context sync  # AI knows ALL services
 ```
 
 Every session starts with full context. No more "wait, which port does user-service run on?"
@@ -260,9 +260,9 @@ Every session starts with full context. No more "wait, which port does user-serv
 ```bash
 git clone repo
 cd repo
-gptcode context show  # ← Full architecture overview in 30 seconds
+gt context show  # ← Full architecture overview in 30 seconds
 
-gptcode context sync  # ← All AI tools have context
+gt context sync  # ← All AI tools have context
 # Start coding immediately
 ```
 
@@ -274,10 +274,10 @@ No more 2-week ramp-up. Context is in the repo.
 
 ```bash
 # Once
-gptcode context sync              # Warp + Cursor
+gt context sync              # Warp + Cursor
 
 # Per session
-gptcode context export clipboard  # Claude web
+gt context export clipboard  # Claude web
 ```
 
 Same context, every tool. Zero copy-paste.
@@ -294,7 +294,7 @@ git commit -am "Update: split into microservices"
 
 # Everyone gets it
 git pull
-gptcode context sync
+gt context sync
 ```
 
 Context stays synchronized with reality.
@@ -370,7 +370,7 @@ go install github.com/gptcode-cloud/cli/cmd/gptcode@latest
 
 ```bash
 cd ~/your-project
-gptcode context init
+gt context init
 ```
 
 ### Fill in Context
@@ -383,7 +383,7 @@ vi .gptcode/context/next.md
 ### Sync
 
 ```bash
-gptcode context sync
+gt context sync
 ```
 
 ### Commit
@@ -425,7 +425,7 @@ You can. But:
 Context Layer:
 - ✅ **Universal**: One source → all tools
 - ✅ **Separated**: `shared.md`, `next.md`, `roadmap.md`
-- ✅ **Tooling**: `gptcode context sync`, validation, etc.
+- ✅ **Tooling**: `gt context sync`, validation, etc.
 
 Think of it as: **WARP.md is the compilation target, `.gptcode/context/` is the source code.**
 
@@ -469,7 +469,7 @@ Universal Context Management gives you:
 
 All for running:
 ```bash
-gptcode context init
+gt context init
 ```
 
 ## Try It
@@ -480,13 +480,13 @@ go install github.com/gptcode-cloud/cli/cmd/gptcode@latest
 
 # Initialize
 cd ~/your-project
-gptcode context init
+gt context init
 
 # Fill in context
 vi .gptcode/context/shared.md
 
 # Sync
-gptcode context sync
+gt context sync
 
 # Done
 ```

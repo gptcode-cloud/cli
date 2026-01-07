@@ -9,7 +9,7 @@ Official Docker image for GPTCode CLI - your AI coding assistant.
 docker pull gptcode/cli:latest
 
 # Run with your token
-docker run -e GPTCODE_TOKEN=$GPTCODE_TOKEN gptcode/cli:latest gptcode chat "explain Docker"
+docker run -e GPTCODE_TOKEN=$GPTCODE_TOKEN gptcode/cli:latest gt chat "explain Docker"
 ```
 
 ## Usage in CI/CD
@@ -28,7 +28,7 @@ jobs:
       - name: AI Code Review
         env:
           GPTCODE_TOKEN: ${{ secrets.GPTCODE_TOKEN }}
-        run: gptcode review --ci
+        run: gt review --ci
 ```
 
 ### GitLab CI
@@ -37,7 +37,7 @@ jobs:
 code-review:
   image: gptcode/cli:latest
   script:
-    - gptcode review --ci
+    - gt review --ci
   variables:
     GPTCODE_TOKEN: $GPTCODE_TOKEN
 ```
@@ -55,7 +55,7 @@ pipeline {
     stages {
         stage('AI Review') {
             steps {
-                sh 'gptcode review --ci'
+                sh 'gt review --ci'
             }
         }
     }
@@ -78,7 +78,7 @@ For persistent configuration:
 docker run -v ~/.gptcode:/home/gptcode/.gptcode \
            -v $(pwd):/workspace \
            -w /workspace \
-           gptcode/cli:latest gptcode do "fix the tests"
+           gptcode/cli:latest gt do "fix the tests"
 ```
 
 ## Available Tags

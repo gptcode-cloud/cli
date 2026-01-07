@@ -13,24 +13,24 @@ go build -o ./bin/gptcode ./cmd/gptcode
 
 ## Initial setup
 ```bash
-gptcode setup             # creates ~/.gptcode/setup.yaml
+gt setup             # creates ~/.gptcode/setup.yaml
 gptcode key openrouter    # add API key(s) as needed
-gptcode backend           # check current backend
-gptcode backend list      # list all backends
-gptcode profile           # check current profile
+gt backend           # check current backend
+gt backend list      # list all backends
+gt profile           # check current profile
 ```
 
 ## Quick start: two‑keystroke feedback (Ctrl+g)
 Capture corrections from any CLI as training signals.
 ```bash
 # zsh
-gptcode feedback hook install --with-diff --and-source
+gt feedback hook install --with-diff --and-source
 
 # bash
-gptcode feedback hook install --shell=bash --with-diff --and-source
+gt feedback hook install --shell=bash --with-diff --and-source
 
 # fish
-gptcode feedback hook install --shell=fish --with-diff
+gt feedback hook install --shell=fish --with-diff
 ```
 Usage:
 1) Type/paste the suggested command
@@ -41,26 +41,26 @@ GPTCode records good/bad outcomes and saves changed files and optional git patch
 
 Check stats:
 ```bash
-gptcode feedback stats
+gt feedback stats
 ```
 
 ## Core commands
 
 - Chat (code‑focused Q&A):
 ```bash
-gptcode chat "how does auth middleware work?"
+gt chat "how does auth middleware work?"
 ```
 
 - Orchestrated execution (Analyzer → Planner → Editor → Validator):
 ```bash
-gptcode do "add feature"
-gptcode do --supervised "refactor module"
+gt do "add feature"
+gt do --supervised "refactor module"
 ```
 
 - Model management:
 ```bash
-gptcode model list
-gptcode model recommend editor
+gt model list
+gt model recommend editor
 ```
 
 ## Troubleshooting

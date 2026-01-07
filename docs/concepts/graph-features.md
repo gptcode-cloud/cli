@@ -117,13 +117,13 @@ Control how many files are added to context:
 
 ```bash
 # View current setting (default: 5)
-gptcode config get defaults.graph_max_files
+gt config get defaults.graph_max_files
 
 # Increase for more context (1-20)
-gptcode config set defaults.graph_max_files 10
+gt config set defaults.graph_max_files 10
 
 # Decrease for fewer tokens
-gptcode config set defaults.graph_max_files 3
+gt config set defaults.graph_max_files 3
 ```
 
 **Recommendations:**
@@ -136,7 +136,7 @@ gptcode config set defaults.graph_max_files 3
 **Enable debug mode:**
 ```bash
 export GPTCODE_DEBUG=1
-gptcode chat "your query"  # Shows graph stats
+gt chat "your query"  # Shows graph stats
 ```
 
 Debug output example:
@@ -157,7 +157,7 @@ Debug output example:
 Force rebuild ignoring cache:
 
 ```bash
-gptcode graph build
+gt graph build
 ```
 
 Output:
@@ -179,9 +179,9 @@ Output:
 Find relevant files for a query:
 
 ```bash
-gptcode graph query "authentication"
-gptcode graph query "database connection"
-gptcode graph query "api routes"
+gt graph query "authentication"
+gt graph query "database connection"
+gt graph query "api routes"
 ```
 
 Output:
@@ -199,10 +199,10 @@ Output:
 
 ## Auto-Integration in Chat Mode
 
-The graph automatically enhances `gptcode chat`:
+The graph automatically enhances `gt chat`:
 
 ```bash
-gptcode chat "how does authentication work?"
+gt chat "how does authentication work?"
 ```
 
 **What happens:**
@@ -253,7 +253,7 @@ The graph is expensive to build (300ms for 500 files), so results are cached:
 
 ```bash
 # Force rebuild (clears cache)
-gptcode graph build
+gt graph build
 
 # Clear all caches manually
 rm -rf ~/.gptcode/cache/graph_*.json
@@ -370,7 +370,7 @@ def optimize_context(query, max_files):
 ### Example 1: Authentication Query
 
 ```bash
-gptcode chat "explain the authentication flow"
+gt chat "explain the authentication flow"
 ```
 
 **Graph selects:**
@@ -385,7 +385,7 @@ gptcode chat "explain the authentication flow"
 ### Example 2: Database Query
 
 ```bash
-gptcode chat "how do we connect to the database?"
+gt chat "how do we connect to the database?"
 ```
 
 **Graph selects:**
@@ -400,7 +400,7 @@ gptcode chat "how do we connect to the database?"
 ### Example 3: API Routes Query
 
 ```bash
-gptcode chat "list all api endpoints"
+gt chat "list all api endpoints"
 ```
 
 **Graph selects:**
@@ -427,7 +427,7 @@ ls **/*.go **/*.py **/*.ts
 
 # Enable debug mode
 export GPTCODE_DEBUG=1
-gptcode graph build
+gt graph build
 
 # Check for errors in output
 ```
@@ -439,13 +439,13 @@ gptcode graph build
 **Solutions:**
 ```bash
 # Test query matching
-gptcode graph query "your search term"
+gt graph query "your search term"
 
 # Adjust max_files if too few/many
-gptcode config set defaults.graph_max_files 8
+gt config set defaults.graph_max_files 8
 
 # Rebuild graph if stale
-gptcode graph build
+gt graph build
 ```
 
 ### Cache not updating
@@ -455,7 +455,7 @@ gptcode graph build
 **Solutions:**
 ```bash
 # Force rebuild
-gptcode graph build
+gt graph build
 
 # Clear cache manually
 rm ~/.gptcode/cache/graph_*.json

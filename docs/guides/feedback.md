@@ -17,13 +17,13 @@ Capture feedback from any CLI with two keystrokes:
 ### Install the hook
 ```bash
 # zsh (with diff)
-gptcode feedback hook install --with-diff
+gt feedback hook install --with-diff
 
 # bash
-gptcode feedback hook install --shell=bash --with-diff
+gt feedback hook install --shell=bash --with-diff
 
 # fish
-gptcode feedback hook install --shell=fish --with-diff
+gt feedback hook install --shell=fish --with-diff
 ```
 
 This creates and references a hook at `~/.gptcode/feedback_hook.<shell>` and updates your shell rc.
@@ -49,12 +49,12 @@ gptcode demo feedback create           # also available as: `gptcode demo feedba
 
 ## Check events
 ```bash
-gptcode feedback stats
+gt feedback stats
 ```
 
 ## Manual/programmatic submission (optional)
 ```bash
-gptcode feedback submit \
+gt feedback submit \
   --sentiment=bad --kind=command --source=shell --agent=editor \
   --task='open Elixir console on Fly.io' \
   --wrong='fly ssh console --exec "iex -S mix"' \

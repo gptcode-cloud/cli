@@ -14,12 +14,12 @@ This is a summary of the features that shipped in December. No marketing speak, 
 
 We added three commands that actually work:
 
-### `gptcode plan`
+### `gt plan`
 
 Creates a markdown plan before you start coding. Why? Because jumping straight into implementation usually means you'll miss something.
 
 ```bash
-gptcode plan "Add user authentication with JWT"
+gt plan "Add user authentication with JWT"
 ```
 
 This gives you:
@@ -43,12 +43,12 @@ What makes this different:
 - **Verification**: Runs tests/build after each phase
 - **Interactive mode**: Asks before making changes (default)
 
-### `gptcode do`
+### `gt do`
 
 End-to-end autonomous execution. Give it a task, it figures out the rest:
 
 ```bash
-gptcode do "Fix the failing test in auth_test.go"
+gt do "Fix the failing test in auth_test.go"
 ```
 
 This uses the Symphony pattern internally:
@@ -100,7 +100,7 @@ echo "## New Architecture\nMigrated to microservices" >> .gptcode/context/shared
 If you're working on sensitive code, enable Private Mode:
 
 ```bash
-gptcode context live --private
+gt context live --private
 ```
 
 The server becomes a blind relay. It sees encrypted blobs, nothing readable. Uses X25519 + ChaCha20-Poly1305 (same as Signal).
@@ -112,11 +112,11 @@ The server becomes a blind relay. It sees encrypted blobs, nothing readable. Use
 go install github.com/gptcode-cloud/cli/cmd/gptcode@latest
 
 # Try the workflow
-gptcode plan "Add rate limiting to API endpoints"
+gt plan "Add rate limiting to API endpoints"
 gptcode implement ~/.gptcode/plans/rate-limiting-plan.md
 
 # Or go autonomous
-gptcode do "Add a health check endpoint"
+gt do "Add a health check endpoint"
 
 # Run Live Dashboard (requires Elixir)
 cd live && mix deps.get && mix phx.server

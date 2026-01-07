@@ -75,7 +75,7 @@ But for teams handling sensitive code, these trade-offs are worth it.
 
 ```bash
 # When connecting to Live Dashboard
-gptcode context live --private
+gt context live --private
 
 # Or in your config
 echo "live:
@@ -130,6 +130,6 @@ Your code stays yours. Even we can't read it.
 
 ---
 
-*Try Private Mode today: `gptcode context live --private`*
+*Try Private Mode today: `gt context live --private`*
 
 *Questions? [Join our Discord](https://discord.gg/gptcode) or [open an issue](https://github.com/gptcode-cloud/cli/issues).*

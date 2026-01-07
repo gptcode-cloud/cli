@@ -49,7 +49,7 @@ Instead of loading all 58 tools upfront, Anthropic defers most tools and discove
 GPTCode doesn't use a tool search. Instead, it routes to **specialized agents**:
 
 ```bash
-gptcode do "add authentication"
+gt do "add authentication"
   ↓
 ML Classifier (1ms) → OrchestratedMode
   ↓
@@ -98,7 +98,7 @@ print(json.dumps(exceeded))  # Just 3 people
 
 ### GPTCode: Maestro Pipeline
 
-GPTCode's autonomous mode (`gptcode do`) implements orchestration as an **agent pipeline**:
+GPTCode's autonomous mode (`gt do`) implements orchestration as an **agent pipeline**:
 
 ```
 Analyzer (scans 100 files)
@@ -257,7 +257,7 @@ We're adopting Anthropic's **Tool Use Examples** pattern while keeping our fast,
 ## Try It
 
 ```bash
-gptcode do "add user authentication"
+gt do "add user authentication"
 # 1ms routing → Analyzer → Planner → Editor → Validator
 # 100K codebase → 20K relevant context → 3 files modified
 # Total cost: $0.000556 (vs. $0.01+ with full context)

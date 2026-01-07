@@ -49,10 +49,10 @@ Routes user requests to the right agent (query, editor, research, review):
 Auto-detects if a task is simple or complex:
 
 ```bash
-gptcode chat "fix typo in readme"
+gt chat "fix typo in readme"
 # → Simple task, stays in chat mode
 
-gptcode chat "implement oauth2 with jwt"
+gt chat "implement oauth2 with jwt"
 # → Complex task, automatically activates Guided Mode
 ```
 
@@ -106,15 +106,15 @@ Both models have configurable confidence thresholds:
 
 ```bash
 # Intent classification (default: 0.7)
-gptcode config get defaults.ml_intent_threshold
-gptcode config set defaults.ml_intent_threshold 0.8  # More conservative
+gt config get defaults.ml_intent_threshold
+gt config set defaults.ml_intent_threshold 0.8  # More conservative
 
 # Complexity detection (default: 0.55)
-gptcode config get defaults.ml_complex_threshold
-gptcode config set defaults.ml_complex_threshold 0.6  # Less Guided Mode
+gt config get defaults.ml_complex_threshold
+gt config set defaults.ml_complex_threshold 0.6  # Less Guided Mode
 ```
 
-> **Note**: These use `gptcode config` commands for direct manipulation. For general backend/profile management, see the user-friendly `gptcode backend` and `gptcode profile` commands.
+> **Note**: These use `gt config` commands for direct manipulation. For general backend/profile management, see the user-friendly `gt backend` and `gt profile` commands.
 
 **Lower threshold** = more ML, faster but riskier
 **Higher threshold** = more LLM fallback, slower but safer
@@ -125,12 +125,12 @@ gptcode config set defaults.ml_complex_threshold 0.6  # Less Guided Mode
 
 ```bash
 # Test intent classification
-gptcode ml test intent
+gt ml test intent
 > explain this code
 Prediction: query (confidence: 0.89)
 
 # Test complexity detection
-gptcode ml test complexity
+gt ml test complexity
 > implement oauth2 authentication
 Prediction: complex (confidence: 0.91) → Would trigger Guided Mode
 ```
@@ -138,10 +138,10 @@ Prediction: complex (confidence: 0.91) → Would trigger Guided Mode
 ### Evaluate accuracy
 
 ```bash
-gptcode ml eval intent
+gt ml eval intent
 Overall Accuracy: 89.1%
 
-gptcode ml eval complexity
+gt ml eval complexity
 Overall Accuracy: 92.3%
 ```
 
@@ -149,8 +149,8 @@ Overall Accuracy: 92.3%
 
 ```bash
 # Retrain with your own examples
-gptcode ml train intent
-gptcode ml train complexity
+gt ml train intent
+gt ml train complexity
 ```
 
 Training data is in `ml/{model}/data/training_data.csv` - add your own examples and retrain to customize the models for your workflow.
@@ -269,7 +269,7 @@ This means you can handle 5x more chat interactions before hitting rate limits o
 ## Real Usage Example
 
 ```bash
-$ gptcode chat
+$ gt chat
 
 > show me the auth code
 # ML: "show" → query agent (1ms)
@@ -315,12 +315,12 @@ Want to see them in action?
 
 ```bash
 # Interactive testing
-gptcode ml test intent
-gptcode ml test complexity
+gt ml test intent
+gt ml test complexity
 
 # Check your current config
-gptcode config get defaults.ml_intent_threshold
-gptcode config get defaults.ml_complex_threshold
+gt config get defaults.ml_intent_threshold
+gt config get defaults.ml_complex_threshold
 
 # View training data
 cat ml/intent/data/training_data.csv

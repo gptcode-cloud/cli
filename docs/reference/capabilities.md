@@ -39,11 +39,11 @@ GPTCode can autonomously resolve simple GitHub issues end-to-end:
 
 **Commands:**
 ```bash
-gptcode issue fix 123       # Fetch and implement
-gptcode issue commit 123    # Validate and commit  
-gptcode issue push 123      # Create PR
-gptcode issue ci 42         # Handle CI failures
-gptcode issue review 42     # Address review comments
+gt issue fix 123       # Fetch and implement
+gt issue commit 123    # Validate and commit  
+gt issue push 123      # Create PR
+gt issue ci 42         # Handle CI failures
+gt issue review 42     # Address review comments
 ```
 
 **Limitations:**
@@ -307,14 +307,14 @@ gptcode git reword HEAD
 **Implemented:**
 
 - ✅ Generate CHANGELOG entries (`gptcode gen changelog`)
-- ✅ Update README files (`gptcode docs update`)
-- ✅ Generate API documentation (`gptcode docs api`)
+- ✅ Update README files (`gt docs update`)
+- ✅ Generate API documentation (`gt docs api`)
 
 **Examples:**
 ```bash
 gptcode gen changelog           # All commits since last tag
-gptcode docs update             # Analyze and preview README updates
-gptcode docs update --apply     # Apply updates automatically
+gt docs update             # Analyze and preview README updates
+gt docs update --apply     # Apply updates automatically
 ```
 
 **Limitations:**
@@ -322,7 +322,7 @@ gptcode docs update --apply     # Apply updates automatically
 - API docs require schema/spec parsing
 - Uses conventional commits format for CHANGELOG
 
-**Workaround:** Use `gptcode chat` mode to draft API documentation.
+**Workaround:** Use `gt chat` mode to draft API documentation.
 
 ---
 

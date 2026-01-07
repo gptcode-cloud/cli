@@ -31,7 +31,7 @@ GPTCode's Universal Context Layer provides a **single source of truth** for proj
 
 ```bash
 cd ~/your-project
-gptcode context init
+gt context init
 ```
 
 This creates:
@@ -92,32 +92,32 @@ terraform apply
 
 **Option A: Auto-sync to integrations**
 ```bash
-gptcode context sync
+gt context sync
 # ✅ Synced to WARP.md (Warp uses it automatically)
 # ✅ Synced to .cursor/docs/ (Cursor reads it)
 ```
 
 **Option B: Copy to clipboard**
 ```bash
-gptcode context export clipboard
+gt context export clipboard
 # ✅ Context copied - paste into any AI chat
 ```
 
 **Option C: Show in terminal**
 ```bash
-gptcode context show          # Show all
-gptcode context show shared   # Show specific
+gt context show          # Show all
+gt context show shared   # Show specific
 ```
 
 ## Commands Reference
 
-### `gptcode context init`
+### `gt context init`
 Initialize `.gptcode/` directory structure.
 
 **Example:**
 ```bash
 cd ~/project
-gptcode context init
+gt context init
 ```
 
 **Output:**
@@ -135,32 +135,32 @@ gptcode context init
 
 📝 Next steps:
   1. Edit context files: vi .gptcode/context/shared.md
-  2. Show context: gptcode context show
-  3. Export for use: gptcode context export clipboard
+  2. Show context: gt context show
+  3. Export for use: gt context export clipboard
 ```
 
-### `gptcode context show [type]`
+### `gt context show [type]`
 Display context content.
 
 **Examples:**
 ```bash
-gptcode context show          # Show all contexts
-gptcode context show shared   # Show only shared.md
-gptcode context show next     # Show only next.md
-gptcode context show roadmap  # Show only roadmap.md
+gt context show          # Show all contexts
+gt context show shared   # Show only shared.md
+gt context show next     # Show only next.md
+gt context show roadmap  # Show only roadmap.md
 ```
 
-### `gptcode context add <type> <content>`
+### `gt context add <type> <content>`
 Append content to a context file.
 
 **Examples:**
 ```bash
-gptcode context add shared "## New Section\nContent here"
-gptcode context add next "- [ ] Implement feature X"
-gptcode context add roadmap "### Q2 2025\n- Launch mobile app"
+gt context add shared "## New Section\nContent here"
+gt context add next "- [ ] Implement feature X"
+gt context add roadmap "### Q2 2025\n- Launch mobile app"
 ```
 
-### `gptcode context sync`
+### `gt context sync`
 Sync context to integration formats.
 
 **What it does:**
@@ -172,7 +172,7 @@ Sync context to integration formats.
 
 **Example:**
 ```bash
-gptcode context sync
+gt context sync
 
 # Output:
 🔄 Syncing context to integrations...
@@ -191,21 +191,21 @@ integrations:
     doc_path: .cursor/docs
 ```
 
-### `gptcode context export <format>`
+### `gt context export <format>`
 Export context to specific format or clipboard.
 
 **Examples:**
 ```bash
 # Copy to clipboard (macOS)
-gptcode context export clipboard
+gt context export clipboard
 # ✅ Context copied to clipboard
 # 📋 1,234 characters ready to paste
 
 # Print in Warp format
-gptcode context export warp
+gt context export warp
 
 # Print in Cursor format
-gptcode context export cursor
+gt context export cursor
 ```
 
 ## Use Cases
@@ -217,7 +217,7 @@ gptcode context export cursor
 **Solution:**
 ```bash
 .gptcode/context/shared.md  # Documents all 20 services
-gptcode context sync         # WARP.md always up-to-date
+gt context sync         # WARP.md always up-to-date
 ```
 
 **Result:** Every Warp session instantly knows your entire architecture.
@@ -235,7 +235,7 @@ git push
 
 # Developer B receives update
 git pull
-gptcode context sync  # Local tools updated automatically
+gt context sync  # Local tools updated automatically
 ```
 
 **Result:** Team shares single source of truth, always in sync.
@@ -255,8 +255,8 @@ integrations:
 ```
 
 ```bash
-gptcode context sync              # Updates Warp & Cursor
-gptcode context export clipboard  # For Claude web chat
+gt context sync              # Updates Warp & Cursor
+gt context export clipboard  # For Claude web chat
 ```
 
 **Result:** Same context everywhere, zero copy-paste.
@@ -270,10 +270,10 @@ gptcode context export clipboard  # For Claude web chat
 # New dev joins
 git clone repo
 cd repo
-gptcode context show  # ← Instant architecture overview
+gt context show  # ← Instant architecture overview
 
 # Start using AI assistants
-gptcode context sync  # ← Tools have full context immediately
+gt context sync  # ← Tools have full context immediately
 ```
 
 **Result:** Productive from day 1.
@@ -286,7 +286,7 @@ gptcode context sync  # ← Tools have full context immediately
 ```bash
 # Architecture changes
 vi .gptcode/context/shared.md  # Update in ONE place
-gptcode context sync           # Propagate everywhere
+gt context sync           # Propagate everywhere
 git commit -m "Update: migrated to microservices"
 ```
 
@@ -371,7 +371,7 @@ Just like code review:
 #!/bin/bash
 # Auto-sync context after git pull
 if command -v gptcode &> /dev/null; then
-    gptcode context sync --quiet
+    gt context sync --quiet
 fi
 ```
 
@@ -388,7 +388,7 @@ integrations:
 ```
 
 **How it works:**
-1. `gptcode context sync` combines `shared.md` + `next.md`
+1. `gt context sync` combines `shared.md` + `next.md`
 2. Writes to `WARP.md` in project root
 3. Warp Agent automatically loads `WARP.md` as project rules
 
@@ -417,7 +417,7 @@ cursor:
 ```
 
 **How it works:**
-1. `gptcode context sync` copies each file individually:
+1. `gt context sync` copies each file individually:
    - `.gptcode/context/shared.md` → `.cursor/docs/shared.md`
    - `.gptcode/context/next.md` → `.cursor/docs/next.md`
    - `.gptcode/context/roadmap.md` → `.cursor/docs/roadmap.md`
@@ -435,10 +435,10 @@ auto_load:
 ```
 
 **Effect:**
-- `gptcode context sync` → Uses `auto_load` list
-- `gptcode context export warp` → Uses `shared` + `next`
-- `gptcode context export cursor` → Uses all three
-- `gptcode context show` → Shows requested types
+- `gt context sync` → Uses `auto_load` list
+- `gt context export warp` → Uses `shared` + `next`
+- `gt context export cursor` → Uses all three
+- `gt context show` → Shows requested types
 
 ## Version Control
 
@@ -475,7 +475,7 @@ diffs/
 **Adding context:**
 ```bash
 vi .gptcode/context/shared.md
-gptcode context sync
+gt context sync
 git add .gptcode/ WARP.md
 git commit -m "docs: Update architecture context"
 git push
@@ -484,7 +484,7 @@ git push
 **Receiving updates:**
 ```bash
 git pull
-gptcode context sync  # Update local integrations
+gt context sync  # Update local integrations
 ```
 
 **Merge conflicts:**
@@ -493,7 +493,7 @@ gptcode context sync  # Update local integrations
 vi .gptcode/context/shared.md  # Resolve conflict
 git add .gptcode/context/shared.md
 git commit
-gptcode context sync           # Regenerate WARP.md
+gt context sync           # Regenerate WARP.md
 git add WARP.md
 git commit --amend
 ```
@@ -506,12 +506,12 @@ Use different contexts per project:
 
 ```bash
 cd ~/project-a
-gptcode context init
-gptcode context sync  # → project-a/WARP.md
+gt context init
+gt context sync  # → project-a/WARP.md
 
 cd ~/project-b
-gptcode context init
-gptcode context sync  # → project-b/WARP.md
+gt context init
+gt context sync  # → project-b/WARP.md
 ```
 
 Warp Agent loads correct `WARP.md` based on current directory.
@@ -536,14 +536,14 @@ Context search walks up directory tree:
 # .github/workflows/validate.yml
 - name: Validate context
   run: |
-    gptcode context show
-    gptcode context sync --dry-run  # Future: validate without writing
+    gt context show
+    gt context sync --dry-run  # Future: validate without writing
 ```
 
 **Auto-sync on deploy:**
 ```bash
 # deploy.sh
-gptcode context add next "- [x] Deployed v1.2.3 to production"
+gt context add next "- [x] Deployed v1.2.3 to production"
 git commit -am "Update deployment status"
 ```
 
@@ -553,28 +553,28 @@ git commit -am "Update deployment status"
 
 **Error:**
 ```bash
-$ gptcode context show
-Error: .gptcode directory not found (run 'gptcode context init')
+$ gt context show
+Error: .gptcode directory not found (run 'gt context init')
 ```
 
 **Solution:**
 ```bash
 cd /path/to/project/root
-gptcode context init
+gt context init
 ```
 
 ### "Clipboard export failed"
 
 **Error:**
 ```bash
-$ gptcode context export clipboard
+$ gt context export clipboard
 Error: failed to copy to clipboard (pbcopy not available)
 ```
 
 **Solution:**
 - **macOS**: `pbcopy` should be available by default
 - **Linux**: Install `xclip` or `xsel`
-- **Windows**: Use `gptcode context export warp` and copy output
+- **Windows**: Use `gt context export warp` and copy output
 
 ### Sync Not Working
 
@@ -592,7 +592,7 @@ integrations:
 
 **Run sync with verbose output:**
 ```bash
-gptcode context sync
+gt context sync
 # Should show:
 # ✅ Synced to WARP.md
 ```
@@ -610,7 +610,7 @@ GPTCode CLI just makes it easier to manage.
 
 ### What if I don't use Warp or Cursor?
 
-Use `gptcode context export clipboard` to copy context for:
+Use `gt context export clipboard` to copy context for:
 - ChatGPT web
 - Claude web
 - Gemini web
@@ -631,13 +631,13 @@ Currently: `shared.md`, `next.md`, `roadmap.md`.
 **Those are tool-specific.** GPTCode Context Layer is **tool-agnostic**:
 
 - ✅ Edit in ONE place (`.gptcode/context/`)
-- ✅ Sync to ALL tools (`gptcode context sync`)
+- ✅ Sync to ALL tools (`gt context sync`)
 - ✅ Version-controlled evolution
 - ✅ Team-shared via git
 
 ## Next Steps
 
-- **Try it:** `gptcode context init`
+- **Try it:** `gt context init`
 - **Blog post:** [Why Your AI Needs Context Management](link)
 - **Examples:** [Real-world context examples](link)
 - **Community:** Share your context setup in Discussions

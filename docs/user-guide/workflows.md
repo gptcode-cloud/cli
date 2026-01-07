@@ -24,7 +24,7 @@ Use research mode to explore your codebase and understand the context before mak
 ### Example
 
 ```bash
-gptcode research "How does user authentication work in this codebase?"
+gt research "How does user authentication work in this codebase?"
 ```
 
 **What happens:**
@@ -58,7 +58,7 @@ Create a detailed implementation plan based on your research.
 ### Example
 
 ```bash
-gptcode plan "Add OAuth2 support to authentication"
+gt plan "Add OAuth2 support to authentication"
 ```
 
 **What happens:**
@@ -190,7 +190,7 @@ Let's walk through adding a "password reset" feature:
 ### 1. Research the codebase
 
 ```bash
-gptcode research "How is user authentication currently implemented?"
+gt research "How is user authentication currently implemented?"
 ```
 
 Review the generated research document to understand:
@@ -201,7 +201,7 @@ Review the generated research document to understand:
 ### 2. Create a plan
 
 ```bash
-gptcode plan "Add password reset feature with email verification"
+gt plan "Add password reset feature with email verification"
 ```
 
 Review the generated plan at `~/.gptcode/plans/2025-01-23-password-reset.md`:

@@ -93,14 +93,14 @@ document.addEventListener('DOMContentLoaded', function() {
 
 ---
 
-## `gptcode do` - Autonomous Execution
+## `gt do` - Autonomous Execution
 
 **The flagship copilot command.** Orchestrates 4 specialized agents to autonomously complete tasks with validation and auto-retry.
 
 ### How It Works
 
 ```bash
-gptcode do "add JWT authentication"
+gt do "add JWT authentication"
 ```
 
 **Agent Flow:**
@@ -113,10 +113,10 @@ gptcode do "add JWT authentication"
 ### Examples
 
 ```bash
-gptcode do "fix authentication bug in login handler"
-gptcode do "refactor error handling to use custom types"
-gptcode do "add rate limiting to API endpoints" --supervised
-gptcode do "optimize database queries" --interactive
+gt do "fix authentication bug in login handler"
+gt do "refactor error handling to use custom types"
+gt do "add rate limiting to API endpoints" --supervised
+gt do "optimize database queries" --interactive
 ```
 
 ### Flags
@@ -141,12 +141,12 @@ gptcode do "optimize database queries" --interactive
 
 ## Setup Commands
 
-### `gptcode setup`
+### `gt setup`
 
 Initialize GPTCode configuration at `~/.gptcode`.
 
 ```bash
-gptcode setup
+gt setup
 ```
 
 Creates:
@@ -163,26 +163,26 @@ gptcode key openrouter
 gptcode key groq
 ```
 
-### `gptcode models update`
+### `gt models update`
 
 Update model catalog from available providers (OpenRouter, Groq, OpenAI, etc.).
 
 ```bash
-gptcode models update
+gt models update
 ```
 
 ---
 
 ## Interactive Modes
 
-### `gptcode chat`
+### `gt chat`
 
 Code-focused conversation mode. Routes queries to appropriate agents based on intent.
 
 ```bash
-gptcode chat
-gptcode chat "explain how authentication works"
-echo "list go files" | gptcode chat
+gt chat
+gt chat "explain how authentication works"
+echo "list go files" | gt chat
 ```
 
 **Agent routing:**
@@ -192,13 +192,13 @@ echo "list go files" | gptcode chat
 - `test` – run tests or commands
 - `review` – code review and critique
 
-### `gptcode tdd`
+### `gt tdd`
 
 Incremental TDD mode. Generates tests first, then implementation.
 
 ```bash
-gptcode tdd
-gptcode tdd "slugify function with unicode support"
+gt tdd
+gt tdd "slugify function with unicode support"
 ```
 
 Workflow:
@@ -211,24 +211,24 @@ Workflow:
 
 ## Workflow Commands (Research → Plan → Implement)
 
-### `gptcode research [question]`
+### `gt research [question]`
 
 Document codebase and understand architecture.
 
 ```bash
-gptcode research "How does authentication work?"
-gptcode research "Explain the payment flow"
+gt research "How does authentication work?"
+gt research "Explain the payment flow"
 ```
 
 Creates a research document with findings and analysis.
 
-### `gptcode plan [task]`
+### `gt plan [task]`
 
 Create detailed implementation plan with phases.
 
 ```bash
-gptcode plan "Add user authentication"
-gptcode plan "Implement webhook system"
+gt plan "Add user authentication"
+gt plan "Implement webhook system"
 ```
 
 Generates:
@@ -254,15 +254,15 @@ Each phase:
 
 ## Code Quality
 
-### `gptcode review [target]`
+### `gt review [target]`
 
 **NEW**: Review code for bugs, security issues, and improvements against coding standards.
 
 ```bash
-gptcode review main.go
-gptcode review ./src
-gptcode review .
-gptcode review internal/agents/ --focus security
+gt review main.go
+gt review ./src
+gt review .
+gt review internal/agents/ --focus security
 ```
 
 **Options:**
@@ -282,21 +282,21 @@ gptcode review internal/agents/ --focus security
 
 **Examples:**
 ```bash
-gptcode review main.go --focus "error handling"
-gptcode review . --focus performance
-gptcode review src/auth --focus security
+gt review main.go --focus "error handling"
+gt review . --focus performance
+gt review src/auth --focus security
 ```
 
 ---
 
 ## Feature Generation
 
-### `gptcode feature [description]`
+### `gt feature [description]`
 
 Generate tests + implementation with auto-detected language.
 
 ```bash
-gptcode feature "slugify with unicode support and max length"
+gt feature "slugify with unicode support and max length"
 ```
 
 **Supported languages:**
@@ -311,20 +311,20 @@ gptcode feature "slugify with unicode support and max length"
 
 ## Execution Mode
 
-### `gptcode run [task]`
+### `gt run [task]`
 
 Execute tasks with follow-up support. Two modes available:
 
 **1. AI-assisted mode (default when no args provided):**
 ```bash
-gptcode run                                    # Start interactive session
-gptcode run "deploy to staging" --once         # Single AI execution
+gt run                                    # Start interactive session
+gt run "deploy to staging" --once         # Single AI execution
 ```
 
 **2. Direct REPL mode with command history:**
 ```bash
-gptcode run --raw                              # Interactive command execution
-gptcode run "docker ps" --raw                  # Execute command and exit
+gt run --raw                              # Interactive command execution
+gt run "docker ps" --raw                  # Execute command and exit
 ```
 
 #### AI-Assisted Mode
@@ -336,7 +336,7 @@ Provides intelligent command suggestions and execution:
 - Context preservation across commands
 
 ```bash
-gptcode run
+gt run
 > deploy to staging
 [AI executes fly deploy command]
 > check if it's running
@@ -349,7 +349,7 @@ gptcode run
 
 Direct shell command execution with enhanced features:
 ```bash
-gptcode run --raw
+gt run --raw
 > ls -la
 > cat $1                    # Reference previous command
 > /history                  # Show command history
@@ -375,18 +375,18 @@ gptcode run --raw
 
 ```bash
 # AI-assisted operational tasks
-gptcode run "check postgres status"
-gptcode run "make GET request to api.github.com/users/octocat"
+gt run "check postgres status"
+gt run "make GET request to api.github.com/users/octocat"
 
 # Direct command REPL for DevOps
-gptcode run --raw
+gt run --raw
 > docker ps
 > docker logs $1            # Reference container from previous output
 > /cd /var/log
 > tail -f app.log
 
 # Single-shot with piped input
-echo "deploy to production" | gptcode run --once
+echo "deploy to production" | gt run --once
 ```
 
 #### Flags
@@ -400,12 +400,12 @@ Perfect for operational tasks, DevOps workflows, and command execution with hist
 
 ## Machine Learning Commands
 
-### `gptcode ml list`
+### `gt ml list`
 
 List available ML models.
 
 ```bash
-gptcode ml list
+gt ml list
 ```
 
 Shows:
@@ -414,13 +414,13 @@ Shows:
 - Location
 - Status (trained/not trained)
 
-### `gptcode ml train <model>`
+### `gt ml train <model>`
 
 Train an ML model using Python.
 
 ```bash
-gptcode ml train complexity
-gptcode ml train intent
+gt ml train complexity
+gt ml train intent
 ```
 
 **Available models:**
@@ -431,24 +431,24 @@ gptcode ml train intent
 - Python 3.8+
 - Will create venv and install dependencies automatically
 
-### `gptcode ml test <model> [query]`
+### `gt ml test <model> [query]`
 
 Test a trained model with a query.
 
 ```bash
-gptcode ml test complexity "implement oauth"
-gptcode ml test intent "explain this code"
+gt ml test complexity "implement oauth"
+gt ml test intent "explain this code"
 ```
 
 Shows prediction and probabilities for all classes.
 
-### `gptcode ml eval <model> [-f file]`
+### `gt ml eval <model> [-f file]`
 
 Evaluate model performance on test dataset.
 
 ```bash
-gptcode ml eval complexity
-gptcode ml eval intent -f ml/intent/data/eval.csv
+gt ml eval complexity
+gt ml eval intent -f ml/intent/data/eval.csv
 ```
 
 Shows:
@@ -457,14 +457,14 @@ Shows:
 - Confusion matrix
 - Low-confidence predictions
 
-### `gptcode ml predict [model] <text>`
+### `gt ml predict [model] <text>`
 
 Make prediction using embedded Go model (no Python runtime).
 
 ```bash
-gptcode ml predict "implement auth"               # uses complexity (default)
-gptcode ml predict complexity "fix typo"          # explicit model
-gptcode ml predict intent "explain this code"     # intent classification
+gt ml predict "implement auth"               # uses complexity (default)
+gt ml predict complexity "fix typo"          # explicit model
+gt ml predict intent "explain this code"     # intent classification
 ```
 
 **Fast path:**
@@ -482,10 +482,10 @@ Controls when Guided Mode is automatically activated.
 
 ```bash
 # View current threshold (default: 0.55)
-gptcode config get defaults.ml_complex_threshold
+gt config get defaults.ml_complex_threshold
 
 # Set threshold (0.0-1.0)
-gptcode config set defaults.ml_complex_threshold 0.6
+gt config set defaults.ml_complex_threshold 0.6
 ```
 
 Higher threshold = less sensitive (fewer Guided Mode triggers)
@@ -496,10 +496,10 @@ Controls when ML router is used instead of LLM.
 
 ```bash
 # View current threshold (default: 0.7)
-gptcode config get defaults.ml_intent_threshold
+gt config get defaults.ml_intent_threshold
 
 # Set threshold (0.0-1.0)
-gptcode config set defaults.ml_intent_threshold 0.8
+gt config set defaults.ml_intent_threshold 0.8
 ```
 
 Higher threshold = more LLM fallbacks (more accurate but slower/expensive)
@@ -508,12 +508,12 @@ Higher threshold = more LLM fallbacks (more accurate but slower/expensive)
 
 ## Dependency Graph Commands
 
-### `gptcode graph build`
+### `gt graph build`
 
 Force rebuild dependency graph, ignoring cache.
 
 ```bash
-gptcode graph build
+gt graph build
 ```
 
 Shows:
@@ -526,14 +526,14 @@ Shows:
 - After adding/removing many files
 - If cache seems stale
 
-### `gptcode graph query <terms>`
+### `gt graph query <terms>`
 
 Find relevant files for a query term using PageRank.
 
 ```bash
-gptcode graph query "authentication"
-gptcode graph query "database connection"
-gptcode graph query "api routes"
+gt graph query "authentication"
+gt graph query "database connection"
+gt graph query "api routes"
 ```
 
 Shows:
@@ -557,10 +557,10 @@ Control how many files are added to context in chat mode.
 
 ```bash
 # View current setting (default: 5)
-gptcode config get defaults.graph_max_files
+gt config get defaults.graph_max_files
 
 # Set max files (1-20)
-gptcode config set defaults.graph_max_files 8
+gt config set defaults.graph_max_files 8
 ```
 
 **Recommendations:**
@@ -572,7 +572,7 @@ gptcode config set defaults.graph_max_files 8
 
 ```bash
 export GPTCODE_DEBUG=1
-gptcode chat "your query"  # Shows graph stats
+gt chat "your query"  # Shows graph stats
 ```
 
 Shows:
@@ -600,12 +600,12 @@ Shows:
 
 ## Backend Management
 
-### `gptcode backend`
+### `gt backend`
 
 Show current backend.
 
 ```bash
-gptcode backend
+gt backend
 ```
 
 Shows:
@@ -614,20 +614,20 @@ Shows:
 - Base URL
 - Default model
 
-### `gptcode backend list`
+### `gt backend list`
 
 List all configured backends.
 
 ```bash
-gptcode backend list
+gt backend list
 ```
 
-### `gptcode backend show [name]`
+### `gt backend show [name]`
 
 Show backend configuration. Shows current if no name provided.
 
 ```bash
-gptcode backend show groq
+gt backend show groq
 ```
 
 Shows:
@@ -635,79 +635,79 @@ Shows:
 - Default model
 - All configured models
 
-### `gptcode backend use <name>`
+### `gt backend use <name>`
 
 Switch to a backend.
 
 ```bash
-gptcode backend use groq
-gptcode backend use openrouter
-gptcode backend use ollama
+gt backend use groq
+gt backend use openrouter
+gt backend use ollama
 ```
 
-### `gptcode backend create`
+### `gt backend create`
 
 Create a new backend.
 
 ```bash
-gptcode backend create mygroq openai https://api.groq.com/openai/v1
+gt backend create mygroq openai https://api.groq.com/openai/v1
 gptcode key mygroq  # Set API key
-gptcode config set backend.mygroq.default_model llama-3.3-70b-versatile
-gptcode backend use mygroq
+gt config set backend.mygroq.default_model llama-3.3-70b-versatile
+gt backend use mygroq
 ```
 
-### `gptcode backend delete`
+### `gt backend delete`
 
 Delete a backend.
 
 ```bash
-gptcode backend delete mygroq
+gt backend delete mygroq
 ```
 
 ---
 
 ## Profile Management
 
-### `gptcode profile`
+### `gt profile`
 
 Show current profile.
 
 ```bash
-gptcode profile
+gt profile
 ```
 
 Shows:
 - Backend and profile name
 - Agent models (router, query, editor, research)
 
-### `gptcode profile list [backend]`
+### `gt profile list [backend]`
 
 List all profiles. Optionally filter by backend.
 
 ```bash
-gptcode profile list              # All profiles
-gptcode profile list groq        # Only groq profiles
+gt profile list              # All profiles
+gt profile list groq        # Only groq profiles
 ```
 
 Shows profiles in `backend.profile` format.
 
-### `gptcode profile show [backend.profile]`
+### `gt profile show [backend.profile]`
 
 Show profile configuration. Shows current if not specified.
 
 ```bash
-gptcode profile show groq.speed
-gptcode profile show              # Current profile
+gt profile show groq.speed
+gt profile show              # Current profile
 ```
 
-### `gptcode profile use <backend>.<profile>`
+### `gt profile use <backend>.<profile>`
 
 Switch to a backend and profile in one command.
 
 ```bash
-gptcode profile use groq.speed
-gptcode profile use openrouter.free
-gptcode profile use ollama.local
+gt profile use groq.speed
+gt profile use openrouter.free
+gt profile use ollama.local
 ```
 
 **Benefits:**
@@ -717,17 +717,17 @@ gptcode profile use ollama.local
 
 ### Advanced Profile Commands
 
-For creating and configuring profiles, use `gptcode profiles` (plural):
+For creating and configuring profiles, use `gt profiles` (plural):
 
 ```bash
 # Create new profile
-gptcode profiles create groq speed
+gt profiles create groq speed
 
 # Configure agents
-gptcode profiles set-agent groq speed router llama-3.1-8b-instant
-gptcode profiles set-agent groq speed query llama-3.1-8b-instant
-gptcode profiles set-agent groq speed editor llama-3.1-8b-instant
-gptcode profiles set-agent groq speed research llama-3.1-8b-instant
+gt profiles set-agent groq speed router llama-3.1-8b-instant
+gt profiles set-agent groq speed query llama-3.1-8b-instant
+gt profiles set-agent groq speed editor llama-3.1-8b-instant
+gt profiles set-agent groq speed research llama-3.1-8b-instant
 ```
 
 ---
@@ -739,7 +739,7 @@ gptcode profiles set-agent groq speed research llama-3.1-8b-instant
 Enable debug output to stderr.
 
 ```bash
-GPTCODE_DEBUG=1 gptcode chat
+GPTCODE_DEBUG=1 gt chat
 ```
 
 Shows:
@@ -789,19 +789,19 @@ For advanced users who need direct access to configuration values:
 
 ```bash
 # Get configuration value
-gptcode config get defaults.backend
-gptcode config get defaults.profile
-gptcode config get backend.groq.default_model
+gt config get defaults.backend
+gt config get defaults.profile
+gt config get backend.groq.default_model
 
 # Set configuration value
-gptcode config set defaults.backend groq
-gptcode config set defaults.profile speed
-gptcode config set backend.groq.default_model llama-3.3-70b-versatile
+gt config set defaults.backend groq
+gt config set defaults.profile speed
+gt config set backend.groq.default_model llama-3.3-70b-versatile
 ```
 
 **Note:** For most use cases, prefer the user-friendly commands:
-- `gptcode backend use` instead of `gptcode config set defaults.backend`
-- `gptcode profile use` instead of `gptcode config set defaults.profile`
+- `gt backend use` instead of `gt config set defaults.backend`
+- `gt profile use` instead of `gt config set defaults.profile`
 
 ---
 

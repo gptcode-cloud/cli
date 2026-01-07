@@ -452,9 +452,9 @@ A: We recommend:
 ## Related Commands
 
 - `gptcode coverage` - Analyze test coverage
-- `gptcode review` - Code review with AI
+- `gt review` - Code review with AI
 - `gptcode gen changelog` - Generate CHANGELOG from commits
-- `gptcode docs update` - Update README based on changes
+- `gt docs update` - Update README based on changes
 
 ---
 

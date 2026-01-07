@@ -202,17 +202,17 @@ Grok 4.1 Fast is particularly interesting for AI coding agents:
 
 1. Update your model catalog:
    ```bash
-   gptcode models update
+   gt models update
    ```
 
 2. Verify your configuration:
    ```bash
-   gptcode profile
+   gt profile
    ```
 
 3. Test with a chat:
    ```bash
-   gptcode chat
+   gt chat
    ```
 
 ## The Result

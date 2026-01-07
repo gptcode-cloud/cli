@@ -22,7 +22,7 @@
   <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_analytics }}"></script>
   <script>
     window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
+    function gtag() { dataLayer.push(arguments); }
     gtag('js', new Date());
     gtag('config', '{{ site.google_analytics }}');
   </script>
@@ -38,6 +38,7 @@
       </a>
       <div class="nav-links">
         <a href="{{ '/reference/capabilities' | relative_url }}">Features</a>
+        <a href="{{ '/skills' | relative_url }}">Skills</a>
         <a href="{{ '/reference/commands' | relative_url }}">Commands</a>
         <a href="{{ '/vs' | relative_url }}">Compare</a>
         <a href="{{ '/blog' | relative_url }}">Blog</a>
