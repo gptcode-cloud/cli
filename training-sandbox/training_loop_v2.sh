@@ -35,13 +35,36 @@ cat > "$RESULTS_FILE" << 'EOF'
 }
 EOF
 
-jq ".started_at = \"$(date -Iseconds)\"" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+safe_jq_update ".started_at = \"$(date -Iseconds)\"" "$RESULTS_FILE"
 
 echo "🚀 Training Loop v2 - Self-Improving"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "Issues: $NUM_ISSUES"
 echo "Results: $RESULTS_FILE"
 echo ""
+
+# Safe jq update function with error handling
+safe_jq_update() {
+    local filter="$1"
+    local file="$2"
+    local temp_file="/tmp/jq_temp_$$.json"
+    
+    # Validate current file
+    if ! jq '.' "$file" > /dev/null 2>&1; then
+        echo "  ⚠️  JSON file corrupted, reinitializing..."
+        cat > "$file" << 'RESET'
+{"version":2,"started_at":"","runs":[],"stats":{"total":0,"l1_syntax_pass":0,"l2_review_approved":0,"l3_tests_pass":0,"l4_analysis_clean":0,"full_success":0,"skipped":0,"failed":0},"model_performance":{}}
+RESET
+    fi
+    
+    # Apply update
+    if jq "$filter" "$file" > "$temp_file" 2>/dev/null; then
+        mv "$temp_file" "$file"
+    else
+        echo "  ⚠️  jq update failed, skipping"
+        rm -f "$temp_file"
+    fi
+}
 
 # Detect test runner for a repo
 detect_test_runner() {
@@ -141,7 +164,7 @@ echo "$ISSUES" | jq -c '.[]' | while read -r issue; do
     # Skip spam repos
     if [[ "$REPO" == *"Unit_Automation"* ]] || [[ "$REPO" == *"almadhlom"* ]]; then
         echo "  ⏭️  Skipping (spam repo)"
-        jq ".stats.skipped += 1 | .stats.total += 1" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+        safe_jq_update ".stats.skipped += 1 | .stats.total += 1" "$RESULTS_FILE"
         continue
     fi
     
@@ -152,7 +175,7 @@ echo "$ISSUES" | jq -c '.[]' | while read -r issue; do
     
     if ! /opt/homebrew/bin/gh repo clone "$REPO" "$REPO_NAME" 2>/dev/null; then
         echo "  ❌ Failed to clone"
-        jq ".stats.skipped += 1 | .stats.total += 1" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+        safe_jq_update ".stats.skipped += 1 | .stats.total += 1" "$RESULTS_FILE"
         continue
     fi
     
@@ -164,7 +187,7 @@ echo "$ISSUES" | jq -c '.[]' | while read -r issue; do
         echo "  ⏭️  Skipping (repo too large: $FILE_COUNT files)"
         cd "$SANDBOX_DIR"
         rm -rf "$REPO_NAME"
-        jq ".stats.skipped += 1 | .stats.total += 1" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+        safe_jq_update ".stats.skipped += 1 | .stats.total += 1" "$RESULTS_FILE"
         continue
     fi
     echo "  📦 Repo size: $FILE_COUNT files"
@@ -176,7 +199,7 @@ echo "$ISSUES" | jq -c '.[]' | while read -r issue; do
         echo "  ⏭️  Skipping (issue body too short)"
         cd "$SANDBOX_DIR"
         rm -rf "$REPO_NAME"
-        jq ".stats.skipped += 1 | .stats.total += 1" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+        safe_jq_update ".stats.skipped += 1 | .stats.total += 1" "$RESULTS_FILE"
         continue
     fi
     
@@ -215,7 +238,7 @@ $BODY"
     
     if [ -z "$DIFF" ]; then
         echo "  ⚪ No changes (${DURATION}s)"
-        jq ".stats.total += 1" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+        safe_jq_update ".stats.total += 1" "$RESULTS_FILE"
         cd "$SANDBOX_DIR"
         rm -rf "$REPO_NAME"
         PROCESSED=$((PROCESSED + 1))
@@ -240,7 +263,7 @@ $BODY"
     if [ "$REVIEW_RESULT" = "approved" ]; then
         echo "  ✅ L2 PASS: Review approved"
         L2_PASS=true
-        jq ".stats.l2_review_approved += 1" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+        safe_jq_update ".stats.l2_review_approved += 1" "$RESULTS_FILE"
     else
         echo "  ❌ L2 FAIL: Review $REVIEW_RESULT"
     fi
@@ -255,7 +278,7 @@ $BODY"
         if eval "$TEST_RUNNER" > "$LOG_DIR/${REPO_NAME}_${NUMBER}_tests.log" 2>&1; then
             echo "  ✅ L3 PASS: Tests passed"
             L3_PASS=true
-            jq ".stats.l3_tests_pass += 1" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+            safe_jq_update ".stats.l3_tests_pass += 1" "$RESULTS_FILE"
         else
             echo "  ❌ L3 FAIL: Tests failed"
         fi
@@ -275,7 +298,7 @@ $BODY"
     if [ "$ERROR_COUNT" -eq 0 ]; then
         echo "  ✅ L4 PASS: No error patterns"
         L4_PASS=true
-        jq ".stats.l4_analysis_clean += 1" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+        safe_jq_update ".stats.l4_analysis_clean += 1" "$RESULTS_FILE"
     else
         echo "  ⚠️  L4 WARN: $ERROR_COUNT error pattern(s) found"
     fi
@@ -287,13 +310,13 @@ $BODY"
     if [ "$L1_PASS" = true ] && [ "$L2_PASS" = true ] && [ "$L3_PASS" = true ] && [ "$L4_PASS" = true ]; then
         RESULT="success"
         echo "  🎉 FULL SUCCESS"
-        jq ".stats.full_success += 1" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+        safe_jq_update ".stats.full_success += 1" "$RESULTS_FILE"
     else
         echo "  📊 Partial: L1=$L1_PASS L2=$L2_PASS L3=$L3_PASS L4=$L4_PASS"
     fi
     
     # Update stats
-    jq ".stats.total += 1 | .stats.l1_syntax_pass += 1" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+    safe_jq_update ".stats.total += 1 | .stats.l1_syntax_pass += 1" "$RESULTS_FILE"
     
     # Record run
     RUN_JSON=$(cat <<EOF
@@ -311,7 +334,7 @@ $BODY"
 }
 EOF
 )
-    jq ".runs += [$RUN_JSON]" "$RESULTS_FILE" > /tmp/r.json && mv /tmp/r.json "$RESULTS_FILE"
+    safe_jq_update ".runs += [$RUN_JSON]" "$RESULTS_FILE"
     
     # Write feedback for ML
     if [ -f "$FEEDBACK_FILE" ]; then
