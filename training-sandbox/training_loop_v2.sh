@@ -90,6 +90,90 @@ detect_language() {
     echo "unknown"
 }
 
+# Detect skills that should be loaded for a task
+detect_skills_for_task() {
+    local task="$1"
+    local detected_skills=""
+    
+    # Product skills
+    echo "$task" | grep -qi "form\|button\|ui\|component\|frontend" && detected_skills="$detected_skills design-system"
+    echo "$task" | grep -qi "tracking\|analytics\|metrics\|pixel" && detected_skills="$detected_skills product-metrics"
+    echo "$task" | grep -qi "test\|e2e\|playwright" && detected_skills="$detected_skills qa-automation"
+    echo "$task" | grep -qi "deploy\|production\|health\|error" && detected_skills="$detected_skills production-ready"
+    
+    # Security skills
+    echo "$task" | grep -qi "auth\|login\|password\|token\|jwt\|security" && detected_skills="$detected_skills security"
+    echo "$task" | grep -qi "vulnerability\|audit\|incident\|waf" && detected_skills="$detected_skills secops"
+    
+    # Ops skills
+    echo "$task" | grep -qi "docker\|kubernetes\|k8s\|terraform\|pipeline" && detected_skills="$detected_skills devops"
+    echo "$task" | grep -qi "bash\|shell\|linux\|systemd\|cron" && detected_skills="$detected_skills sysops"
+    echo "$task" | grep -qi "model\|ml\|training\|inference\|mlflow" && detected_skills="$detected_skills mlops"
+    
+    # Workflow skills
+    echo "$task" | grep -qi "bug\|fix\|tdd" && detected_skills="$detected_skills tdd-bug-fix"
+    echo "$task" | grep -qi "review" && detected_skills="$detected_skills code-review"
+    
+    echo "$detected_skills" | xargs  # Trim whitespace
+}
+
+# Track skill effectiveness for a run
+track_skill_metrics() {
+    local task="$1"
+    local language="$2"
+    local success="$3"  # 1 = success, 0 = failure
+    local skills_used="$4"
+    local metrics_file="$SANDBOX_DIR/skill_metrics.json"
+    
+    # Initialize metrics file if not exists
+    if [ ! -f "$metrics_file" ]; then
+        echo '{"skill_usage":{},"skill_success":{},"missing_keywords":[]}' > "$metrics_file"
+    fi
+    
+    # Record each skill used
+    for skill in $skills_used; do
+        jq --arg s "$skill" --argjson success "$success" '
+            .skill_usage[$s] = ((.skill_usage[$s] // 0) + 1) |
+            if $success == 1 then
+                .skill_success[$s] = ((.skill_success[$s] // 0) + 1)
+            else . end
+        ' "$metrics_file" > /tmp/sm.json && mv /tmp/sm.json "$metrics_file"
+    done
+    
+    # If no skills detected but task had specific keywords, record as potential gap
+    if [ -z "$skills_used" ] && [ ${#task} -gt 20 ]; then
+        jq --arg task "$task" '.missing_keywords += [$task]' "$metrics_file" > /tmp/sm.json && mv /tmp/sm.json "$metrics_file"
+    fi
+}
+
+# Analyze skill metrics and suggest keyword improvements
+analyze_skill_gaps() {
+    local metrics_file="$SANDBOX_DIR/skill_metrics.json"
+    
+    if [ ! -f "$metrics_file" ]; then
+        echo "  📊 No skill metrics yet"
+        return
+    fi
+    
+    echo ""
+    echo "📊 Skill Effectiveness Analysis"
+    echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    
+    # Calculate success rates per skill
+    jq -r '
+        .skill_usage | to_entries | .[] | 
+        "\(.key): \(.value) uses"
+    ' "$metrics_file" 2>/dev/null || echo "  No data yet"
+    
+    # Show potential missing keywords
+    local missing_count=$(jq '.missing_keywords | length' "$metrics_file" 2>/dev/null || echo "0")
+    if [ "$missing_count" -gt 0 ]; then
+        echo ""
+        echo "  ⚠️  Tasks with no skill match ($missing_count):"
+        jq -r '.missing_keywords | .[-5:][]' "$metrics_file" 2>/dev/null | head -5
+    fi
+}
+
 # Run gt review and parse result
 run_review() {
     local diff_file="$1"
@@ -226,6 +310,10 @@ echo "$ISSUES" | jq -c '.[]' | while read -r issue; do
 
 $BODY"
     
+    # Detect skills that will be used for this task
+    DETECTED_SKILLS=$(detect_skills_for_task "$TASK")
+    [ -n "$DETECTED_SKILLS" ] && echo "  🎯 Skills: $DETECTED_SKILLS"
+    
     LOG_FILE="$LOG_DIR/${REPO_NAME}_${NUMBER}.log"
     START_TIME=$(date +%s)
     
@@ -356,6 +444,11 @@ EOF
         jq ". += [$FEEDBACK_JSON]" "$FEEDBACK_FILE" > /tmp/f.json && mv /tmp/f.json "$FEEDBACK_FILE"
     fi
     
+    # Track skill metrics for this run
+    SKILL_SUCCESS=0
+    [ "$RESULT" = "success" ] && SKILL_SUCCESS=1
+    track_skill_metrics "$TASK" "$LANGUAGE" "$SKILL_SUCCESS" "$DETECTED_SKILLS"
+    
     # Cleanup
     cd "$SANDBOX_DIR"
     rm -rf "$REPO_NAME"
@@ -397,5 +490,9 @@ if [ "$TOTAL" -gt 0 ]; then
     fi
 fi
 
+# Analyze skill effectiveness
+analyze_skill_gaps
+
 echo ""
 echo "📁 Logs saved in: $LOG_DIR"
+echo "📊 Skill metrics: $SANDBOX_DIR/skill_metrics.json"
