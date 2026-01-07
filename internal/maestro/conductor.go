@@ -18,12 +18,13 @@ import (
 
 // Conductor is the central coordinator (Maestro) that orchestrates all agents
 type Conductor struct {
-	selector *config.ModelSelector
-	setup    *config.Setup
-	cwd      string
-	language string
-	Recovery *RecoveryStrategy
-	Tracer   observability.Tracer
+	selector     *config.ModelSelector
+	setup        *config.Setup
+	cwd          string
+	language     string
+	Recovery     *RecoveryStrategy
+	Tracer       observability.Tracer
+	loopDetector *llm.LoopDetector // Centralized Claude Code-style loop detection
 }
 
 // NewConductor creates a new Maestro conductor
@@ -112,19 +113,31 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		{Role: "user", Content: plan},
 	}
 
-	// Higher retry limit for autonomous error fixing loops
-	// For syntax errors, the agent needs multiple attempts to:
-	// 1. Fix initial error
-	// 2. Run build to discover new errors
-	// 3. Fix cascading errors
-	// 4. Verify final solution
-	maxAttempts := 10
-	if os.Getenv("GPTCODE_DEBUG") == "1" {
-		fmt.Fprintf(os.Stderr, "[MAESTRO] maxAttempts = %d\n", maxAttempts)
+	// Initialize centralized Claude Code-style loop detector
+	// Intent is derived from complexity: complex tasks are "edit", simple are "query"
+	intent := "edit"
+	if c.isQueryTask(plan, nil) {
+		intent = "query"
 	}
-	for attempt := 1; attempt <= maxAttempts; attempt++ {
+	c.loopDetector = llm.NewLoopDetector(intent)
+
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "[MAESTRO] LoopDetector initialized with intent=%s\n", intent)
+	}
+
+	for {
+		// Check if we should continue (intent-aware limits + loop detection)
+		shouldContinue, stopReason := c.loopDetector.ShouldContinue()
+		if !shouldContinue {
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
+				fmt.Fprintf(os.Stderr, "[MAESTRO] Stopping: %s\n", stopReason)
+			}
+			return fmt.Errorf("task stopped: %s (stats: %s)", stopReason, c.loopDetector.GetStats())
+		}
+
+		attempt := c.loopDetector.Iteration
 		if attempt > 1 {
-			fmt.Printf("Retrying (attempt %d/%d)...\n", attempt, maxAttempts)
+			fmt.Printf("Retrying (attempt %d)...\n", attempt)
 		}
 
 		// Select model for editing
@@ -154,60 +167,43 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		elapsed = time.Since(start)
 		c.selector.RecordUsage(editBackend, editModel, err == nil, errorMsg(err))
 		if err != nil {
-			if attempt < maxAttempts {
-				fmt.Printf("[WARNING] Execution error: %v\n", err)
+			// LoopDetector will handle max iterations check on next iteration
+			fmt.Printf("[WARNING] Execution error: %v\n", err)
 
-				// Use enhanced recovery system
-				recoveryCtx := &RecoveryContext{
-					ErrorType:     ErrorUnknown, // Will be classified by formatExecutionError
-					ErrorOutput:   err.Error(),
-					ModifiedFiles: modifiedFiles,
-					StepIndex:     -1, // Not applicable in conductor
-					Attempts:      attempt,
-					MaxAttempts:   maxAttempts,
-				}
-
-				// Try advanced recovery first
-				advancedPrompt, found := c.Recovery.AdvancedRecovery(recoveryCtx)
-				if !found {
-					// Fall back to basic error formatting
-					advancedPrompt = c.formatExecutionError(err)
-				}
-
-				// Record recovery decision
-				if c.Tracer != nil {
-					decision := observability.Decision{
-						Type:         "recovery_strategy",
-						Chosen:       "retry_with_error_fix",
-						Alternatives: []string{"skip", "abort"},
-						Attribution:  map[string]float64{"attempt": float64(attempt), "error_type": 1.0},
-						Reasoning:    fmt.Sprintf("Retrying attempt %d/%d after error", attempt, maxAttempts),
-					}
-					_ = c.Tracer.RecordDecision("RecoverySystem", decision)
-				}
-
-				history = append(history, llm.ChatMessage{
-					Role:    "user",
-					Content: advancedPrompt,
-				})
-				continue
+			// Use enhanced recovery system
+			recoveryCtx := &RecoveryContext{
+				ErrorType:     ErrorUnknown, // Will be classified by formatExecutionError
+				ErrorOutput:   err.Error(),
+				ModifiedFiles: modifiedFiles,
+				StepIndex:     -1, // Not applicable in conductor
+				Attempts:      attempt,
+				MaxAttempts:   c.loopDetector.Iteration,
 			}
 
-			// Record execution failure metrics
+			// Try advanced recovery first
+			advancedPrompt, found := c.Recovery.AdvancedRecovery(recoveryCtx)
+			if !found {
+				// Fall back to basic error formatting
+				advancedPrompt = c.formatExecutionError(err)
+			}
+
+			// Record recovery decision
 			if c.Tracer != nil {
-				metrics := observability.Metrics{
-					DurationMs:   elapsed.Milliseconds(),
-					ErrorMessage: err.Error(),
+				decision := observability.Decision{
+					Type:         "recovery_strategy",
+					Chosen:       "retry_with_error_fix",
+					Alternatives: []string{"skip", "abort"},
+					Attribution:  map[string]float64{"attempt": float64(attempt), "error_type": 1.0},
+					Reasoning:    fmt.Sprintf("Retrying attempt %d after error", attempt),
 				}
-				_ = c.Tracer.RecordMetrics("EditorAgent", metrics)
+				_ = c.Tracer.RecordDecision("RecoverySystem", decision)
 			}
 
-			// Update tracer with failure status
-			if c.Tracer != nil {
-				// Override the success status set in defer
-				_ = c.Tracer.End(false)
-			}
-			return fmt.Errorf("execution failed: %w", err)
+			history = append(history, llm.ChatMessage{
+				Role:    "user",
+				Content: advancedPrompt,
+			})
+			continue
 		}
 
 		// Record execution metrics
@@ -257,118 +253,84 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		elapsed = time.Since(start)
 		c.selector.RecordUsage(reviewBackend, reviewModel, err == nil, errorMsg(err))
 		if err != nil {
-			if attempt < maxAttempts {
-				fmt.Printf("[WARNING] Validation error: %v\n", err)
+			// LoopDetector will handle max iterations check on next iteration
+			fmt.Printf("[WARNING] Validation error: %v\n", err)
 
-				// Use enhanced recovery system
-				recoveryCtx := &RecoveryContext{
-					ErrorType:     ErrorUnknown, // Will be classified by formatValidationError
-					ErrorOutput:   err.Error(),
-					ModifiedFiles: modifiedFiles,
-					StepIndex:     -1, // Not applicable in conductor
-					Attempts:      attempt,
-					MaxAttempts:   maxAttempts,
-				}
-
-				// Try advanced recovery first
-				advancedPrompt, found := c.Recovery.AdvancedRecovery(recoveryCtx)
-				if !found {
-					// Fall back to basic error formatting
-					advancedPrompt = c.formatValidationError(err)
-				}
-
-				// Record recovery decision
-				if c.Tracer != nil {
-					decision := observability.Decision{
-						Type:         "recovery_strategy",
-						Chosen:       "retry_with_validation_fix",
-						Alternatives: []string{"skip", "abort"},
-						Attribution:  map[string]float64{"attempt": float64(attempt), "error_type": 1.0},
-						Reasoning:    fmt.Sprintf("Retrying attempt %d/%d after validation error", attempt, maxAttempts),
-					}
-					_ = c.Tracer.RecordDecision("RecoverySystem", decision)
-				}
-
-				history = append(history, llm.ChatMessage{
-					Role:    "user",
-					Content: advancedPrompt,
-				})
-				continue
+			// Use enhanced recovery system
+			recoveryCtx := &RecoveryContext{
+				ErrorType:     ErrorUnknown, // Will be classified by formatValidationError
+				ErrorOutput:   err.Error(),
+				ModifiedFiles: modifiedFiles,
+				StepIndex:     -1, // Not applicable in conductor
+				Attempts:      attempt,
+				MaxAttempts:   c.loopDetector.Iteration,
 			}
 
-			// Record validation failure metrics
+			// Try advanced recovery first
+			advancedPrompt, found := c.Recovery.AdvancedRecovery(recoveryCtx)
+			if !found {
+				// Fall back to basic error formatting
+				advancedPrompt = c.formatValidationError(err)
+			}
+
+			// Record recovery decision
 			if c.Tracer != nil {
-				metrics := observability.Metrics{
-					DurationMs:   elapsed.Milliseconds(),
-					ErrorMessage: err.Error(),
+				decision := observability.Decision{
+					Type:         "recovery_strategy",
+					Chosen:       "retry_with_validation_fix",
+					Alternatives: []string{"skip", "abort"},
+					Attribution:  map[string]float64{"attempt": float64(attempt), "error_type": 1.0},
+					Reasoning:    fmt.Sprintf("Retrying attempt %d after validation error", attempt),
 				}
-				_ = c.Tracer.RecordMetrics("ReviewerAgent", metrics)
+				_ = c.Tracer.RecordDecision("RecoverySystem", decision)
 			}
 
-			// Update tracer with failure status
-			if c.Tracer != nil {
-				// Override the success status set in defer
-				_ = c.Tracer.End(false)
-			}
-			return fmt.Errorf("review failed: %w", err)
+			history = append(history, llm.ChatMessage{
+				Role:    "user",
+				Content: advancedPrompt,
+			})
+			continue
 		}
 
 		if !review.Success {
-			if attempt < maxAttempts {
-				issuesStr := strings.Join(review.Issues, "\n")
-				fmt.Printf("[WARNING] Validation failed:\n%s\n", issuesStr)
+			// LoopDetector will handle max iterations check on next iteration
+			issuesStr := strings.Join(review.Issues, "\n")
+			fmt.Printf("[WARNING] Validation failed:\n%s\n", issuesStr)
 
-				// Use enhanced recovery system
-				recoveryCtx := &RecoveryContext{
-					ErrorType:     ErrorUnknown, // Will be classified by formatValidationIssues
-					ErrorOutput:   issuesStr,
-					ModifiedFiles: modifiedFiles,
-					StepIndex:     -1, // Not applicable in conductor
-					Attempts:      attempt,
-					MaxAttempts:   maxAttempts,
-				}
-
-				// Try advanced recovery first
-				advancedPrompt, found := c.Recovery.AdvancedRecovery(recoveryCtx)
-				if !found {
-					// Fall back to basic error formatting
-					advancedPrompt = c.formatValidationIssues(review.Issues)
-				}
-
-				// Record recovery decision
-				if c.Tracer != nil {
-					decision := observability.Decision{
-						Type:         "recovery_strategy",
-						Chosen:       "retry_with_issues_fix",
-						Alternatives: []string{"skip", "abort"},
-						Attribution:  map[string]float64{"attempt": float64(attempt), "error_count": float64(len(review.Issues))},
-						Reasoning:    fmt.Sprintf("Retrying attempt %d/%d after %d validation issues", attempt, maxAttempts, len(review.Issues)),
-					}
-					_ = c.Tracer.RecordDecision("RecoverySystem", decision)
-				}
-
-				history = append(history, llm.ChatMessage{
-					Role:    "user",
-					Content: advancedPrompt,
-				})
-				continue
+			// Use enhanced recovery system
+			recoveryCtx := &RecoveryContext{
+				ErrorType:     ErrorUnknown, // Will be classified by formatValidationIssues
+				ErrorOutput:   issuesStr,
+				ModifiedFiles: modifiedFiles,
+				StepIndex:     -1, // Not applicable in conductor
+				Attempts:      attempt,
+				MaxAttempts:   c.loopDetector.Iteration,
 			}
 
-			// Record validation failure metrics
+			// Try advanced recovery first
+			advancedPrompt, found := c.Recovery.AdvancedRecovery(recoveryCtx)
+			if !found {
+				// Fall back to basic error formatting
+				advancedPrompt = c.formatValidationIssues(review.Issues)
+			}
+
+			// Record recovery decision
 			if c.Tracer != nil {
-				metrics := observability.Metrics{
-					DurationMs:   elapsed.Milliseconds(),
-					ErrorMessage: fmt.Sprintf("Validation failed with %d issues", len(review.Issues)),
+				decision := observability.Decision{
+					Type:         "recovery_strategy",
+					Chosen:       "retry_with_issues_fix",
+					Alternatives: []string{"skip", "abort"},
+					Attribution:  map[string]float64{"attempt": float64(attempt), "error_count": float64(len(review.Issues))},
+					Reasoning:    fmt.Sprintf("Retrying attempt %d after %d validation issues", attempt, len(review.Issues)),
 				}
-				_ = c.Tracer.RecordMetrics("ReviewerAgent", metrics)
+				_ = c.Tracer.RecordDecision("RecoverySystem", decision)
 			}
 
-			// Update tracer with failure status
-			if c.Tracer != nil {
-				// Override the success status set in defer
-				_ = c.Tracer.End(false)
-			}
-			return fmt.Errorf("review failed after %d attempts: %v", maxAttempts, review.Issues)
+			history = append(history, llm.ChatMessage{
+				Role:    "user",
+				Content: advancedPrompt,
+			})
+			continue
 		}
 
 		// Record validation success metrics
@@ -408,7 +370,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		_ = c.Tracer.End(false)
 	}
 
-	return fmt.Errorf("task failed after %d attempts", maxAttempts)
+	return fmt.Errorf("task stopped by loop detector")
 }
 
 func errorMsg(err error) string {
