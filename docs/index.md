@@ -1,15 +1,15 @@
 ---
 layout: default
-title: GPTCode
-description: AI coding assistant with specialized agents and validation
+title: GPTCode - Product Engineering Assistant
+description: AI-powered product engineering assistant. Ship production-ready code with built-in design systems, metrics, and quality guardrails.
 ---
 
 <div class="hero">
-  <h1>The Open Source<br/>AI Coding Assistant</h1>
-  <p>Transparent, Autonomous, and Local. <strong>Bring Your Own Keys</strong>. Run with Groq, OpenAI, or locally with Ollama. No subscriptions, full control.</p>
+  <h1>AI-Powered<br/>Product Engineering Assistant</h1>
+  <p>Beyond code generation — <strong>gt</strong> ships production-ready features with design systems, tracking pixels, health checks, and quality guardrails built-in. <strong>Bring Your Own Keys</strong>. Run with Groq, OpenAI, or locally with Ollama.</p>
   <div class="hero-cta">
     <a href="#quick-start" class="btn btn-primary">Get Started</a>
-    <a href="https://github.com/gptcode-cloud/cli" class="btn btn-secondary">View on GitHub</a>
+    <a href="/skills" class="btn btn-secondary">Explore Skills</a>
   </div>
 </div>
 
@@ -46,9 +46,9 @@ description: AI coding assistant with specialized agents and validation
     <p>Break down complex tasks: <code>gt research</code> → <code>gt plan</code> → <code>gptcode implement</code>. Full control when you need it.</p>
   </a>
   
-  <a href="/blog/2025-12-14-universal-context-management" class="feature-card" style="border: 2px solid var(--color-primary);">
-    <h3>🆕 Universal Context</h3>
-    <p>Version-controlled context for <strong>any AI assistant</strong> (Warp, Cursor, Claude, Gemini). <code>gptcode context init</code> → team-shared, tool-agnostic, zero-effort.</p>
+  <a href="/skills" class="feature-card" style="border: 2px solid var(--color-primary);">
+    <h3>🎯 15 Product Skills</h3>
+    <p>Beyond code: <strong>Design Systems</strong>, <strong>Product Metrics</strong>, <strong>Production Guardrails</strong>, <strong>QA Automation</strong>. Language idioms + product best practices built into every prompt.</p>
   </a>
 </div>
 
