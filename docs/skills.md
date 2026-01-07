@@ -63,6 +63,15 @@ With skills, `gt` produces **production-ready** code:
 | [Code Review](/skills/code-review) | Structured code review with priorities |
 | [Git Commit](/skills/git-commit) | Conventional commit messages |
 
+### Design & Product
+
+| Skill | Category | Description |
+|-------|----------|-------------|
+| [Design System](/skills/design-system) | Design | Atomic Design, tokens, Storybook, accessibility |
+| [Product Metrics](/skills/product-metrics) | Product | GA4, UTM, funnels, tracking pixels |
+| [Production Ready](/skills/production-ready) | Product | Error handling, feature flags, health checks |
+| [QA Automation](/skills/qa-automation) | Product | E2E, visual regression, a11y, performance |
+
 ## Installing Skills
 
 ```bash
