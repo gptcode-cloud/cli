@@ -236,8 +236,9 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 
 	// Tool call processing loop: handles multiple sequential tool calls within a single editor run.
 	// The outer retry logic (errors, validation failures) is controlled by Maestro's LoopDetector.
-	// This internal loop is just for processing a chain of tool calls before returning.
-	maxToolChainDepth := 5
+	// This internal loop is for processing a chain of tool calls (discovery → read → write).
+	// Set to 10 to allow complex tasks: 3-4 discovery calls + 2-3 reads + 2-3 writes
+	maxToolChainDepth := 10
 	for iteration := 0; iteration < maxToolChainDepth; iteration++ {
 		resp, err := e.provider.Chat(ctx, llm.ChatRequest{
 			SystemPrompt: editorPrompt,
