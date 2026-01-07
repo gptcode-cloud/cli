@@ -108,9 +108,24 @@ Want to add a skill for your favorite language? [Open a PR](https://github.com/g
 
 ---
 
-## Using gt Skills in Other Tools
+## Using Skills in Other Tools
 
 The skills that power `gt` can also be used in other AI coding tools. Here's how to apply them in your favorite environment:
+
+### Cursor
+
+Cursor has the **strongest support** for project rules via `.cursorrules`:
+
+```bash
+# Export skills directly to Cursor format
+gt skills show go > .cursorrules
+
+# Or combine multiple skills
+gt skills show go >> .cursorrules
+gt skills show tdd-bug-fix >> .cursorrules
+```
+
+Cursor reads `.cursorrules` automatically and applies them to **every** interaction—no need to ask.
 
 ### VS Code (GitHub Copilot)
 
@@ -132,33 +147,23 @@ gt skills show tdd-bug-fix > .github/prompts/tdd.prompt.md
 
 Use in Copilot Chat by referencing the prompt.
 
-### Cursor
+### Antigravity (Gemini in IDE)
 
-Cursor has strong support for project rules via `.cursorrules`:
+If you're using Google's Antigravity (Gemini IDE integration):
 
-```bash
-# Export skills directly to Cursor format
-gt skills show go > .cursorrules
-
-# Or combine multiple skills
-gt skills show go >> .cursorrules
-gt skills show tdd-bug-fix >> .cursorrules
+1. Create `.gemini/settings.json` in your project:
+```json
+{
+  "customInstructions": "See .gemini/skills/ for coding guidelines"
+}
 ```
 
-Cursor reads `.cursorrules` automatically and applies them to **every** interaction—no need to ask.
-
-### Replit (Agent / Ghostwriter)
-
-Replit doesn't auto-load rule files yet, but you can use a convention:
-
+2. Export skills to `.gemini/skills/`:
 ```bash
-# Export to a RULES file
-gt skills show python > RULES.md
+mkdir -p .gemini/skills
+gt skills show python > .gemini/skills/python.md
+gt skills show tdd-bug-fix > .gemini/skills/tdd.md
 ```
-
-**Tips for Replit:**
-1. Keep `RULES.md` **open in an editor tab**—Ghostwriter prioritizes open files
-2. When using Replit Agent, start with: *"Read RULES.md and follow strictly"*
 
 ### Google Gemini (AI Studio / API)
 
@@ -208,23 +213,18 @@ message = client.messages.create(
 )
 ```
 
-### Antigravity (Gemini in IDE)
+### Replit (Agent / Ghostwriter)
 
-If you're using Google's Antigravity (Gemini IDE integration):
+Replit doesn't auto-load rule files yet, but you can use a convention:
 
-1. Create `.gemini/settings.json` in your project:
-```json
-{
-  "customInstructions": "See .gemini/skills/ for coding guidelines"
-}
-```
-
-2. Export skills to `.gemini/skills/`:
 ```bash
-mkdir -p .gemini/skills
-gt skills show python > .gemini/skills/python.md
-gt skills show tdd-bug-fix > .gemini/skills/tdd.md
+# Export to a RULES file
+gt skills show python > RULES.md
 ```
+
+**Tips for Replit:**
+1. Keep `RULES.md` **open in an editor tab**—Ghostwriter prioritizes open files
+2. When using Replit Agent, start with: *"Read RULES.md and follow strictly"*
 
 ---
 
@@ -233,11 +233,11 @@ gt skills show tdd-bug-fix > .gemini/skills/tdd.md
 | Tool | Config Location | Auto-loaded? |
 |------|-----------------|--------------|
 | **gt** | Built-in | ✅ Yes |
-| **VS Code Copilot** | `.github/copilot-instructions.md` | ✅ Yes |
 | **Cursor** | `.cursorrules` | ✅ Yes (strong) |
-| **Replit** | `RULES.md` (convention) | ❌ Manual |
+| **VS Code Copilot** | `.github/copilot-instructions.md` | ✅ Yes |
+| **Antigravity** | `.gemini/skills/` | ⚡ Partial |
 | **Gemini** | System instruction | ❌ Manual |
 | **Claude** | System prompt | ❌ Manual |
-| **Antigravity** | `.gemini/skills/` | ⚡ Partial |
+| **Replit** | `RULES.md` (convention) | ❌ Manual |
 
 > 💡 **Pro tip**: Commit your skills files to git so your whole team benefits from consistent AI-generated code!

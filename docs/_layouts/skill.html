@@ -1,0 +1,65 @@
+---
+layout: default
+---
+
+<style>
+    .skill-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid var(--color-border, #3b4261);
+    }
+
+    .skill-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        margin-bottom: 1rem;
+    }
+
+    .skill-badge {
+        background: var(--color-card-bg, #16161e);
+        border: 1px solid var(--color-border, #3b4261);
+        padding: 0.25rem 0.75rem;
+        border-radius: 16px;
+        font-size: 0.85rem;
+        color: var(--color-text-secondary);
+    }
+
+    .skill-badge.language {
+        border-color: #7aa2f7;
+        color: #7aa2f7;
+    }
+
+    .back-link {
+        display: inline-block;
+        margin-bottom: 1.5rem;
+        color: #7aa2f7;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
+    .back-link:hover {
+        text-decoration: underline;
+    }
+</style>
+
+<a href="{{ '/skills' | relative_url }}" class="back-link">← Back to Skills</a>
+
+<article class="skill-content">
+    <header class="skill-header">
+        <h1>{{ page.title }}</h1>
+        <div class="skill-meta">
+            {% if page.language %}
+            <span class="skill-badge language">{{ page.language }}</span>
+            {% endif %}
+            {% if page.category %}
+            <span class="skill-badge">{{ page.category }}</span>
+            {% endif %}
+        </div>
+        {% if page.description %}
+        <p>{{ page.description }}</p>
+        {% endif %}
+    </header>
+
+    {{ content }}
+</article>
