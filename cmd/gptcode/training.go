@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
 
 	"github.com/spf13/cobra"
@@ -258,38 +257,4 @@ var trainingStatsCmd = &cobra.Command{
 func init() {
 	trainingCmd.AddCommand(trainingAnalyzeCmd)
 	trainingCmd.AddCommand(trainingStatsCmd)
-}
-
-// Helper for log analysis
-func analyzeLogFile(logPath string) ([]string, error) {
-	data, err := os.ReadFile(logPath)
-	if err != nil {
-		return nil, err
-	}
-
-	content := string(data)
-	var issues []string
-
-	// Check for common error patterns
-	errorPatterns := []struct {
-		pattern string
-		message string
-	}{
-		{`panic:`, "Panic detected"},
-		{`fatal:`, "Fatal error"},
-		{`error:.*not found`, "Resource not found error"},
-		{`rate limit`, "Rate limiting hit"},
-		{`context deadline exceeded`, "Timeout"},
-		{`failed to compile`, "Compilation failure"},
-		{`syntax error`, "Syntax error in generated code"},
-	}
-
-	for _, ep := range errorPatterns {
-		re := regexp.MustCompile(`(?i)` + ep.pattern)
-		if re.MatchString(content) {
-			issues = append(issues, ep.message)
-		}
-	}
-
-	return issues, nil
 }
