@@ -452,13 +452,6 @@ func (o *AgentObserver) PrintSummary() {
 		fmt.Printf("  Tokens In:          %s\n", formatNumber(summary.TokensIn))
 		fmt.Printf("  Tokens Out:         %s\n", formatNumber(summary.TokensOut))
 		fmt.Printf("  Total Tokens:       %s\n", formatNumber(summary.TokensIn+summary.TokensOut))
-		
-		// Estimate cost (rough approximation)
-		if summary.TokensIn+summary.TokensOut > 0 {
-			// Assuming average cost of $0.001 per 1K tokens (varies by model)
-			estimatedCost := float64(summary.TokensIn+summary.TokensOut) / 1000.0 * 0.001
-			fmt.Printf("  Est. Cost:          $%.4f\n", estimatedCost)
-		}
 	} else {
 		fmt.Println("  No LLM calls recorded")
 	}

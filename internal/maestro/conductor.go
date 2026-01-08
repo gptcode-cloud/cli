@@ -221,7 +221,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 
 		// Check if this is a query-only task (no validation needed)
 		if c.isQueryTask(plan, modifiedFiles) {
-			c.recordFeedback(editBackend, editModel, "editor", task, true)
+			c.recordFeedback(editBackend, editModel, "editor", task, true, "")
 
 			fmt.Printf("\n[OK] Task complete!\n")
 			if result != "" {
@@ -351,8 +351,8 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		}
 
 		// Success! Record positive feedback
-		c.recordFeedback(editBackend, editModel, "editor", task, true)
-		c.recordFeedback(reviewBackend, reviewModel, "reviewer", task, true)
+		c.recordFeedback(editBackend, editModel, "editor", task, true, "")
+		c.recordFeedback(reviewBackend, reviewModel, "reviewer", task, true, "")
 
 		fmt.Printf("\n[OK] Task complete!\n")
 		if result != "" {
@@ -374,8 +374,13 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 	// Task failed after all attempts - record negative feedback
 	editBackend, editModel, _ := c.selector.SelectModel(config.ActionEdit, c.language, complexity)
 	reviewBackend, reviewModel, _ := c.selector.SelectModel(config.ActionReview, c.language, complexity)
-	c.recordFeedback(editBackend, editModel, "editor", task, false)
-	c.recordFeedback(reviewBackend, reviewModel, "reviewer", task, false)
+	// Capture failure reason from loop detector for learning
+	failureReason := "max_iterations_reached"
+	if c.loopDetector != nil {
+		failureReason = fmt.Sprintf("max_iterations_reached (%s)", c.loopDetector.GetStats())
+	}
+	c.recordFeedback(editBackend, editModel, "editor", task, false, failureReason)
+	c.recordFeedback(reviewBackend, reviewModel, "reviewer", task, false, failureReason)
 
 	// Record final failure metrics
 	if c.Tracer != nil {
@@ -392,7 +397,7 @@ func errorMsg(err error) string {
 	return err.Error()
 }
 
-func (c *Conductor) recordFeedback(backend, model, agent, task string, success bool) {
+func (c *Conductor) recordFeedback(backend, model, agent, task string, success bool, failureReason string) {
 	sentiment := feedback.SentimentBad
 	if success {
 		sentiment = feedback.SentimentGood
@@ -405,6 +410,13 @@ func (c *Conductor) recordFeedback(backend, model, agent, task string, success b
 		Agent:     agent,
 		Task:      task,
 		Context:   fmt.Sprintf("language=%s", c.language),
+	}
+
+	// Add failure reason to metadata so we can learn from specific failure types
+	if !success && failureReason != "" {
+		event.Metadata = map[string]string{
+			"failure_reason": failureReason,
+		}
 	}
 
 	if err := feedback.Record(event); err != nil {
