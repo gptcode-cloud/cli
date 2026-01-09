@@ -187,6 +187,31 @@ func GetAvailableTools() []map[string]interface{} {
 				},
 			},
 		},
+		{
+			"type": "function",
+			"function": map[string]interface{}{
+				"name":        "find_relevant_files",
+				"description": "Find files most relevant to a task by searching for keywords. Use this FIRST before browsing directories. Returns ranked list of files containing task-related keywords.",
+				"parameters": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"query": map[string]interface{}{
+							"type":        "string",
+							"description": "Keywords or description of what you're looking for (e.g., 'URL formatting scanner output')",
+						},
+						"file_types": map[string]interface{}{
+							"type":        "string",
+							"description": "Optional: comma-separated extensions to filter (e.g., 'go,ts,py')",
+						},
+						"limit": map[string]interface{}{
+							"type":        "integer",
+							"description": "Maximum files to return (default: 10)",
+						},
+					},
+					"required": []string{"query"},
+				},
+			},
+		},
 	}
 }
 
@@ -208,6 +233,8 @@ func ExecuteTool(call ToolCall, workdir string) ToolResult {
 		return ProjectMap(call, workdir)
 	case "apply_patch":
 		return ApplyPatch(call, workdir)
+	case "find_relevant_files":
+		return FindRelevantFiles(call, workdir)
 	default:
 		return ToolResult{
 			Tool:  call.Name,
