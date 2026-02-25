@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"gopkg.in/yaml.v3"
+	"gptcode/internal/langdetect"
 )
 
 func RunSetup() {
@@ -80,17 +81,45 @@ func interactiveSetup() *Setup {
 	}
 
 	fmt.Fprintln(os.Stderr, "\n=== GPTCode Setup ===")
-	fmt.Fprintln(os.Stderr, "\nWhich LLM backends do you want to configure?")
-	fmt.Fprintln(os.Stderr, "1) Local (Ollama)")
-	fmt.Fprintln(os.Stderr, "2) OpenAI-compatible API (OpenAI, OpenRouter, etc)")
-	fmt.Fprintln(os.Stderr, "3) Both")
-	fmt.Fprint(os.Stderr, "\nChoice (1-3): ")
+	fmt.Fprintln(os.Stderr, "\nChoose your setup:")
+	fmt.Fprintln(os.Stderr, "1) Quick Start (recommended) - Free, no API key needed")
+	fmt.Fprintln(os.Stderr, "2) Local (Ollama) - Run models on your machine")
+	fmt.Fprintln(os.Stderr, "3) Cloud API (OpenAI, Groq, etc) - Use external APIs")
+	fmt.Fprintln(os.Stderr, "4) Both Local and Cloud")
+	fmt.Fprint(os.Stderr, "\nChoice (1-4): ")
 
 	choice, _ := reader.ReadString('\n')
 	choice = strings.TrimSpace(choice)
 
-	useLocal := choice == "1" || choice == "3"
-	useAPI := choice == "2" || choice == "3"
+	// Quick Start: Configure OpenRouter with free model automatically
+	if choice == "1" {
+		fmt.Fprintln(os.Stderr, "\n--- Quick Start: OpenRouter Free ---")
+		fmt.Fprintln(os.Stderr, "Using stepfun/step-3.5-flash:free (no cost, supports tools)")
+		fmt.Fprintln(os.Stderr, "\nTo get started:")
+		fmt.Fprintln(os.Stderr, "1. Get a free API key: https://openrouter.ai/keys")
+		fmt.Fprintln(os.Stderr, "2. Run: gptcode key openrouter")
+		fmt.Fprintln(os.Stderr, "   (paste your key when prompted)")
+		fmt.Fprintln(os.Stderr, "\nOr skip for now and run:")
+		fmt.Fprint(os.Stderr, "   gptcode key openrouter\n\n")
+
+		setup.Backend["openrouter"] = BackendConfig{
+			Type:         "openai",
+			BaseURL:      "https://openrouter.ai/api/v1",
+			DefaultModel: "stepfun/step-3.5-flash:free",
+			Models: map[string]string{
+				"free": "stepfun/step-3.5-flash:free",
+			},
+		}
+		setup.Defaults.Backend = "openrouter"
+		setup.Defaults.Model = "free"
+		lang := langdetect.DetectLanguage(".")
+		setup.Defaults.Lang = strings.ToLower(string(lang))
+
+		return setup
+	}
+
+	useLocal := choice == "2" || choice == "4"
+	useAPI := choice == "3" || choice == "4"
 
 	if useLocal {
 		fmt.Fprintln(os.Stderr, "\n--- Ollama (Local) ---")

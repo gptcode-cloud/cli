@@ -111,6 +111,46 @@ $0-5/month vs $20-30/month subscriptions.
 }
 
 func init() {
+	rootCmd.PersistentPreRunE = func(cmd *cobra.Command, args []string) error {
+		// Skip for setup and key commands
+		if cmd.Name() == "setup" || cmd.Name() == "key" || cmd.Name() == "completion" {
+			return nil
+		}
+
+		// Check if setup exists and show welcome message if needed
+		setup, err := config.LoadSetup()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, `
+╔════════════════════════════════════════════════════════════╗
+║                    Welcome to GPTCode!                     ║
+╠════════════════════════════════════════════════════════════╣
+║                                                            ║
+║  To get started, run:                                     ║
+║                                                            ║
+║    gptcode setup                                          ║
+║                                                            ║
+║  This will guide you through the initial setup.            ║
+║                                                            ║
+║  Quick start (free, no API key needed):                    ║
+║    1. Get key: https://openrouter.ai/keys                  ║
+║    2. Run: gptcode key openrouter                          ║
+║    3. Run: gptcode run "your task"                         ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝
+`)
+			return nil
+		}
+
+		// Check if backend is configured
+		if setup.Defaults.Backend == "" {
+			fmt.Fprintf(os.Stderr, `
+⚠️  No backend configured. Run: gptcode setup
+`)
+		}
+
+		return nil
+	}
+
 	rootCmd.AddCommand(setupCmd)
 	rootCmd.AddCommand(keyCmd)
 	rootCmd.AddCommand(backendCmd)

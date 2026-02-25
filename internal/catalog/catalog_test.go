@@ -3,6 +3,7 @@ package catalog
 import (
 	"encoding/json"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 )
@@ -74,8 +75,22 @@ func TestCatalogSearch(t *testing.T) {
 }
 
 func TestSearchModelsMulti(t *testing.T) {
+	// Skip if CI or if user catalog doesn't exist (requires API key to fetch)
 	if os.Getenv("CI") == "true" {
-		t.Skip("Skipping integration test in CI (requires models_catalog.json)")
+		t.Skip("Skipping in CI (requires models_catalog.json with API key)")
+	}
+
+	// Check if user catalog exists
+	homeDir, _ := os.UserHomeDir()
+	catalogPath := filepath.Join(homeDir, ".gptcode", "models_catalog.json")
+	if _, err := os.Stat(catalogPath); os.IsNotExist(err) {
+		t.Skip("Skipping: user catalog not found (run 'gptcode model update --all' with API key)")
+	}
+
+	// Check if Groq data exists in catalog (requires GROQ_API_KEY to fetch)
+	catalog, err := Load()
+	if err != nil || len(catalog.Groq.Models) == 0 {
+		t.Skip("Skipping: Groq catalog not available (run 'gptcode model update --all' with GROQ_API_KEY)")
 	}
 
 	t.Run("backend auto-detection", func(t *testing.T) {

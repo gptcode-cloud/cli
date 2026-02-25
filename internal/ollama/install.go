@@ -25,7 +25,12 @@ func IsInstalled(modelName string) (bool, error) {
 
 	resp, err := http.Get("http://localhost:11434/api/tags")
 	if err != nil {
-		return false, fmt.Errorf("ollama not running or not accessible: %w", err)
+		return false, fmt.Errorf(`ollama not running or not accessible: %w
+
+To use local models:
+1. Install Ollama: https://ollama.ai
+2. Run: ollama pull qwen3-coder
+3. Run: gptcode setup`, err)
 	}
 	defer resp.Body.Close()
 

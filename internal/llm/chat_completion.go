@@ -125,7 +125,19 @@ type chatCompletionResponse struct {
 
 func (c *ChatCompletionProvider) ChatStream(ctx context.Context, req ChatRequest, callback func(chunk string)) error {
 	if c.APIKey == "" {
-		return errors.New("API key not defined")
+		return errors.New(`API key not defined for this backend
+
+To get started for free:
+1. Get a free API key from https://openrouter.ai/keys
+2. Run: gptcode key openrouter
+
+Or use Groq (free tier available):
+1. Get a free API key from https://console.groq.com/keys
+2. Run: gptcode key groq
+
+Or use local models with Ollama:
+1. Install Ollama: https://ollama.ai
+2. Run: gptcode setup`)
 	}
 
 	messages := []chatCompletionMsg{
@@ -230,7 +242,19 @@ func (c *ChatCompletionProvider) ChatStream(ctx context.Context, req ChatRequest
 
 func (c *ChatCompletionProvider) Chat(ctx context.Context, req ChatRequest) (*ChatResponse, error) {
 	if c.APIKey == "" {
-		return nil, errors.New("API key not defined")
+		return nil, errors.New(`API key not defined for this backend
+
+To get started for free:
+1. Get a free API key from https://openrouter.ai/keys
+2. Run: gptcode key openrouter
+
+Or use Groq (free tier available):
+1. Get a free API key from https://console.groq.com/keys
+2. Run: gptcode key groq
+
+Or use local models with Ollama:
+1. Install Ollama: https://ollama.ai
+2. Run: gptcode setup`)
 	}
 
 	messages := []chatCompletionMsg{
