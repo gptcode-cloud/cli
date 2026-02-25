@@ -370,24 +370,6 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		}
 		return nil
 	}
-
-	// Task failed after all attempts - record negative feedback
-	editBackend, editModel, _ := c.selector.SelectModel(config.ActionEdit, c.language, complexity)
-	reviewBackend, reviewModel, _ := c.selector.SelectModel(config.ActionReview, c.language, complexity)
-	// Capture failure reason from loop detector for learning
-	failureReason := "max_iterations_reached"
-	if c.loopDetector != nil {
-		failureReason = fmt.Sprintf("max_iterations_reached (%s)", c.loopDetector.GetStats())
-	}
-	c.recordFeedback(editBackend, editModel, "editor", task, false, failureReason)
-	c.recordFeedback(reviewBackend, reviewModel, "reviewer", task, false, failureReason)
-
-	// Record final failure metrics
-	if c.Tracer != nil {
-		_ = c.Tracer.End(false)
-	}
-
-	return fmt.Errorf("task stopped by loop detector")
 }
 
 func errorMsg(err error) string {

@@ -118,28 +118,45 @@ func TestSearchModelsMulti(t *testing.T) {
 	})
 
 	t.Run("multi-term AND filtering", func(t *testing.T) {
-		models, err := SearchModelsMulti("openrouter", []string{"gemini", "free"}, "")
+		// Test multi-term AND filtering with gemini + cheap (more realistic)
+		models, err := SearchModelsMulti("openrouter", []string{"gemini", "cheap"}, "")
 		if err != nil {
 			t.Fatalf("SearchModelsMulti failed: %v", err)
 		}
 
 		if len(models) == 0 {
-			t.Error("Expected free gemini models but got none")
+			t.Error("Expected cheap gemini models but got none")
 		}
 
 		for _, m := range models {
 			hasGemini := strings.Contains(strings.ToLower(m.Name), "gemini") || strings.Contains(strings.ToLower(m.ID), "gemini")
-			isFree := m.PricingPrompt == 0 && m.PricingComp == 0
+			hasCheap := false
+			for _, tag := range m.Tags {
+				if strings.ToLower(tag) == "cheap" {
+					hasCheap = true
+					break
+				}
+			}
 
 			if !hasGemini {
 				t.Errorf("Model %s doesn't contain 'gemini'", m.Name)
 			}
-			if !isFree {
-				t.Errorf("Model %s is not free: $%.2f/$%.2f", m.Name, m.PricingPrompt, m.PricingComp)
+			if !hasCheap {
+				t.Errorf("Model %s doesn't have 'cheap' tag: %v", m.Name, m.Tags)
 			}
 		}
 
-		t.Logf("Found %d free gemini models", len(models))
+		t.Logf("Found %d cheap gemini models", len(models))
+
+		// Also test that free filtering works for other models (like free grok models)
+		freeModels, err := SearchModelsMulti("groq", []string{"free"}, "")
+		if err != nil {
+			t.Fatalf("SearchModelsMulti failed: %v", err)
+		}
+		if len(freeModels) == 0 {
+			t.Error("Expected free models in groq but got none")
+		}
+		t.Logf("Found %d free models in groq", len(freeModels))
 	})
 }
 

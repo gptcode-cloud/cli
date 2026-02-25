@@ -147,7 +147,7 @@ func newBuilderAndLLM(lang, mode, hint string) (*prompt.Builder, llm.Provider, s
 	model := backendCfg.DefaultModel
 	if alias, ok := backendCfg.Models[modelAlias]; ok {
 		model = alias
-	} else if modelAlias != "" {
+	} else if modelAlias != "" && modelAlias != backendCfg.DefaultModel {
 		model = modelAlias
 	}
 

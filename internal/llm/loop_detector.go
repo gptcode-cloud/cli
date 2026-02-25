@@ -22,7 +22,6 @@ type LoopDetector struct {
 	responseHistory    []string // Hashes of responses
 	consecutiveToolHit int      // Count of same tool in a row
 	lastToolHash       string
-	lastResponseHash   string
 
 	// Progress tracking
 	Iteration         int

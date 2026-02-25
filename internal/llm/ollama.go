@@ -81,6 +81,7 @@ func (o *OllamaProvider) ChatStream(ctx context.Context, req ChatRequest, callba
 		Model:    req.Model,
 		Messages: messages,
 		Stream:   true,
+		Tools:    req.Tools,
 	}
 	b, _ := json.Marshal(body)
 
@@ -196,13 +197,25 @@ func (o *OllamaProvider) Chat(ctx context.Context, req ChatRequest) (*ChatRespon
 func parseXMLToolCalls(text string) []ChatToolCall {
 	var calls []ChatToolCall
 
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "### parseXMLToolCalls input:\n%s\n\n", text)
+	}
+
 	funcRe := regexp.MustCompile(`<function=([^>]+)>(.*?)</function>`)
 	funcMatches := funcRe.FindAllStringSubmatch(text, -1)
+
+	if os.Getenv("GPTCODE_DEBUG") == "1" {
+		fmt.Fprintf(os.Stderr, "### Found %d function matches\n", len(funcMatches))
+	}
 
 	for idx, match := range funcMatches {
 		if len(match) >= 3 {
 			funcName := match[1]
 			funcBody := match[2]
+
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
+				fmt.Fprintf(os.Stderr, "### Function %d: %s, body: %s\n", idx, funcName, funcBody)
+			}
 
 			args := make(map[string]interface{})
 
