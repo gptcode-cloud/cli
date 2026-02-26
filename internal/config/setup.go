@@ -108,9 +108,11 @@ func RunSetupQuickStart() {
 ║                                                            ║
 ║  1. Get a free API key: https://openrouter.ai/keys     ║
 ║  2. Run: gt key openrouter                              ║
-║  3. Run: gt run "hello"                                ║
+║  3. Run: gt go "hello" or gt run "listar arquivos"     ║
 ║                                                            ║
-╚════════════════════════════════════════════════════════════╝
+║  Optional - Enable web search:                           ║
+║    export TAVILY_API_KEY="..." (from https://tavily.com)║
+║                                                            ╚════════════════════════════════════════════════════╝
 `)
 
 	installFeedbackHook()

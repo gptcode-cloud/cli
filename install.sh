@@ -169,6 +169,9 @@ if [ -x "$INSTALL_DIR/gptcode" ]; then
   echo "   gt key openrouter     # Add your API key"
   echo "   gt run \"hello\"        # Test it works"
   echo ""
+  echo "   Optional - Enable web search:"
+  echo "   export TAVILY_API_KEY=\"...\" (from https://tavily.com)"
+  echo ""
   echo "   Or use interactive setup:"
   echo "   gt setup              # Guided setup"
 else
