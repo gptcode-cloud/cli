@@ -49,6 +49,7 @@ type LLMRequestEvent struct {
 	Backend   string        `json:"backend"`
 	TokensIn  int           `json:"tokens_in"`
 	TokensOut int           `json:"tokens_out"`
+	Cost      float64       `json:"cost"`
 	Duration  time.Duration `json:"duration_ms"`
 	Error     string        `json:"error,omitempty"`
 }
@@ -88,16 +89,17 @@ func (e ValidationEvent) EventType() string { return "validation" }
 
 // ExecutionSummary provides a summary of the entire execution
 type ExecutionSummary struct {
-	Duration      time.Duration     `json:"duration_ms"`
-	FilesCreated  []string          `json:"files_created"`
-	FilesModified []string          `json:"files_modified"`
-	FilesDeleted  []string          `json:"files_deleted"`
-	ToolCalls     map[string]int    `json:"tool_calls"`
-	LLMCalls      int               `json:"llm_calls"`
-	TokensIn      int               `json:"tokens_in"`
-	TokensOut     int               `json:"tokens_out"`
-	Errors        []string          `json:"errors"`
-	Success       bool              `json:"success"`
+	Duration      time.Duration  `json:"duration_ms"`
+	FilesCreated  []string       `json:"files_created"`
+	FilesModified []string       `json:"files_modified"`
+	FilesDeleted  []string       `json:"files_deleted"`
+	ToolCalls     map[string]int `json:"tool_calls"`
+	LLMCalls      int            `json:"llm_calls"`
+	TokensIn      int            `json:"tokens_in"`
+	TokensOut     int            `json:"tokens_out"`
+	TotalCost     float64        `json:"total_cost"`
+	Errors        []string       `json:"errors"`
+	Success       bool           `json:"success"`
 }
 
 // Observer is the interface for tracking agent activity
@@ -134,6 +136,7 @@ type AgentObserver struct {
 	llmCalls      int
 	tokensIn      int
 	tokensOut     int
+	totalCost     float64
 	errors        []string
 	success       bool
 }
@@ -180,6 +183,7 @@ func (o *AgentObserver) Emit(event Event) {
 		o.llmCalls++
 		o.tokensIn += e.TokensIn
 		o.tokensOut += e.TokensOut
+		o.totalCost += e.Cost
 		if e.Error != "" {
 			o.errors = append(o.errors, e.Error)
 		}
@@ -227,8 +231,12 @@ func (o *AgentObserver) printEvent(event Event) {
 			fmt.Printf("  [FILE] - %s\n", e.Path)
 		}
 	case *LLMRequestEvent:
-		fmt.Printf("  [LLM]  %-15s in:%s out:%s (%.2fs)\n",
-			e.Model, formatNumber(e.TokensIn), formatNumber(e.TokensOut), e.Duration.Seconds())
+		costStr := fmt.Sprintf("$%.4f", e.Cost)
+		if e.Cost == 0 {
+			costStr = "$0.00"
+		}
+		fmt.Printf("  [LLM]  %-15s in:%s out:%s %s (%.2fs)\n",
+			e.Model, formatNumber(e.TokensIn), formatNumber(e.TokensOut), costStr, e.Duration.Seconds())
 	case *AgentEvent:
 		if e.Phase == "start" {
 			fmt.Printf("  [AGENT] %s started\n", e.Name)
@@ -251,7 +259,6 @@ func (o *AgentObserver) printEvent(event Event) {
 		}
 	}
 }
-
 
 // Summary returns the execution summary
 func (o *AgentObserver) Summary() *ExecutionSummary {
@@ -277,6 +284,7 @@ func (o *AgentObserver) Summary() *ExecutionSummary {
 		LLMCalls:      o.llmCalls,
 		TokensIn:      o.tokensIn,
 		TokensOut:     o.tokensOut,
+		TotalCost:     o.totalCost,
 		Errors:        o.errors,
 		Success:       o.success && len(o.errors) == 0,
 	}
@@ -384,7 +392,7 @@ func (o *AgentObserver) PrintSummary() {
 	fmt.Println()
 	fmt.Println("FILE CHANGES")
 	fmt.Println(strings.Repeat("-", 40))
-	
+
 	totalFiles := len(o.filesCreated) + len(o.filesModified) + len(o.filesDeleted)
 	var totalBytes int64
 	for _, b := range o.filesCreated {
@@ -399,7 +407,7 @@ func (o *AgentObserver) PrintSummary() {
 		fmt.Printf("  Files Modified:     %d\n", len(o.filesModified))
 		fmt.Printf("  Files Deleted:      %d\n", len(o.filesDeleted))
 		fmt.Printf("  Total Bytes:        %s\n", formatBytes(totalBytes))
-		
+
 		if len(o.filesCreated) > 0 {
 			fmt.Println()
 			fmt.Println("  Created:")
@@ -429,7 +437,7 @@ func (o *AgentObserver) PrintSummary() {
 	fmt.Println()
 	fmt.Println("TOOL USAGE")
 	fmt.Println(strings.Repeat("-", 40))
-	
+
 	if totalToolCalls > 0 {
 		fmt.Printf("  Total Calls:        %d\n", totalToolCalls)
 		fmt.Println()
@@ -446,12 +454,13 @@ func (o *AgentObserver) PrintSummary() {
 	fmt.Println()
 	fmt.Println("LLM USAGE")
 	fmt.Println(strings.Repeat("-", 40))
-	
+
 	if summary.LLMCalls > 0 || summary.TokensIn > 0 || summary.TokensOut > 0 {
 		fmt.Printf("  API Calls:          %d\n", summary.LLMCalls)
 		fmt.Printf("  Tokens In:          %s\n", formatNumber(summary.TokensIn))
 		fmt.Printf("  Tokens Out:         %s\n", formatNumber(summary.TokensOut))
 		fmt.Printf("  Total Tokens:       %s\n", formatNumber(summary.TokensIn+summary.TokensOut))
+		fmt.Printf("  Total Cost:         $%.4f\n", summary.TotalCost)
 	} else {
 		fmt.Println("  No LLM calls recorded")
 	}

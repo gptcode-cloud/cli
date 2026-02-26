@@ -13,6 +13,46 @@ import (
 	"gptcode/internal/tools"
 )
 
+// calculateCost estimates the cost of an LLM call based on model and token usage
+// This is a simplified calculation - for accurate costs, integrate with the model catalog
+func calculateCost(model string, promptTokens, completionTokens int) float64 {
+	modelLower := strings.ToLower(model)
+
+	// Free models have 0 cost
+	if strings.Contains(modelLower, ":free") || strings.Contains(modelLower, "free") {
+		return 0
+	}
+
+	// Known model prices per 1M tokens (approximate)
+	// These can be extended with actual pricing from the catalog
+	prices := map[string][2]float64{
+		"llama-3.3-70b":     {0.88, 0.88},
+		"llama-3.1-8b":      {0.19, 0.19},
+		"llama-3.1-70b":     {0.59, 0.79},
+		"gpt-4o-mini":       {0.15, 0.60},
+		"gpt-4o":            {2.50, 10.00},
+		"gpt-4-turbo":       {10.00, 30.00},
+		"claude-3-5-sonnet": {3.00, 15.00},
+		"claude-3-haiku":    {0.25, 1.25},
+		"gemini-1.5-flash":  {0.075, 0.30},
+		"gemini-2.0-flash":  {0.00, 0.00},
+		"qwen3-32b":         {0.50, 1.50},
+		"qwen2.5-coder":     {0.50, 0.50},
+	}
+
+	// Find matching model price
+	for modelKey, price := range prices {
+		if strings.Contains(modelLower, strings.ToLower(modelKey)) {
+			promptCost := float64(promptTokens) / 1_000_000 * price[0]
+			completionCost := float64(completionTokens) / 1_000_000 * price[1]
+			return promptCost + completionCost
+		}
+	}
+
+	// Default: assume cheap model if unknown
+	return float64(promptTokens+completionTokens) / 1_000_000 * 0.50
+}
+
 type EditorAgent struct {
 	provider     llm.Provider
 	cwd          string
@@ -269,11 +309,14 @@ func (e *EditorAgent) Execute(ctx context.Context, history []llm.ChatMessage, st
 
 		// Emit LLM request event to observer
 		if e.observer != nil && resp.TokenUsage != nil {
+			// Calculate cost (free models have 0 cost)
+			cost := calculateCost(e.model, resp.TokenUsage.PromptTokens, resp.TokenUsage.CompletionTokens)
 			e.observer.Emit(&observability.LLMRequestEvent{
 				BaseEvent: observability.BaseEvent{Time: time.Now()},
 				Model:     e.model,
 				TokensIn:  resp.TokenUsage.PromptTokens,
 				TokensOut: resp.TokenUsage.CompletionTokens,
+				Cost:      cost,
 				Duration:  llmDuration,
 			})
 		}
