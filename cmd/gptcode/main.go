@@ -127,14 +127,14 @@ func init() {
 ║                                                            ║
 ║  To get started, run:                                     ║
 ║                                                            ║
-║    gptcode setup                                          ║
+║    gt setup                                               ║
 ║                                                            ║
 ║  This will guide you through the initial setup.            ║
 ║                                                            ║
 ║  Quick start (free, no API key needed):                    ║
-║    1. Get key: https://openrouter.ai/keys                  ║
-║    2. Run: gptcode key openrouter                          ║
-║    3. Run: gptcode run "your task"                         ║
+║    1. Get key: https://openrouter.ai/keys                ║
+║    2. Run: gt key openrouter                              ║
+║    3. Run: gt run "your task"                             ║
 ║                                                            ║
 ╚════════════════════════════════════════════════════════════╝
 `)

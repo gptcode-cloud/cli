@@ -95,12 +95,13 @@ func interactiveSetup() *Setup {
 	if choice == "1" {
 		fmt.Fprintln(os.Stderr, "\n--- Quick Start: OpenRouter Free ---")
 		fmt.Fprintln(os.Stderr, "Using stepfun/step-3.5-flash:free (no cost, supports tools)")
-		fmt.Fprintln(os.Stderr, "\nTo get started:")
-		fmt.Fprintln(os.Stderr, "1. Get a free API key: https://openrouter.ai/keys")
-		fmt.Fprintln(os.Stderr, "2. Run: gptcode key openrouter")
-		fmt.Fprintln(os.Stderr, "   (paste your key when prompted)")
-		fmt.Fprintln(os.Stderr, "\nOr skip for now and run:")
-		fmt.Fprint(os.Stderr, "   gptcode key openrouter\n\n")
+
+		// Ask for API key
+		fmt.Fprintln(os.Stderr, "\nTo get started, you need a free API key from OpenRouter.")
+		fmt.Fprintln(os.Stderr, "Get one at: https://openrouter.ai/keys")
+		fmt.Fprint(os.Stderr, "\nPaste your OpenRouter API key (or press Enter to skip): ")
+		apiKey, _ := reader.ReadString('\n')
+		apiKey = strings.TrimSpace(apiKey)
 
 		setup.Backend["openrouter"] = BackendConfig{
 			Type:         "openai",
@@ -114,6 +115,20 @@ func interactiveSetup() *Setup {
 		setup.Defaults.Model = "free"
 		lang := langdetect.DetectLanguage(".")
 		setup.Defaults.Lang = strings.ToLower(string(lang))
+
+		// Save API key if provided
+		if apiKey != "" {
+			envVar := "OPENROUTER_API_KEY"
+			os.Setenv(envVar, apiKey)
+			if err := saveAPIKeyToProfile(envVar, apiKey); err != nil {
+				fmt.Fprintf(os.Stderr, "\nWarning: Could not save API key: %v\n", err)
+			} else {
+				fmt.Fprintln(os.Stderr, "\n✓ API key saved!")
+			}
+		} else {
+			fmt.Fprintln(os.Stderr, "\n⚠️  No API key provided.")
+			fmt.Fprintln(os.Stderr, "To enable, run: gt key openrouter")
+		}
 
 		return setup
 	}

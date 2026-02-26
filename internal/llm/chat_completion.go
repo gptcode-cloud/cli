@@ -129,15 +129,15 @@ func (c *ChatCompletionProvider) ChatStream(ctx context.Context, req ChatRequest
 
 To get started for free:
 1. Get a free API key from https://openrouter.ai/keys
-2. Run: gptcode key openrouter
+2. Run: gt key openrouter
 
 Or use Groq (free tier available):
 1. Get a free API key from https://console.groq.com/keys
-2. Run: gptcode key groq
+2. Run: gt key groq
 
 Or use local models with Ollama:
 1. Install Ollama: https://ollama.ai
-2. Run: gptcode setup`)
+2. Run: gt setup`)
 	}
 
 	messages := []chatCompletionMsg{
@@ -246,15 +246,15 @@ func (c *ChatCompletionProvider) Chat(ctx context.Context, req ChatRequest) (*Ch
 
 To get started for free:
 1. Get a free API key from https://openrouter.ai/keys
-2. Run: gptcode key openrouter
+2. Run: gt key openrouter
 
 Or use Groq (free tier available):
 1. Get a free API key from https://console.groq.com/keys
-2. Run: gptcode key groq
+2. Run: gt key groq
 
 Or use local models with Ollama:
 1. Install Ollama: https://ollama.ai
-2. Run: gptcode setup`)
+2. Run: gt setup`)
 	}
 
 	messages := []chatCompletionMsg{
