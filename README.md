@@ -38,7 +38,11 @@ gt setup
 Use `gptcode` or the short alias `gt`:
 
 ```bash
-# Autonomous mode - AI completes the task
+# Quick AI answers (no tool loop - fastest)
+gt go "what is Go language"
+gt go "write hello world in Python"
+
+# Autonomous mode - AI completes the task with tools
 gt do "add user authentication"
 
 # Interactive chat
@@ -55,7 +59,8 @@ gt research "how does the payment system work?"
 
 | Command | Description |
 |---------|-------------|
-| `gt do "task"` | Autonomous task completion |
+| `gt go "question"` | Quick AI answer (no tools) - fastest |
+| `gt do "task"` | Autonomous task completion with tools |
 | `gt chat` | Interactive code conversation |
 | `gt run "task"` | Execute with follow-up |
 | `gt research "question"` | Document codebase/architecture |
@@ -64,6 +69,22 @@ gt research "how does the payment system work?"
 | `gt review` | Code review for bugs/security |
 | `gt tdd` | Test-driven development mode |
 | `gt feature "desc"` | Generate tests + implementation |
+
+## Tools Available
+
+When using autonomous modes (`gt do`, `gt run`, `gt chat`), these tools are available:
+
+| Tool | Description |
+|------|-------------|
+| `read_file` | Read file contents |
+| `list_files` | List files with pattern filter |
+| `search_code` | Regex search in code |
+| `find_relevant_files` | AI-powered file discovery |
+| `write_file` | Create/edit files |
+| `apply_patch` | Replace text blocks |
+| `run_command` | Execute shell commands |
+| `project_map` | Project structure tree |
+| `web_search` | Web lookup (requires EXA_API_KEY) |
 
 ## Skills
 

@@ -149,18 +149,25 @@ Initialize GPTCode configuration at `~/.gptcode`.
 gt setup
 ```
 
+Or use Quick Start for non-interactive setup:
+
+```bash
+gt setup -y
+```
+
 Creates:
 - `~/.gptcode/profile.yaml` – backend and model configuration
 - `~/.gptcode/system_prompt.md` – base system prompt
 - `~/.gptcode/memories.jsonl` – memory store for examples
+- `~/.gptcode/feedback_hook.zsh` – shell feedback hook for learning
 
-### `gptcode key [backend]`
+### `gt key [backend]`
 
 Add or update API key for a backend provider.
 
 ```bash
-gptcode key openrouter
-gptcode key groq
+gt key openrouter
+gt key groq
 ```
 
 ### `gt models update`
@@ -174,6 +181,30 @@ gt models update
 ---
 
 ## Interactive Modes
+
+### `gt go [question]`
+
+**NEW**: Direct AI answers without tool execution. Fastest mode for quick questions.
+
+```bash
+gt go "what is Go language"
+gt go "explain what a goroutine is"
+gt go "write hello world in Python"
+gt go "what does this error mean: nil pointer"
+```
+
+**When to use:**
+- Quick questions
+- Simple explanations
+- Code generation without execution
+- Fast answers without autonomous loop
+
+**Difference from other modes:**
+| Mode | Tools | Use Case |
+|------|-------|----------|
+| `gt go` | ❌ | Quick Q&A, code snippets |
+| `gt run` | ✅ | Tasks requiring file operations |
+| `gt do` | ✅ | Complex autonomous tasks |
 
 ### `gt chat`
 
@@ -587,6 +618,7 @@ Shows:
 
 | Command | Purpose | When to Use |
 |---------|---------|-------------|
+| `go` | Quick AI answer | Fast Q&A, code snippets |
 | `chat` | Interactive conversation | Quick questions, exploratory work |
 | `review` | Code review | Before commit, quality check, security audit |
 | `tdd` | TDD workflow | New features requiring tests |
@@ -595,6 +627,39 @@ Shows:
 | `implement` | Execute plan | Structured feature implementation |
 | `feature` | Quick feature generation | Small, focused features |
 | `run` | Execute tasks | DevOps, HTTP requests, CLI commands |
+
+---
+
+## Tools Reference
+
+Available tools in autonomous modes (`gt do`, `gt run`, `gt chat`):
+
+| Tool | Description |
+|------|-------------|
+| `read_file` | Read file contents |
+| `list_files` | List directory with optional glob pattern filter |
+| `search_code` | Regex search across code files |
+| `find_relevant_files` | AI-powered file discovery by keywords |
+| `write_file` | Create or overwrite files |
+| `apply_patch` | Replace text blocks in files |
+| `run_command` | Execute shell commands |
+| `project_map` | Get tree view of project structure |
+| `read_guideline` | Read coding guidelines |
+| `web_search` | Search the web (requires EXA_API_KEY) |
+
+### Web Search Configuration
+
+To enable web search:
+
+```bash
+# Get free API key from https://exa.ai
+export EXA_API_KEY="your-key"
+
+# Or use SEARCH_API_KEY env var
+export SEARCH_API_KEY="your-key"
+```
+
+Without API key, the tool shows setup instructions.
 
 ---
 
