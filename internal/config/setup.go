@@ -111,7 +111,8 @@ func RunSetupQuickStart() {
 ║  3. Run: gt go "hello" or gt run "listar arquivos"     ║
 ║                                                            ║
 ║  Optional - Enable web search:                           ║
-║    export TAVILY_API_KEY="..." (from https://tavily.com)║
+║    gt key tavily      # Get key from https://tavily.com  ║
+║    gt key exa         # Get key from https://exa.ai      ║
 ║                                                            ╚════════════════════════════════════════════════════╝
 `)
 
@@ -510,6 +511,43 @@ func GetAPIKey(backendName string) string {
 	return keys[backendName]
 }
 
+func LoadAPIKey(keyName string) string {
+	// First check environment variable
+	if val := os.Getenv(keyName); val != "" {
+		return val
+	}
+
+	// Then check keys.yaml
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return ""
+	}
+
+	keysPath := filepath.Join(home, ".gptcode", "keys.yaml")
+	data, err := os.ReadFile(keysPath)
+	if err != nil {
+		return ""
+	}
+
+	var keys map[string]string
+	if err := yaml.Unmarshal(data, &keys); err != nil {
+		return ""
+	}
+
+	// Try exact match first
+	if val, ok := keys[keyName]; ok {
+		return val
+	}
+
+	// Try without _API_KEY suffix
+	cleanName := strings.TrimSuffix(keyName, "_API_KEY")
+	if val, ok := keys[cleanName]; ok {
+		return val
+	}
+
+	return ""
+}
+
 func saveAPIKeyToKeysFile(backendName, apiKey string) error {
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -534,6 +572,12 @@ func saveAPIKeyToKeysFile(backendName, apiKey string) error {
 }
 
 func UpdateAPIKey(backendName string) error {
+	// Handle web search API keys specially (they're not backends)
+	lowerName := strings.ToLower(backendName)
+	if lowerName == "tavily" || lowerName == "exa" {
+		return updateSearchAPIKey(backendName)
+	}
+
 	setup, err := LoadSetup()
 	if err != nil {
 		return fmt.Errorf("could not load setup: %w", err)
@@ -558,6 +602,29 @@ func UpdateAPIKey(backendName string) error {
 
 	fmt.Fprintf(os.Stderr, "\n✓ API key saved to ~/.gptcode/keys.yaml\n")
 	fmt.Fprintf(os.Stderr, "  (with 0600 permissions for security)\n")
+
+	return nil
+}
+
+func updateSearchAPIKey(name string) error {
+	envVar := strings.ToUpper(name) + "_API_KEY"
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Fprintf(os.Stderr, "Enter API key for %s (will be saved as %s): ", name, envVar)
+	apiKey, _ := reader.ReadString('\n')
+	apiKey = strings.TrimSpace(apiKey)
+
+	if apiKey == "" {
+		return fmt.Errorf("API key cannot be empty")
+	}
+
+	if err := saveAPIKeyToKeysFile(envVar, apiKey); err != nil {
+		return fmt.Errorf("failed to save API key: %w", err)
+	}
+
+	fmt.Fprintf(os.Stderr, "\n✓ API key saved to ~/.gptcode/keys.yaml\n")
+	fmt.Fprintf(os.Stderr, "  (with 0600 permissions for security)\n")
+	fmt.Fprintf(os.Stderr, "  Env var: %s\n", envVar)
 
 	return nil
 }

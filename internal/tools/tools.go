@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"gopkg.in/yaml.v3"
 	"gptcode/internal/observability"
 )
 
@@ -561,19 +562,29 @@ func WebSearch(call ToolCall) ToolResult {
 
 func searchWeb(query string, numResults int) (string, error) {
 	// Check for Tavily first (more popular for AI agents)
+	// Check env var first, then keys.yaml
 	tavilyKey := os.Getenv("TAVILY_API_KEY")
+	if tavilyKey == "" {
+		tavilyKey = loadSearchKey("TAVILY_API_KEY")
+	}
 	if tavilyKey != "" {
 		return searchTavily(query, numResults, tavilyKey)
 	}
 
 	// Check for Exa
 	exaKey := os.Getenv("EXA_API_KEY")
+	if exaKey == "" {
+		exaKey = loadSearchKey("EXA_API_KEY")
+	}
 	if exaKey != "" {
 		return searchExa(query, numResults, exaKey)
 	}
 
 	// Check generic search API key
 	searchKey := os.Getenv("SEARCH_API_KEY")
+	if searchKey == "" {
+		searchKey = loadSearchKey("SEARCH_API_KEY")
+	}
 	if searchKey != "" {
 		// Try Exa first, fall back to Tavily
 		if result, err := searchExa(query, numResults, searchKey); err == nil {
@@ -583,6 +594,45 @@ func searchWeb(query string, numResults int) (string, error) {
 	}
 
 	return searchFallback(query, numResults)
+}
+
+func loadSearchKey(envVar string) string {
+	// Try to load from config package
+	if val, err := getConfigKey(envVar); err == nil && val != "" {
+		return val
+	}
+	return ""
+}
+
+func getConfigKey(key string) (string, error) {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	keysPath := filepath.Join(home, ".gptcode", "keys.yaml")
+	data, err := os.ReadFile(keysPath)
+	if err != nil {
+		return "", err
+	}
+
+	var keys map[string]string
+	if err := yaml.Unmarshal(data, &keys); err != nil {
+		return "", err
+	}
+
+	// Try exact match
+	if val, ok := keys[key]; ok {
+		return val, nil
+	}
+
+	// Try without _API_KEY suffix
+	cleanKey := strings.TrimSuffix(key, "_API_KEY")
+	if val, ok := keys[cleanKey]; ok {
+		return val, nil
+	}
+
+	return "", fmt.Errorf("key not found")
 }
 
 func searchExa(query string, numResults int, apiKey string) (string, error) {
