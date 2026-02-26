@@ -3,6 +3,8 @@ package tools
 import (
 	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -212,6 +214,27 @@ func GetAvailableTools() []map[string]interface{} {
 				},
 			},
 		},
+		{
+			"type": "function",
+			"function": map[string]interface{}{
+				"name":        "web_search",
+				"description": "Search the web for information, documentation, or answers. Use when you need to look up error messages, API docs, or general knowledge not in the codebase.",
+				"parameters": map[string]interface{}{
+					"type": "object",
+					"properties": map[string]interface{}{
+						"query": map[string]interface{}{
+							"type":        "string",
+							"description": "Search query",
+						},
+						"num_results": map[string]interface{}{
+							"type":        "integer",
+							"description": "Number of results (default: 5)",
+						},
+					},
+					"required": []string{"query"},
+				},
+			},
+		},
 	}
 }
 
@@ -235,6 +258,8 @@ func ExecuteTool(call ToolCall, workdir string) ToolResult {
 		return ApplyPatch(call, workdir)
 	case "find_relevant_files":
 		return FindRelevantFiles(call, workdir)
+	case "web_search":
+		return WebSearch(call)
 	default:
 		return ToolResult{
 			Tool:  call.Name,
@@ -510,4 +535,105 @@ func ExecuteToolWithObserver(call LLMToolCall, workdir string, observer observab
 	}
 
 	return result
+}
+
+func WebSearch(call ToolCall) ToolResult {
+	query, ok := call.Arguments["query"].(string)
+	if !ok || query == "" {
+		return ToolResult{Tool: "web_search", Error: "query parameter required"}
+	}
+
+	numResults := 5
+	if n, ok := call.Arguments["num_results"].(float64); ok {
+		numResults = int(n)
+	}
+
+	results, err := searchWeb(query, numResults)
+	if err != nil {
+		return ToolResult{Tool: "web_search", Error: err.Error()}
+	}
+
+	return ToolResult{
+		Tool:   "web_search",
+		Result: results,
+	}
+}
+
+func searchWeb(query string, numResults int) (string, error) {
+	apiKey := os.Getenv("EXA_API_KEY")
+	if apiKey == "" {
+		apiKey = os.Getenv("SEARCH_API_KEY")
+	}
+
+	if apiKey != "" {
+		return searchExa(query, numResults, apiKey)
+	}
+
+	return searchFallback(query, numResults)
+}
+
+func searchExa(query string, numResults int, apiKey string) (string, error) {
+	req, err := http.NewRequest("POST", "https://api.exa.ai/search", strings.NewReader(
+		fmt.Sprintf(`{"query": %q, "num_results": %d}`, query, numResults)))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Authorization", apiKey)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("search API returned status %d", resp.StatusCode)
+	}
+
+	var result struct {
+		Results []struct {
+			Title   string `json:"title"`
+			URL     string `json:"url"`
+			Content string `json:"content"`
+		} `json:"results"`
+	}
+
+	body, _ := io.ReadAll(resp.Body)
+	if err := json.Unmarshal(body, &result); err != nil {
+		return "", err
+	}
+
+	if len(result.Results) == 0 {
+		return "No results found", nil
+	}
+
+	var output strings.Builder
+	output.WriteString("Search Results:\n\n")
+	for i, r := range result.Results {
+		output.WriteString(fmt.Sprintf("%d. %s\n", i+1, r.Title))
+		output.WriteString(fmt.Sprintf("   URL: %s\n", r.URL))
+		truncated := r.Content
+		if len(truncated) > 300 {
+			truncated = truncated[:300] + "..."
+		}
+		output.WriteString(fmt.Sprintf("   %s\n\n", truncated))
+	}
+
+	return output.String(), nil
+}
+
+func searchFallback(query string, numResults int) (string, error) {
+	return fmt.Sprintf(`Web search not configured. To enable:
+
+1. Get a free API key from https://exa.ai (or use SEARCH_API_KEY env var)
+2. Set: export EXA_API_KEY="your-key"
+
+For now, here's a suggestion for manual search:
+- Query: %s
+- Search manually at: https://www.google.com/search?q=%s
+
+Alternatively, use DuckDuckGo (no API key needed in browser).`, query, query), nil
 }

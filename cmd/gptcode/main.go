@@ -159,6 +159,7 @@ func init() {
 	rootCmd.AddCommand(detectLanguageCmd)
 	rootCmd.AddCommand(mlCmd)
 	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(goCmd)
 	rootCmd.AddCommand(chatCmd)
 	rootCmd.AddCommand(tddCmd)
 	rootCmd.AddCommand(researchCmd)
@@ -1641,6 +1642,26 @@ Examples:
 		// Start AI-assisted REPL mode - combine run REPL with AI processing
 		repl := repl.NewRunREPL(20)
 		return repl.Run()
+	},
+}
+
+var goCmd = &cobra.Command{
+	Use:   "go [task]",
+	Short: "Direct execution - ask AI and get immediate answer (no tools)",
+	Long: `Direct execution mode - gets AI response without tool calling loop.
+
+Examples:
+  gt go hello world
+  gt go "what is Go programming language"
+  gt go "write a simple HTTP server in Python"
+  gt go "explain this error: cannot find package"`,
+	Args: cobra.MinimumNArgs(1),
+	RunE: func(cmd *cobra.Command, args []string) error {
+		builder, provider, model, err := newBuilderAndLLM("general", "go", "")
+		if err != nil {
+			return err
+		}
+		return modes.RunGo(builder, provider, model, args)
 	},
 }
 
