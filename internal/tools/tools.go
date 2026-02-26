@@ -560,13 +560,26 @@ func WebSearch(call ToolCall) ToolResult {
 }
 
 func searchWeb(query string, numResults int) (string, error) {
-	apiKey := os.Getenv("EXA_API_KEY")
-	if apiKey == "" {
-		apiKey = os.Getenv("SEARCH_API_KEY")
+	// Check for Tavily first (more popular for AI agents)
+	tavilyKey := os.Getenv("TAVILY_API_KEY")
+	if tavilyKey != "" {
+		return searchTavily(query, numResults, tavilyKey)
 	}
 
-	if apiKey != "" {
-		return searchExa(query, numResults, apiKey)
+	// Check for Exa
+	exaKey := os.Getenv("EXA_API_KEY")
+	if exaKey != "" {
+		return searchExa(query, numResults, exaKey)
+	}
+
+	// Check generic search API key
+	searchKey := os.Getenv("SEARCH_API_KEY")
+	if searchKey != "" {
+		// Try Exa first, fall back to Tavily
+		if result, err := searchExa(query, numResults, searchKey); err == nil {
+			return result, nil
+		}
+		return searchTavily(query, numResults, searchKey)
 	}
 
 	return searchFallback(query, numResults)
@@ -625,15 +638,71 @@ func searchExa(query string, numResults int, apiKey string) (string, error) {
 	return output.String(), nil
 }
 
+func searchTavily(query string, numResults int, apiKey string) (string, error) {
+	reqBody := fmt.Sprintf(`{"query": %q, "max_results": %d}`, query, numResults)
+	req, err := http.NewRequest("POST", "https://api.tavily.com/search", strings.NewReader(reqBody))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{Timeout: 30 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		return "", fmt.Errorf("tavily API returned status %d", resp.StatusCode)
+	}
+
+	var result struct {
+		Results []struct {
+			Title   string  `json:"title"`
+			URL     string  `json:"url"`
+			Content string  `json:"content"`
+			Score   float64 `json:"score"`
+		} `json:"results"`
+	}
+
+	body, _ := io.ReadAll(resp.Body)
+	if err := json.Unmarshal(body, &result); err != nil {
+		return "", err
+	}
+
+	if len(result.Results) == 0 {
+		return "No results found", nil
+	}
+
+	var output strings.Builder
+	output.WriteString("Search Results:\n\n")
+	for i, r := range result.Results {
+		output.WriteString(fmt.Sprintf("%d. %s\n", i+1, r.Title))
+		output.WriteString(fmt.Sprintf("   URL: %s\n", r.URL))
+		truncated := r.Content
+		if len(truncated) > 300 {
+			truncated = truncated[:300] + "..."
+		}
+		output.WriteString(fmt.Sprintf("   %s\n\n", truncated))
+	}
+
+	return output.String(), nil
+}
+
 func searchFallback(query string, numResults int) (string, error) {
-	return fmt.Sprintf(`Web search not configured. To enable:
+	return fmt.Sprintf(`Web search not configured. To enable, get a free API key:
 
-1. Get a free API key from https://exa.ai (or use SEARCH_API_KEY env var)
-2. Set: export EXA_API_KEY="your-key"
+# Option 1: Tavily (recommended - $1/month for 1k searches)
+https://tavily.com
+export TAVILY_API_KEY="your-key"
 
-For now, here's a suggestion for manual search:
+# Option 2: Exa (1k free/month)
+https://exa.ai
+export EXA_API_KEY="your-key"
+
+# Then retry your search.
 - Query: %s
-- Search manually at: https://www.google.com/search?q=%s
-
-Alternatively, use DuckDuckGo (no API key needed in browser).`, query, query), nil
+- Search manually: https://www.google.com/search?q=%s`, query, query), nil
 }

@@ -649,15 +649,22 @@ Available tools in autonomous modes (`gt do`, `gt run`, `gt chat`):
 
 ### Web Search Configuration
 
-To enable web search:
+To enable web search, set one of these API keys:
 
 ```bash
-# Get free API key from https://exa.ai
+# Option 1: Tavily (recommended - $1/month for 1k searches)
+export TAVILY_API_KEY="your-key"
+
+# Option 2: Exa (1k free/month)
 export EXA_API_KEY="your-key"
 
-# Or use SEARCH_API_KEY env var
+# Or use a generic key
 export SEARCH_API_KEY="your-key"
 ```
+
+Get free API keys:
+- **Tavily**: https://tavily.com
+- **Exa**: https://exa.ai
 
 Without API key, the tool shows setup instructions.
 
