@@ -152,6 +152,7 @@ func init() {
 	}
 
 	rootCmd.AddCommand(setupCmd)
+	setupCmd.Flags().BoolP("yes", "y", false, "Use Quick Start (non-interactive)")
 	rootCmd.AddCommand(keyCmd)
 	rootCmd.AddCommand(backendCmd)
 	rootCmd.AddCommand(configCmd)
@@ -218,7 +219,12 @@ var setupCmd = &cobra.Command{
 	Use:   "setup",
 	Short: "Initialize ~/.gptcode with default profile and system prompt",
 	Run: func(cmd *cobra.Command, args []string) {
-		config.RunSetup()
+		quickStart, _ := cmd.Flags().GetBool("yes")
+		if quickStart {
+			config.RunSetupQuickStart()
+		} else {
+			config.RunSetup()
+		}
 	},
 }
 

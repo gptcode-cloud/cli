@@ -46,6 +46,74 @@ func RunSetup() {
 	fmt.Fprintln(os.Stderr, "\nGPTCode: setup complete → ~/.gptcode")
 }
 
+func RunSetupQuickStart() {
+	home, _ := os.UserHomeDir()
+	target := filepath.Join(home, ".gptcode")
+
+	if err := os.MkdirAll(target, 0o755); err != nil {
+		fmt.Fprintln(os.Stderr, "GPTCode: failed to create ~/.gptcode:", err)
+		return
+	}
+
+	templateDir := detectTemplateDir()
+
+	copyIfMissing(templateDir, target, "profile.yaml")
+	copyIfMissing(templateDir, target, "system_prompt.md")
+
+	setupPath := filepath.Join(target, "setup.yaml")
+
+	lang := langdetect.DetectLanguage(".")
+	setup := &Setup{
+		Defaults: struct {
+			Mode               string  `yaml:"mode,omitempty"`
+			Backend            string  `yaml:"backend"`
+			Profile            string  `yaml:"profile,omitempty"`
+			Model              string  `yaml:"model,omitempty"`
+			Lang               string  `yaml:"lang"`
+			SystemPromptFile   string  `yaml:"system_prompt_file,omitempty"`
+			MLComplexThreshold float64 `yaml:"ml_complex_threshold,omitempty"`
+			MLIntentThreshold  float64 `yaml:"ml_intent_threshold,omitempty"`
+			GraphMaxFiles      int     `yaml:"graph_max_files,omitempty"`
+			BudgetMode         bool    `yaml:"budget_mode,omitempty"`
+			MaxCostPerTask     float64 `yaml:"max_cost_per_task,omitempty"`
+			MonthlyBudget      float64 `yaml:"monthly_budget,omitempty"`
+		}{
+			Backend: "openrouter",
+			Model:   "free",
+			Lang:    strings.ToLower(string(lang)),
+		},
+		Backend: map[string]BackendConfig{
+			"openrouter": {
+				Type:         "openai",
+				BaseURL:      "https://openrouter.ai/api/v1",
+				DefaultModel: "stepfun/step-3.5-flash:free",
+				Models: map[string]string{
+					"free": "stepfun/step-3.5-flash:free",
+				},
+			},
+		},
+	}
+
+	if err := saveSetup(setupPath, setup); err != nil {
+		fmt.Fprintln(os.Stderr, "GPTCode: failed to save setup.yaml:", err)
+		return
+	}
+
+	fmt.Print(`
+╔════════════════════════════════════════════════════════════╗
+║              Quick Start Setup Complete!                 ║
+╠════════════════════════════════════════════════════════════╣
+║                                                            ║
+║  Next steps:                                             ║
+║                                                            ║
+║  1. Get a free API key: https://openrouter.ai/keys     ║
+║  2. Run: gt key openrouter                              ║
+║  3. Run: gt run "hello"                                ║
+║                                                            ║
+╚════════════════════════════════════════════════════════════╝
+`)
+}
+
 func detectTemplateDir() string {
 	if env := os.Getenv("GPTCODE_TEMPLATES_DIR"); env != "" {
 		return env

@@ -2,14 +2,35 @@
 
 > Autonomous AI Coding Assistant — **$0-5/month** vs $20-30/month subscriptions
 
-## Quick Start
+## Quick Start (30 seconds)
 
 ```bash
-# Install (creates both gptcode and gt commands)
+# 1. Install
+curl -sSL https://gptcode.dev/install.sh | bash
+
+# 2. Quick setup (recommended)
+gt setup -y
+
+# 3. Add your free API key
+gt key openrouter
+# (paste key from https://openrouter.ai/keys)
+
+# 4. Test it!
+gt run "hello"
+```
+
+## Alternative: Manual Setup
+
+```bash
+# Install
 curl -sSL https://gptcode.dev/install.sh | bash
 
 # Or using go install
 go install github.com/gptcode/cli/cmd/gptcode@latest
+
+# Guided setup
+gt setup
+# Choose "1) Quick Start" and paste your API key
 ```
 
 ## Usage

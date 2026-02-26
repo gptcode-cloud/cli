@@ -159,12 +159,18 @@ if [ -x "$INSTALL_DIR/gptcode" ]; then
       echo ""
     fi
   fi
-  
-  echo "🎉 Run 'gt --help' to get started!"
+
+  echo "🎉 Installation complete!"
   echo ""
-  echo "   gt do \"your task\"     # Autonomous mode"
-  echo "   gt chat               # Interactive chat"
-  echo "   gt skills install-all # Install coding skills"
+  echo "   gt --help              # Show help"
+  echo ""
+  echo "   Quick start (recommended):"
+  echo "   gt setup -y            # Quick setup with defaults"
+  echo "   gt key openrouter     # Add your API key"
+  echo "   gt run \"hello\"        # Test it works"
+  echo ""
+  echo "   Or use interactive setup:"
+  echo "   gt setup              # Guided setup"
 else
   echo "❌ Installation failed"
   exit 1
