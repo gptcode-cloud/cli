@@ -112,6 +112,104 @@ func RunSetupQuickStart() {
 ║                                                            ║
 ╚════════════════════════════════════════════════════════════╝
 `)
+
+	installFeedbackHook()
+}
+
+func installFeedbackHook() {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return
+	}
+
+	hookDir := filepath.Join(home, ".gptcode")
+	if err := os.MkdirAll(hookDir, 0755); err != nil {
+		return
+	}
+
+	shell := os.Getenv("SHELL")
+	isZsh := strings.Contains(shell, "zsh")
+
+	var hookPath string
+	var hookContent string
+	var sourceLine string
+
+	if isZsh {
+		hookPath = filepath.Join(hookDir, "feedback_hook.zsh")
+		hookContent = `chu_mark_suggestion_widget() {
+	local f="$HOME/.gptcode/last_suggestion_cmd"
+	print -r -- "$BUFFER" > "$f"
+	zle -M "Suggestion captured"
+}
+
+zle -N chu_mark_suggestion_widget
+bindkey -M emacs "^G" chu_mark_suggestion_widget
+bindkey -M viins "^G" chu_mark_suggestion_widget
+
+preexec_chu_feedback() {
+	local cmd="$1"
+	local sfile="$HOME/.gptcode/last_suggestion_cmd"
+	if [[ -f "$sfile" ]]; then
+		print -r -- "$(<"$sfile")" > "$HOME/.gptcode/.pending_wrong"
+		print -r -- "$cmd" > "$HOME/.gptcode/.pending_correct"
+	fi
+}
+
+precmd_chu_feedback() {
+	local wrongf="$HOME/.gptcode/.pending_wrong"
+	local correctf="$HOME/.gptcode/.pending_correct"
+	if [[ -f "$wrongf" && -f "$correctf" ]]; then
+		local wrong="$(<"$wrongf")"
+		local correct="$(<"$correctf")"
+		local files=""
+		if command -v git >/dev/null 2>&1; then
+			if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+				files=$(git diff --name-only)
+			fi
+		fi
+		local -a args
+		args=(gt feedback submit --sentiment=bad --kind=command --source=shell --agent=editor --wrong="$wrong" --correct="$correct")
+		
+		if [[ -n "$files" ]]; then
+			local f
+			for f in ${(f)files}; do
+				args+=(--files "$f")
+			done
+		fi
+		gt $args >/dev/null 2>&1
+		rm -f "$wrongf" "$correctf" "$HOME/.gptcode/last_suggestion_cmd"
+	fi
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook preexec preexec_chu_feedback
+add-zsh-hook precmd precmd_chu_feedback
+`
+		sourceLine = "source $HOME/.gptcode/feedback_hook.zsh"
+	} else {
+		hookPath = filepath.Join(hookDir, "feedback_hook.bash")
+		hookContent = `# GPTCode feedback hook for bash
+# Tracks command corrections for learning
+PROMPT_COMMAND="${PROMPT_COMMAND:+$PROMPT_COMMAND;} gt feedback watch"
+`
+		sourceLine = ". \"$HOME/.gptcode/feedback_hook.bash\""
+	}
+
+	os.WriteFile(hookPath, []byte(hookContent), 0644)
+
+	rcPath := filepath.Join(home, ".zshrc")
+	if _, err := os.Stat(rcPath); err != nil {
+		rcPath = filepath.Join(home, ".bashrc")
+	}
+
+	if existing, err := os.ReadFile(rcPath); err == nil {
+		if !strings.Contains(string(existing), "feedback_hook") {
+			f, _ := os.OpenFile(rcPath, os.O_APPEND|os.O_WRONLY, 0644)
+			defer f.Close()
+			f.WriteString("\n# GPTCode feedback hook\n")
+			f.WriteString(sourceLine + "\n")
+		}
+	}
 }
 
 func detectTemplateDir() string {

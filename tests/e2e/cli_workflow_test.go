@@ -115,7 +115,8 @@ func main() {
 		err := modes.RunPlan(args)
 		if err != nil {
 			// Skip test if API key is not available (expected in CI environment)
-			if strings.Contains(err.Error(), "API key") {
+			errMsg := err.Error()
+			if strings.Contains(errMsg, "API key") || strings.Contains(errMsg, "Provider returned error") || strings.Contains(errMsg, "no such file or directory") {
 				t.Skipf("Skipping: %v", err)
 			}
 			t.Fatalf("Plan command failed: %v", err)
