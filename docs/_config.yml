@@ -50,3 +50,5 @@ exclude:
   - Gemfile
   - Gemfile.lock
   - README.md
+  - install.sh
+  - install_nvim_plugin.sh

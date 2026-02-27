@@ -8,6 +8,17 @@ VERSION="${GPTCODE_VERSION:-latest}"
 INSTALL_DIR="${GPTCODE_INSTALL_DIR:-$HOME/.local/bin}"
 RELEASES_REPO="gptcode-cloud/cli-releases"
 
+# Detect if we're being served as HTML (Jekyll fallback)
+if [[ "$0" == *"sh"* ]] && [[ ! "$BASH_SOURCE" ]]; then
+  # Being sourced, try to download real script
+  SCRIPT_URL="https://raw.githubusercontent.com/${RELEASES_REPO%/*}/cli/main/install.sh"
+  if command -v curl &> /dev/null; then
+    exec curl -sSL "$SCRIPT_URL" | bash
+  elif command -v wget &> /dev/null; then
+    exec wget -qO- "$SCRIPT_URL" | bash
+  fi
+fi
+
 echo "🚀 GPTCode CLI Installer"
 echo ""
 
