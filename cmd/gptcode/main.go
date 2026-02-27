@@ -154,6 +154,7 @@ func init() {
 	rootCmd.AddCommand(setupCmd)
 	setupCmd.Flags().BoolP("yes", "y", false, "Use Quick Start (non-interactive)")
 	rootCmd.AddCommand(keyCmd)
+	rootCmd.AddCommand(releaseCmd)
 	rootCmd.AddCommand(backendCmd)
 	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(detectLanguageCmd)
