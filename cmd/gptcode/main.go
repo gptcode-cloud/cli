@@ -33,6 +33,21 @@ func main() {
 	}
 }
 
+var version = "dev"
+
+var versionCmd = &cobra.Command{
+	Use:   "version",
+	Short: "Print version information",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Printf("GPTCode version %s\n", version)
+	},
+}
+
+func init() {
+	rootCmd.Version = version
+	rootCmd.SetVersionTemplate("GPTCode version {{.Version}}\n")
+}
+
 var rootCmd = &cobra.Command{
 	Use:   "gptcode",
 	Short: "GPTCode – AI Coding Assistant with Specialized Agents",
@@ -152,6 +167,7 @@ func init() {
 	}
 
 	rootCmd.AddCommand(setupCmd)
+	rootCmd.AddCommand(versionCmd)
 	setupCmd.Flags().BoolP("yes", "y", false, "Use Quick Start (non-interactive)")
 	rootCmd.AddCommand(keyCmd)
 	rootCmd.AddCommand(releaseCmd)
