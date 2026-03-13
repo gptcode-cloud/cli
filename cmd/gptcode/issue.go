@@ -90,6 +90,10 @@ Examples:
 		}
 		fmt.Println()
 
+		if err := validateIssueForPR(repo, issue); err != nil {
+			return err
+		}
+
 		reqs := issue.ExtractRequirements()
 		if len(reqs) > 0 {
 			fmt.Println("📝 Requirements:")
@@ -892,4 +896,26 @@ func init() {
 	issueReviewCmd.Flags().String("repo", "", "GitHub repository (owner/repo)")
 
 	issueCICmd.Flags().String("repo", "", "GitHub repository (owner/repo)")
+}
+
+func validateIssueForPR(repo string, issue *github.Issue) error {
+	labels := issue.Labels
+	hasHelpWanted := false
+	hasGoodFirstIssue := false
+
+	for _, label := range labels {
+		lowerLabel := strings.ToLower(label)
+		if strings.Contains(lowerLabel, "help wanted") || strings.Contains(lowerLabel, "help-wanted") {
+			hasHelpWanted = true
+		}
+		if strings.Contains(lowerLabel, "good first issue") || strings.Contains(lowerLabel, "good-first-issue") {
+			hasGoodFirstIssue = true
+		}
+	}
+
+	if !hasHelpWanted && !hasGoodFirstIssue {
+		return fmt.Errorf("issue #%d does not have 'help wanted' or 'good first issue' label. Many repositories (like cli/cli) require this label before accepting PRs. Please find an issue with the appropriate label or request the label to be added", issue.Number)
+	}
+
+	return nil
 }
