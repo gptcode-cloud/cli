@@ -154,6 +154,19 @@ func (ms *ModelSelector) loadCatalog() error {
 			model.Capabilities.SupportsFileOperations = false
 			model.Capabilities.SupportsCodeExecution = false
 
+			// Auto-detect capabilities based on model characteristics if not explicitly set
+			modelIDLower := strings.ToLower(model.ID)
+			modelNameLower := strings.ToLower(model.Name)
+			// Known model families that support tools
+			toolCapableModels := []string{"gpt-4", "gpt-4o", "gpt-4.5", "gpt-5", "claude-3", "claude-4", "gemini-2", "gemini-2.5", "sonar", "deepseek-chat", "llama-3.1", "llama-3.2", "llama-3.3", "mistral-large", "mistral-small", "mixtral", "qwen-2.5"}
+			for _, toolModel := range toolCapableModels {
+				if strings.Contains(modelIDLower, toolModel) || strings.Contains(modelNameLower, toolModel) {
+					model.Capabilities.SupportsTools = true
+					model.Capabilities.SupportsFileOperations = true
+					break
+				}
+			}
+
 			if caps, ok := modelMap["capabilities"].(map[string]interface{}); ok {
 				if val, ok := caps["supports_tools"].(bool); ok {
 					model.Capabilities.SupportsTools = val
