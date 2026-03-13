@@ -28,17 +28,30 @@ type Issue struct {
 // Client represents a GitHub client using gh CLI
 type Client struct {
 	repo    string // owner/repo format
-	workDir string // working directory for git commands
+	workDir string
+}
+
+func (c *Client) SetWorkDir(dir string) {
+	c.workDir = dir
+}
+
+// HasExistingPR checks if there's already a PR for this issue
+func (c *Client) HasExistingPR(issueNum int) (bool, error) {
+	cmd := exec.Command("gh", "api", fmt.Sprintf("repos/%s/issues/%d", c.repo, issueNum), "--jq", ".pull_request")
+	if c.workDir != "" {
+		cmd.Dir = c.workDir
+	}
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		// No PR exists if we get an error
+		return false, nil
+	}
+	return strings.Contains(string(output), "pull_request"), nil
 }
 
 // NewClient creates a new GitHub client
 func NewClient(repo string) *Client {
 	return &Client{repo: repo}
-}
-
-// SetWorkDir sets the working directory for git operations
-func (c *Client) SetWorkDir(dir string) {
-	c.workDir = dir
 }
 
 // FetchIssue fetches a GitHub issue by number

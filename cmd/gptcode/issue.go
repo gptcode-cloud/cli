@@ -94,6 +94,14 @@ Examples:
 			return err
 		}
 
+		// Check if PR already exists for this issue
+		hasPR, err := client.HasExistingPR(issueNum)
+		if err != nil {
+			fmt.Printf("⚠️  Warning: Could not check for existing PRs: %v\n", err)
+		} else if hasPR {
+			return fmt.Errorf("a pull request already exists for issue #%d. Please review the existing PR instead of creating a new one", issueNum)
+		}
+
 		reqs := issue.ExtractRequirements()
 		if len(reqs) > 0 {
 			fmt.Println("📝 Requirements:")
@@ -485,14 +493,22 @@ var issuePushCmd = &cobra.Command{
 
 		defaultBranch := client.DetectDefaultBranch()
 		headBranch := branchName
+		prRepo := repo // Create PR in the original repo (upstream)
+
 		if _, isFork := client.GetForkRemote(); isFork {
 			cmd := exec.Command("gh", "api", "user", "--jq", ".login")
 			output, _ := cmd.CombinedOutput()
 			currentUser := strings.TrimSpace(string(output))
+			// Use "username:branch" format for head when creating PR from fork
 			headBranch = currentUser + ":" + branchName
+			// PR is created in the upstream repo, head points to fork branch
 		}
 
-		pr, err := client.CreatePR(github.PRCreateOptions{
+		// Create a new client for the PR repo
+		prClient := github.NewClient(prRepo)
+		prClient.SetWorkDir(workDir)
+
+		pr, err := prClient.CreatePR(github.PRCreateOptions{
 			Title:      fmt.Sprintf("Fix: %s", issue.Title),
 			Body:       prBody,
 			HeadBranch: headBranch,
