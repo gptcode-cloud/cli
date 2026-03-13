@@ -479,11 +479,20 @@ var issuePushCmd = &cobra.Command{
 		changes := []string{"Implemented fix for issue"}
 		prBody := github.GeneratePRBody(issue, changes)
 
+		defaultBranch := client.DetectDefaultBranch()
+		headBranch := branchName
+		if _, isFork := client.GetForkRemote(); isFork {
+			cmd := exec.Command("gh", "api", "user", "--jq", ".login")
+			output, _ := cmd.CombinedOutput()
+			currentUser := strings.TrimSpace(string(output))
+			headBranch = currentUser + ":" + branchName
+		}
+
 		pr, err := client.CreatePR(github.PRCreateOptions{
 			Title:      fmt.Sprintf("Fix: %s", issue.Title),
 			Body:       prBody,
-			HeadBranch: branchName,
-			BaseBranch: "main",
+			HeadBranch: headBranch,
+			BaseBranch: defaultBranch,
 			IsDraft:    draft,
 			Labels:     issue.Labels,
 		})

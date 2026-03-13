@@ -52,7 +52,7 @@ type CommitOptions struct {
 
 func (c *Client) CreateBranch(branchName string, fromBranch string) error {
 	if fromBranch == "" {
-		fromBranch = "main"
+		fromBranch = c.DetectDefaultBranch()
 	}
 
 	checkoutCmd := exec.Command("git", "checkout", "-b", branchName, fromBranch)
@@ -76,6 +76,96 @@ func (c *Client) CreateBranch(branchName string, fromBranch string) error {
 	}
 
 	return nil
+}
+
+// DetectDefaultBranch detects the default branch (main, master, trunk, etc.)
+func (c *Client) DetectDefaultBranch() string {
+	// Use git rev-parse to get current branch name
+	cmd := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
+	if c.workDir != "" {
+		cmd.Dir = c.workDir
+	}
+	output, err := cmd.CombinedOutput()
+	if err == nil {
+		branch := strings.TrimSpace(string(output))
+		if branch != "HEAD" {
+			return branch
+		}
+	}
+
+	// Fallback: try common default branch names
+	for _, branch := range []string{"main", "master", "trunk", "develop", "dev"} {
+		cmd := exec.Command("git", "rev-parse", "--verify", branch)
+		if c.workDir != "" {
+			cmd.Dir = c.workDir
+		}
+		if _, err := cmd.CombinedOutput(); err == nil {
+			return branch
+		}
+	}
+
+	// Final fallback
+	return "main"
+}
+
+// GetForkRemote determines if we're in a fork and returns the correct remote to push to
+func (c *Client) GetForkRemote() (remoteName string, isFork bool) {
+	// Get the current user from gh
+	cmd := exec.Command("gh", "api", "user", "--jq", ".login")
+	output, err := cmd.CombinedOutput()
+	if err != nil {
+		return "origin", false
+	}
+	currentUser := strings.TrimSpace(string(output))
+
+	// Parse the repo to get owner
+	parts := strings.Split(c.repo, "/")
+	if len(parts) != 2 {
+		return "origin", false
+	}
+	repoOwner := parts[0]
+
+	// If the repo owner matches the current user, we're not in a fork scenario
+	// or we're working with our own repo
+	if repoOwner == currentUser {
+		return "origin", false
+	}
+
+	// Check if there's a remote for the current user (fork)
+	cmd = exec.Command("git", "remote", "-v")
+	if c.workDir != "" {
+		cmd.Dir = c.workDir
+	}
+	output, err = cmd.CombinedOutput()
+	if err != nil {
+		return "origin", false
+	}
+
+	// Look for a remote that belongs to the current user
+	for _, line := range strings.Split(string(output), "\n") {
+		if strings.Contains(line, "(push)") && strings.Contains(line, currentUser) {
+			parts := strings.Fields(line)
+			if len(parts) >= 2 {
+				return parts[0], true
+			}
+		}
+	}
+
+	// If no fork remote found, try to add one
+	if repoOwner != currentUser {
+		// The original repo is the "upstream" or "origin"
+		// We need to add the user's fork as a remote
+		forkURL := fmt.Sprintf("git@github.com:%s/%s.git", currentUser, parts[1])
+		addCmd := exec.Command("git", "remote", "add", "fork", forkURL)
+		if c.workDir != "" {
+			addCmd.Dir = c.workDir
+		}
+		if _, err := addCmd.CombinedOutput(); err == nil {
+			return "fork", true
+		}
+	}
+
+	return "origin", false
 }
 
 func (c *Client) CommitChanges(opts CommitOptions) error {
@@ -119,7 +209,8 @@ func (c *Client) CommitChanges(opts CommitOptions) error {
 }
 
 func (c *Client) PushBranch(branchName string) error {
-	pushCmd := exec.Command("git", "push", "-u", "origin", branchName)
+	remote, _ := c.GetForkRemote()
+	pushCmd := exec.Command("git", "push", "-u", remote, branchName)
 	if c.workDir != "" {
 		pushCmd.Dir = c.workDir
 	}
