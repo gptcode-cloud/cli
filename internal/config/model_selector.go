@@ -367,6 +367,30 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 	mode := ms.setup.Defaults.Mode
 	defaultBackend := ms.setup.Defaults.Backend
 
+	// First, try approved models for this action
+	approvedModels := ms.setup.GetApprovedModelsForAction(string(action))
+	if len(approvedModels) > 0 {
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
+			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Trying %d approved models for action=%s\n", len(approvedModels), action)
+		}
+		for _, approved := range approvedModels {
+			backend, model, err := ms.trySelectApprovedModel(approved.Model, action, language, complexity)
+			if err == nil {
+				if os.Getenv("GPTCODE_DEBUG") == "1" {
+					fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Approved model selected: %s/%s\n", backend, model)
+				}
+				return backend, model, nil
+			}
+			if os.Getenv("GPTCODE_DEBUG") == "1" {
+				fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Approved model %s failed: %v\n", approved.Model, err)
+			}
+		}
+		// All approved models failed - will notify about blocking later
+		if os.Getenv("GPTCODE_DEBUG") == "1" {
+			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] All approved models failed for action=%s\n", action)
+		}
+	}
+
 	type scoredModel struct {
 		backend string
 		model   string
@@ -413,6 +437,10 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] No models scored > 0 for action=%s lang=%s\n", action, language)
 			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Checked %d models in catalog\n", len(ms.catalog[defaultBackend]))
 		}
+
+		// Log blocked notification
+		ms.logBlockedNotification(string(action), language)
+
 		return "", "", fmt.Errorf("no suitable model found for action=%s lang=%s", action, language)
 	}
 
@@ -445,6 +473,76 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 	}
 
 	return best.backend, best.model, nil
+}
+
+// trySelectApprovedModel attempts to select a specific approved model
+func (ms *ModelSelector) trySelectApprovedModel(modelID string, action ActionType, language string, complexity string) (backend string, model string, err error) {
+	// Parse model ID to find backend (e.g., "google/gemini-2.5-flash-lite" -> backend "openrouter")
+	parts := strings.Split(modelID, "/")
+	if len(parts) < 2 {
+		return "", "", fmt.Errorf("invalid model ID format: %s", modelID)
+	}
+
+	// Try to find the backend that has this model
+	for backend, models := range ms.catalog {
+		for _, modelInfo := range models {
+			if modelInfo.ID == modelID {
+				// Check if model supports tools for edit/review actions
+				if action == ActionEdit || action == ActionReview {
+					if !modelInfo.Capabilities.SupportsTools {
+						if os.Getenv("GPTCODE_DEBUG") == "1" {
+							fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Approved model %s rejected: no tool support\n", modelID)
+						}
+						return "", "", fmt.Errorf("model %s does not support tools", modelID)
+					}
+				}
+				return backend, modelID, nil
+			}
+		}
+	}
+
+	return "", "", fmt.Errorf("model %s not found in catalog", modelID)
+}
+
+// logBlockedNotification logs when all models fail
+func (ms *ModelSelector) logBlockedNotification(action, language string) {
+	if ms.setup == nil || !ms.setup.IsBlockedNotificationEnabled() {
+		return
+	}
+
+	fmt.Printf("\n🔔 [BLOCKED] GT needs intervention!\n")
+	fmt.Printf("   Action: %s\n", action)
+	fmt.Printf("   Language: %s\n", language)
+	fmt.Printf("   All approved models failed.\n")
+	fmt.Printf("   Add a new approved model in setup.yaml or check API credentials.\n")
+	fmt.Printf("   Check Live dashboard for more details.\n\n")
+
+	// Save to notifications file for Live
+	ms.saveBlockedNotification(action, language)
+}
+
+// saveBlockedNotification saves notification to file for Live to pick up
+func (ms *ModelSelector) saveBlockedNotification(action, language string) {
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return
+	}
+	notifyDir := filepath.Join(homeDir, ".gptcode", "notifications")
+	if err := os.MkdirAll(notifyDir, 0755); err != nil {
+		return
+	}
+
+	notification := map[string]interface{}{
+		"type":      "blocked",
+		"action":    action,
+		"language":  language,
+		"timestamp": time.Now().Format(time.RFC3339),
+		"message":   "All approved models failed",
+	}
+
+	data, _ := json.MarshalIndent(notification, "", "  ")
+	filename := filepath.Join(notifyDir, fmt.Sprintf("blocked-%d.json", time.Now().Unix()))
+	_ = os.WriteFile(filename, data, 0644)
 }
 
 func (ms *ModelSelector) scoreModel(model ModelInfo, action ActionType, language string, complexity string) float64 {

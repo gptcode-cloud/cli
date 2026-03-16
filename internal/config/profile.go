@@ -35,7 +35,25 @@ type Setup struct {
 		Notify         bool   `yaml:"notify,omitempty"`
 		Parallel       int    `yaml:"parallel,omitempty"`
 	} `yaml:"e2e,omitempty"`
-	Backend map[string]BackendConfig `yaml:"backend"`
+	Backend        map[string]BackendConfig `yaml:"backend"`
+	ApprovedModels []ApprovedModel          `yaml:"approved_models,omitempty"`
+	Notifications  NotificationConfig       `yaml:"notifications,omitempty"`
+}
+
+type ApprovedModel struct {
+	Model      string   `yaml:"model"`
+	ForActions []string `yaml:"for_actions"`
+	Reason     string   `yaml:"reason,omitempty"`
+}
+
+type NotificationConfig struct {
+	Blocked BlockedNotificationConfig `yaml:"blocked"`
+}
+
+type BlockedNotificationConfig struct {
+	Enabled  bool     `yaml:"enabled"`
+	Channels []string `yaml:"channels"` // telegram, live, both
+	Message  string   `yaml:"message"`
 }
 
 type BackendConfig struct {
@@ -132,4 +150,23 @@ func (s *Setup) ResolveBackendAndModel(modelStr string, defaultBackend string) (
 	// Always use the defaultBackend and full model string
 	// The model string itself is the slug that the API expects
 	return defaultBackend, modelStr
+}
+
+// GetApprovedModelsForAction returns approved models for a specific action
+func (s *Setup) GetApprovedModelsForAction(action string) []ApprovedModel {
+	var result []ApprovedModel
+	for _, model := range s.ApprovedModels {
+		for _, a := range model.ForActions {
+			if a == action {
+				result = append(result, model)
+				break
+			}
+		}
+	}
+	return result
+}
+
+// IsBlockedNotificationEnabled checks if blocked notifications are enabled
+func (s *Setup) IsBlockedNotificationEnabled() bool {
+	return s.Notifications.Blocked.Enabled
 }
