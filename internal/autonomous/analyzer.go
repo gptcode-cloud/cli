@@ -8,9 +8,95 @@ import (
 	"strings"
 
 	"gptcode/internal/agents"
+	"gptcode/internal/config"
 	"gptcode/internal/llm"
 	"gptcode/internal/ml"
 )
+
+// shouldDeepAnalyze determines if a task needs deep analysis
+func shouldDeepAnalyze(task string) bool {
+	taskLower := strings.ToLower(task)
+	keywords := []string{"bug", "fix", "error", "issue", "crash", "broken", "fails", "incorrect", "unexpected"}
+	for _, kw := range keywords {
+		if strings.Contains(taskLower, kw) {
+			return true
+		}
+	}
+	return false
+}
+
+// DeepAnalyze performs deep analysis using a reasoning model
+func (a *TaskAnalyzer) DeepAnalyze(ctx context.Context, task string) (string, error) {
+	// Get a reasoning model for deep analysis
+	setup, err := config.LoadSetup()
+	if err != nil {
+		return "", fmt.Errorf("failed to load setup: %w", err)
+	}
+
+	// Try to get a reasoning model - prefer reasoning models, fallback to any available
+	reasoningModel := ""
+	backendName := setup.Defaults.Backend
+
+	// Try to find a reasoning model from the selector
+	if selector, err := config.NewModelSelector(setup); err == nil {
+		// Try different reasoning-capable models
+		for _, model := range []string{"o3", "o4", "claude-opus", "gemini-2.5-pro", "gemini-2.0-flash-exp"} {
+			if backend, m, err := selector.SelectModel(config.ActionResearch, a.model, "complex"); err == nil {
+				if strings.Contains(strings.ToLower(m), model) {
+					reasoningModel = m
+					backendName = backend
+					break
+				}
+			}
+		}
+	}
+
+	// If no specific reasoning model, use the default model but with reasoning-focused prompt
+	if reasoningModel == "" {
+		reasoningModel = a.model
+	}
+
+	// Create a provider for deep analysis
+	var provider llm.Provider
+	backendCfg := setup.Backend[backendName]
+	if backendCfg.Type == "ollama" {
+		provider = llm.NewOllama(backendCfg.BaseURL)
+	} else {
+		provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
+	}
+
+	// Create deep analysis prompt
+	deepAnalysisPrompt := fmt.Sprintf(`You are a senior software engineer performing DEEP ANALYSIS of a bug fix task.
+
+TASK:
+%s
+
+INSTRUCTIONS:
+1. Identify the ROOT CAUSE of the bug (not just symptoms)
+2. Determine what files likely need to be modified
+3. Identify any edge cases or potential regressions
+4. Outline the APPROACH for fixing this bug
+
+Be specific and technical. Focus on the actual code changes needed.
+
+Return your analysis in this format:
+ROOT CAUSE: [2-3 sentence explanation of the root cause]
+FILES TO MODIFY: [list of likely files]
+EDGE CASES: [potential edge cases to consider]
+APPROACH: [high-level approach to fix]`, task)
+
+	response, err := provider.Chat(ctx, llm.ChatRequest{
+		SystemPrompt: "You are a senior software engineer performing deep analysis.",
+		UserPrompt:   deepAnalysisPrompt,
+		Model:        reasoningModel,
+	})
+
+	if err != nil {
+		return "", fmt.Errorf("deep analysis failed: %w", err)
+	}
+
+	return response.Text, nil
+}
 
 // TaskAnalysis represents the result of analyzing a task
 type TaskAnalysis struct {
@@ -62,6 +148,18 @@ func NewTaskAnalyzer(classifier *agents.Classifier, llmProvider llm.Provider, cw
 // Analyze analyzes a task and determines if it needs decomposition
 func (a *TaskAnalyzer) Analyze(ctx context.Context, task string) (*TaskAnalysis, error) {
 	analysis := &TaskAnalysis{}
+
+	// 0. Deep Analysis for complex tasks - use reasoning model to deeply understand the problem
+	if shouldDeepAnalyze(task) {
+		deepAnalysis, err := a.DeepAnalyze(ctx, task)
+		if err != nil {
+			fmt.Printf("[DEEP_ANALYSIS] Warning: deep analysis failed: %v, continuing with standard analysis\n", err)
+		} else if deepAnalysis != "" {
+			fmt.Printf("[DEEP_ANALYSIS] Completed: %s\n", strings.ReplaceAll(strings.ReplaceAll(deepAnalysis[:min(200, len(deepAnalysis))], "\n", " "), "\t", " "))
+			// Prepend deep analysis context to task for better understanding
+			task = fmt.Sprintf("DEEP ANALYSIS CONTEXT:\n%s\n\n---\n\nORIGINAL TASK:\n%s", deepAnalysis, task)
+		}
+	}
 
 	// 1. Use existing classifier for intent
 	intent, err := a.classifier.ClassifyIntent(ctx, task)

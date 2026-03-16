@@ -63,6 +63,7 @@ Examples:
 		repo, _ := cmd.Flags().GetString("repo")
 		autonomous, _ := cmd.Flags().GetBool("autonomous")
 		findFiles, _ := cmd.Flags().GetBool("find-files")
+		skipLabelCheck, _ := cmd.Flags().GetBool("skip-label-check")
 
 		if repo == "" {
 			repo = detectGitHubRepo()
@@ -91,7 +92,10 @@ Examples:
 		fmt.Println()
 
 		if err := validateIssueForPR(repo, issue); err != nil {
-			return err
+			if !skipLabelCheck {
+				return err
+			}
+			fmt.Printf("⚠️  Warning: %v (continuing anyway due to --skip-label-check)\n", err)
 		}
 
 		// Check if PR already exists for this issue
@@ -893,6 +897,7 @@ func init() {
 	issueFixCmd.Flags().Bool("skip-lint", false, "Skip running linters")
 	issueFixCmd.Flags().Bool("autonomous", true, "Execute implementation autonomously")
 	issueFixCmd.Flags().Bool("find-files", true, "Find relevant files before implementation")
+	issueFixCmd.Flags().Bool("skip-label-check", false, "Skip validation of help wanted label")
 
 	issueShowCmd.Flags().String("repo", "", "GitHub repository (owner/repo)")
 
