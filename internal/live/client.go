@@ -1,12 +1,14 @@
 package live
 
 import (
+	crypto_rand "crypto/rand"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/url"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -19,28 +21,161 @@ import (
 // Global client instance
 var globalClient *Client
 
-// Client connects to the GPTCode Live Dashboard via Phoenix WebSocket
+// Agent types based on skill/purpose
+const (
+	AgentTypeBuilder  = "builder"  // Full implementation, TDD cycle
+	AgentTypeReviewer = "reviewer" // Code review
+	AgentTypeFixer    = "fixer"    // Bug fix, red-green-commit
+	AgentTypeGuardian = "guardian" // Security audit
+	AgentTypeShipper  = "shipper"  // CI/CD, deploy
+	AgentTypeTester   = "tester"   // E2E, QA automation
+)
+
+// AgentTypeFromWorkflow maps a workflow name to an agent type
+func AgentTypeFromWorkflow(workflow string) string {
+	switch workflow {
+	case "implement", "builder":
+		return AgentTypeBuilder
+	case "code-review", "review", "design-review":
+		return AgentTypeReviewer
+	case "tdd-bug-fix", "fix", "fixer":
+		return AgentTypeFixer
+	case "security", "sec-ops", "guardian":
+		return AgentTypeGuardian
+	case "dev-ops", "shipper", "ship":
+		return AgentTypeShipper
+	case "qa-automation", "tester", "test":
+		return AgentTypeTester
+	default:
+		return AgentTypeBuilder
+	}
+}
+
+// AgentTypeFromInput infers agent type from the task description text
+func AgentTypeFromInput(input string) string {
+	lower := strings.ToLower(input)
+
+	// Order matters: check more specific patterns first
+	reviewKeywords := []string{"review", "audit code", "check code", "code quality"}
+	for _, kw := range reviewKeywords {
+		if strings.Contains(lower, kw) {
+			return AgentTypeReviewer
+		}
+	}
+
+	fixKeywords := []string{"fix", "bug", "debug", "repair", "patch"}
+	for _, kw := range fixKeywords {
+		if strings.Contains(lower, kw) {
+			return AgentTypeFixer
+		}
+	}
+
+	securityKeywords := []string{"security", "vulnerab", "owasp", "cve", "pentest"}
+	for _, kw := range securityKeywords {
+		if strings.Contains(lower, kw) {
+			return AgentTypeGuardian
+		}
+	}
+
+	shipKeywords := []string{"deploy", "ci/cd", "pipeline", "release", "ship"}
+	for _, kw := range shipKeywords {
+		if strings.Contains(lower, kw) {
+			return AgentTypeShipper
+		}
+	}
+
+	testKeywords := []string{"test", "e2e", "qa", "regression", "coverage"}
+	for _, kw := range testKeywords {
+		if strings.Contains(lower, kw) {
+			return AgentTypeTester
+		}
+	}
+
+	return AgentTypeBuilder
+}
+
+// GetAgentID returns a unique agent identifier per execution.
+// Format: {type}-{short_random} (e.g. "reviewer-a3f2")
+func GetAgentID() string {
+	return GetAgentIDWithType(AgentTypeBuilder)
+}
+
+// GetAgentIDWithType returns a unique agent identifier with the given type prefix
+func GetAgentIDWithType(agentType string) string {
+	b := make([]byte, 4)
+	_, _ = crypto_rand.Read(b)
+	suffix := fmt.Sprintf("%x", b)[:4]
+	return fmt.Sprintf("%s-%s", agentType, suffix)
+}
+
 type Client struct {
 	conn               *websocket.Conn
 	agentID            string
+	agentType          string
+	engine             string
+	context            string
+	taskDescription    string
 	url                string
+	authToken          string
 	mu                 sync.Mutex
-	joinRef            int
-	msgRef             int
+	joinRef            interface{} // nil for Phoenix Channel
+	msgRef             string      // "1", "2", etc
 	onEdit             func(contextType, content string)
+	onCommand          func(command string, payload map[string]interface{})
 	e2e                *crypto.E2ESession
 	encrypted          bool
 	onEncryptedMessage func(data []byte)
 }
 
+// inferContext derives the project context from workspace path or env var
+func inferContext() string {
+	if ctx := os.Getenv("GPTCODE_CONTEXT"); ctx != "" {
+		return ctx
+	}
+	cwd, err := os.Getwd()
+	if err != nil {
+		return "gptcode"
+	}
+	parts := strings.Split(cwd, string(os.PathSeparator))
+	for i, p := range parts {
+		if p == "workspace" && i+1 < len(parts) {
+			return parts[i+1]
+		}
+	}
+	if len(parts) > 0 {
+		return parts[len(parts)-1]
+	}
+	return "gptcode"
+}
+
 // NewClient creates a new Live Dashboard client
 func NewClient(dashboardURL, agentID string) *Client {
 	return &Client{
-		url:     dashboardURL,
-		agentID: agentID,
-		joinRef: 1,
-		msgRef:  1,
+		url:       dashboardURL,
+		agentID:   agentID,
+		agentType: AgentTypeBuilder, // default
+		engine:    "cli",
+		context:   inferContext(),
+		authToken: os.Getenv("GPTCODE_LIVE_TOKEN"),
+		joinRef:   nil,
+		msgRef:    "1",
 	}
+}
+
+// SetAgentType sets the agent's type/purpose
+func (c *Client) SetAgentType(t string) {
+	c.agentType = t
+}
+
+// SetTask sets the task description for this agent
+func (c *Client) SetTask(task string) {
+	c.taskDescription = task
+}
+
+// incrementMsgRef increments the message ref as a string
+func (c *Client) incrementMsgRef() {
+	n, _ := strconv.Atoi(c.msgRef)
+	c.msgRef = strconv.Itoa(n + 1)
 }
 
 // Connect establishes WebSocket connection to Phoenix
@@ -56,7 +191,7 @@ func (c *Client) Connect() error {
 		scheme = "wss"
 	}
 	u.Scheme = scheme
-	u.Path = "/socket/websocket"
+	u.Path = "/agent/websocket"
 	u.RawQuery = "vsn=2.0.0"
 
 	conn, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -82,14 +217,31 @@ func (c *Client) joinChannel() error {
 	defer c.mu.Unlock()
 
 	topic := fmt.Sprintf("agent:%s", c.agentID)
+
+	// Host info is metadata, not identity
+	host := GetHostInfo()
+
+	// Build join payload: type, task, host metadata, and auth
+	payload := map[string]interface{}{
+		"engine":    c.engine,
+		"type":      c.agentType,
+		"context":   c.context,
+		"task":      c.taskDescription,
+		"hostname":  host["hostname"],
+		"workspace": host["workspace"],
+	}
+	if c.authToken != "" {
+		payload["token"] = c.authToken
+	}
+
 	msg := []interface{}{
 		c.joinRef,
 		c.msgRef,
 		topic,
 		"phx_join",
-		map[string]interface{}{},
+		payload,
 	}
-	c.msgRef++
+	c.incrementMsgRef()
 
 	return c.conn.WriteJSON(msg)
 }
@@ -128,6 +280,10 @@ func (c *Client) handleMessages() {
 			c.handleContextEdit(payload)
 		case "phx_reply":
 			// Handle join reply
+		default:
+			if c.onCommand != nil {
+				c.onCommand(event, payload)
+			}
 		}
 	}
 }
@@ -163,7 +319,7 @@ func (c *Client) SendContextUpdate(shared, next, roadmap string) error {
 			"roadmap": roadmap,
 		},
 	}
-	c.msgRef++
+	c.incrementMsgRef()
 
 	return c.conn.WriteJSON(msg)
 }
@@ -181,7 +337,7 @@ func (c *Client) SendTraceData(data map[string]interface{}) error {
 		"trace_data",
 		data,
 	}
-	c.msgRef++
+	c.incrementMsgRef()
 
 	return c.conn.WriteJSON(msg)
 }
@@ -189,6 +345,11 @@ func (c *Client) SendTraceData(data map[string]interface{}) error {
 // OnContextEdit sets callback for when Live edits context
 func (c *Client) OnContextEdit(fn func(contextType, content string)) {
 	c.onEdit = fn
+}
+
+// OnCommand sets callback for when Live sends a command
+func (c *Client) OnCommand(fn func(command string, payload map[string]interface{})) {
+	c.onCommand = fn
 }
 
 // Close closes the WebSocket connection
@@ -221,7 +382,7 @@ func (c *Client) EnableEncryption() error {
 			"public_key": c.e2e.PublicKey(),
 		},
 	}
-	c.msgRef++
+	c.incrementMsgRef()
 
 	log.Printf("Live: Initiated key exchange, fingerprint: %s", c.e2e.Fingerprint())
 	return c.conn.WriteJSON(msg)
@@ -265,7 +426,7 @@ func (c *Client) SendEncrypted(sessionID string, data []byte) error {
 			"data":       ciphertext,
 		},
 	}
-	c.msgRef++
+	c.incrementMsgRef()
 
 	return c.conn.WriteJSON(msg)
 }
@@ -398,21 +559,27 @@ func GetDashboardURL() string {
 	return "https://live.gptcode.app"
 }
 
-// GetAgentID returns a unique agent identifier
-func GetAgentID() string {
+// GetHostInfo returns machine metadata (hostname + workspace).
+// This is NOT the agent's identity — it's where the agent runs.
+func GetHostInfo() map[string]string {
 	hostname, err := os.Hostname()
 	if err != nil {
 		hostname = "unknown"
 	}
+	// Clean up ".local" suffix
+	hostname = strings.TrimSuffix(hostname, ".local")
 
-	// Make it unique per workspace
 	cwd, _ := os.Getwd()
 	parts := strings.Split(cwd, string(os.PathSeparator))
+	workspace := ""
 	if len(parts) > 0 {
-		hostname = hostname + "-" + parts[len(parts)-1]
+		workspace = parts[len(parts)-1]
 	}
 
-	return hostname
+	return map[string]string{
+		"hostname":  hostname,
+		"workspace": workspace,
+	}
 }
 
 // GetClient returns the global live client instance
@@ -423,4 +590,59 @@ func GetClient() *Client {
 // SetGlobalClient sets the global live client instance
 func SetGlobalClient(client *Client) {
 	globalClient = client
+}
+
+// SendExecutionStep sends a real-time execution step update
+func (c *Client) SendExecutionStep(stepType, description string, metadata map[string]interface{}) error {
+	if c == nil || c.conn == nil {
+		return nil
+	}
+
+	topic := fmt.Sprintf("agent:%s", c.agentID)
+
+	event := map[string]interface{}{
+		"type":        stepType,
+		"description": description,
+		"timestamp":   time.Now().Format(time.RFC3339),
+	}
+
+	for k, v := range metadata {
+		event[k] = v
+	}
+
+	msg := []interface{}{
+		0, 0, topic, "execution_step", event,
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.conn == nil {
+		return nil
+	}
+
+	return c.conn.WriteJSON(msg)
+}
+
+// SendCommandResult sends the result of a dashboard command back to Live
+func (c *Client) SendCommandResult(command string, success bool, message string) error {
+	topic := fmt.Sprintf("agent:%s", c.agentID)
+
+	msg := []interface{}{
+		0, 0, topic, "command_result",
+		map[string]interface{}{
+			"command": command,
+			"success": success,
+			"message": message,
+		},
+	}
+
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	if c.conn == nil {
+		return nil
+	}
+
+	return c.conn.WriteJSON(msg)
 }
