@@ -112,16 +112,22 @@ func (e *Executor) Execute(ctx context.Context, task string) error {
 	for i, movement := range symphony.Movements {
 		symphony.CurrentMovement = i
 
+		movementMsg := fmt.Sprintf("Movement %d/%d: %s", i+1, len(symphony.Movements), movement.Name)
 		fmt.Printf("Movement %d/%d: %s\n", i+1, len(symphony.Movements), movement.Name)
 		fmt.Printf("   Goal: %s\n", movement.Goal)
+
+		// Report progress to Live Dashboard
+		e.maestro.ReportProgress("symphony", movementMsg)
 
 		err := e.executeMovement(ctx, &symphony.Movements[i])
 		if err != nil {
 			symphony.Status = "failed"
+			e.maestro.ReportError("symphony", fmt.Sprintf("Movement %d failed: %v", i+1, err))
 			return fmt.Errorf("movement %d failed: %w", i+1, err)
 		}
 
 		fmt.Printf("   [OK] Movement %d complete\n\n", i+1)
+		e.maestro.ReportProgress("symphony", fmt.Sprintf("Movement %d complete", i+1))
 
 		// Save checkpoint (enable resume)
 		if err := e.saveCheckpoint(symphony); err != nil {

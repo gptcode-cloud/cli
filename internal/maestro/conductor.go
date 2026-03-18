@@ -77,8 +77,23 @@ func (c *Conductor) SetProgressCallback(callback ProgressCallback) {
 	c.progressCallback = callback
 }
 
-// reportProgress sends progress to Live Dashboard via HTTP and WebSocket, and calls progress callback
-func (c *Conductor) reportProgress(phase string, details string) {
+// ReportProgress sends progress to Live Dashboard via HTTP and WebSocket, and calls progress callback
+func (c *Conductor) ReportProgress(phase string, details string) {
+	c.sendProgress(phase, details)
+}
+
+// ReportError sends error to Live Dashboard
+func (c *Conductor) ReportError(phase string, errMsg string) {
+	c.sendError(phase, errMsg)
+}
+
+// ReportComplete sends completion to Live Dashboard
+func (c *Conductor) ReportComplete(success bool, summary string) {
+	c.sendComplete(success, summary)
+}
+
+// sendProgress internal helper
+func (c *Conductor) sendProgress(phase string, details string) {
 	msg := phase + ": " + details
 
 	// Send via HTTP API (backup/reliability)
@@ -100,8 +115,8 @@ func (c *Conductor) reportProgress(phase string, details string) {
 	}
 }
 
-// reportError sends error to Live Dashboard
-func (c *Conductor) reportError(phase string, errMsg string) {
+// sendError internal helper
+func (c *Conductor) sendError(phase string, errMsg string) {
 	// Send via HTTP API
 	if c.liveReportConfig != nil {
 		c.liveReportConfig.Step(phase+": ERROR - "+errMsg, "error")
@@ -116,8 +131,8 @@ func (c *Conductor) reportError(phase string, errMsg string) {
 	}
 }
 
-// reportComplete sends completion to Live Dashboard
-func (c *Conductor) reportComplete(success bool, summary string) {
+// sendComplete internal helper
+func (c *Conductor) sendComplete(success bool, summary string) {
 	stepType := "complete"
 	if !success {
 		stepType = "failed"
@@ -182,11 +197,11 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 	planner := agents.NewPlanner(planProvider, planModel)
 
 	fmt.Println("Creating plan...")
-	c.reportProgress("planning", "Creating plan")
+	c.ReportProgress("planning", "Creating plan")
 	start := time.Now()
 	plan, err := planner.CreatePlan(ctx, task, "", nil)
 	elapsed := time.Since(start)
-	c.reportProgress("planning", "Plan created")
+	c.ReportProgress("planning", "Plan created")
 	c.selector.RecordUsage(planBackend, planModel, err == nil, errorMsg(err))
 	if err != nil {
 		return fmt.Errorf("planning failed: %w", err)
@@ -231,9 +246,9 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		attempt := c.loopDetector.Iteration
 		if attempt > 1 {
 			fmt.Printf("Retrying (attempt %d)...\n", attempt)
-			c.reportProgress("retry", fmt.Sprintf("Attempt %d", attempt))
+			c.ReportProgress("retry", fmt.Sprintf("Attempt %d", attempt))
 		} else {
-			c.reportProgress("editing", "Starting code changes")
+			c.ReportProgress("editing", "Starting code changes")
 		}
 
 		// Select model for editing
@@ -258,11 +273,11 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 
 		// Execute with editor
 		fmt.Println("Executing changes...")
-		c.reportProgress("editing", "Executing code changes")
+		c.ReportProgress("editing", "Executing code changes")
 		start = time.Now()
 		result, modifiedFiles, err := editor.Execute(ctx, history, nil)
 		elapsed = time.Since(start)
-		c.reportProgress("editing", fmt.Sprintf("Completed - %d files changed", len(modifiedFiles)))
+		c.ReportProgress("editing", fmt.Sprintf("Completed - %d files changed", len(modifiedFiles)))
 		c.selector.RecordUsage(editBackend, editModel, err == nil, errorMsg(err))
 		if err != nil {
 			// LoopDetector will handle max iterations check on next iteration
@@ -350,11 +365,11 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 
 		// Validate
 		fmt.Println("Validating...")
-		c.reportProgress("validation", "Running tests and checks")
+		c.ReportProgress("validation", "Running tests and checks")
 		start = time.Now()
 		review, err := reviewer.Review(ctx, plan, modifiedFiles, nil)
 		elapsed = time.Since(start)
-		c.reportProgress("validation", "Validation complete")
+		c.ReportProgress("validation", "Validation complete")
 		c.selector.RecordUsage(reviewBackend, reviewModel, err == nil, errorMsg(err))
 		if err != nil {
 			// LoopDetector will handle max iterations check on next iteration
