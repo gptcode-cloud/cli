@@ -205,7 +205,7 @@ Examples:
 					language = "go"
 				}
 			}
-			exec := modes.NewAutonomousExecutorWithBackend(provider, workDir, queryModel, language, backendName)
+			exec := modes.NewAutonomousExecutorWithLive(provider, workDir, queryModel, language, nil, nil, backendName)
 			if err := exec.Execute(context.Background(), task); err != nil {
 				return fmt.Errorf("autonomous implementation failed: %w", err)
 			}
@@ -706,7 +706,7 @@ Comment: %s
 Please read the file, understand the context, and implement the requested change.`,
 				comment.Path, comment.Line, comment.Body)
 
-			exec := modes.NewAutonomousExecutorWithBackend(provider, workDir, queryModel, language, backendName)
+			exec := modes.NewAutonomousExecutorWithLive(provider, workDir, queryModel, language, nil, nil, backendName)
 			if err := exec.Execute(context.Background(), task); err != nil {
 				fmt.Printf("⚠️  Failed to address comment: %v\n", err)
 				continue

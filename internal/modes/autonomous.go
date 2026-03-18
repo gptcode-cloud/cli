@@ -8,31 +8,32 @@ import (
 	"gptcode/internal/autonomous"
 	"gptcode/internal/config"
 	"gptcode/internal/events"
+	"gptcode/internal/live"
 	"gptcode/internal/llm"
 	"gptcode/internal/maestro"
 )
 
 // AutonomousExecutor wraps autonomous execution for use across modes
 type AutonomousExecutor struct {
-	events   *events.Emitter
-	provider llm.Provider
-	cwd      string
-	model    string
-	executor *autonomous.Executor
+	events    *events.Emitter
+	provider  llm.Provider
+	cwd       string
+	model     string
+	executor  *autonomous.Executor
+	conductor *maestro.Conductor
 }
 
-// NewAutonomousExecutor creates a new autonomous executor
+// NewAutonomousExecutor creates a new autonomous executor (no Live integration)
 func NewAutonomousExecutor(provider llm.Provider, cwd string, model string, language string) *AutonomousExecutor {
-	return NewAutonomousExecutorWithBackend(provider, cwd, model, language, "")
+	return NewAutonomousExecutorWithLive(provider, cwd, model, language, nil, nil, "")
 }
 
-// NewAutonomousExecutorWithBackend creates executor with specific backend override
-func NewAutonomousExecutorWithBackend(provider llm.Provider, cwd string, model string, language string, backendName string) *AutonomousExecutor {
+// NewAutonomousExecutorWithLive creates executor with Live Dashboard integration
+func NewAutonomousExecutorWithLive(provider llm.Provider, cwd string, model string, language string, liveClient *live.Client, liveConfig *live.ReportConfig, backendName string) *AutonomousExecutor {
 	// Load setup
 	setup, err := config.LoadSetup()
 	if err != nil {
 		fmt.Printf("[WARN] Failed to load setup: %v, using defaults\n", err)
-		// Create minimal setup
 		setup = &config.Setup{
 			Backend: make(map[string]config.BackendConfig),
 		}
@@ -53,6 +54,14 @@ func NewAutonomousExecutorWithBackend(provider llm.Provider, cwd string, model s
 	// Create Maestro
 	conductor := maestro.NewConductor(selector, setup, cwd, language)
 
+	// Set up Live Dashboard integration
+	if liveClient != nil {
+		conductor.SetLiveClient(liveClient)
+	}
+	if liveConfig != nil {
+		conductor.SetLiveReportConfig(liveConfig)
+	}
+
 	// Create autonomous components
 	classifier := agents.NewClassifier(provider, model)
 	analyzer := autonomous.NewTaskAnalyzer(classifier, provider, cwd, model)
@@ -60,11 +69,12 @@ func NewAutonomousExecutorWithBackend(provider llm.Provider, cwd string, model s
 	executor := autonomous.NewExecutor(analyzer, conductor, cwd)
 
 	return &AutonomousExecutor{
-		events:   events.NewEmitter(nil),
-		provider: provider,
-		cwd:      cwd,
-		model:    model,
-		executor: executor,
+		events:    events.NewEmitter(nil),
+		provider:  provider,
+		cwd:       cwd,
+		model:     model,
+		executor:  executor,
+		conductor: conductor,
 	}
 }
 

@@ -31,6 +31,7 @@ type Conductor struct {
 	Observer         *observability.AgentObserver // For tracking and summary
 	loopDetector     *llm.LoopDetector            // Centralized Claude Code-style loop detection
 	liveReportConfig *live.ReportConfig           // For Live Dashboard HTTP reporting
+	liveClient       *live.Client                 // For Live Dashboard WebSocket reporting
 	progressCallback ProgressCallback             // For real-time progress updates
 }
 
@@ -66,18 +67,78 @@ func (c *Conductor) SetLiveReportConfig(reportConfig *live.ReportConfig) {
 	c.liveReportConfig = reportConfig
 }
 
+// SetLiveClient sets the Live Dashboard WebSocket client for real-time updates
+func (c *Conductor) SetLiveClient(client *live.Client) {
+	c.liveClient = client
+}
+
 // SetProgressCallback sets the callback for real-time progress updates
 func (c *Conductor) SetProgressCallback(callback ProgressCallback) {
 	c.progressCallback = callback
 }
 
-// reportProgress sends progress to Live Dashboard and calls progress callback
+// reportProgress sends progress to Live Dashboard via HTTP and WebSocket, and calls progress callback
 func (c *Conductor) reportProgress(phase string, details string) {
+	msg := phase + ": " + details
+
+	// Send via HTTP API (backup/reliability)
 	if c.liveReportConfig != nil {
-		c.liveReportConfig.Step(phase+": "+details, "step")
+		c.liveReportConfig.Step(msg, "step")
 	}
+
+	// Send via WebSocket (real-time)
+	if c.liveClient != nil {
+		c.liveClient.SendExecutionStep(phase, details, map[string]interface{}{
+			"phase":   phase,
+			"details": details,
+		})
+	}
+
+	// Call progress callback
 	if c.progressCallback != nil {
 		c.progressCallback(phase, details)
+	}
+}
+
+// reportError sends error to Live Dashboard
+func (c *Conductor) reportError(phase string, errMsg string) {
+	// Send via HTTP API
+	if c.liveReportConfig != nil {
+		c.liveReportConfig.Step(phase+": ERROR - "+errMsg, "error")
+	}
+
+	// Send via WebSocket
+	if c.liveClient != nil {
+		c.liveClient.SendExecutionStep("error", errMsg, map[string]interface{}{
+			"phase": phase,
+			"error": errMsg,
+		})
+	}
+}
+
+// reportComplete sends completion to Live Dashboard
+func (c *Conductor) reportComplete(success bool, summary string) {
+	stepType := "complete"
+	if !success {
+		stepType = "failed"
+	}
+
+	// Send via HTTP API
+	if c.liveReportConfig != nil {
+		if success {
+			c.liveReportConfig.Step("Completed: "+summary, "complete")
+		} else {
+			c.liveReportConfig.Step("Failed: "+summary, "error")
+		}
+		c.liveReportConfig.Disconnect()
+	}
+
+	// Send via WebSocket
+	if c.liveClient != nil {
+		c.liveClient.SendExecutionStep(stepType, summary, map[string]interface{}{
+			"success": success,
+			"summary": summary,
+		})
 	}
 }
 
