@@ -61,3 +61,7 @@ ml/intent/venv/
 ml/intent/__pycache__/
 docs/_site/
 supabase/.temp/
+
+# Training repos
+training-sandbox/devguard/
+training-sandbox/tgstation/
