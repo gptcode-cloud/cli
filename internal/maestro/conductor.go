@@ -12,20 +12,26 @@ import (
 	"gptcode/internal/agents"
 	"gptcode/internal/config"
 	"gptcode/internal/feedback"
+	"gptcode/internal/live"
 	"gptcode/internal/llm"
 	"gptcode/internal/observability"
 )
 
+// ProgressCallback is called during execution to report progress
+type ProgressCallback func(phase string, details string)
+
 // Conductor is the central coordinator (Maestro) that orchestrates all agents
 type Conductor struct {
-	selector     *config.ModelSelector
-	setup        *config.Setup
-	cwd          string
-	language     string
-	Recovery     *RecoveryStrategy
-	Tracer       observability.Tracer
-	Observer     *observability.AgentObserver // For tracking and summary
-	loopDetector *llm.LoopDetector            // Centralized Claude Code-style loop detection
+	selector         *config.ModelSelector
+	setup            *config.Setup
+	cwd              string
+	language         string
+	Recovery         *RecoveryStrategy
+	Tracer           observability.Tracer
+	Observer         *observability.AgentObserver // For tracking and summary
+	loopDetector     *llm.LoopDetector            // Centralized Claude Code-style loop detection
+	liveReportConfig *live.ReportConfig           // For Live Dashboard HTTP reporting
+	progressCallback ProgressCallback             // For real-time progress updates
 }
 
 // NewConductor creates a new Maestro conductor
@@ -52,6 +58,26 @@ func NewConductor(
 		Recovery: recovery,
 		Tracer:   tracer,
 		Observer: observer,
+	}
+}
+
+// SetLiveReportConfig sets the Live Dashboard HTTP reporting configuration
+func (c *Conductor) SetLiveReportConfig(reportConfig *live.ReportConfig) {
+	c.liveReportConfig = reportConfig
+}
+
+// SetProgressCallback sets the callback for real-time progress updates
+func (c *Conductor) SetProgressCallback(callback ProgressCallback) {
+	c.progressCallback = callback
+}
+
+// reportProgress sends progress to Live Dashboard and calls progress callback
+func (c *Conductor) reportProgress(phase string, details string) {
+	if c.liveReportConfig != nil {
+		c.liveReportConfig.Step(phase+": "+details, "step")
+	}
+	if c.progressCallback != nil {
+		c.progressCallback(phase, details)
 	}
 }
 
@@ -95,9 +121,11 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 	planner := agents.NewPlanner(planProvider, planModel)
 
 	fmt.Println("Creating plan...")
+	c.reportProgress("planning", "Creating plan")
 	start := time.Now()
 	plan, err := planner.CreatePlan(ctx, task, "", nil)
 	elapsed := time.Since(start)
+	c.reportProgress("planning", "Plan created")
 	c.selector.RecordUsage(planBackend, planModel, err == nil, errorMsg(err))
 	if err != nil {
 		return fmt.Errorf("planning failed: %w", err)
@@ -142,6 +170,9 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		attempt := c.loopDetector.Iteration
 		if attempt > 1 {
 			fmt.Printf("Retrying (attempt %d)...\n", attempt)
+			c.reportProgress("retry", fmt.Sprintf("Attempt %d", attempt))
+		} else {
+			c.reportProgress("editing", "Starting code changes")
 		}
 
 		// Select model for editing
@@ -166,9 +197,11 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 
 		// Execute with editor
 		fmt.Println("Executing changes...")
+		c.reportProgress("editing", "Executing code changes")
 		start = time.Now()
 		result, modifiedFiles, err := editor.Execute(ctx, history, nil)
 		elapsed = time.Since(start)
+		c.reportProgress("editing", fmt.Sprintf("Completed - %d files changed", len(modifiedFiles)))
 		c.selector.RecordUsage(editBackend, editModel, err == nil, errorMsg(err))
 		if err != nil {
 			// LoopDetector will handle max iterations check on next iteration
@@ -256,9 +289,11 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 
 		// Validate
 		fmt.Println("Validating...")
+		c.reportProgress("validation", "Running tests and checks")
 		start = time.Now()
 		review, err := reviewer.Review(ctx, plan, modifiedFiles, nil)
 		elapsed = time.Since(start)
+		c.reportProgress("validation", "Validation complete")
 		c.selector.RecordUsage(reviewBackend, reviewModel, err == nil, errorMsg(err))
 		if err != nil {
 			// LoopDetector will handle max iterations check on next iteration
@@ -469,10 +504,11 @@ func (c *Conductor) formatValidationIssues(issues []string) string {
 	hasPackageError := false
 	hasSnapshotFailure := false
 	for _, issue := range issues {
+		lowerIssue := strings.ToLower(issue)
 		if strings.Contains(issue, "found packages") {
 			hasPackageError = true
 		}
-		if strings.Contains(strings.ToLower(issue), "snapshot") {
+		if strings.Contains(lowerIssue, "snapshot") {
 			hasSnapshotFailure = true
 		}
 	}
