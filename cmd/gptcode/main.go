@@ -210,6 +210,7 @@ func init() {
 	rootCmd.AddCommand(featureCmd)
 	rootCmd.AddCommand(reviewCmd)
 	rootCmd.AddCommand(issueCmd)
+	rootCmd.AddCommand(prCmd)
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(logoutCmd)
 	rootCmd.AddCommand(trainingCmd)
