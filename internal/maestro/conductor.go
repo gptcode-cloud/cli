@@ -467,21 +467,75 @@ func (c *Conductor) formatValidationIssues(issues []string) string {
 
 	// Check if there's a Go package mismatch error
 	hasPackageError := false
+	hasSnapshotFailure := false
 	for _, issue := range issues {
 		if strings.Contains(issue, "found packages") {
 			hasPackageError = true
-			break
+		}
+		if strings.Contains(strings.ToLower(issue), "snapshot") {
+			hasSnapshotFailure = true
 		}
 	}
 
 	if hasPackageError {
 		sb.WriteString("   - **CRITICAL**: Package name mismatch! Read ALL .go files in the directory to see the correct package name, then fix ONLY the wrong file(s)\n")
 	}
+
+	if hasSnapshotFailure {
+		sb.WriteString("   - **SNAPSHOT FAILURES**: The new output may be CORRECT - review the diff\n")
+		sb.WriteString("   - If new output is correct, run test with update flag (e.g., 'npm test -- -u', 'go test -update')\n")
+		sb.WriteString("   - If new output is WRONG, fix the implementation\n")
+	}
+
 	sb.WriteString("   - Correct package names (all .go files in same directory must have same package)\n")
 	sb.WriteString("   - Missing imports\n")
 	sb.WriteString("   - Compilation errors\n")
 	sb.WriteString("3. Do NOT change what's already correct\n")
 	sb.WriteString("4. Only fix the specific problems mentioned\n")
+	return sb.String()
+}
+
+// formatSnapshotGuidance creates specific guidance for snapshot test failures
+func (c *Conductor) formatSnapshotGuidance(testOutput string) string {
+	var sb strings.Builder
+	sb.WriteString("SNAPSHOT TEST FAILURES DETECTED\n\n")
+	sb.WriteString("The test output shows differences in expected vs actual output.\n\n")
+
+	// Check if there are actual diffs shown
+	if strings.Contains(testOutput, "+ Received") || strings.Contains(testOutput, "- Snapshot") {
+		sb.WriteString("DIFF DETECTED:\n")
+		lines := strings.Split(testOutput, "\n")
+		inDiff := false
+		for _, line := range lines {
+			if strings.HasPrefix(line, "    - Snapshot") || strings.HasPrefix(line, "    + Received") {
+				inDiff = true
+			}
+			if inDiff {
+				sb.WriteString(line + "\n")
+				if strings.HasPrefix(strings.TrimSpace(line), "===") {
+					break
+				}
+			}
+		}
+		sb.WriteString("\n")
+	}
+
+	sb.WriteString("ANALYSIS:\n")
+	sb.WriteString("Review the diff above carefully:\n")
+	sb.WriteString("  - If the '+ Received' output is CORRECT (better formatting, improved behavior):\n")
+	sb.WriteString("      → Update snapshots: run the test with update flag\n")
+	sb.WriteString("  - If the '+ Received' output is WRONG (bug, regression):\n")
+	sb.WriteString("      → Fix the implementation to match expected output\n\n")
+
+	sb.WriteString("COMMON SNAPSHOT UPDATE COMMANDS:\n")
+	sb.WriteString("  Jest: npm test -- -u\n")
+	sb.WriteString("  Vitest: npm test -- --update\n")
+	sb.WriteString("  Go: go test -update\n")
+	sb.WriteString("  RSpec: rspec --update-snapshots\n")
+	sb.WriteString("  Instinct: instinct update\n\n")
+
+	sb.WriteString("IMPORTANT: Only update snapshots if the new output is CORRECT!\n")
+
 	return sb.String()
 }
 

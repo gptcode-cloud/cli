@@ -76,7 +76,22 @@ When validating version numbers, be FLEXIBLE about format:
 The SEMANTIC version is what matters, not the exact operator syntax.
 If criteria says "version 1.15.4" and file has "~> 1.15.4", that's SUCCESS.
 
-EXAMPLE 1 - Validation SUCCESS:
+SNAPSHOT TEST HANDLING:
+When tests fail due to snapshot differences:
+1. Look at the diff: "- Snapshot" = old, "+ Received" = new
+2. Evaluate if the NEW output is BETTER (correct fix) or WRONG (bug)
+3. If the new output is correct (better formatting, improved style):
+   → Report SUCCESS with note: "Snapshot differences are improvements"
+4. If the new output is wrong (bug introduced):
+   → Report FAIL with specific issue
+
+SNAPSHOT IMPROVEMENTS include:
+- Better line breaking / formatting
+- Consistent style changes
+- Improved error messages
+- Removal of unnecessary whitespace
+
+EXAMPLES:
 Success Criteria:
   - Tests pass: go test ./auth/...
   - File auth/handler.go contains Login function
@@ -130,7 +145,25 @@ Issues:
 - Syntax error at lib/my_app.ex:10 - missing 'do' keyword before 'end'
 - Run mix compile to verify after fix
 
-EXAMPLE 3 - Clear issue reporting:
+EXAMPLE 3 - Snapshot test improvement (should report SUCCESS):
+Success Criteria:
+  - Code formatting improved
+  - Tests pass
+
+Validation:
+  1. Read modified files → formatting changes look correct
+  2. Run: npm test
+     Output:
+     SNAPSHOT SUMMARY: 3 snapshots updated
+     + Received 3 snapshots
+
+  The new formatting output is BETTER (improved line breaking).
+  Snapshot updates are expected and correct.
+
+Result: SUCCESS
+Note: Snapshot differences are improvements - new formatting is better
+
+EXAMPLE 4 - Clear issue reporting:
 BAD:
   "Something is wrong with the file"
   

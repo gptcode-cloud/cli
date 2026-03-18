@@ -52,7 +52,7 @@ func (cm *ControlManager) RegisterWithClient(client *Client) {
 			cm.Resume()
 		case "kill":
 			cm.Kill()
-		case "send_prompt":
+		case "update_prompt":
 			cm.handlePrompt(payload)
 		default:
 			log.Printf("Live: unknown control command: %s", command)
