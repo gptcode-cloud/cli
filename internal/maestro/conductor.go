@@ -495,50 +495,6 @@ func (c *Conductor) formatValidationIssues(issues []string) string {
 	return sb.String()
 }
 
-// formatSnapshotGuidance creates specific guidance for snapshot test failures
-func (c *Conductor) formatSnapshotGuidance(testOutput string) string {
-	var sb strings.Builder
-	sb.WriteString("SNAPSHOT TEST FAILURES DETECTED\n\n")
-	sb.WriteString("The test output shows differences in expected vs actual output.\n\n")
-
-	// Check if there are actual diffs shown
-	if strings.Contains(testOutput, "+ Received") || strings.Contains(testOutput, "- Snapshot") {
-		sb.WriteString("DIFF DETECTED:\n")
-		lines := strings.Split(testOutput, "\n")
-		inDiff := false
-		for _, line := range lines {
-			if strings.HasPrefix(line, "    - Snapshot") || strings.HasPrefix(line, "    + Received") {
-				inDiff = true
-			}
-			if inDiff {
-				sb.WriteString(line + "\n")
-				if strings.HasPrefix(strings.TrimSpace(line), "===") {
-					break
-				}
-			}
-		}
-		sb.WriteString("\n")
-	}
-
-	sb.WriteString("ANALYSIS:\n")
-	sb.WriteString("Review the diff above carefully:\n")
-	sb.WriteString("  - If the '+ Received' output is CORRECT (better formatting, improved behavior):\n")
-	sb.WriteString("      → Update snapshots: run the test with update flag\n")
-	sb.WriteString("  - If the '+ Received' output is WRONG (bug, regression):\n")
-	sb.WriteString("      → Fix the implementation to match expected output\n\n")
-
-	sb.WriteString("COMMON SNAPSHOT UPDATE COMMANDS:\n")
-	sb.WriteString("  Jest: npm test -- -u\n")
-	sb.WriteString("  Vitest: npm test -- --update\n")
-	sb.WriteString("  Go: go test -update\n")
-	sb.WriteString("  RSpec: rspec --update-snapshots\n")
-	sb.WriteString("  Instinct: instinct update\n\n")
-
-	sb.WriteString("IMPORTANT: Only update snapshots if the new output is CORRECT!\n")
-
-	return sb.String()
-}
-
 // isQueryTask checks if task is query-only (no validation needed)
 func (c *Conductor) isQueryTask(plan string, modifiedFiles []string) bool {
 	if len(modifiedFiles) > 0 {
