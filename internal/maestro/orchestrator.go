@@ -13,6 +13,7 @@ import (
 	"gptcode/internal/agents"
 	"gptcode/internal/config"
 	"gptcode/internal/events"
+	"gptcode/internal/live"
 	"gptcode/internal/llm"
 	"gptcode/internal/observability"
 	"gptcode/internal/telemetry"
@@ -42,19 +43,23 @@ func NewMaestro(provider llm.Provider, cwd, model string) *Maestro {
 	tracer := observability.NewTracer()
 	usageTracker := telemetry.NewUsageTracker()
 
-	// Initialize with no verifiers by default - will be set based on file types
 	return &Maestro{
 		Provider:     provider,
 		CWD:          cwd,
 		Model:        model,
 		Events:       events.NewEmitter(os.Stderr),
-		Verifiers:    []Verifier{}, // Will be populated dynamically based on modified files
+		Verifiers:    []Verifier{},
 		Recovery:     recovery,
 		Checkpoints:  checkpoints,
 		MaxRetries:   3,
 		Tracer:       tracer,
 		UsageTracker: usageTracker,
 	}
+}
+
+// checkPause delegates to the global ControlManager
+func (m *Maestro) checkPause() {
+	live.GetControlManager().CheckPause()
 }
 
 // ExecutePlan runs the autonomous execution loop
@@ -108,6 +113,8 @@ func (m *Maestro) ExecutePlan(ctx context.Context, planContent string) error {
 
 			// Execute the step
 			m.CurrentStepIdx = stepIdx
+			m.checkPause()
+
 			result, modifiedFiles, err := m.executeStepWithHistory(ctx, step, history)
 			m.ModifiedFiles = modifiedFiles // Use the actual modified files returned by the agent
 			_ = result                      // Use the result to avoid unused variable error, could be used for additional processing later

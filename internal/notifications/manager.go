@@ -11,6 +11,7 @@ import (
 	"gptcode/internal/config"
 	"gptcode/internal/live"
 )
+
 type BlockedNotification struct {
 	ID         string    `json:"id"`
 	Type       string    `json:"type"` // "blocked"
@@ -44,6 +45,9 @@ func NewManager(setup *config.Setup) *Manager {
 			fmt.Fprintf(os.Stderr, "[Live] Failed to connect: %v\n", err)
 		}
 	}()
+
+	// Make the client globally available for the tracer
+	live.SetGlobalClient(liveClient)
 
 	return &Manager{
 		setup:         setup,
@@ -123,14 +127,14 @@ func (m *Manager) sendToLive(n BlockedNotification) {
 	// Now push directly to the Live Server via WebSocket
 	if m.liveClient != nil {
 		payload := map[string]interface{}{
-			"type": "blocked",
 			"data": n,
 		}
-		if err := m.liveClient.SendSessionEvent(payload); err != nil {
+		if err := m.liveClient.SendExecutionStep("blocked", n.Message, payload); err != nil {
 			fmt.Fprintf(os.Stderr, "Warning: failed to stream notification to Live dashboard: %v\n", err)
 		}
 	}
 }
+
 // This is a placeholder - would need actual Telegram bot integration
 func (m *Manager) sendToTelegram(n BlockedNotification) {
 	// Would integrate with Telegram bot here

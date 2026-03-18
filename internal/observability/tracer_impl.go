@@ -159,14 +159,29 @@ func (t *TracerImpl) streamToLive(step StepTrace) error {
 		return nil // No Live client, skip streaming
 	}
 
-	// Prepare the trace data to send
+	// Send human-readable execution step for dashboard cards
+	stepType := "step"
+	description := step.Node
+	if step.Decision != nil {
+		description = fmt.Sprintf("%s → %s", step.Node, step.Decision.Reasoning)
+		stepType = "step"
+	}
+	if step.Metrics.Cost > 0 {
+		description = fmt.Sprintf("%s (cost: $%.4f)", description, step.Metrics.Cost)
+	}
+
+	_ = client.SendExecutionStep(stepType, description, map[string]interface{}{
+		"node":       step.Node,
+		"session_id": t.sessionID,
+	})
+
+	// Also send raw trace data
 	traceData := map[string]interface{}{
 		"type":       "step_trace",
 		"session_id": t.sessionID,
 		"step":       step,
 	}
 
-	// Send via WebSocket
 	return client.SendTraceData(traceData)
 }
 

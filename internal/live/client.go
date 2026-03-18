@@ -94,6 +94,11 @@ func AgentTypeFromInput(input string) string {
 	return AgentTypeBuilder
 }
 
+var (
+	processAgentID string
+	agentIDMutex   sync.Mutex
+)
+
 // GetAgentID returns a unique agent identifier per execution.
 // Format: {type}-{short_random} (e.g. "reviewer-a3f2")
 func GetAgentID() string {
@@ -101,11 +106,20 @@ func GetAgentID() string {
 }
 
 // GetAgentIDWithType returns a unique agent identifier with the given type prefix
+// It caches the ID so the same process always uses the same ID.
 func GetAgentIDWithType(agentType string) string {
+	agentIDMutex.Lock()
+	defer agentIDMutex.Unlock()
+
+	if processAgentID != "" {
+		return processAgentID
+	}
+
 	b := make([]byte, 4)
 	_, _ = crypto_rand.Read(b)
 	suffix := fmt.Sprintf("%x", b)[:4]
-	return fmt.Sprintf("%s-%s", agentType, suffix)
+	processAgentID = fmt.Sprintf("%s-%s", agentType, suffix)
+	return processAgentID
 }
 
 type Client struct {

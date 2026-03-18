@@ -124,7 +124,7 @@ func Chat(input string, args []string) {
 		}
 		builder := prompt.NewDefaultBuilder(nil)
 		queryModel := backendCfg.GetModelForAgent("query")
-		RunExecute(builder, provider, queryModel, []string{lastUserMessage})
+		RunExecute(builder, provider, queryModel, []string{lastUserMessage}, nil)
 		return
 	}
 
@@ -374,7 +374,7 @@ func ChatWithResponse(input string, args []string) (string, error) {
 		// For REPL, we can't use RunExecute as it prints directly
 		// This is a limitation - ops queries in REPL will print instead of returning
 		// TODO: Refactor RunExecute to support response capture
-		RunExecute(builder, provider, queryModel, []string{lastUserMessage})
+		RunExecute(builder, provider, queryModel, []string{lastUserMessage}, nil)
 		return "[Executed operational command]", nil
 	}
 

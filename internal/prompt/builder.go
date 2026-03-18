@@ -137,4 +137,3 @@ func mustReadFile(path string) string {
 type MemoryStore interface {
 	LastRelevant(lang string) string
 }
-

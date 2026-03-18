@@ -36,16 +36,16 @@ var languageSkillMap = map[string]string{
 // productSkillKeywords maps task keywords to product skill files
 var productSkillKeywords = map[string]string{
 	// Design System
-	"component":  "design-system.md",
-	"ui":         "design-system.md",
-	"frontend":   "design-system.md",
-	"button":     "design-system.md",
-	"form":       "design-system.md",
-	"modal":      "design-system.md",
-	"storybook":  "design-system.md",
-	"design":     "design-system.md",
-	"css":        "design-system.md",
-	"styled":     "design-system.md",
+	"component": "design-system.md",
+	"ui":        "design-system.md",
+	"frontend":  "design-system.md",
+	"button":    "design-system.md",
+	"form":      "design-system.md",
+	"modal":     "design-system.md",
+	"storybook": "design-system.md",
+	"design":    "design-system.md",
+	"css":       "design-system.md",
+	"styled":    "design-system.md",
 
 	// Product Metrics
 	"tracking":   "product-metrics.md",
@@ -71,15 +71,15 @@ var productSkillKeywords = map[string]string{
 	"observability": "production-ready.md",
 
 	// QA Automation
-	"test":       "qa-automation.md",
-	"e2e":        "qa-automation.md",
-	"playwright": "qa-automation.md",
-	"cypress":    "qa-automation.md",
-	"selenium":   "qa-automation.md",
-	"a11y":       "qa-automation.md",
+	"test":          "qa-automation.md",
+	"e2e":           "qa-automation.md",
+	"playwright":    "qa-automation.md",
+	"cypress":       "qa-automation.md",
+	"selenium":      "qa-automation.md",
+	"a11y":          "qa-automation.md",
 	"accessibility": "qa-automation.md",
-	"visual":     "qa-automation.md",
-	"screenshot": "qa-automation.md",
+	"visual":        "qa-automation.md",
+	"screenshot":    "qa-automation.md",
 
 	// Security
 	"security":       "security.md",
@@ -97,15 +97,15 @@ var productSkillKeywords = map[string]string{
 	"jwt":            "security.md",
 
 	// DevOps
-	"devops":     "devops.md",
-	"docker":     "devops.md",
-	"dockerfile": "devops.md",
-	"kubernetes": "devops.md",
-	"k8s":        "devops.md",
-	"helm":       "devops.md",
-	"terraform":  "devops.md",
-	"ci/cd":      "devops.md",
-	"pipeline":   "devops.md",
+	"devops":         "devops.md",
+	"docker":         "devops.md",
+	"dockerfile":     "devops.md",
+	"kubernetes":     "devops.md",
+	"k8s":            "devops.md",
+	"helm":           "devops.md",
+	"terraform":      "devops.md",
+	"ci/cd":          "devops.md",
+	"pipeline":       "devops.md",
 	"github actions": "devops.md",
 
 	// SysOps
@@ -129,24 +129,24 @@ var productSkillKeywords = map[string]string{
 	"compliance":    "secops.md",
 
 	// MLOps
-	"mlops":      "mlops.md",
-	"ml":         "mlops.md",
-	"model":      "mlops.md",
-	"training":   "mlops.md",
-	"inference":  "mlops.md",
-	"mlflow":     "mlops.md",
-	"experiment": "mlops.md",
+	"mlops":         "mlops.md",
+	"ml":            "mlops.md",
+	"model":         "mlops.md",
+	"training":      "mlops.md",
+	"inference":     "mlops.md",
+	"mlflow":        "mlops.md",
+	"experiment":    "mlops.md",
 	"feature store": "mlops.md",
 }
 
 // workflowSkillMap maps workflow types to skill files
 var workflowSkillMap = map[string]string{
-	"tdd":      "tdd-bug-fix.md",
-	"bug":      "tdd-bug-fix.md",
-	"fix":      "tdd-bug-fix.md",
-	"review":   "code-review.md",
-	"commit":   "git-commit.md",
-	"git":      "git-commit.md",
+	"tdd":    "tdd-bug-fix.md",
+	"bug":    "tdd-bug-fix.md",
+	"fix":    "tdd-bug-fix.md",
+	"review": "code-review.md",
+	"commit": "git-commit.md",
+	"git":    "git-commit.md",
 }
 
 // loadEmbeddedSkill loads a skill from embedded files
@@ -161,12 +161,12 @@ func loadEmbeddedSkill(fileName string) string {
 // LoadForLanguage returns the skill content for a given language
 func (sl *SkillsLoader) LoadForLanguage(lang string) string {
 	langLower := strings.ToLower(lang)
-	
+
 	fileName, ok := languageSkillMap[langLower]
 	if !ok {
 		return ""
 	}
-	
+
 	return loadEmbeddedSkill(fileName)
 }
 
@@ -177,7 +177,7 @@ func (sl *SkillsLoader) LoadByName(name string) string {
 	if content != "" {
 		return content
 	}
-	
+
 	// Try as-is (shouldn't happen but just in case)
 	return loadEmbeddedSkill(name)
 }
@@ -187,13 +187,13 @@ func (sl *SkillsLoader) LoadProductSkillsForTask(task string) []string {
 	if task == "" {
 		return nil
 	}
-	
+
 	taskLower := strings.ToLower(task)
-	
+
 	// Track which skills we've already added to avoid duplicates
 	addedSkills := make(map[string]bool)
 	var skills []string
-	
+
 	// Check for product skill keywords
 	for keyword, fileName := range productSkillKeywords {
 		if strings.Contains(taskLower, keyword) && !addedSkills[fileName] {
@@ -204,7 +204,7 @@ func (sl *SkillsLoader) LoadProductSkillsForTask(task string) []string {
 			}
 		}
 	}
-	
+
 	// Check for workflow skill keywords
 	for keyword, fileName := range workflowSkillMap {
 		if strings.Contains(taskLower, keyword) && !addedSkills[fileName] {
@@ -215,7 +215,7 @@ func (sl *SkillsLoader) LoadProductSkillsForTask(task string) []string {
 			}
 		}
 	}
-	
+
 	return skills
 }
 
@@ -225,7 +225,7 @@ func (sl *SkillsLoader) ListAvailable() []string {
 	if err != nil {
 		return nil
 	}
-	
+
 	var skills []string
 	for _, entry := range entries {
 		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".md") {
@@ -234,7 +234,7 @@ func (sl *SkillsLoader) ListAvailable() []string {
 			skills = append(skills, name)
 		}
 	}
-	
+
 	return skills
 }
 

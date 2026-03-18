@@ -19,6 +19,7 @@ import (
 	"gptcode/internal/elixir"
 	"gptcode/internal/feedback"
 	"gptcode/internal/langdetect"
+	"gptcode/internal/live"
 	"gptcode/internal/llm"
 	"gptcode/internal/memory"
 	"gptcode/internal/ml"
@@ -163,6 +164,29 @@ func init() {
 `)
 		}
 
+		// Initialize Live dashboard connection (with short timeout)
+		// Must be synchronous so GetClient() works during command execution
+		done := make(chan struct{})
+		go func() {
+			defer close(done)
+			agentID := live.GetAgentID()
+			client := live.NewClient(live.GetDashboardURL(), agentID)
+			if err := client.Connect(); err != nil {
+				return
+			}
+			live.SetGlobalClient(client)
+
+			// Register global control manager for pause/resume/kill from dashboard
+			cm := live.GetControlManager()
+			cm.RegisterWithClient(client)
+		}()
+		select {
+		case <-done:
+			// Connected (or failed silently)
+		case <-time.After(2 * time.Second):
+			// Timeout — proceed without live dashboard
+		}
+
 		return nil
 	}
 
@@ -176,6 +200,7 @@ func init() {
 	rootCmd.AddCommand(detectLanguageCmd)
 	rootCmd.AddCommand(mlCmd)
 	rootCmd.AddCommand(runCmd)
+	rootCmd.AddCommand(watchCmd)
 	rootCmd.AddCommand(goCmd)
 	rootCmd.AddCommand(chatCmd)
 	rootCmd.AddCommand(tddCmd)
@@ -1649,16 +1674,116 @@ Examples:
 
 		// If we have input or --once flag, use single-shot AI mode
 		if input != "" || once {
+			// Try to connect to Live Dashboard via HTTP API
+			reportConfig := live.DefaultReportConfig()
+			liveURL := os.Getenv("GPTCODE_LIVE_URL")
+			if liveURL != "" {
+				reportConfig.SetBaseURL(liveURL)
+			}
+
+			// Auto-detect agent type from input text
+			agentType := live.AgentTypeFromInput(input)
+			agentID := live.GetAgentIDWithType(agentType)
+
+			// Report connect to Live
+			if err := reportConfig.Connect(agentID, agentType, input); err != nil {
+				fmt.Printf("⚠️  Live connect error: %v\n", err)
+			} else {
+				fmt.Printf("🔗 Reported to Live Dashboard: %s\n", reportConfig.BaseURL)
+			}
+
+			// Report first step
+			reportConfig.Step("Starting: "+input, "start")
+
+			// WebSocket connection for commands (optional)
+			var liveClient *live.Client
+			wsURL := os.Getenv("GPTCODE_LIVE_URL")
+			if wsURL != "" && strings.HasPrefix(wsURL, "ws") {
+				liveClient = live.NewClient(wsURL, agentID)
+				liveClient.SetAgentType(agentType)
+				liveClient.SetTask(input)
+				if err := liveClient.Connect(); err != nil {
+					fmt.Printf("⚠️  Live WS error: %v\n", err)
+				} else {
+					live.SetGlobalClient(liveClient)
+				}
+			}
+
 			builder, provider, model, err := newBuilderAndLLM("general", "run", "")
 			if err != nil {
 				return err
 			}
-			return modes.RunExecute(builder, provider, model, strings.Fields(input))
+
+			err = modes.RunExecute(builder, provider, model, strings.Fields(input), liveClient)
+
+			// Report completion to Live
+			if err != nil {
+				reportConfig.Step("Error: "+err.Error(), "error")
+			} else {
+				reportConfig.Step("Completed: "+input, "complete")
+			}
+			reportConfig.Disconnect()
+
+			// Send end event via WebSocket
+			if liveClient != nil {
+				liveClient.SendExecutionStep("complete", "Task completed", map[string]interface{}{
+					"task":  input,
+					"error": err != nil,
+				})
+			}
+
+			return err
 		}
 
 		// Start AI-assisted REPL mode - combine run REPL with AI processing
 		repl := repl.NewRunREPL(20)
 		return repl.Run()
+	},
+}
+
+var watchCmd = &cobra.Command{
+	Use:   "watch",
+	Short: "Continuously execute tasks from a roadmap file",
+	Long: `Watch mode reads a roadmap file and executes tasks one by one.
+
+Looks for roadmap files in this order:
+  _roadmap.md, .gptcode/roadmap.md, ROADMAP.md, roadmap.md, TODO.md
+
+Tasks are markdown checkboxes: - [ ] task description
+Completed tasks are marked: - [x] task description
+
+The agent stays connected to the Live Dashboard between tasks,
+allowing real-time monitoring from the /live page.
+
+Examples:
+  gt watch
+  gt watch --file my-tasks.md
+  gt watch --interval 60s
+  gt watch --max 5`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		roadmapFile, _ := cmd.Flags().GetString("file")
+		intervalStr, _ := cmd.Flags().GetString("interval")
+		maxTasks, _ := cmd.Flags().GetInt("max")
+
+		interval := 30 * time.Second
+		if intervalStr != "" {
+			parsed, err := time.ParseDuration(intervalStr)
+			if err != nil {
+				return fmt.Errorf("invalid interval: %w", err)
+			}
+			interval = parsed
+		}
+
+		builder, provider, model, err := newBuilderAndLLM("general", "run", "")
+		if err != nil {
+			return err
+		}
+
+		return modes.WatchExecute(builder, provider, model, modes.WatchConfig{
+			RoadmapFile: roadmapFile,
+			Interval:    interval,
+			MaxTasks:    maxTasks,
+		})
 	},
 }
 
@@ -1685,6 +1810,10 @@ Examples:
 func init() {
 	runCmd.Flags().Bool("raw", false, "Run direct command REPL mode (no AI)")
 	runCmd.Flags().Bool("once", false, "Run single-shot mode")
+
+	watchCmd.Flags().String("file", "", "Path to roadmap file (default: auto-detect)")
+	watchCmd.Flags().String("interval", "30s", "Wait duration between tasks")
+	watchCmd.Flags().Int("max", 0, "Maximum number of tasks to execute (0 = unlimited)")
 }
 
 var featureCmd = &cobra.Command{

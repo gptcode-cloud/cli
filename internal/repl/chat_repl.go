@@ -372,7 +372,7 @@ func RunSingleShot(input string, args []string) error {
 			provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
 		}
 		builder := prompt.NewDefaultBuilder(nil)
-		return modes.RunExecute(builder, provider, queryModel, []string{input})
+		return modes.RunExecute(builder, provider, queryModel, []string{input}, nil)
 	}
 	modes.Chat(input, args)
 	return nil

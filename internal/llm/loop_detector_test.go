@@ -46,8 +46,8 @@ func TestLoopDetector_ContentLoops(t *testing.T) {
 
 func TestLoopDetector_IntentAwareLimits(t *testing.T) {
 	tests := []struct {
-		intent       string
-		expectedMax  int
+		intent      string
+		expectedMax int
 	}{
 		{"query", 15},
 		{"edit", 25},

@@ -8,12 +8,17 @@ import (
 	"os"
 	"strings"
 
+	"gptcode/internal/live"
 	"gptcode/internal/llm"
 	"gptcode/internal/prompt"
 	"gptcode/internal/tools"
 )
 
-func RunExecute(builder *prompt.Builder, provider llm.Provider, model string, args []string) error {
+// ExecutionCallback is called during execution to report progress
+type ExecutionCallback func(stepType, description string, metadata map[string]interface{})
+
+// RunExecute runs a task with optional Live reporting
+func RunExecute(builder *prompt.Builder, provider llm.Provider, model string, args []string, liveClient *live.Client) error {
 	task := ""
 	if len(args) > 0 {
 		task = strings.Join(args, " ")
@@ -31,6 +36,33 @@ func RunExecute(builder *prompt.Builder, provider llm.Provider, model string, ar
 
 	if task == "" {
 		return fmt.Errorf("no task provided")
+	}
+
+	// Report start to Live
+	if liveClient != nil {
+		liveClient.SendExecutionStep("start", "Starting task: "+task, map[string]interface{}{
+			"task": task,
+		})
+	}
+
+	// Set up command callback from Live
+	if liveClient != nil {
+		liveClient.OnCommand(func(command string, payload map[string]interface{}) {
+			fmt.Printf("\n📟 Received command from Live: %s\n", command)
+			switch command {
+			case "skip":
+				fmt.Printf("⚠️  Skip requested - this would skip current step\n")
+				liveClient.SendCommandResult(command, true, "Skip not implemented yet")
+			case "retry":
+				fmt.Printf("🔄 Retry requested - this would retry current step\n")
+				liveClient.SendCommandResult(command, true, "Retry not implemented yet")
+			case "stop":
+				fmt.Printf("🛑 Stop requested\n")
+				liveClient.SendCommandResult(command, true, "Stopping execution")
+			default:
+				liveClient.SendCommandResult(command, false, "Unknown command")
+			}
+		})
 	}
 
 	sys := builder.BuildSystemPrompt(prompt.BuildOptions{
