@@ -129,7 +129,7 @@ func (m *Manager) sendToLive(n BlockedNotification) {
 		payload := map[string]interface{}{
 			"data": n,
 		}
-		if err := m.liveClient.SendExecutionStep("blocked", n.Message, payload); err != nil {
+		if err := m.liveClient.SendExecutionStep("error", "BLOCKED: "+n.Message, payload); err != nil {
 			fmt.Fprintf(os.Stderr, "Warning: failed to stream notification to Live dashboard: %v\n", err)
 		}
 	}

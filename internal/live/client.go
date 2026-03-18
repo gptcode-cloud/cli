@@ -294,9 +294,14 @@ func (c *Client) handleMessages() {
 			c.handleContextEdit(payload)
 		case "phx_reply":
 			// Handle join reply
+		case "request_sessions":
+			// Respond to session request from Live
+			c.handleRequestSessions(payload)
 		default:
 			if c.onCommand != nil {
 				c.onCommand(event, payload)
+			} else {
+				log.Printf("Live: unknown control command: %s", event)
 			}
 		}
 	}
@@ -313,6 +318,43 @@ func (c *Client) handleContextEdit(payload map[string]interface{}) {
 		if err := WriteContextFile(contextType, content); err != nil {
 			log.Printf("Live: failed to write context: %v", err)
 		}
+	}
+}
+
+// handleRequestSessions responds to a session info request from Live
+func (c *Client) handleRequestSessions(payload map[string]interface{}) {
+	// Get hostname and workspace info
+	hostname, _ := os.Hostname()
+	cwd, _ := os.Getwd()
+	workspace := filepath.Base(cwd)
+
+	// Send session info back
+	sessionInfo := map[string]interface{}{
+		"agent_id":  c.agentID,
+		"type":      c.agentType,
+		"task":      c.taskDescription,
+		"hostname":  hostname,
+		"workspace": workspace,
+		"pid":       os.Getpid(),
+		"status":    "running",
+	}
+
+	// Send via sessions_update event
+	c.mu.Lock()
+	defer c.mu.Unlock()
+
+	topic := fmt.Sprintf("agent:%s", c.agentID)
+	msg := []interface{}{
+		c.joinRef,
+		c.msgRef,
+		topic,
+		"sessions_update",
+		sessionInfo,
+	}
+	c.incrementMsgRef()
+
+	if c.conn != nil {
+		_ = c.conn.WriteJSON(msg)
 	}
 }
 
