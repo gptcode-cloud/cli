@@ -27,36 +27,21 @@ func shouldDeepAnalyze(task string) bool {
 
 // DeepAnalyze performs deep analysis using a reasoning model
 func (a *TaskAnalyzer) DeepAnalyze(ctx context.Context, task string) (string, error) {
-	// Get a reasoning model for deep analysis
 	setup, err := config.LoadSetup()
 	if err != nil {
 		return "", fmt.Errorf("failed to load setup: %w", err)
 	}
 
-	// Try to get a reasoning model - prefer reasoning models, fallback to any available
-	reasoningModel := ""
-	backendName := setup.Defaults.Backend
-
-	// Try to find a reasoning model from the selector
-	if selector, err := config.NewModelSelector(setup); err == nil {
-		// Try different reasoning-capable models
-		for _, model := range []string{"o3", "o4", "claude-opus", "gemini-2.5-pro", "gemini-2.0-flash-exp"} {
-			if backend, m, err := selector.SelectModel(config.ActionResearch, a.model, "complex"); err == nil {
-				if strings.Contains(strings.ToLower(m), model) {
-					reasoningModel = m
-					backendName = backend
-					break
-				}
-			}
-		}
+	selector, err := config.NewModelSelector(setup)
+	if err != nil {
+		return "", fmt.Errorf("failed to create model selector: %w", err)
 	}
 
-	// If no specific reasoning model, use the default model but with reasoning-focused prompt
-	if reasoningModel == "" {
-		reasoningModel = a.model
+	backendName, reasoningModel, err := selector.SelectModel(config.ActionResearch, a.model, "complex")
+	if err != nil {
+		return "", fmt.Errorf("failed to select reasoning model: %w", err)
 	}
 
-	// Create a provider for deep analysis
 	var provider llm.Provider
 	backendCfg := setup.Backend[backendName]
 	if backendCfg.Type == "ollama" {
@@ -65,7 +50,6 @@ func (a *TaskAnalyzer) DeepAnalyze(ctx context.Context, task string) (string, er
 		provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
 	}
 
-	// Create deep analysis prompt
 	deepAnalysisPrompt := fmt.Sprintf(`You are a senior software engineer performing DEEP ANALYSIS of a bug fix task.
 
 TASK:
