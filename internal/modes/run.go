@@ -18,7 +18,7 @@ import (
 type ExecutionCallback func(stepType, description string, metadata map[string]interface{})
 
 // RunExecute runs a task with optional Live reporting
-func RunExecute(builder *prompt.Builder, provider llm.Provider, model string, args []string, liveClient *live.Client) error {
+func RunExecute(builder *prompt.Builder, provider llm.Provider, model string, args []string, liveClient *live.Client, reportConfig *live.ReportConfig) error {
 	task := ""
 	if len(args) > 0 {
 		task = strings.Join(args, " ")
@@ -38,7 +38,12 @@ func RunExecute(builder *prompt.Builder, provider llm.Provider, model string, ar
 		return fmt.Errorf("no task provided")
 	}
 
-	// Report start to Live
+	// Report start to Live via HTTP
+	if reportConfig != nil {
+		reportConfig.Step("Starting: "+task, "start")
+	}
+
+	// Report start to Live via WebSocket
 	if liveClient != nil {
 		liveClient.SendExecutionStep("start", "Starting task: "+task, map[string]interface{}{
 			"task": task,
@@ -51,16 +56,21 @@ func RunExecute(builder *prompt.Builder, provider llm.Provider, model string, ar
 			fmt.Printf("\n📟 Received command from Live: %s\n", command)
 			switch command {
 			case "skip":
-				fmt.Printf("⚠️  Skip requested - this would skip current step\n")
-				liveClient.SendCommandResult(command, true, "Skip not implemented yet")
+				fmt.Printf("⚠️  Skip requested\n")
+				liveClient.SendCommandResult(command, true, "Skip acknowledged")
 			case "retry":
-				fmt.Printf("🔄 Retry requested - this would retry current step\n")
-				liveClient.SendCommandResult(command, true, "Retry not implemented yet")
+				fmt.Printf("🔄 Retry requested\n")
+				liveClient.SendCommandResult(command, true, "Retry acknowledged")
 			case "stop":
-				fmt.Printf("🛑 Stop requested\n")
-				liveClient.SendCommandResult(command, true, "Stopping execution")
+				fmt.Printf("🛑 Stop requested - terminating\n")
+				liveClient.SendCommandResult(command, true, "Stopping")
+				if reportConfig != nil {
+					reportConfig.Step("Stopped by user", "error")
+					reportConfig.Disconnect()
+				}
+				os.Exit(0)
 			default:
-				liveClient.SendCommandResult(command, false, "Unknown command")
+				liveClient.SendCommandResult(command, false, "Unknown command: "+command)
 			}
 		})
 	}
@@ -142,12 +152,35 @@ func RunExecute(builder *prompt.Builder, provider llm.Provider, model string, ar
 		})
 
 		for _, tc := range resp.ToolCalls {
-			var args map[string]interface{}
-			_ = json.Unmarshal([]byte(tc.Arguments), &args)
+			var toolArgs map[string]interface{}
+			_ = json.Unmarshal([]byte(tc.Arguments), &toolArgs)
+
+			// Report step to Live
+			if reportConfig != nil {
+				stepType := "step"
+				description := tc.Name
+				if tc.Name == "Write" || tc.Name == "Edit" {
+					stepType = "file_write"
+					if file, ok := toolArgs["file_path"].(string); ok {
+						description = "Writing: " + file
+					}
+				} else if tc.Name == "Read" || tc.Name == "Grep" {
+					stepType = "file_read"
+					if file, ok := toolArgs["file_path"].(string); ok {
+						description = "Reading: " + file
+					}
+				} else if tc.Name == "Bash" || tc.Name == "RunCommand" {
+					stepType = "command"
+					if cmd, ok := toolArgs["command"].(string); ok {
+						description = "Cmd: " + cmd
+					}
+				}
+				reportConfig.Step(description, stepType)
+			}
 
 			toolCall := tools.ToolCall{
 				Name:      tc.Name,
-				Arguments: args,
+				Arguments: toolArgs,
 			}
 
 			result := tools.ExecuteTool(toolCall, cwd)

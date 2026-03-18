@@ -93,7 +93,7 @@ func WatchExecute(builder *prompt.Builder, provider llm.Provider, model string, 
 		}
 
 		// Execute the task
-		err = RunExecute(builder, provider, model, []string{task}, liveClient)
+		err = RunExecute(builder, provider, model, []string{task}, liveClient, nil)
 
 		if err != nil {
 			fmt.Printf("Task failed: %v\n", err)

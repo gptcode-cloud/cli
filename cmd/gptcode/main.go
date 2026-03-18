@@ -1714,7 +1714,7 @@ Examples:
 				return err
 			}
 
-			err = modes.RunExecute(builder, provider, model, strings.Fields(input), liveClient)
+			err = modes.RunExecute(builder, provider, model, strings.Fields(input), liveClient, reportConfig)
 
 			// Report completion to Live
 			if err != nil {
