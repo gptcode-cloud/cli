@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -204,4 +205,146 @@ func fileExists(dir, file string) bool {
 		}
 	}
 	return false
+}
+
+// TestRunner handles automatic test execution and snapshot updates
+type TestRunner struct {
+	cwd   string
+	model string
+}
+
+func NewTestRunner(cwd string, model string) *TestRunner {
+	return &TestRunner{
+		cwd:   cwd,
+		model: model,
+	}
+}
+
+// TestResult holds the result of a test run
+type TestResult struct {
+	Passed        bool
+	Command       string
+	Output        string
+	Failures      int
+	SnapshotAware bool
+	CanAutoFix    bool
+}
+
+// RunTests executes tests for the project
+func (tr *TestRunner) RunTests(ctx context.Context) (*TestResult, error) {
+	projectType := DetectProjectType(tr.cwd)
+	testCmd := DetectTestCommand(projectType)
+
+	return tr.runTestCommand(ctx, testCmd, projectType)
+}
+
+// RunTestsWithUpdate runs tests with snapshot update flag
+func (tr *TestRunner) RunTestsWithUpdate(ctx context.Context) (*TestResult, error) {
+	projectType := DetectProjectType(tr.cwd)
+	testCmd := DetectUpdateCommand(projectType)
+
+	return tr.runTestCommand(ctx, testCmd, projectType)
+}
+
+// RunTestsInDirectory runs tests in a specific directory
+func (tr *TestRunner) RunTestsInDirectory(ctx context.Context, dir string) (*TestResult, error) {
+	projectType := DetectProjectType(filepath.Join(tr.cwd, dir))
+	testCmd := DetectTestCommand(projectType)
+
+	return tr.runTestCommandInDir(ctx, testCmd, dir)
+}
+
+func (tr *TestRunner) runTestCommand(ctx context.Context, cmd string, projectType string) (*TestResult, error) {
+	return tr.runTestCommandInDir(ctx, cmd, ".")
+}
+
+func (tr *TestRunner) runTestCommandInDir(ctx context.Context, cmd string, dir string) (*TestResult, error) {
+	fullCmd := fmt.Sprintf("cd %s && %s", dir, cmd)
+
+	result := &TestResult{
+		Command: cmd,
+	}
+
+	output, err := runCommand(fullCmd)
+	result.Output = output
+
+	if err != nil {
+		// Check if it's just a test failure (not a crash)
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			if exitErr.ExitCode() != 0 {
+				result.Passed = false
+			}
+		} else {
+			result.Passed = false
+			result.Output += fmt.Sprintf("\nError: %v", err)
+		}
+	} else {
+		result.Passed = true
+	}
+
+	// Analyze output
+	result.Analyze()
+
+	return result, nil
+}
+
+// Analyze examines test output for failures and snapshots
+func (r *TestResult) Analyze() {
+	output := r.Output
+
+	// Count failures
+	failMatch := regexp.MustCompile(`(\d+)\s+(?:failures?|errors?|failed)`)
+	if matches := failMatch.FindStringSubmatch(strings.ToLower(output)); len(matches) > 1 {
+		fmt.Sscanf(matches[1], "%d", &r.Failures)
+	}
+
+	// Check if snapshot tests
+	r.SnapshotAware = strings.Contains(output, "snapshot") ||
+		strings.Contains(output, "Snapshot") ||
+		strings.Contains(output, "-u") ||
+		strings.Contains(output, "--update")
+
+	// Can auto-fix if snapshot related
+	r.CanAutoFix = r.SnapshotAware && r.Failures > 0 && !r.Passed
+}
+
+// DetectUpdateCommand returns the command to update snapshots
+func DetectUpdateCommand(projectType string) string {
+	commands := map[string]string{
+		"go":         "go test -update ./...",
+		"node":       "npm test -- -u",
+		"python":     "pytest --snapshot-update",
+		"rust":       "cargo test",
+		"elixir":     "mix test --trace",
+		"ruby":       "rspec --update-snapshots",
+		"typescript": "npm test -- -u",
+	}
+
+	if cmd, ok := commands[projectType]; ok {
+		return cmd
+	}
+	return "npm test -- -u"
+}
+
+// runCommand executes a shell command
+func runCommand(cmd string) (string, error) {
+	parts := strings.Fields(cmd)
+	if len(parts) == 0 {
+		return "", fmt.Errorf("empty command")
+	}
+
+	dir := "."
+	command := cmd
+
+	// Parse cd command
+	if parts[0] == "cd" && len(parts) >= 2 {
+		dir = parts[1]
+		command = strings.Join(parts[3:], " ")
+	}
+
+	execCmd := exec.Command("sh", "-c", command)
+	execCmd.Dir = dir
+	output, err := execCmd.CombinedOutput()
+
+	return string(output), err
 }
