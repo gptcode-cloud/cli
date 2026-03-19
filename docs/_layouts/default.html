@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{{ page.title }} - GPTCode</title>
+  <title>{{ page.title }} - gptcode</title>
   <meta name="description" content="{{ page.description | default: site.description }}" />
   {% assign bust = site.github.build_revision | default: site.time | date: '%s' %}
   <link rel="icon" type="image/svg+xml" href="{{ '/assets/gptcode.svg' | relative_url }}?v={{ bust }}" />
@@ -15,7 +15,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
     rel="stylesheet">
 
   {% if site.google_analytics and jekyll.environment == 'production' %}
@@ -33,8 +33,8 @@
   <nav class="main-nav">
     <div class="nav-container">
       <a href="{{ '/' | relative_url }}" class="nav-brand">
-        <img src="{{ '/assets/gptcode.svg' | relative_url }}?v={{ bust }}" alt="GPTCode" class="nav-logo" />
-        <span>GPTCode</span>
+        <img src="{{ '/assets/gptcode.svg' | relative_url }}?v={{ bust }}" alt="gptcode" class="nav-logo" />
+        <span>gpt<span class="logo-accent">code</span></span>
       </a>
       <div class="nav-links">
         <a href="{{ '/reference/capabilities' | relative_url }}">Features</a>
@@ -43,7 +43,7 @@
         <a href="{{ '/vs' | relative_url }}">Compare</a>
         <a href="{{ '/blog' | relative_url }}">Blog</a>
         <a href="{{ '/pricing' | relative_url }}">Pricing</a>
-        <a href="{{ '/live' | relative_url }}" class="nav-live">Live</a>
+        <a href="https://gptcode.live/connect" class="nav-live">Connect</a>
       </div>
     </div>
   </nav>
@@ -54,7 +54,7 @@
 
   <footer class="main-footer">
     <div class="footer-container">
-      <p>MIT License — <a href="https://github.com/gptcode-cloud/cli">GPTCode Project</a></p>
+      <p>MIT License — <a href="https://github.com/gptcode-cloud/cli">gptcode</a> · <a href="https://gptcode.live">Live Dashboard</a> · <a href="https://gptcode.cloud">Docs</a></p>
     </div>
   </footer>
 </body>
