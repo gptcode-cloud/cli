@@ -336,12 +336,93 @@ permalink: /live/
     .cta-btn:hover {
         transform: translateY(-2px);
     }
+
+    /* Scrolling Agent Logo Strip */
+    .rc-scroll-strip {
+        overflow: hidden;
+        width: 100%;
+        padding: 16px 0;
+        mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    }
+
+    .rc-scroll-track {
+        display: flex;
+        gap: 24px;
+        animation: rc-scroll 30s linear infinite;
+        width: max-content;
+    }
+
+    .rc-scroll-icon {
+        width: 52px;
+        height: 52px;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+        padding: 10px;
+        transition: all 0.3s;
+    }
+
+    .rc-scroll-icon:hover {
+        background: rgba(255, 255, 255, 0.08);
+        border-color: rgba(255, 255, 255, 0.12);
+        transform: scale(1.1);
+    }
+
+    @keyframes rc-scroll {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0; }
+    }
 </style>
 
-<div class="live-hero">
-    <h1>GPTCode Live</h1>
-    <p class="subtitle">Real-time dashboard for your AI coding sessions. Monitor agents, track costs, and collaborate
-        with your team.</p>
+<div class="live-hero" style="padding-top: 2rem;">
+    <!-- Scrolling Agent Logo Strip -->
+    <div class="rc-scroll-strip">
+      <div class="rc-scroll-track">
+        <!-- Set 1 -->
+        <div class="rc-scroll-icon" title="Claude Code"><img src="https://cdn.simpleicons.org/anthropic/fff" alt="Claude" style="width:100%;height:100%; border-radius:6px;"/></div>
+        <div class="rc-scroll-icon" title="Cursor"><img src="https://cursor.sh/brand/icon.svg" alt="Cursor" style="width:100%;height:100%; border-radius:6px; filter: invert(1);"/></div>
+        <div class="rc-scroll-icon" title="Antigravity"><img src="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/light/antigravity-color.png" alt="Antigravity" style="width:100%;height:100%; object-fit: contain;"/></div>
+        <div class="rc-scroll-icon" title="Gemini CLI"><img src="https://cdn.simpleicons.org/googlegemini/8E75B2" alt="Gemini" style="width:100%;height:100%;"/></div>
+        <div class="rc-scroll-icon" title="GitHub Copilot"><img src="https://cdn.simpleicons.org/githubcopilot/fff" alt="Copilot" style="width:100%;height:100%;"/></div>
+        <div class="rc-scroll-icon" title="Windsurf"><img src="https://windsurf.com/favicon.svg" alt="Windsurf" style="width:100%;height:100%; object-fit: contain;"/></div>
+        <div class="rc-scroll-icon" title="Aider"><img src="https://aider.chat/assets/icons/apple-touch-icon.png" alt="Aider" style="width:100%;height:100%; border-radius:6px;"/></div>
+        <div class="rc-scroll-icon" title="Cline"><img src="https://raw.githubusercontent.com/cline/cline/main/assets/icons/icon.png" alt="Cline" style="width:100%;height:100%; filter: invert(1);"/></div>
+        <div class="rc-scroll-icon" title="Codex CLI"><img src="https://cdn.simpleicons.org/openai/fff" alt="Codex" style="width:100%;height:100%;"/></div>
+        <div class="rc-scroll-icon" title="Gptcode CLI"><img src="{{ '/assets/gptcode.svg' | relative_url }}" alt="gptcode" style="width:100%;height:100%; border-radius:6px;"/></div>
+        <div class="rc-scroll-icon" title="Goose"><img src="https://raw.githubusercontent.com/block/goose/main/ui/desktop/src/images/brand/goose_icon.svg" alt="Goose" style="width:100%;height:100%; object-fit: contain; filter: invert(1);"/></div>
+        <!-- Set 2 (duplicate for seamless loop) -->
+        <div class="rc-scroll-icon" title="Claude Code"><img src="https://cdn.simpleicons.org/anthropic/fff" alt="Claude" style="width:100%;height:100%; border-radius:6px;"/></div>
+        <div class="rc-scroll-icon" title="Cursor"><img src="https://cursor.sh/brand/icon.svg" alt="Cursor" style="width:100%;height:100%; border-radius:6px; filter: invert(1);"/></div>
+        <div class="rc-scroll-icon" title="Antigravity"><img src="https://raw.githubusercontent.com/lobehub/lobe-icons/refs/heads/master/packages/static-png/light/antigravity-color.png" alt="Antigravity" style="width:100%;height:100%; object-fit: contain;"/></div>
+        <div class="rc-scroll-icon" title="Gemini CLI"><img src="https://cdn.simpleicons.org/googlegemini/8E75B2" alt="Gemini" style="width:100%;height:100%;"/></div>
+        <div class="rc-scroll-icon" title="GitHub Copilot"><img src="https://cdn.simpleicons.org/githubcopilot/fff" alt="Copilot" style="width:100%;height:100%;"/></div>
+        <div class="rc-scroll-icon" title="Windsurf"><img src="https://windsurf.com/favicon.svg" alt="Windsurf" style="width:100%;height:100%; object-fit: contain;"/></div>
+        <div class="rc-scroll-icon" title="Aider"><img src="https://aider.chat/assets/icons/apple-touch-icon.png" alt="Aider" style="width:100%;height:100%; border-radius:6px;"/></div>
+        <div class="rc-scroll-icon" title="Cline"><img src="https://raw.githubusercontent.com/cline/cline/main/assets/icons/icon.png" alt="Cline" style="width:100%;height:100%; filter: invert(1);"/></div>
+        <div class="rc-scroll-icon" title="Codex CLI"><img src="https://cdn.simpleicons.org/openai/fff" alt="Codex" style="width:100%;height:100%;"/></div>
+        <div class="rc-scroll-icon" title="gptcode CLI"><img src="{{ '/assets/gptcode.svg' | relative_url }}" alt="gptcode" style="width:100%;height:100%; border-radius:6px;"/></div>
+        <div class="rc-scroll-icon" title="Goose"><img src="https://raw.githubusercontent.com/block/goose/main/ui/desktop/src/images/brand/goose_icon.svg" alt="Goose" style="width:100%;height:100%; object-fit: contain; filter: invert(1);"/></div>
+      </div>
+    </div>
+
+    <!-- Typewriter Title -->
+    <div style="min-height: 90px; margin: 24px 0 16px 0; text-align: center;">
+      <h1 id="hero-typewriter" style="display:inline-block; font-size: 3rem; font-weight: 700; letter-spacing: -0.03em; margin: 0;">Agents</h1><span class="tw-cursor" style="display:inline-block; width:4px; height:0.85em; background:#10b981; margin-left:8px; animation:blink 1s step-end infinite; transform:translateY(4px);"></span>
+    </div>
+
+    <p class="subtitle" style="font-size: 1.15rem; color: var(--color-text-muted, #94a3b8); max-width: 560px; margin: 0 auto 2rem;">
+      Connect your AI agents and take your development workflow to the next level.
+    </p>
 
     <div class="hero-cta-group">
         <a href="https://gptcode.live/connect" class="hero-btn primary">Open Dashboard</a>
@@ -479,3 +560,44 @@ permalink: /live/
 
     <a href="https://github.com/gptcode-cloud/cli" class="cta-btn secondary">View on GitHub</a>
 </div>
+
+<script>
+(function() {
+  var words = ['Agents', 'CLIs', 'MCPs', 'Copilots', 'Editors'];
+  var el = document.getElementById('hero-typewriter');
+  if (!el) return;
+  var idx = 0;
+  var charIdx = words[0].length;
+  var isDeleting = true;
+  var typeSpeed = 120;
+  var deleteSpeed = 60;
+  var pauseEnd = 2000;
+  var pauseStart = 500;
+
+  function tick() {
+    var current = words[idx];
+    if (isDeleting) {
+      charIdx--;
+      el.textContent = current.substring(0, charIdx);
+      if (charIdx === 0) {
+        isDeleting = false;
+        idx = (idx + 1) % words.length;
+        setTimeout(tick, pauseStart);
+        return;
+      }
+      setTimeout(tick, deleteSpeed);
+    } else {
+      charIdx++;
+      el.textContent = current.substring(0, charIdx);
+      if (charIdx === current.length) {
+        isDeleting = true;
+        setTimeout(tick, pauseEnd);
+        return;
+      }
+      setTimeout(tick, typeSpeed);
+    }
+  }
+
+  setTimeout(tick, pauseEnd);
+})();
+</script>
