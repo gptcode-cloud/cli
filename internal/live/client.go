@@ -251,6 +251,19 @@ func (c *Client) joinChannel() error {
 		"workspace": host["workspace"],
 		"model":     c.model,
 	}
+
+	// Add model limits if known
+	if limits := GetModelLimits(c.model); limits != nil {
+		payload["model_limits"] = map[string]interface{}{
+			"context_window": limits.ContextWindow,
+			"max_output":     limits.MaxOutput,
+			"rpm":            limits.RPM,
+			"tpm":            limits.TPM,
+			"rpd":            limits.RPD,
+			"provider":       limits.Provider,
+			"tier":           limits.Tier,
+		}
+	}
 	if c.authToken != "" {
 		payload["token"] = c.authToken
 	}
