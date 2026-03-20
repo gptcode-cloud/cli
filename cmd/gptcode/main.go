@@ -1696,6 +1696,11 @@ Examples:
 			// Report first step
 			reportConfig.Step("Starting: "+input, "start")
 
+			builder, provider, model, err := newBuilderAndLLM("general", "run", "")
+			if err != nil {
+				return err
+			}
+
 			// WebSocket connection for commands (optional)
 			var liveClient *live.Client
 			wsURL := os.Getenv("GPTCODE_LIVE_URL")
@@ -1703,16 +1708,12 @@ Examples:
 				liveClient = live.NewClient(wsURL, agentID)
 				liveClient.SetAgentType(agentType)
 				liveClient.SetTask(input)
+				liveClient.SetModel(model)
 				if err := liveClient.Connect(); err != nil {
 					fmt.Printf("⚠️  Live WS error: %v\n", err)
 				} else {
 					live.SetGlobalClient(liveClient)
 				}
-			}
-
-			builder, provider, model, err := newBuilderAndLLM("general", "run", "")
-			if err != nil {
-				return err
 			}
 
 			err = modes.RunExecute(builder, provider, model, strings.Fields(input), liveClient, reportConfig)
