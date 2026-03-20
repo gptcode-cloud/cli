@@ -129,6 +129,7 @@ type Client struct {
 	engine             string
 	context            string
 	taskDescription    string
+	model              string
 	url                string
 	authToken          string
 	mu                 sync.Mutex
@@ -184,6 +185,11 @@ func (c *Client) SetAgentType(t string) {
 // SetTask sets the task description for this agent
 func (c *Client) SetTask(task string) {
 	c.taskDescription = task
+}
+
+// SetModel sets the model name for this agent
+func (c *Client) SetModel(model string) {
+	c.model = model
 }
 
 // incrementMsgRef increments the message ref as a string
@@ -243,6 +249,7 @@ func (c *Client) joinChannel() error {
 		"task":      c.taskDescription,
 		"hostname":  host["hostname"],
 		"workspace": host["workspace"],
+		"model":     c.model,
 	}
 	if c.authToken != "" {
 		payload["token"] = c.authToken
