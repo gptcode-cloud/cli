@@ -123,21 +123,32 @@ func parseAntigravityLog(logFile, today string, usage map[string]*AgentUsage) {
 	defer f.Close()
 
 	scanner := bufio.NewScanner(f)
-	// Increase buffer size for long lines
 	buf := make([]byte, 0, 256*1024)
 	scanner.Buffer(buf, 1024*1024)
 
 	currentModel := ""
+	// Track exhaustion events with timestamps to compute rolling window
+	type exhaustionEvent struct {
+		model     string
+		timestamp string // when the 429 happened
+		resetStr  string // e.g. "2h49m19s"
+	}
+	var exhaustions []exhaustionEvent
+
+	// First pass: collect all lines, detect models, and track exhaustion events
+	type apiCall struct {
+		model     string
+		timestamp string
+	}
+	var calls []apiCall
 
 	for scanner.Scan() {
 		line := scanner.Text()
-
-		// Only process today's entries
 		if !strings.HasPrefix(line, today) {
 			continue
 		}
 
-		// Detect model from RESOURCE_EXHAUSTED or capacity errors
+		// Detect model from log lines (error messages, planner requests, etc.)
 		if strings.Contains(line, "claude-opus") {
 			currentModel = "claude-opus-4-6-thinking"
 		} else if strings.Contains(line, "claude-sonnet") {
@@ -146,58 +157,137 @@ func parseAntigravityLog(logFile, today string, usage map[string]*AgentUsage) {
 			currentModel = "gemini-2.5-pro"
 		} else if strings.Contains(line, "gemini-2.5-flash") || strings.Contains(line, "gemini_2.5_flash") {
 			currentModel = "gemini-2.5-flash"
+		} else if strings.Contains(line, "gemini-2.0-flash") || strings.Contains(line, "gemini_2.0_flash") {
+			currentModel = "gemini-2.0-flash"
 		}
 
-		// Count API calls: streamGenerateContent is the Gemini/Claude proxy call
+		// Count API calls
 		if strings.Contains(line, "streamGenerateContent") {
-			// Default model if not detected
-			model := currentModel
-			if model == "" {
-				model = "unknown"
-			}
-
-			// Extract timestamp (format: 2026-03-20 19:48:46.310)
 			ts := ""
 			if len(line) >= 23 {
 				ts = line[:23]
 			}
+			model := currentModel
+			if model == "" {
+				model = "unknown"
+			}
+			calls = append(calls, apiCall{model: model, timestamp: ts})
+		}
 
+		// Track exhaustion events
+		if strings.Contains(line, "RESOURCE_EXHAUSTED") || strings.Contains(line, "code 429") {
+			ts := ""
+			if len(line) >= 23 {
+				ts = line[:23]
+			}
+			resetStr := ""
+			if idx := strings.Index(line, "reset after "); idx > 0 {
+				rest := line[idx+len("reset after "):]
+				// Extract duration like "2h49m19s" or "0s"
+				endIdx := strings.Index(rest, ":")
+				if endIdx > 0 {
+					resetStr = strings.TrimRight(rest[:endIdx], ".")
+				}
+			}
+			exhaustions = append(exhaustions, exhaustionEvent{
+				model:     currentModel,
+				timestamp: ts,
+				resetStr:  resetStr,
+			})
+		}
+	}
+
+	// Find the last reset time per model
+	lastResetTime := make(map[string]string) // model -> timestamp when quota reset
+	for _, evt := range exhaustions {
+		model := evt.model
+		if model == "" {
+			model = "unknown"
+		}
+		// Parse the reset duration and calculate when quota reset
+		if evt.resetStr != "" && evt.resetStr != "0s" {
+			dur, err := time.ParseDuration(evt.resetStr)
+			if err == nil {
+				// Parse the exhaustion timestamp
+				t, err := time.Parse("2006-01-02 15:04:05", evt.timestamp[:19])
+				if err == nil {
+					resetAt := t.Add(dur)
+					resetTs := resetAt.Format("2006-01-02 15:04:05.000")
+					// Keep the latest reset time
+					if existing, ok := lastResetTime[model]; !ok || resetTs > existing {
+						lastResetTime[model] = resetTs
+					}
+				}
+			}
+		}
+	}
+
+	// If unknown model has calls but we detected a model from exhaustion, merge them
+	// The Antigravity log doesn't repeat the model name on normal API calls
+	detectedModel := currentModel
+	if detectedModel == "" && len(exhaustions) > 0 {
+		detectedModel = exhaustions[len(exhaustions)-1].model
+	}
+
+	// Count calls per model, only SINCE the last reset
+	for _, call := range calls {
+		model := call.model
+		// Merge "unknown" into the detected model if we have one
+		if model == "unknown" && detectedModel != "" {
+			model = detectedModel
+		}
+
+		// Check if this call is after the last reset for this model
+		resetTs, hasReset := lastResetTime[model]
+		if hasReset && call.timestamp <= resetTs {
+			// This call was before the quota reset — skip it for current window
+			// But still track total daily calls
 			if _, ok := usage[model]; !ok {
 				usage[model] = &AgentUsage{
 					Agent:    "Antigravity",
 					Model:    model,
 					Provider: detectProvider(model),
-					FirstCall: ts,
 				}
 			}
-
-			usage[model].APICalls++
-			usage[model].LastCall = ts
+			// Don't count these in APICalls (which represents current window)
+			continue
 		}
 
-		// Detect exhaustion
-		if strings.Contains(line, "RESOURCE_EXHAUSTED") || strings.Contains(line, "code 429") {
-			model := currentModel
-			if model == "" {
-				model = "unknown"
+		if _, ok := usage[model]; !ok {
+			usage[model] = &AgentUsage{
+				Agent:     "Antigravity",
+				Model:     model,
+				Provider:  detectProvider(model),
+				FirstCall: call.timestamp,
 			}
-			if u, ok := usage[model]; ok {
-				u.Exhausted = true
-			}
+		}
+		usage[model].APICalls++
+		usage[model].LastCall = call.timestamp
+		if usage[model].FirstCall == "" {
+			usage[model].FirstCall = call.timestamp
+		}
+	}
 
-			// Extract reset time
-			if idx := strings.Index(line, "reset after "); idx > 0 {
-				rest := line[idx+len("reset after "):]
-				if end := strings.Index(rest, ":"); end > 0 {
-					// Find the full reset time (e.g. "2h49m19s")
-					resetEnd := strings.Index(rest, ".: ")
-					if resetEnd < 0 {
-						resetEnd = len(rest)
-					}
-					if u, ok := usage[model]; ok {
-						u.ResetIn = rest[:resetEnd]
-					}
+	// Mark models that had exhaustion today (for informational display)
+	for _, evt := range exhaustions {
+		model := evt.model
+		if model == "" {
+			model = detectedModel
+		}
+		if model == "" {
+			continue
+		}
+		if u, ok := usage[model]; ok {
+			// Only mark as currently exhausted if it hasn't reset yet
+			if resetTs, hasReset := lastResetTime[model]; hasReset {
+				now := time.Now().Format("2006-01-02 15:04:05.000")
+				if now < resetTs {
+					u.Exhausted = true
+					u.ResetIn = evt.resetStr
 				}
+				// If reset is in the past, quota recovered — don't mark exhausted
+			} else {
+				u.Exhausted = true
 			}
 		}
 	}
