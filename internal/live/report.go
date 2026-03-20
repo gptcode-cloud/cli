@@ -20,6 +20,7 @@ type ReportConfig struct {
 	Hostname  string
 	Workspace string
 	Task      string
+	Model     string
 }
 
 // DefaultReportConfig creates a new report config
@@ -64,6 +65,7 @@ func (r *ReportConfig) Connect(agentID, agentType, task string) error {
 		"context":  r.Workspace,
 		"task":     task,
 		"hostname": r.Hostname,
+		"model":    r.Model,
 	}
 
 	return r.post("/api/report/connect", payload)

@@ -1675,16 +1675,23 @@ Examples:
 
 		// If we have input or --once flag, use single-shot AI mode
 		if input != "" || once {
+			// Auto-detect agent type from input text
+			agentType := live.AgentTypeFromInput(input)
+			agentID := live.GetAgentIDWithType(agentType)
+
+			// Resolve model first so we can send it in all connect payloads
+			builder, provider, model, err := newBuilderAndLLM("general", "run", "")
+			if err != nil {
+				return err
+			}
+
 			// Try to connect to Live Dashboard via HTTP API
 			reportConfig := live.DefaultReportConfig()
+			reportConfig.Model = model
 			liveURL := os.Getenv("GPTCODE_LIVE_URL")
 			if liveURL != "" {
 				reportConfig.SetBaseURL(liveURL)
 			}
-
-			// Auto-detect agent type from input text
-			agentType := live.AgentTypeFromInput(input)
-			agentID := live.GetAgentIDWithType(agentType)
 
 			// Report connect to Live
 			if err := reportConfig.Connect(agentID, agentType, input); err != nil {
@@ -1695,11 +1702,6 @@ Examples:
 
 			// Report first step
 			reportConfig.Step("Starting: "+input, "start")
-
-			builder, provider, model, err := newBuilderAndLLM("general", "run", "")
-			if err != nil {
-				return err
-			}
 
 			// WebSocket connection for commands (optional)
 			var liveClient *live.Client
