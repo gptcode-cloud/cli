@@ -205,9 +205,9 @@ func (c *Client) Connect() error {
 		return fmt.Errorf("invalid URL: %w", err)
 	}
 
-	// Convert http/https to ws/wss
+	// Convert to ws/wss scheme
 	scheme := "ws"
-	if u.Scheme == "https" {
+	if u.Scheme == "https" || u.Scheme == "wss" {
 		scheme = "wss"
 	}
 	u.Scheme = scheme
