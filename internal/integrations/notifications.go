@@ -191,7 +191,7 @@ type TelegramMessage struct {
 
 func (t *TelegramClient) Send(ctx context.Context, message string) error {
 	if !t.IsConfigured() {
-		return fmt.Errorf("Telegram not configured")
+		return fmt.Errorf("telegram not configured")
 	}
 
 	url := fmt.Sprintf("https://api.telegram.org/bot%s/sendMessage", t.botToken)

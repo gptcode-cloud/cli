@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
 	"time"
 
 	"gptcode/internal/live"
@@ -13,11 +12,7 @@ func main() {
 	fmt.Println("🔗 GT Live Dashboard Test")
 	fmt.Println("==========================")
 
-	// Get model from config
-	model := os.Getenv("GPTCODE_MODEL")
-	if model == "" {
-		model = "claude-3-sonnet"
-	}
+	// Note: model configuration is handled by the Live client internally
 
 	// Create client
 	url := "https://gptcode.live"
