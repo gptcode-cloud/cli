@@ -24,6 +24,9 @@ jobs:
       - name: Download dependencies
         run: go mod download
       
+      - name: Build binary
+        run: go build -o $(go env GOPATH)/bin/gptcode ./cmd/gptcode
+
       - name: Run tests
         env:
           CI: true
