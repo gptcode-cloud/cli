@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
-	
+
 	"gptcode/internal/live"
 	"gptcode/internal/llm"
 	"gptcode/internal/modes"
@@ -51,7 +51,7 @@ func runAgent(cmd *cobra.Command, args []string) error {
 	os.RemoveAll(cloneDir)
 
 	repoURL := fmt.Sprintf("https://x-access-token:%s@github.com/%s.git", token, repo)
-	
+
 	fmt.Printf("📦 Cloning %s (branch: %s) into %s...\n", repo, branch, cloneDir)
 	cmdClone := exec.Command("git", "clone", "--depth", "1", "--branch", branch, repoURL, cloneDir)
 	cmdClone.Stdout = os.Stdout
@@ -168,14 +168,14 @@ Please discover what failed by examining the code, tests, and standard CI config
 	if queryModel == "" {
 		queryModel = "anthropic/claude-sonnet-4"
 	}
-	
+
 	liveClient := live.GetClient()
 	var reportConfig *live.ReportConfig
 	if liveURL != "" {
 		reportConfig = live.DefaultReportConfig()
 		reportConfig.SetBaseURL(liveURL)
 		reportConfig.AgentID = agentID
-		
+
 		// Register on the Live Dashboard BEFORE starting execution
 		taskLabel := "Sentry Exception Repair"
 		if agentType != "sentry" {
@@ -192,8 +192,8 @@ Please discover what failed by examining the code, tests, and standard CI config
 		reportConfig.AgentID = live.GetAgentID()
 	}
 
-	executor := modes.NewAutonomousExecutorWithLive(provider, cloneDir, queryModel, language, liveClient, reportConfig, backendName)
-	
+	executor := modes.NewAutonomousExecutorWithLive(provider, ".", queryModel, language, liveClient, reportConfig, backendName)
+
 	fmt.Println("🤖 Starting AutoFix process...")
 	err = executor.Execute(ctx, prompt)
 	if err != nil {
