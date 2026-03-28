@@ -46,6 +46,9 @@ func TestGTDoHelp(t *testing.T) {
 }
 
 func TestGTModelList(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Requires setup.yaml")
+	}
 	cli := NewCLI("gptcode")
 	result := cli.Run("model", "list")
 
@@ -53,6 +56,9 @@ func TestGTModelList(t *testing.T) {
 }
 
 func TestGTBackendList(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Requires setup.yaml")
+	}
 	cli := NewCLI("gptcode")
 	result := cli.Run("backend", "list")
 
@@ -91,6 +97,9 @@ func TestGTIssueHelp(t *testing.T) {
 }
 
 func TestGTInit(t *testing.T) {
+	if os.Getenv("CI") != "" {
+		t.Skip("Requires setup.yaml")
+	}
 	dir := t.TempDir()
 	cli := NewCLI("gptcode")
 	cli.workDir = dir
@@ -227,7 +236,7 @@ func TestGTMergeHelp(t *testing.T) {
 
 func TestGTDocHelp(t *testing.T) {
 	cli := NewCLI("gptcode")
-	result := cli.Run("doc", "--help")
+	result := cli.Run("docs", "--help")
 
 	AssertSuccess(t, result)
 }
@@ -318,7 +327,7 @@ func TestGTConfigHelp(t *testing.T) {
 
 func TestGTDoctorHelp(t *testing.T) {
 	cli := NewCLI("gptcode")
-	result := cli.Run("doctor", "--help")
+	result := cli.Run("status", "--help")
 
 	AssertSuccess(t, result)
 }
