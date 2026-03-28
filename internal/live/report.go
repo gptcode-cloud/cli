@@ -72,7 +72,7 @@ func (r *ReportConfig) Connect(agentID, agentType, task string) error {
 }
 
 // Step reports a step to Live Dashboard
-func (r *ReportConfig) Step(description string, stepType string) error {
+func (r *ReportConfig) Step(description string, stepType string, opts ...map[string]interface{}) error {
 	if r.AgentID == "" {
 		return nil // Not connected
 	}
@@ -84,6 +84,12 @@ func (r *ReportConfig) Step(description string, stepType string) error {
 
 	if stepType != "" {
 		payload["type"] = stepType
+	}
+
+	if len(opts) > 0 && opts[0] != nil {
+		for k, v := range opts[0] {
+			payload[k] = v
+		}
 	}
 
 	return r.post("/api/report/step", payload)

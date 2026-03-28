@@ -170,9 +170,10 @@ func printStatus(status *HealthStatus) {
 	fmt.Println("Health Checks:")
 	for _, check := range status.Checks {
 		icon := "✓"
-		if check.Status == "fail" {
+		switch check.Status {
+		case "fail":
 			icon = "✗"
-		} else if check.Status == "warn" {
+		case "warn":
 			icon = "⚠"
 		}
 		msg := ""

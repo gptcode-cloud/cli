@@ -3,11 +3,11 @@ package maestro
 import (
 	"context"
 	"fmt"
+	"github.com/google/uuid"
 	"os"
 	"strings"
+	"sync"
 	"time"
-
-	"github.com/google/uuid"
 
 	"gptcode/internal/agents"
 	"gptcode/internal/config"
@@ -33,6 +33,12 @@ type Conductor struct {
 	liveReportConfig *live.ReportConfig           // For Live Dashboard HTTP reporting
 	liveClient       *live.Client                 // For Live Dashboard WebSocket reporting
 	progressCallback ProgressCallback             // For real-time progress updates
+
+	// Telemetry
+	mu           sync.Mutex
+	apiCalls     int
+	totalTokens  int
+	currentModel string
 }
 
 // NewConductor creates a new Maestro conductor
@@ -96,16 +102,37 @@ func (c *Conductor) ReportComplete(success bool, summary string) {
 func (c *Conductor) sendProgress(phase string, details string) {
 	msg := phase + ": " + details
 
+	c.mu.Lock()
+	quotaUsed := c.estimateQuota()
+	c.mu.Unlock()
+
+	progressPct := 50
+	switch phase {
+	case "planning":
+		progressPct = 15
+	case "editing":
+		progressPct = 45
+	case "validation":
+		progressPct = 75
+	case "retry":
+		progressPct = 60
+	}
+
 	// Send via HTTP API (backup/reliability)
 	if c.liveReportConfig != nil {
-		c.liveReportConfig.Step(msg, "step")
+		c.liveReportConfig.Step(msg, "step", map[string]interface{}{
+			"progress":   progressPct,
+			"quota_used": quotaUsed,
+		})
 	}
 
 	// Send via WebSocket (real-time)
 	if c.liveClient != nil {
 		c.liveClient.SendExecutionStep(phase, details, map[string]interface{}{
-			"phase":   phase,
-			"details": details,
+			"phase":      phase,
+			"details":    details,
+			"progress":   progressPct,
+			"quota_used": quotaUsed,
 		})
 	}
 
@@ -117,16 +144,24 @@ func (c *Conductor) sendProgress(phase string, details string) {
 
 // sendError internal helper
 func (c *Conductor) sendError(phase string, errMsg string) {
+	c.mu.Lock()
+	quotaUsed := c.estimateQuota()
+	c.mu.Unlock()
+
 	// Send via HTTP API
 	if c.liveReportConfig != nil {
-		c.liveReportConfig.Step(phase+": ERROR - "+errMsg, "error")
+		c.liveReportConfig.Step(phase+": ERROR - "+errMsg, "error", map[string]interface{}{
+			"progress":   100,
+			"quota_used": quotaUsed,
+		})
 	}
 
 	// Send via WebSocket
 	if c.liveClient != nil {
 		c.liveClient.SendExecutionStep("error", errMsg, map[string]interface{}{
-			"phase": phase,
-			"error": errMsg,
+			"phase":      phase,
+			"error":      errMsg,
+			"quota_used": quotaUsed,
 		})
 	}
 }
@@ -137,6 +172,10 @@ func (c *Conductor) sendComplete(success bool, summary string) {
 	if !success {
 		stepType = "failed"
 	}
+
+	c.mu.Lock()
+	quotaUsed := c.estimateQuota()
+	c.mu.Unlock()
 
 	// Send via HTTP API
 	if c.liveReportConfig != nil {
@@ -151,9 +190,25 @@ func (c *Conductor) sendComplete(success bool, summary string) {
 	// Send via WebSocket
 	if c.liveClient != nil {
 		c.liveClient.SendExecutionStep(stepType, summary, map[string]interface{}{
-			"success": success,
-			"summary": summary,
+			"success":    success,
+			"summary":    summary,
+			"progress":   100,
+			"quota_used": quotaUsed,
 		})
+	}
+}
+
+// ReportCompleteWithPR sends completion with a PR URL to the Live Dashboard
+func (c *Conductor) ReportCompleteWithPR(success bool, summary string, prURL string) {
+	c.sendComplete(success, summary)
+	if prURL != "" && c.liveClient != nil {
+		c.liveClient.SendExecutionStep("pr_created", summary, map[string]interface{}{
+			"pr_url":   prURL,
+			"progress": 100,
+		})
+	}
+	if prURL != "" && c.liveReportConfig != nil {
+		c.liveReportConfig.Step("PR Created: "+prURL, "complete")
 	}
 }
 
@@ -363,6 +418,13 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		reviewProvider := c.createProvider(reviewBackend)
 		reviewer := agents.NewReviewer(reviewProvider, c.cwd, reviewModel)
 
+		// Skip validation for Sentry agents (CI/CD will validate)
+		if os.Getenv("SKIP_VALIDATION") == "1" {
+			fmt.Println("Skipping validation (SKIP_VALIDATION=1)...")
+			c.ReportProgress("validation", "Skipped (CI/CD will validate)")
+			break
+		}
+
 		// Validate
 		fmt.Println("Validating...")
 		c.ReportProgress("validation", "Running tests and checks")
@@ -481,6 +543,8 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		}
 		return nil
 	}
+
+	return nil
 }
 
 func errorMsg(err error) string {
@@ -528,10 +592,66 @@ func (c *Conductor) createProvider(backendName string) llm.Provider {
 		backendCfg = c.setup.Backend[backendName]
 	}
 
+	var provider llm.Provider
 	if backendCfg.Type == "ollama" {
-		return llm.NewOllama(backendCfg.BaseURL)
+		provider = llm.NewOllama(backendCfg.BaseURL)
+	} else {
+		provider = llm.NewChatCompletion(backendCfg.BaseURL, backendName)
 	}
-	return llm.NewChatCompletion(backendCfg.BaseURL, backendName)
+
+	return &trackingProvider{inner: provider, conductor: c}
+}
+
+type trackingProvider struct {
+	inner     llm.Provider
+	conductor *Conductor
+}
+
+func (t *trackingProvider) Chat(ctx context.Context, req llm.ChatRequest) (*llm.ChatResponse, error) {
+	t.conductor.mu.Lock()
+	t.conductor.apiCalls++
+	t.conductor.currentModel = req.Model
+	t.conductor.mu.Unlock()
+
+	resp, err := t.inner.Chat(ctx, req)
+
+	if resp != nil && resp.TokenUsage != nil {
+		t.conductor.mu.Lock()
+		t.conductor.totalTokens += resp.TokenUsage.TotalTokens
+		t.conductor.mu.Unlock()
+	}
+	return resp, err
+}
+
+func (c *Conductor) estimateQuota() float64 {
+	knownRPD := map[string]int{
+		"claude-opus-4-6-thinking": 800,
+		"claude-sonnet-4":          2000,
+		"gemini-2.5-pro":           25,
+		"gemini-2.5-flash":         500,
+		"gemini-2.0-flash":         1500,
+		"gpt-4o":                   10000,
+	}
+
+	rpd, ok := knownRPD[c.currentModel]
+	if !ok {
+		for key, val := range knownRPD {
+			if strings.HasPrefix(c.currentModel, key) {
+				rpd = val
+				ok = true
+				break
+			}
+		}
+	}
+	if !ok || rpd == 0 {
+		return 0
+	}
+
+	quota := float64(c.apiCalls) / float64(rpd)
+	if quota > 1.0 {
+		quota = 1.0
+	}
+	return quota
 }
 
 // formatExecutionError creates clear feedback for execution errors

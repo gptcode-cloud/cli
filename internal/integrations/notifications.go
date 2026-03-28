@@ -52,7 +52,7 @@ type SentryIssue struct {
 
 func (s *SentryClient) ListIssues(ctx context.Context, query string) ([]SentryIssue, error) {
 	if !s.IsConfigured() {
-		return nil, fmt.Errorf("Sentry not configured")
+		return nil, fmt.Errorf("sentry not configured")
 	}
 
 	url := fmt.Sprintf("https://sentry.io/api/0/organizations/%s/issues/", s.org)
@@ -88,7 +88,7 @@ func (s *SentryClient) ListIssues(ctx context.Context, query string) ([]SentryIs
 
 func (s *SentryClient) GetIssue(ctx context.Context, issueID string) (*SentryIssue, error) {
 	if !s.IsConfigured() {
-		return nil, fmt.Errorf("Sentry not configured")
+		return nil, fmt.Errorf("sentry not configured")
 	}
 
 	url := fmt.Sprintf("https://sentry.io/api/0/organizations/%s/issues/%s/", s.org, issueID)
@@ -136,7 +136,7 @@ type SentryEvent struct {
 
 func (s *SentryClient) GetEvents(ctx context.Context, issueID string) ([]SentryEvent, error) {
 	if !s.IsConfigured() {
-		return nil, fmt.Errorf("Sentry not configured")
+		return nil, fmt.Errorf("sentry not configured")
 	}
 
 	url := fmt.Sprintf("https://sentry.io/api/0/organizations/%s/issues/%s/events/", s.org, issueID)

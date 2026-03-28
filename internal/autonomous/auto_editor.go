@@ -137,22 +137,20 @@ func (me *MultiEditor) ExecuteAll(ctx context.Context, tasks []string) *MultiEdi
 	close(taskCh)
 
 	for i, task := range tasks {
-		select {
-		case sem <- struct{}{}:
-			go func(idx int, t string) {
-				editor := me.editors[idx%len(me.editors)]
-				editResult := editor.Execute(ctx, t)
-				result.mu.Lock()
-				result.Results = append(result.Results, *editResult)
-				if editResult.Success {
-					result.Completed++
-				} else {
-					result.Failed++
-				}
-				result.mu.Unlock()
-				<-sem
-			}(i, task)
-		}
+		sem <- struct{}{}
+		go func(idx int, t string) {
+			editor := me.editors[idx%len(me.editors)]
+			editResult := editor.Execute(ctx, t)
+			result.mu.Lock()
+			result.Results = append(result.Results, *editResult)
+			if editResult.Success {
+				result.Completed++
+			} else {
+				result.Failed++
+			}
+			result.mu.Unlock()
+			<-sem
+		}(i, task)
 	}
 
 	result.Duration = time.Since(result.StartTime)

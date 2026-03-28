@@ -172,7 +172,7 @@ func (w *AutonomousWorkflow) ResumeFromCheckpoint(ctx context.Context) error {
 		movement := symphony.Movements[i]
 		fmt.Printf("[RESUME] Executing movement %d: %s\n", i+1, movement.Name)
 
-		err := w.executor.executeMovement(ctx, &movement)
+		err := w.executor.executeMovement(ctx, &movement, symphony.Task)
 		if err != nil {
 			return fmt.Errorf("movement %d failed: %w", i+1, err)
 		}

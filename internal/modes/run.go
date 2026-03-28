@@ -159,17 +159,18 @@ func RunExecute(builder *prompt.Builder, provider llm.Provider, model string, ar
 			if reportConfig != nil {
 				stepType := "step"
 				description := tc.Name
-				if tc.Name == "Write" || tc.Name == "Edit" {
+				switch tc.Name {
+				case "Write", "Edit":
 					stepType = "file_write"
 					if file, ok := toolArgs["file_path"].(string); ok {
 						description = "Writing: " + file
 					}
-				} else if tc.Name == "Read" || tc.Name == "Grep" {
+				case "Read", "Grep":
 					stepType = "file_read"
 					if file, ok := toolArgs["file_path"].(string); ok {
 						description = "Reading: " + file
 					}
-				} else if tc.Name == "Bash" || tc.Name == "RunCommand" {
+				case "Bash", "RunCommand":
 					stepType = "command"
 					if cmd, ok := toolArgs["command"].(string); ok {
 						description = "Cmd: " + cmd

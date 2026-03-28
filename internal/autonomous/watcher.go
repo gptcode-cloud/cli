@@ -173,7 +173,6 @@ type TaskQueue struct {
 	pending   []string
 	completed []string
 	failed    []string
-	mu        int
 }
 
 func NewTaskQueue(tasks []string) *TaskQueue {
@@ -246,31 +245,29 @@ func (be *BatchExecutor) ExecuteAll(ctx context.Context, tasks []string) *BatchR
 	close(taskCh)
 
 	for i := range taskCh {
-		select {
-		case sem <- struct{}{}:
-			go func(idx int) {
-				task := tasks[idx]
-				start := time.Now()
+		sem <- struct{}{}
+		go func(idx int) {
+			task := tasks[idx]
+			start := time.Now()
 
-				err := be.executor.Execute(ctx, task)
+			err := be.executor.Execute(ctx, task)
 
-				result.mu.Lock()
-				result.Tasks[idx] = TaskResult{
-					Task:     task,
-					Success:  err == nil,
-					Error:    err,
-					Duration: time.Since(start),
-				}
-				if err == nil {
-					result.Completed++
-				} else {
-					result.Failed++
-				}
-				result.mu.Unlock()
+			result.mu.Lock()
+			result.Tasks[idx] = TaskResult{
+				Task:     task,
+				Success:  err == nil,
+				Error:    err,
+				Duration: time.Since(start),
+			}
+			if err == nil {
+				result.Completed++
+			} else {
+				result.Failed++
+			}
+			result.mu.Unlock()
 
-				<-sem
-			}(i)
-		}
+			<-sem
+		}(i)
 	}
 
 	result.Duration = time.Since(result.StartTime)

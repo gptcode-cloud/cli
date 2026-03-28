@@ -14,21 +14,21 @@ import (
 
 // AgentUsage holds real usage data parsed from agent log files
 type AgentUsage struct {
-	Agent      string  // e.g. "Antigravity", "Cursor", "Windsurf"
-	Model      string  // e.g. "claude-opus-4-6-thinking", "gemini-2.5-pro"
-	Provider   string  // e.g. "anthropic", "google"
-	APICalls   int     // total API calls today
-	FirstCall  string  // timestamp of first call
-	LastCall   string  // timestamp of last call
-	Exhausted  bool    // hit rate limit today?
-	ResetIn    string  // reset time if exhausted
-	QuotaUsed  float64 // 0.0-1.0 estimated
+	Agent     string  // e.g. "Antigravity", "Cursor", "Windsurf"
+	Model     string  // e.g. "claude-opus-4-6-thinking", "gemini-2.5-pro"
+	Provider  string  // e.g. "anthropic", "google"
+	APICalls  int     // total API calls today
+	FirstCall string  // timestamp of first call
+	LastCall  string  // timestamp of last call
+	Exhausted bool    // hit rate limit today?
+	ResetIn   string  // reset time if exhausted
+	QuotaUsed float64 // 0.0-1.0 estimated
 }
 
 // MonitorResult aggregates usage across all agents
 type MonitorResult struct {
-	Agents    []AgentUsage
-	ScanTime  time.Time
+	Agents        []AgentUsage
+	ScanTime      time.Time
 	TotalAPICalls int
 }
 
@@ -502,14 +502,14 @@ func (r *MonitorResult) ReportToLive(reportConfig *ReportConfig) error {
 
 		// Connect
 		payload := map[string]interface{}{
-			"agent_id": agentID,
-			"engine":   "monitor",
-			"type":     usage.Agent,
-			"model":    usage.DisplayName(),
-			"provider": usage.Provider,
-			"context":  "local",
-			"task":     fmt.Sprintf("%d API calls today", usage.APICalls),
-			"hostname": reportConfig.Hostname,
+			"agent_id":   agentID,
+			"engine":     "monitor",
+			"type":       usage.Agent,
+			"model":      usage.DisplayName(),
+			"provider":   usage.Provider,
+			"context":    "local",
+			"task":       fmt.Sprintf("%d API calls today", usage.APICalls),
+			"hostname":   reportConfig.Hostname,
 			"quota_used": usage.QuotaUsed,
 		}
 

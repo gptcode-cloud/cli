@@ -35,13 +35,18 @@ func NewChatCompletion(baseURL, backendName string) *ChatCompletionProvider {
 	}
 }
 
+type providerPreferences struct {
+	RequireParameters bool `json:"require_parameters,omitempty"`
+}
+
 type chatCompletionRequest struct {
-	Model       string              `json:"model"`
-	Messages    []chatCompletionMsg `json:"messages"`
-	Tools       []interface{}       `json:"tools,omitempty"`
-	ToolChoice  *string             `json:"tool_choice,omitempty"`
-	Stream      bool                `json:"stream,omitempty"`
-	Temperature float64             `json:"temperature"`
+	Model       string               `json:"model"`
+	Messages    []chatCompletionMsg  `json:"messages"`
+	Tools       []interface{}        `json:"tools,omitempty"`
+	ToolChoice  *string              `json:"tool_choice,omitempty"`
+	Stream      bool                 `json:"stream,omitempty"`
+	Temperature float64              `json:"temperature"`
+	Provider    *providerPreferences `json:"provider,omitempty"`
 }
 
 type compoundChatRequest struct {
@@ -188,6 +193,7 @@ Or use local models with Ollama:
 			body.Tools = req.Tools
 			auto := "auto"
 			body.ToolChoice = &auto
+			body.Provider = &providerPreferences{RequireParameters: true}
 		}
 		b, _ = json.Marshal(body)
 	}
@@ -195,6 +201,7 @@ Or use local models with Ollama:
 	httpReq, _ := http.NewRequestWithContext(ctx, "POST", c.BaseURL, bytes.NewReader(b))
 	httpReq.Header.Set("Authorization", "Bearer "+c.APIKey)
 	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("X-Title", "gptcode-agent")
 
 	resp, err := http.DefaultClient.Do(httpReq)
 	if err != nil {
@@ -317,6 +324,7 @@ Or use local models with Ollama:
 			body.Tools = req.Tools
 			auto := "auto"
 			body.ToolChoice = &auto
+			body.Provider = &providerPreferences{RequireParameters: true}
 		}
 		b, _ = json.Marshal(body)
 	}
@@ -328,6 +336,7 @@ Or use local models with Ollama:
 	httpReq, _ := http.NewRequestWithContext(ctx, "POST", c.BaseURL, bytes.NewReader(b))
 	httpReq.Header.Set("Authorization", "Bearer "+c.APIKey)
 	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("X-Title", "gptcode-agent")
 
 	if os.Getenv("GPTCODE_DEBUG") == "1" {
 		fmt.Fprintf(os.Stderr, "[HTTP] Making request to %s\n", c.BaseURL)

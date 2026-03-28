@@ -454,8 +454,6 @@ func (r *ReporterClient) Disconnect() error {
 
 func (r *ReporterClient) SetModel(model string) {
 	r.ws.SetModel(model)
-	if r.http != nil {
-	}
 }
 
 func (r *ReporterClient) SetCallbacks(callbacks map[string]interface{}) {

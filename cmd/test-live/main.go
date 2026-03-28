@@ -70,7 +70,7 @@ func main() {
 
 	// Wait for messages
 	fmt.Println("\n👂 Listening for messages from Live Dashboard...")
-	fmt.Println("   (Press Ctrl+C to exit)\n")
+	fmt.Println("   (Press Ctrl+C to exit)")
 
 	// Keep running
 	done := make(chan bool)

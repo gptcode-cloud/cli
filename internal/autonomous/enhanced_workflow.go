@@ -389,7 +389,7 @@ func (ew *EnhancedWorkflow) ExecuteWithLearning(ctx context.Context, task string
 		})
 	}()
 
-	if err := ew.AutonomousWorkflow.ExecuteTask(ctx, task); err != nil {
+	if err := ew.ExecuteTask(ctx, task); err != nil {
 		success = false
 		return err
 	}

@@ -151,7 +151,6 @@ func findRoadmapFile() string {
 }
 
 var taskPattern = regexp.MustCompile(`^(\s*)-\s*\[\s*\]\s+(.+)$`)
-var donePattern = regexp.MustCompile(`^(\s*)-\s*\[x\]\s+(.+)$`)
 
 // findNextTask reads the roadmap and returns the first unchecked task
 func findNextTask(path string) (string, int, error) {

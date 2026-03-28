@@ -30,20 +30,6 @@ func NewClient(repo string) *Client {
 	return &Client{repo: repo}
 }
 
-func (c *Client) repoAPI(endpoint string) string {
-	return fmt.Sprintf("https://api.github.com/repos/%s/%s%s", c.owner, c.name, endpoint)
-}
-
-func (c *Client) doRequest(method, endpoint string, body interface{}) ([]byte, error) {
-	cmd := exec.Command("gh", "api", endpoint, "--method", method)
-	if body != nil {
-		data, _ := json.Marshal(body)
-		cmd.Stdin = strings.NewReader(string(data))
-	}
-	output, err := cmd.CombinedOutput()
-	return output, err
-}
-
 type StatusCheck struct {
 	Context   string `json:"context"`
 	State     string `json:"state"`

@@ -11,6 +11,7 @@ import (
 
 	"gptcode/internal/config"
 	"gptcode/internal/intelligence"
+	"gptcode/internal/live"
 	"gptcode/internal/llm"
 	"gptcode/internal/modes"
 )
@@ -348,8 +349,19 @@ func runDoExecution(task string, verbose bool, supervised bool, setup *config.Se
 		if language == "" {
 			language = "go" // default
 		}
-		// Use queryProvider for analyzer/classifier with selected backend
-		executor := modes.NewAutonomousExecutorWithLive(queryProvider, cwd, queryModel, language, nil, nil, backendName)
+
+		liveClient := live.GetClient()
+		var reportConfig *live.ReportConfig
+		if liveURL := os.Getenv("GPTCODE_LIVE_URL"); liveURL != "" {
+			reportConfig = live.DefaultReportConfig()
+			reportConfig.SetBaseURL(liveURL)
+			reportConfig.AgentID = live.GetAgentID()
+		} else if liveClient != nil {
+			reportConfig = live.DefaultReportConfig()
+			reportConfig.AgentID = live.GetAgentID()
+		}
+
+		executor := modes.NewAutonomousExecutorWithLive(queryProvider, cwd, queryModel, language, liveClient, reportConfig, backendName)
 		return executor.Execute(context.Background(), task)
 	}
 

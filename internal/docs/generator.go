@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"time"
 )
 
 type Generator struct {
@@ -102,7 +101,7 @@ func (g *Generator) GenerateCHANGELOG() string {
 	var sb strings.Builder
 
 	sb.WriteString("# Changelog\n\n")
-	sb.WriteString(fmt.Sprintf("All notable changes will be documented in this file.\n\n", time.Now().Format("2006-01-02")))
+	sb.WriteString("All notable changes will be documented in this file.\n\n")
 
 	sb.WriteString("## [Unreleased]\n\n")
 	sb.WriteString("### Added\n")

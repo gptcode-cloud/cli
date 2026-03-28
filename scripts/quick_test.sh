@@ -5,8 +5,8 @@
 
 set +e  # Don't exit on error
 
-CHU="/Users/jadercorrea/workspace/opensource/gptcode/chu"
-TEST_DIR="/Users/jadercorrea/workspace/opensource/chu-test-workspace"
+CHU="./bin/gptcode"
+TEST_DIR="./chu-test-workspace"
 
 echo " Quick Capability Test"
 echo "========================"

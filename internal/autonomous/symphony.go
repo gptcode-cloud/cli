@@ -119,7 +119,7 @@ func (e *Executor) Execute(ctx context.Context, task string) error {
 		// Report progress to Live Dashboard
 		e.maestro.ReportProgress("symphony", movementMsg)
 
-		err := e.executeMovement(ctx, &symphony.Movements[i])
+		err := e.executeMovement(ctx, &symphony.Movements[i], symphony.Task)
 		if err != nil {
 			symphony.Status = "failed"
 			e.maestro.ReportError("symphony", fmt.Sprintf("Movement %d failed: %v", i+1, err))
@@ -165,11 +165,19 @@ func (e *Executor) executeDirect(ctx context.Context, task string, analysis *Tas
 }
 
 // executeMovement executes a single movement with retry on review failure
-func (e *Executor) executeMovement(ctx context.Context, movement *Movement) error {
+func (e *Executor) executeMovement(ctx context.Context, movement *Movement, originalTask string) error {
 	movement.Status = "executing"
 
+	// Prepend the original task context so the editor LLM has full context
+	// (stacktrace, tool instructions, etc.) instead of just the movement's short goal
+	enrichedGoal := fmt.Sprintf(`## Original Task Context
+%s
+
+## Current Movement Goal
+%s`, originalTask, movement.Goal)
+
 	// Delegate to Maestro (movements are complex by definition)
-	err := e.maestro.ExecuteTask(ctx, movement.Goal, "complex")
+	err := e.maestro.ExecuteTask(ctx, enrichedGoal, "complex")
 	if err != nil {
 		movement.Status = "failed"
 		return err
