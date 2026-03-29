@@ -288,6 +288,8 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		fmt.Fprintf(os.Stderr, "[MAESTRO] LoopDetector initialized with intent=%s\n", intent)
 	}
 
+	consecutiveErrors := 0
+
 	for {
 		// Check if we should continue (intent-aware limits + loop detection)
 		shouldContinue, stopReason := c.loopDetector.ShouldContinue()
@@ -335,8 +337,17 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 		c.ReportProgress("editing", fmt.Sprintf("Completed - %d files changed", len(modifiedFiles)))
 		c.selector.RecordUsage(editBackend, editModel, err == nil, errorMsg(err))
 		if err != nil {
+			consecutiveErrors++
+			if consecutiveErrors >= 5 {
+				if os.Getenv("GPTCODE_DEBUG") == "1" {
+					fmt.Fprintf(os.Stderr, "[MAESTRO] Aborting after %d consecutive execution errors\n", consecutiveErrors)
+				}
+				c.ReportError("execution", fmt.Sprintf("Aborted: %d consecutive execution errors. Last error: %v", consecutiveErrors, err))
+				return fmt.Errorf("task aborted: %d consecutive execution errors: %w", consecutiveErrors, err)
+			}
+			
 			// LoopDetector will handle max iterations check on next iteration
-			fmt.Printf("[WARNING] Execution error: %v\n", err)
+			fmt.Printf("[WARNING] Execution error (%d/5): %v\n", consecutiveErrors, err)
 
 			// Use enhanced recovery system
 			recoveryCtx := &RecoveryContext{
@@ -373,6 +384,8 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 			})
 			continue
 		}
+
+		consecutiveErrors = 0
 
 		// Record execution metrics
 		if c.Tracer != nil {

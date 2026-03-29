@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 
@@ -157,7 +158,8 @@ Please discover what failed by examining the code, tests, and standard CI config
 (such as npm test, mix test, go test, etc.) and write a fix. Once fixed, create a PR.`, branch, sha)
 	}
 
-	ctx := context.Background()
+	timeoutCtx, cancel := context.WithTimeout(context.Background(), 25*time.Minute)
+	defer cancel()
 
 	backendName := "openrouter"
 	baseURL := "https://openrouter.ai/api/v1"
@@ -195,7 +197,7 @@ Please discover what failed by examining the code, tests, and standard CI config
 	executor := modes.NewAutonomousExecutorWithLive(provider, ".", queryModel, language, liveClient, reportConfig, backendName)
 
 	fmt.Println("🤖 Starting AutoFix process...")
-	err = executor.Execute(ctx, prompt)
+	err = executor.Execute(timeoutCtx, prompt)
 	if err != nil {
 		fmt.Printf("❌ AutoFix failed: %v\n", err)
 		return err

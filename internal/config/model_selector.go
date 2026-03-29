@@ -167,6 +167,12 @@ func (ms *ModelSelector) loadCatalog() error {
 				}
 			}
 
+			// Special case: OpenRouter free models typically lack tool support
+			if strings.Contains(modelIDLower, ":free") || strings.Contains(modelIDLower, "-free") || strings.Contains(modelNameLower, " free") {
+				model.Capabilities.SupportsTools = false
+				model.Capabilities.SupportsFileOperations = false
+			}
+
 			if caps, ok := modelMap["capabilities"].(map[string]interface{}); ok {
 				if val, ok := caps["supports_tools"].(bool); ok {
 					model.Capabilities.SupportsTools = val
