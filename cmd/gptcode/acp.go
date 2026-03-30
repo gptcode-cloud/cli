@@ -16,20 +16,28 @@ import (
 	"gptcode/internal/tools"
 )
 
+var (
+	acpHTTP bool
+	acpPort int
+)
+
 var acpCmd = &cobra.Command{
 	Use:   "acp",
 	Short: "Run as an ACP (Agent Client Protocol) agent",
-	Long: `Start GPTCode as an ACP-compliant agent, communicating via JSON-RPC 2.0 over stdio.
+	Long: `Start GPTCode as an ACP-compliant agent, communicating via JSON-RPC 2.0.
 
-This allows any ACP-compatible editor (Zed, JetBrains, Neovim, VS Code) to use
-GPTCode as their AI coding agent. The editor launches this command as a subprocess
-and communicates via stdin/stdout.
+By default, uses stdio transport (stdin/stdout). Any ACP-compatible editor
+(Zed, JetBrains, Neovim, VS Code) can launch this as a subprocess.
+
+With --http, starts an HTTP server for remote clients (e.g., Live dashboard).
 
 For more information, see: https://agentclientprotocol.com`,
 	RunE: runACP,
 }
 
 func init() {
+	acpCmd.Flags().BoolVar(&acpHTTP, "http", false, "Use HTTP transport instead of stdio")
+	acpCmd.Flags().IntVar(&acpPort, "port", 8080, "HTTP port (only with --http)")
 	rootCmd.AddCommand(acpCmd)
 }
 
@@ -49,10 +57,18 @@ func runACP(cmd *cobra.Command, args []string) error {
 	// Create the session handler that bridges ACP to our Maestro engine
 	handler := &acpSessionHandler{}
 
-	// Create and run the ACP server
+	// Create the ACP server
 	server := acp.NewServer(handler)
 	handler.server = server
 
+	if acpHTTP {
+		// HTTP transport for remote clients (Live dashboard, Fly.io)
+		fmt.Fprintf(os.Stderr, "[ACP] Starting HTTP transport on :%d\n", acpPort)
+		transport := acp.NewHTTPTransport(server, acpPort)
+		return transport.ListenAndServe(ctx)
+	}
+
+	// Default: stdio transport for local editors
 	return server.Run(ctx)
 }
 
@@ -185,7 +201,6 @@ func (h *acpSessionHandler) HandlePrompt(ctx context.Context, sessionID string, 
 		{Title: "Implementing changes", Status: "completed"},
 	})
 
-	// Get the list of modified files
 	emitter.EmitText("\n\n✅ Task completed successfully.")
 
 	return acp.SessionPromptResult{StopReason: "endTurn"}, nil
