@@ -345,7 +345,7 @@ func (c *Conductor) ExecuteTask(ctx context.Context, task string, complexity str
 				c.ReportError("execution", fmt.Sprintf("Aborted: %d consecutive execution errors. Last error: %v", consecutiveErrors, err))
 				return fmt.Errorf("task aborted: %d consecutive execution errors: %w", consecutiveErrors, err)
 			}
-			
+
 			// LoopDetector will handle max iterations check on next iteration
 			fmt.Printf("[WARNING] Execution error (%d/5): %v\n", consecutiveErrors, err)
 
