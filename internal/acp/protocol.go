@@ -80,13 +80,13 @@ const (
 	MethodRequestPermission = "session/request_permission"
 
 	// Client optional methods (agent → client)
-	MethodFSReadTextFile  = "fs/read_text_file"
-	MethodFSWriteTextFile = "fs/write_text_file"
-	MethodTerminalCreate  = "terminal/create"
-	MethodTerminalOutput  = "terminal/output"
-	MethodTerminalRelease = "terminal/release"
+	MethodFSReadTextFile   = "fs/read_text_file"
+	MethodFSWriteTextFile  = "fs/write_text_file"
+	MethodTerminalCreate   = "terminal/create"
+	MethodTerminalOutput   = "terminal/output"
+	MethodTerminalRelease  = "terminal/release"
 	MethodTerminalWaitExit = "terminal/wait_for_exit"
-	MethodTerminalKill    = "terminal/kill"
+	MethodTerminalKill     = "terminal/kill"
 
 	// Client notifications (agent → client)
 	MethodSessionUpdate = "session/update"
@@ -123,9 +123,9 @@ type FSCapabilities struct {
 
 // AgentCapabilities describes what the agent supports.
 type AgentCapabilities struct {
-	LoadSession       bool               `json:"loadSession"`
+	LoadSession        bool               `json:"loadSession"`
 	PromptCapabilities PromptCapabilities `json:"promptCapabilities"`
-	MCPCapabilities   MCPCapabilities    `json:"mcpCapabilities"`
+	MCPCapabilities    MCPCapabilities    `json:"mcpCapabilities"`
 }
 
 // PromptCapabilities describes what content types the agent accepts.
@@ -248,7 +248,7 @@ type SlashCommand struct {
 
 // RequestPermissionParams is sent from agent to client.
 type RequestPermissionParams struct {
-	SessionID   string `json:"sessionId"`
+	SessionID   string       `json:"sessionId"`
 	Permissions []Permission `json:"permissions"`
 }
 

@@ -15,18 +15,18 @@ import (
 // It reads JSON-RPC requests from stdin and writes responses/notifications to stdout.
 // Logging goes to stderr per the ACP spec.
 type Server struct {
-	reader  *bufio.Reader
-	writer  io.Writer
-	logger  io.Writer
-	mu      sync.Mutex // protects writer
-	nextID  atomic.Int64
+	reader *bufio.Reader
+	writer io.Writer
+	logger io.Writer
+	mu     sync.Mutex // protects writer
+	nextID atomic.Int64
 
 	// State
-	initialized      bool
-	clientCaps       ClientCapabilities
-	sessions         map[string]*Session
-	cancelFuncs      map[string]context.CancelFunc
-	sessionsMu       sync.Mutex
+	initialized bool
+	clientCaps  ClientCapabilities
+	sessions    map[string]*Session
+	cancelFuncs map[string]context.CancelFunc
+	sessionsMu  sync.Mutex
 
 	// Handler
 	handler SessionHandler
@@ -111,7 +111,7 @@ func (s *Server) Run(ctx context.Context) error {
 			continue
 		}
 
-		go s.handleMessage(ctx, line)
+		s.handleMessage(ctx, line)
 	}
 }
 
