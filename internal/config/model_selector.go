@@ -158,7 +158,7 @@ func (ms *ModelSelector) loadCatalog() error {
 			modelIDLower := strings.ToLower(model.ID)
 			modelNameLower := strings.ToLower(model.Name)
 			// Known model families that support tools
-			toolCapableModels := []string{"gpt-4", "gpt-4o", "gpt-4.5", "gpt-5", "claude-3", "claude-4", "gemini-2", "gemini-2.5", "sonar", "deepseek-chat", "llama-3.1", "llama-3.2", "llama-3.3", "mistral-large", "mistral-small", "mixtral", "qwen-2.5"}
+			toolCapableModels := []string{"gpt-4", "gpt-4o", "gpt-4.5", "gpt-5", "claude-3", "claude-4", "sonnet", "opus", "haiku", "gemini-2", "gemini-2.5", "sonar", "deepseek-chat", "llama-3.1", "llama-3.2", "llama-3.3", "mistral-large", "mistral-small", "mixtral", "qwen-2.5"}
 			for _, toolModel := range toolCapableModels {
 				if strings.Contains(modelIDLower, toolModel) || strings.Contains(modelNameLower, toolModel) {
 					model.Capabilities.SupportsTools = true
