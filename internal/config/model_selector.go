@@ -391,10 +391,13 @@ func (ms *ModelSelector) SelectModel(action ActionType, language string, complex
 				fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] Approved model %s failed: %v\n", approved.Model, err)
 			}
 		}
-		// All approved models failed - will notify about blocking later
+		// All approved models failed — do NOT fall through to scored catalog.
+		// The approved list is authoritative; falling back would defeat its purpose.
 		if os.Getenv("GPTCODE_DEBUG") == "1" {
-			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] All approved models failed for action=%s\n", action)
+			fmt.Fprintf(os.Stderr, "[MODEL_SELECTOR] All approved models failed for action=%s, refusing to use catalog fallback\n", action)
 		}
+		ms.logBlockedNotification(string(action), language)
+		return "", "", fmt.Errorf("all approved models failed for action=%s (check setup.yaml and models_catalog.json)", action)
 	}
 
 	type scoredModel struct {

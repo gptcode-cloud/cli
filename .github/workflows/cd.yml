@@ -150,6 +150,9 @@ jobs:
           git tag -a "$NEW_TAG" -m "Automated release $NEW_TAG"
           git push origin "$NEW_TAG"
       
+      - name: Build binary for E2E tests
+        run: go build -o $(go env GOPATH)/bin/gptcode ./cmd/gptcode
+        
       - name: Run tests
         run: go test -v ./...
       
