@@ -90,7 +90,7 @@ func (s *JSONLMemStore) LastRelevant(lang string) string {
 			ts = parsed.UTC().Format(time.RFC3339)
 		}
 
-		b.WriteString(fmt.Sprintf("• [%s] (%s) %s\n", ts, e.Language, e.File))
+		fmt.Fprintf(&b, "• [%s] (%s) %s\n", ts, e.Language, e.File)
 		sn := e.Snippet
 		if len(sn) > 800 {
 			sn = sn[:800] + "..."

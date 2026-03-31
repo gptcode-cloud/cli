@@ -210,9 +210,9 @@ func FormatBreakdown(breakdown *LanguageBreakdown) string {
 	for _, item := range sorted {
 		pct := item.pct * 100
 		bar := strings.Repeat("█", int(pct/5))
-		b.WriteString(fmt.Sprintf("  %-15s %5.1f%%  %s\n", item.lang, pct, bar))
+		fmt.Fprintf(&b, "  %-15s %5.1f%%  %s\n", item.lang, pct, bar)
 	}
-	b.WriteString(fmt.Sprintf("\nProject Context: %s\n", breakdown.Context))
+	fmt.Fprintf(&b, "\nProject Context: %s\n", breakdown.Context)
 
 	return b.String()
 }

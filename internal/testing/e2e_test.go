@@ -2,7 +2,6 @@ package testing
 
 import (
 	"os"
-	"path/filepath"
 	"testing"
 )
 
@@ -14,13 +13,7 @@ func TestGTVersion(t *testing.T) {
 	AssertContains(t, result.Output(), "GPTCode")
 }
 
-func TestGTStatus(t *testing.T) {
-	cli := NewCLI("gptcode")
-	cli.workDir = getTestWorkDir(t)
-	result := cli.Run("status")
-
-	AssertSuccess(t, result)
-}
+// TestGTStatus removed as status command no longer exists
 
 func TestGTHelp(t *testing.T) {
 	cli := NewCLI("gptcode")
@@ -82,38 +75,9 @@ func TestGTRunSimple(t *testing.T) {
 	}
 }
 
-func TestGTPRHelp(t *testing.T) {
-	cli := NewCLI("gptcode")
-	result := cli.Run("pr", "--help")
+// TestGTPRHelp and TestGTIssueHelp removed as pr/issue commands no longer exist on root
 
-	AssertSuccess(t, result)
-}
-
-func TestGTIssueHelp(t *testing.T) {
-	cli := NewCLI("gptcode")
-	result := cli.Run("issue", "--help")
-
-	AssertSuccess(t, result)
-}
-
-func TestGTInit(t *testing.T) {
-	if os.Getenv("CI") != "" {
-		t.Skip("Requires setup.yaml")
-	}
-	dir := t.TempDir()
-	cli := NewCLI("gptcode")
-	cli.workDir = dir
-
-	result := cli.Run("init")
-
-	AssertSuccess(t, result)
-
-	// Check that .gptcode was created
-	gptcodeDir := filepath.Join(dir, ".gptcode")
-	if _, err := os.Stat(gptcodeDir); os.IsNotExist(err) {
-		t.Errorf("Expected .gptcode directory to be created")
-	}
-}
+// TestGTInit removed as the init command no longer exists
 
 func TestGTSetupHelp(t *testing.T) {
 	cli := NewCLI("gptcode")
@@ -325,9 +289,4 @@ func TestGTConfigHelp(t *testing.T) {
 	AssertSuccess(t, result)
 }
 
-func TestGTDoctorHelp(t *testing.T) {
-	cli := NewCLI("gptcode")
-	result := cli.Run("status", "--help")
-
-	AssertSuccess(t, result)
-}
+// TestGTDoctorHelp removed as status command no longer exists

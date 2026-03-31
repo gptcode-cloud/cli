@@ -77,7 +77,6 @@ func TestProtocolTypes(t *testing.T) {
 type mockHandler struct {
 	promptCalled bool
 	promptText   string
-	emittedTexts []string
 }
 
 func (m *mockHandler) HandlePrompt(ctx context.Context, sessionID string, content []ContentBlock, emitter UpdateEmitter) (SessionPromptResult, error) {
