@@ -5,18 +5,18 @@ import "testing"
 func TestLoopDetector_ToolLoops(t *testing.T) {
 	detector := NewLoopDetector("edit")
 
-	// Call same tool 4 times - should not trigger loop
-	for i := 0; i < 4; i++ {
+	// Call same tool 2 times - should not trigger loop
+	for i := 0; i < 2; i++ {
 		isLoop, _ := detector.RecordToolCall("read_file", `{"path": "/test.go"}`)
 		if isLoop {
-			t.Errorf("Expected no loop detection at call %d, threshold is 5", i+1)
+			t.Errorf("Expected no loop detection at call %d, threshold is 3", i+1)
 		}
 	}
 
-	// 5th call should trigger loop
+	// 3rd call should trigger loop
 	isLoop, reason := detector.RecordToolCall("read_file", `{"path": "/test.go"}`)
 	if !isLoop {
-		t.Error("Expected loop detection at 5th identical call")
+		t.Error("Expected loop detection at 3rd identical call")
 	}
 	if reason == "" {
 		t.Error("Expected non-empty loop reason")
@@ -26,18 +26,18 @@ func TestLoopDetector_ToolLoops(t *testing.T) {
 func TestLoopDetector_ContentLoops(t *testing.T) {
 	detector := NewLoopDetector("query")
 
-	// Record same response 2 times - should not trigger
-	for i := 0; i < 2; i++ {
+	// Record same response 1 time - should not trigger
+	for i := 0; i < 1; i++ {
 		isLoop, _ := detector.RecordResponse("I don't know the answer")
 		if isLoop {
-			t.Errorf("Expected no content loop at response %d, threshold is 3", i+1)
+			t.Errorf("Expected no content loop at response %d, threshold is 2", i+1)
 		}
 	}
 
-	// 3rd same response should trigger
+	// 2nd same response should trigger
 	isLoop, reason := detector.RecordResponse("I don't know the answer")
 	if !isLoop {
-		t.Error("Expected content loop at 3rd identical response")
+		t.Error("Expected content loop at 2nd identical response")
 	}
 	if reason == "" {
 		t.Error("Expected non-empty content loop reason")
@@ -49,10 +49,10 @@ func TestLoopDetector_IntentAwareLimits(t *testing.T) {
 		intent      string
 		expectedMax int
 	}{
-		{"query", 15},
-		{"edit", 25},
-		{"plan", 20},
-		{"research", 30},
+		{"query", 10},
+		{"edit", 15},
+		{"plan", 10},
+		{"research", 15},
 	}
 
 	for _, tt := range tests {

@@ -33,8 +33,8 @@ type LoopDetector struct {
 // NewLoopDetector creates a new loop detector with Claude Code-style thresholds
 func NewLoopDetector(intent string) *LoopDetector {
 	return &LoopDetector{
-		ToolLoopThreshold:    5, // Claude Code uses 5 consecutive tool calls
-		ContentLoopThreshold: 3, // More aggressive than Claude's 10
+		ToolLoopThreshold:    3, // Claude Code uses 5, but we reduce to 3 to save costs
+		ContentLoopThreshold: 2, // More aggressive than Claude's 10
 		toolCallHistory:      make([]string, 0),
 		responseHistory:      make([]string, 0),
 		Intent:               intent,
@@ -102,12 +102,12 @@ func (ld *LoopDetector) ShouldContinue() (shouldContinue bool, reason string) {
 	// Intent-aware progress checks
 	switch ld.Intent {
 	case "edit":
-		// For edit tasks: warn if no file modifications after many iterations
-		if ld.Iteration > 10 && ld.FileModifications == 0 {
+		// For edit tasks: abort if no file modifications after 7 iterations
+		if ld.Iteration >= 7 && ld.FileModifications == 0 {
 			if os.Getenv("GPTCODE_DEBUG") == "1" {
-				fmt.Fprintf(os.Stderr, "[LOOP_DETECTOR] Warning: edit task with no file modifications after %d iterations\n", ld.Iteration)
+				fmt.Fprintf(os.Stderr, "[LOOP_DETECTOR] Fatal: edit task with no file modifications after %d iterations\n", ld.Iteration)
 			}
-			// Don't stop, just warn - might still be researching
+			return false, fmt.Sprintf("Safety abort: %d iterations without file modifications", ld.Iteration)
 		}
 
 	case "query", "research":
@@ -121,11 +121,11 @@ func (ld *LoopDetector) ShouldContinue() (shouldContinue bool, reason string) {
 // getMaxIterationsForIntent returns the maximum iterations based on task intent
 func (ld *LoopDetector) getMaxIterationsForIntent() int {
 	limits := map[string]int{
-		"query":    15, // Query tasks are typically shorter
-		"edit":     25, // Edit tasks may need more iterations
-		"plan":     20, // Planning is moderate
-		"research": 30, // Research can be extensive
-		"":         20, // Default fallback
+		"query":    10, // Query tasks are typically shorter
+		"edit":     15, // Reduced from 25 to prevent runaway edits
+		"plan":     10, // Planning is moderate
+		"research": 15, // Research can be extensive but capped
+		"":         15, // Default fallback
 	}
 
 	if limit, ok := limits[ld.Intent]; ok {
