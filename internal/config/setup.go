@@ -486,66 +486,48 @@ func saveSetup(path string, setup *Setup) error {
 }
 
 func GetAPIKey(backendName string) string {
-	envVar := strings.ToUpper(backendName) + "_API_KEY"
-
-	if key := os.Getenv(envVar); key != "" {
-		return key
-	}
-
+	// keys.yaml takes priority over env vars
 	home, err := os.UserHomeDir()
-	if err != nil {
-		return ""
+	if err == nil {
+		keysPath := filepath.Join(home, ".gptcode", "keys.yaml")
+		if data, err := os.ReadFile(keysPath); err == nil {
+			var keys map[string]string
+			if err := yaml.Unmarshal(data, &keys); err == nil {
+				if val, ok := keys[backendName]; ok && val != "" {
+					return val
+				}
+			}
+		}
 	}
 
-	keysPath := filepath.Join(home, ".gptcode", "keys.yaml")
-	data, err := os.ReadFile(keysPath)
-	if err != nil {
-		return ""
-	}
-
-	var keys map[string]string
-	if err := yaml.Unmarshal(data, &keys); err != nil {
-		return ""
-	}
-
-	return keys[backendName]
+	// Fallback to env var
+	envVar := strings.ToUpper(backendName) + "_API_KEY"
+	return os.Getenv(envVar)
 }
 
 func LoadAPIKey(keyName string) string {
-	// First check environment variable
-	if val := os.Getenv(keyName); val != "" {
-		return val
-	}
-
-	// Then check keys.yaml
+	// keys.yaml takes priority over env vars
 	home, err := os.UserHomeDir()
-	if err != nil {
-		return ""
+	if err == nil {
+		keysPath := filepath.Join(home, ".gptcode", "keys.yaml")
+		if data, err := os.ReadFile(keysPath); err == nil {
+			var keys map[string]string
+			if err := yaml.Unmarshal(data, &keys); err == nil {
+				// Try exact match first
+				if val, ok := keys[keyName]; ok && val != "" {
+					return val
+				}
+				// Try without _API_KEY suffix
+				cleanName := strings.TrimSuffix(keyName, "_API_KEY")
+				if val, ok := keys[cleanName]; ok && val != "" {
+					return val
+				}
+			}
+		}
 	}
 
-	keysPath := filepath.Join(home, ".gptcode", "keys.yaml")
-	data, err := os.ReadFile(keysPath)
-	if err != nil {
-		return ""
-	}
-
-	var keys map[string]string
-	if err := yaml.Unmarshal(data, &keys); err != nil {
-		return ""
-	}
-
-	// Try exact match first
-	if val, ok := keys[keyName]; ok {
-		return val
-	}
-
-	// Try without _API_KEY suffix
-	cleanName := strings.TrimSuffix(keyName, "_API_KEY")
-	if val, ok := keys[cleanName]; ok {
-		return val
-	}
-
-	return ""
+	// Fallback to env var
+	return os.Getenv(keyName)
 }
 
 func saveAPIKeyToKeysFile(backendName, apiKey string) error {
