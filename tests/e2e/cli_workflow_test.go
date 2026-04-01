@@ -116,7 +116,7 @@ func main() {
 		if err != nil {
 			// Skip test if API key is not available (expected in CI environment)
 			errMsg := err.Error()
-			if strings.Contains(errMsg, "API key") || strings.Contains(errMsg, "Provider returned error") || strings.Contains(errMsg, "no such file or directory") {
+			if strings.Contains(errMsg, "API key") || strings.Contains(errMsg, "Provider returned error") || strings.Contains(errMsg, "no such file or directory") || strings.Contains(errMsg, "User not found") {
 				t.Skipf("Skipping: %v", err)
 			}
 			t.Fatalf("Plan command failed: %v", err)
