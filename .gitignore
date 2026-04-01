@@ -64,3 +64,6 @@ supabase/.temp/
 
 # Training sandbox
 training-sandbox/
+
+# Test workspaces
+chu-test-workspace/
