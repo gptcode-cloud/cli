@@ -17,6 +17,23 @@ class SiteIdentityTest < Minitest::Test
     assert_includes File.read(File.join(DOCS_ROOT, "_config.yml")), 'url: "https://gptcode.dev"'
   end
 
+  def test_main_site_workflow_deploys_to_cloudflare_pages
+    workflow = File.read(
+      File.join(REPO_ROOT, ".github", "workflows", "pages.yml")
+    )
+
+    assert_includes workflow,
+                    "cloudflare/wrangler-action@ebbaa1584979971c8614a24965b4405ff95890e0"
+    assert_includes workflow,
+                    'apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}'
+    assert_includes workflow,
+                    'accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}'
+    assert_includes workflow,
+                    "pages deploy docs/_site --project-name=gptcode --branch=main"
+    refute_includes workflow, "gitHubToken:"
+    refute_includes workflow, "deployments: write"
+  end
+
   def test_site_points_to_personal_repository
     assert_includes combined_content, "https://github.com/jadercorrea/gptcode"
     refute_includes combined_content, "github.com/gptcode-cloud"
