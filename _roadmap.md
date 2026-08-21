@@ -22,6 +22,7 @@ engineering portfolio.
 - [x] Publish the site changes to the `main` branch.
 - [x] Move authoritative DNS for `gptcode.dev` from GoDaddy to Cloudflare.
 - [x] Associate `gptcode.dev` and `www.gptcode.dev` with Cloudflare Pages.
+- [x] Deploy Jekyll changes merged to `main` automatically to Cloudflare Pages.
 - [x] Publish a race-safe example with behavior tests and 100% statement coverage enforced in CI.
 - [x] Replace the legacy scheduled/private release pipeline with explicit, verified tag releases.
 - [x] Verify custom-domain certificate activation and HTTPS after DNS propagation.
