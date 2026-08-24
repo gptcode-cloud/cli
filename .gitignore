@@ -36,6 +36,7 @@ vendor/
 dist/
 build/
 bin/
+/_site/
 
 # IDE
 .vscode/
