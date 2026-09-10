@@ -30,6 +30,7 @@ class SiteIdentityTest < Minitest::Test
                     'accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}'
     assert_includes workflow,
                     "pages deploy docs/_site --project-name=gptcode --branch=main"
+    assert_includes workflow, "node --test test/webmcp_test.js"
     refute_includes workflow, "gitHubToken:"
     refute_includes workflow, "deployments: write"
   end
@@ -93,6 +94,27 @@ class SiteIdentityTest < Minitest::Test
     assert_includes config, "https://www.linkedin.com/in/jadercorrea"
     assert_path_exists File.join(DOCS_ROOT, "robots.txt")
     assert_path_exists File.join(DOCS_ROOT, "llms.txt")
+  end
+
+  def test_site_exposes_read_only_webmcp_tools
+    layout = File.read(File.join(DOCS_ROOT, "_layouts", "default.html"))
+    webmcp = File.read(File.join(DOCS_ROOT, "assets", "webmcp.js"))
+
+    assert_includes layout, "'/assets/webmcp.js' | relative_url"
+    assert_path_exists File.join(DOCS_ROOT, "webmcp-index.json")
+    assert_includes webmcp, "document.modelContext.registerTool"
+
+    %w[
+      get_gptcode_overview
+      search_gptcode_content
+      read_gptcode_page
+    ].each do |tool_name|
+      assert_includes webmcp, %(name: "#{tool_name}")
+    end
+
+    assert_includes webmcp, "readOnlyHint: true"
+    assert_includes webmcp, "untrustedContentHint: true"
+    refute_match(/input\.(url|host|origin)/, webmcp)
   end
 
   def test_footer_connects_the_project_to_its_creator

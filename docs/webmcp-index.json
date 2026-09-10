@@ -1,0 +1,39 @@
+---
+layout: null
+permalink: /webmcp-index.json
+---
+{% assign published_pages = site.pages | where_exp: "item", "item.title" %}
+{
+  "generatedAt": {{ site.time | date_to_xmlschema | jsonify }},
+  "pages": [
+    {% for item in published_pages %}
+    {
+      "title": {{ item.title | jsonify }},
+      "section": "documentation",
+      "path": {{ item.url | relative_url | jsonify }},
+      "summary": {{ item.description | default: item.excerpt | default: item.content | strip_html | normalize_whitespace | truncate: 400 | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  "posts": [
+    {% for item in site.posts %}
+    {
+      "title": {{ item.title | jsonify }},
+      "section": "blog",
+      "path": {{ item.url | relative_url | jsonify }},
+      "published": {{ item.date | date_to_xmlschema | jsonify }},
+      "summary": {{ item.description | default: item.excerpt | strip_html | normalize_whitespace | truncate: 400 | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ],
+  "skills": [
+    {% for item in site.skills %}
+    {
+      "title": {{ item.title | default: item.name | jsonify }},
+      "section": "skills",
+      "path": {{ item.url | relative_url | jsonify }},
+      "summary": {{ item.description | default: item.excerpt | default: item.content | strip_html | normalize_whitespace | truncate: 400 | jsonify }}
+    }{% unless forloop.last %},{% endunless %}
+    {% endfor %}
+  ]
+}

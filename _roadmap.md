@@ -27,6 +27,7 @@ engineering portfolio.
 - [x] Replace the legacy scheduled/private release pipeline with explicit, verified tag releases.
 - [x] Verify custom-domain certificate activation and HTTPS after DNS propagation.
 - [x] Align the README and GitHub metadata with the repository-centered verification thesis.
+- [x] Expose read-only WebMCP tools for project overview, content search, and indexed page retrieval.
 - [x] Publish an executable quality contract, security policy, support policy, and contribution templates.
 - [x] Use one `make verify` quality gate locally, in CI, and before tagged releases.
 - [x] Remove tracked binaries, traces, and scratch scripts from the public repository.
